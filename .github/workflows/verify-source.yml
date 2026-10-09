@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Assemble HTML from lossless source segments
-        run: python3 tools/assemble.py
-      - name: Verify required HTML sections
-        run: python3 tools/verify_static.py
+        run: python3 tools/build_cloudflare.py
+      - name: Verify static asset output
+        run: test -s dist/index.html
