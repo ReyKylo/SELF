@@ -306,3 +306,39 @@
 .rey-pro .rv-note-return label{font-size:10px;color:#7091b4;display:flex;align-items:center;gap:7px}
 .rey-pro .rv-note-return select,.rey-pro .rv-notes-quick select{border:1px solid #dce9f8;background:#fff;border-radius:7px;padding:8px;color:#4276ab;font-size:10px}
 .rey-pro .rv-collection-help{font-size:10px;margin:12px 0 0;color:#90a6c0}
+
+/* V4.1 — fluid application width and compact calendar sidebar.
+   Previously the legacy @media(min-width:1500px) .shell capped the app at
+   1600px, leaving the page background empty on wider or zoomed displays.
+   Preserve writing-focus mode's intentionally constrained reading width. */
+body.rey-pro:not(.writing-focus) > .shell,
+body.rey-pro:not(.writing-focus) .shell {
+  max-width: none !important;
+  width: calc(100% - 24px) !important;
+  margin: 12px !important;
+  box-sizing: border-box;
+}
+body.rey-pro:not(.writing-focus) .workspace {
+  flex: 1 1 0;
+  min-width: 0;
+}
+body.rey-pro:not(.writing-focus) .content-grid {
+  min-width: 0;
+  max-width: none;
+  width: 100%;
+}
+/* Calendar: a short Goals card should not grow to match the entire week grid. */
+body.rey-pro[data-page='calendar'] .rv-plan-columns {
+  align-items: start;
+}
+body.rey-pro[data-page='calendar'] .rv-plan-goals {
+  align-self: start;
+  height: auto;
+  min-height: 0;
+}
+@media (max-width: 760px) {
+  body.rey-pro:not(.writing-focus) .shell {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
