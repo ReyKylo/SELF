@@ -10,5 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Assemble HTML from lossless source segments
         run: python3 tools/build_cloudflare.py
+      - name: Validate cloud adapter JavaScript
+        run: node --check tools/self_cloud_runtime.js
       - name: Verify static asset output
         run: test -s dist/index.html

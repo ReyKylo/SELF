@@ -29,6 +29,19 @@ html = html.replace(route, "career:careerStudioReference,more:moreHub,", 1)
 html = html.replace(render_anchor, js + "\n" + render_anchor, 1)
 html = html.replace("</head>", '<style id="rey-career-reference-v3">\n' + css + '\n</style>\n</head>', 1)
 
+# Supabase V1 is additive to the verified Career V3 build. Hook only successful
+# IndexedDB saves; never alter the original checksummed source segments.
+cloud_runtime = (ROOT / "tools" / "self_cloud_runtime.js").read_text(encoding="utf-8")
+save_anchor = "return workspaceStorage.save(snapshot).then(()=>{storageOK=true;"
+assert html.count(save_anchor) == 1, "Expected exact successful local-save anchor"
+assert "function selfCloudDidPersist()" not in html, "Cloud extension already inserted"
+html = html.replace(save_anchor,
+                    "return workspaceStorage.save(snapshot).then(()=>{selfCloudDidPersist();storageOK=true;", 1)
+module_match = re.search(r'<script\s+type="module">(.*?)</script>', html, re.S)
+assert module_match is not None, "SELF module missing"
+html = html[:module_match.end(1)] + "\n" + cloud_runtime + "\n" + html[module_match.end(1):]
+
+
 # Verify the generated deployable JS, not just the existing source.
 match = re.search(r'<script\s+type="module">(.*?)</script>', html, re.S)
 if not match:
@@ -46,4 +59,5 @@ output.mkdir(parents=True, exist_ok=True)
 shutil.copy2(ROOT / "assets" / "career-landscape.svg", output / "career-landscape.svg")
 print(f"PASS: Career Reference V3 built with original Rey data and routes preserved")
 print(f"PASS: compiled JavaScript syntax")
+print("PASS: SELF cloud delta-sync included after local-save integration")
 print(f"Cloudflare static build ready: {output / 'index.html'} ({(output / 'index.html').stat().st_size:,} bytes)")
