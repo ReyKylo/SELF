@@ -50,3 +50,17 @@ See `docs/` for detailed handoff, UX spec, test limits, and career launch instru
 - `csv_templates/` — clean import templates.
 
 **Rey principle:** less decoration, more action; preserve the data you already have.
+
+## Cloudflare deployment
+
+The repo stores the 4.5 MB HTML as lossless source segments, so Cloudflare **must** run a build step before `npx wrangler deploy`.
+
+In **Cloudflare → Workers & Pages → Worker → Settings → Build**:
+
+- Build command: `python3 tools/build_cloudflare.py`
+- Deploy command: `npx wrangler deploy`
+- Root directory: repo root
+
+The repo's `wrangler.jsonc` points Wrangler to `dist/`. **Confirm that `wrangler.jsonc`'s `name` matches the Worker linked to this Git repository before deployment.**
+
+The build verifies source integrity and deploys only `dist/index.html` (not `app/segments`). See [docs/07_CLOUDFLARE_DEPLOY.md](docs/07_CLOUDFLARE_DEPLOY.md) for checks, privacy caveats, and troubleshooting.
