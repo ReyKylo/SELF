@@ -1,22 +1,49 @@
 #!/usr/bin/env python3
-"""Prepare a verified static-only Rey Workspace build for Cloudflare Workers assets.
+"""Build the existing Rey app, then apply an isolated Career dashboard visual layer.
 
-Cloudflare Workers Builds:
-  Build command:  python3 tools/build_cloudflare.py
-  Deploy command: npx wrangler deploy
-
-The deployed dist/ folder contains ONLY index.html. It does not expose the
-lossless source segments, Python scripts, documents, or research templates.
+The underlying 4.5 MB application source and storage logic are unchanged.
+Only dist/ is deployed. All source integrity and JS syntax checks must pass.
 """
 from pathlib import Path
 import subprocess
 import shutil
 import sys
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 subprocess.run([sys.executable, str(ROOT / "tools" / "assemble.py")], cwd=ROOT, check=True)
 subprocess.run([sys.executable, str(ROOT / "tools" / "verify_static.py")], cwd=ROOT, check=True)
-dist = ROOT / "dist"
-dist.mkdir(exist_ok=True)
-shutil.copy2(ROOT / "app" / "index.html", dist / "index.html")
-print(f"Cloudflare static build ready: {dist / 'index.html'} ({(dist / 'index.html').stat().st_size:,} bytes)")
+
+html = (ROOT / "app" / "index.html").read_text(encoding="utf-8")
+css = (ROOT / "tools" / "career_reference_v3.css").read_text(encoding="utf-8")
+js = (ROOT / "tools" / "career_reference_v3.js").read_text(encoding="utf-8")
+
+route = "career:careerStudio,more:moreHub,"
+render_anchor = "function render(){document.body.dataset.page=page;"
+assert html.count(route) == 1, "Expected exact existing Career route; refusing unsafe patch"
+assert html.count(render_anchor) == 1, "Expected exact render anchor; refusing unsafe patch"
+assert html.count("</head>") == 1, "Expected one HTML head closing tag"
+assert "careerStudioReference" not in html, "Career reference extension already included"
+
+html = html.replace(route, "career:careerStudioReference,more:moreHub,", 1)
+html = html.replace(render_anchor, js + "\n" + render_anchor, 1)
+html = html.replace("</head>", '<style id="rey-career-reference-v3">\n' + css + '\n</style>\n</head>', 1)
+
+# Verify the generated deployable JS, not just the existing source.
+match = re.search(r'<script\s+type="module">(.*?)</script>', html, re.S)
+if not match:
+    raise SystemExit("FAIL: Rey JavaScript module was not found after Career patch")
+checker = ROOT / "tools" / "_qa_career_deploy.mjs"
+try:
+    checker.write_text(match.group(1), encoding="utf-8")
+    subprocess.run(["node", "--check", str(checker)], cwd=ROOT, check=True)
+finally:
+    checker.unlink(missing_ok=True)
+
+output = ROOT / "dist"
+output.mkdir(parents=True, exist_ok=True)
+(output / "index.html").write_text(html, encoding="utf-8")
+shutil.copy2(ROOT / "assets" / "career-landscape.svg", output / "career-landscape.svg")
+print(f"PASS: Career Reference V3 built with original Rey data and routes preserved")
+print(f"PASS: compiled JavaScript syntax")
+print(f"Cloudflare static build ready: {output / 'index.html'} ({(output / 'index.html').stat().st_size:,} bytes)")

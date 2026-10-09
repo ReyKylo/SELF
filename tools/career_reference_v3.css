@@ -1,0 +1,129 @@
+/* Rey Career Reference V3 — screenshot-aligned presentation without altering data or global routes. */
+.rey-pro[data-page='career'] .content-grid{padding:18px 22px 30px!important}
+.rey-pro[data-page='career'] .workspace{background:linear-gradient(155deg,#fafcff 0%,#fff 55%,#f6faff 100%)!important}
+.rey-pro[data-page='career'] main{max-width:1600px!important}
+.rx-career{color:#0a2654;font-family:'DM Sans',sans-serif}
+.rx-career .rx-icon{display:inline-block;flex-shrink:0;vertical-align:middle}
+.rx-dashboard{display:grid;grid-template-columns:minmax(0,1fr) 277px;gap:20px;align-items:start}
+.rx-main-column,.rx-side-column{min-width:0}
+.rx-main-column{display:flex;flex-direction:column;gap:15px}
+.rx-side-column{display:flex;flex-direction:column;gap:15px}
+.rx-hero{position:relative;overflow:hidden;isolation:isolate;border:1px solid #c9e0ff;border-radius:15px;min-height:263px;padding:26px 30px;background:linear-gradient(114deg,#e3f2ff 0%,#e8f4ff 34%,#d9eaff 60%,#aecff6 100%);box-shadow:0 9px 25px #3375cb0a}
+.rx-hero-content{position:relative;z-index:3;max-width:62%}
+.rx-hero-kicker{font-size:10px;color:#3c669e;font-weight:700;letter-spacing:.15px;display:flex;align-items:center;gap:7px;margin-bottom:16px}
+.rx-hero-kicker .rx-icon{width:15px;height:15px}
+.rx-hero h1{font:800 clamp(27px,3vw,34px)/1.14 'Manrope',sans-serif;letter-spacing:-1.1px;color:#071f4b;margin:0 0 7px}
+.rx-hero .rx-waving{color:#ebac5b;font-weight:500;font-size:.75em}
+.rx-hero h2{font:800 clamp(15px,1.45vw,18px)/1.35 'Manrope',sans-serif;letter-spacing:-.45px;margin:0 0 8px;color:#0b2a57;max-width:495px}
+.rx-hero p{font-size:12px;line-height:1.7;color:#385981;max-width:385px;margin:0}
+.rx-hero-buttons{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap}
+.rx-blue-btn,.rx-white-btn,.rx-outline-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;padding:11px 15px;font-size:11px;font-weight:700;line-height:1.2;white-space:nowrap;border:1px solid transparent;transition:transform .18s,box-shadow .18s,background .18s;cursor:pointer}
+.rx-blue-btn{color:white;background:linear-gradient(135deg,#176be6,#0644af);box-shadow:0 5px 13px #1b59b432;border-color:#2869d3}
+.rx-blue-btn:hover{background:linear-gradient(135deg,#2675e5,#0b3e9b);transform:translateY(-1px)}
+.rx-white-btn,.rx-outline-btn{color:#1d4a88;background:#ffffffda;border-color:#74a7f4;box-shadow:0 4px 12px #6c99cf12}
+.rx-white-btn:hover,.rx-outline-btn:hover{background:#fff;transform:translateY(-1px)}
+.rx-blue-btn .rx-icon,.rx-white-btn .rx-icon,.rx-outline-btn .rx-icon{width:15px;height:15px}
+.rx-hero-art{position:absolute;z-index:1;inset:0 0 0 36%;background-image:url('./career-landscape.svg');background-repeat:no-repeat;background-position:right bottom;background-size:cover;mask-image:linear-gradient(to right,transparent 0%,#000 24%);pointer-events:none}
+.rx-hero-quote{position:absolute;z-index:2;top:46px;right:17%;font:italic 17px/1.25 'Caveat',cursive;color:#194e92;transform:rotate(-8deg);opacity:.9;pointer-events:none;letter-spacing:.3px}
+.rx-navigation{display:flex;align-items:center;gap:5px;overflow:auto;scrollbar-width:thin;border-bottom:1px solid #e2eafa;padding:0 2px 1px;min-height:42px}
+.rx-tab{position:relative;border:0;background:none;color:#7890ae;font-size:11px;font-weight:650;white-space:nowrap;padding:11px 14px;border-radius:7px 7px 0 0}
+.rx-tab.active{color:#1559b5;background:#eef5ff}
+.rx-tab.active::after{content:'';position:absolute;height:3px;background:#2775e4;bottom:0;left:8px;right:8px;border-radius:5px}
+.rx-tab:hover{color:#1765be;background:#f3f7fd}
+.rx-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.rx-stat{display:flex;align-items:center;gap:11px;text-align:left;border:1px solid #e0e9f6;background:#fff;padding:15px 12px;border-radius:12px;box-shadow:0 3px 12px #1a559012;min-height:96px;min-width:0;transition:transform .17s,box-shadow .17s}
+.rx-stat:hover{transform:translateY(-2px);box-shadow:0 7px 20px #1c5c991c;border-color:#c5daf7}
+.rx-stat-icon{display:grid;place-items:center;width:43px;height:43px;min-width:43px;border-radius:11px;background:linear-gradient(145deg,#deefff,#eff6ff);color:#1765cb}
+.rx-stat-icon .rx-icon{width:21px;height:21px;stroke-width:2.15}
+.rx-stat-info{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.rx-stat-info small{font-size:9px;color:#7084a2;line-height:1.3}
+.rx-stat-info strong{font:800 23px/1.05 Manrope,sans-serif;color:#0c2853;letter-spacing:-.6px}
+.rx-stat-info em{font-size:8px;color:#89a0bb;font-style:normal;line-height:1.35;white-space:normal}
+.rx-stat-arrow{color:#7797c5;margin-left:auto;align-self:center}
+.rx-stat-arrow .rx-icon{width:13px;height:13px}
+.rx-work-grid{display:grid;grid-template-columns:minmax(0,1.16fr) minmax(0,.94fr);gap:14px;align-items:stretch}
+.rx-card,.rx-side-card{border:1px solid #e0e8f3;background:#fff;border-radius:12px;box-shadow:0 4px 17px #1c4f8510;overflow:hidden}
+.rx-card{padding:18px 19px}
+.rx-card-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.rx-card-heading h3,.rx-side-heading h3{display:flex;align-items:center;gap:9px;color:#0f305f;font:800 13px Manrope,sans-serif;letter-spacing:-.2px;margin:0}
+.rx-card-heading h3 .rx-icon,.rx-side-heading h3 .rx-icon{color:#1b6ddd;width:20px;height:20px}
+.rx-card-heading p{color:#8096ad;font-size:10px;margin:6px 0 0}
+.rx-link{display:inline-flex;gap:4px;align-items:center;color:#246bd3;border:0;background:transparent;font-size:10px;font-weight:650;white-space:nowrap;padding:4px 2px}
+.rx-link:hover{text-decoration:underline}
+.rx-link .rx-icon{width:12px;height:12px}
+.rx-follow-list{min-height:180px}
+.rx-follow-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #edf2f9;min-height:62px}
+.rx-follow-row:last-child{border-bottom:0}
+.rx-datecell{min-width:65px;display:flex;flex-direction:column;gap:3px}
+.rx-datecell strong{font-weight:700;font-size:11px;color:#20548a}
+.rx-datecell small{font-size:9px;color:#9aacc1}
+.rx-action-symbol{width:31px;height:31px;min-width:31px;display:grid;place-items:center;color:#236bc7;background:#edf5ff;border-radius:9px}
+.rx-action-symbol .rx-icon{width:17px;height:17px}
+.rx-follow-desc{min-width:0;flex:1}
+.rx-follow-desc strong{display:block;font-size:11px;font-weight:750;color:#153760;line-height:1.5;overflow-wrap:anywhere}
+.rx-follow-desc small{font-size:9px;color:#8496ae;display:block;line-height:1.5;overflow-wrap:anywhere}
+.rx-open-record{border:0;background:#eff6ff;color:#3376c2;border-radius:8px;padding:8px;display:grid;place-items:center}
+.rx-open-record:hover{background:#e2efff}
+.rx-open-record .rx-icon{width:13px;height:13px}
+.rx-calm-empty{text-align:center;padding:27px 8px 17px;color:#8096b1}
+.rx-empty-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:100%;background:#eef5ff;margin:0 auto 12px;color:#5588c4}
+.rx-calm-empty h4{color:#426991;font-size:12px;margin:0 0 6px}
+.rx-calm-empty p{font-size:10px;line-height:1.7;max-width:315px;margin:0 auto 10px}
+.rx-timeline{padding:2px 0 5px 9px;min-height:185px}
+.rx-activity-row{position:relative;border-left:1px solid #d5e4f7;display:flex;min-height:53px;gap:13px;padding:3px 0 10px 17px}
+.rx-activity-row:last-child{border-left-color:transparent}
+.rx-timeline-dot{position:absolute;left:-4px;top:7px;width:7px;height:7px;border-radius:50%;background:#2379ed;box-shadow:0 0 0 4px #f0f6ff}
+.rx-activity-text strong{font-size:10px;font-weight:700;line-height:1.4;color:#2b4771;display:block}
+.rx-activity-text small{font-size:9px;color:#9caec3;line-height:1.6}
+.rx-activity-empty{display:flex;justify-content:center;align-items:center;text-align:center;min-height:176px;color:#8aa0ba;font-size:11px;line-height:1.75}
+.rx-soft-label{font-size:9px;color:#91a5bc}
+.rx-command{padding-bottom:15px}
+.rx-command-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rx-command-tiles button{display:grid;grid-template-columns:20px auto;gap:4px 9px;align-items:center;text-align:left;background:linear-gradient(135deg,#f0f7ff,#e6f1fc);border:1px solid #e6eff9;border-radius:10px;padding:13px;color:#3e77b5}
+.rx-command-tiles button:nth-child(2){background:linear-gradient(135deg,#f0f7ff,#e9f7f7)}
+.rx-command-tiles button:nth-child(3){background:linear-gradient(135deg,#f6f1ff,#f4f7ff)}
+.rx-command-tiles button strong{font-size:19px;color:#174673}
+.rx-command-tiles button span{grid-column:1/-1;font-size:9px;color:#647f9f}
+.rx-command-tiles .rx-icon{width:18px;height:18px}
+.rx-recent .cr-table-row{padding:11px 0}
+.rx-quick{position:relative;overflow:hidden;border:1px solid #164999;background:linear-gradient(136deg,#0c2f89 0%,#1255ba 63%,#287fec 100%);color:#fff;border-radius:13px;padding:20px 19px 13px;box-shadow:0 8px 18px #1b66bf1c;min-height:263px}
+.rx-quick::before{content:'';position:absolute;right:-30px;bottom:-30px;width:180px;height:180px;background:radial-gradient(circle,#53aaff49,transparent 69%);pointer-events:none}
+.rx-quick-heading{margin-bottom:16px;position:relative}
+.rx-quick-heading h3{display:flex;align-items:center;gap:10px;font:800 15px 'Manrope',sans-serif;margin:0;color:#fff}
+.rx-quick-heading h3 .rx-icon{color:#d2e6ff;width:22px;height:22px}
+.rx-quick-heading p{font-size:10px;color:#bfd8fc;margin:6px 0 0 32px}
+.rx-quick>button{display:flex;align-items:center;gap:12px;width:100%;position:relative;padding:12px 1px;background:transparent;border:0;border-bottom:1px solid #ffffff1b;color:#f4f9ff;text-align:left;font-size:11px}
+.rx-quick>button:last-child{border-bottom:0}
+.rx-quick>button:hover{background:#ffffff10;padding-left:6px}
+.rx-quick>button .rx-icon:first-child{width:17px;height:17px}
+.rx-quick>button .rx-icon:last-child{margin-left:auto;width:14px;height:14px;opacity:.8}
+.rx-side-card{padding:17px 15px}
+.rx-side-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}
+.rx-side-heading h3{font-size:12px}
+.rx-side-heading h3 .rx-icon{width:16px;height:16px}
+.rx-side-illustration{height:103px;border-radius:9px;background:linear-gradient(108deg,#d8ecff,#f0f7ff 41%,#c9e2ff);background-image:url('./career-landscape.svg');background-size:cover;background-position:right 48%;border:1px solid #d8e8f6}
+.rx-side-follow-content{text-align:center;padding:12px 2px 1px}
+.rx-side-follow-content h4{font-size:12px;color:#15375f;margin:0 0 8px}
+.rx-side-follow-content p{font-size:10px;line-height:1.75;color:#718aa8;margin:0 auto 13px;max-width:210px}
+.rx-side-follow-content .rx-blue-btn{width:100%;font-size:10px;padding:10px}
+.rx-side-insight{background:linear-gradient(145deg,#f5faff,#e5f1ff)}
+.rx-side-insight p{font:italic 14px/1.55 'DM Serif Display',Georgia,serif;color:#244b81;text-align:center;margin:13px 9px}
+.rx-side-insight>small{display:block;text-align:center;color:#829ebf;letter-spacing:1px;font-size:8px}
+.rx-side-calendar{padding:0}
+.rx-side-calendar button{display:flex;align-items:center;gap:11px;padding:13px 15px;width:100%;border:0;background:transparent;color:#4f7098;font-size:11px;text-align:left}
+.rx-side-calendar button .rx-icon:first-child{width:17px;height:17px}
+.rx-side-calendar button .rx-icon:last-child{margin-left:auto;width:14px;height:14px}
+.rx-privacy{color:#90a3b9;font-size:9px;display:flex;gap:7px;align-items:center;line-height:1.6;padding:0 3px}
+.rx-privacy .rx-icon{width:13px;height:13px}
+.rx-interior-top{display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(110deg,#e7f3ff,#f5faff);padding:24px 29px;border:1px solid #d9e9fb;border-radius:13px 13px 0 0}
+.rx-kicker{font-size:9px;color:#4374ad;letter-spacing:1.5px;font-weight:700;margin-bottom:8px}
+.rx-interior-top h1{font:800 27px 'Manrope',sans-serif;margin:0;color:#113a69;letter-spacing:-.9px}
+.rx-interior-top p{font-size:11px;margin:8px 0 0;color:#778daa}
+.rx-interior .rx-navigation{margin-top:8px}
+.rx-interior-body{padding-top:20px}
+@media(max-width:1460px){.rx-dashboard{grid-template-columns:minmax(0,1fr) 245px;gap:14px}.rx-hero{min-height:270px;padding:23px}.rx-hero-content{max-width:70%}.rx-hero-quote{right:9%}.rx-stat{gap:8px;padding:12px 9px}.rx-stat-icon{width:36px;height:36px;min-width:36px}.rx-stat-info small{font-size:8px}.rx-stat-info strong{font-size:21px}.rx-stat-arrow{display:none}}
+@media(max-width:1230px){.rx-dashboard{grid-template-columns:minmax(0,1fr)}.rx-side-column{display:grid;grid-template-columns:1fr 1fr;align-items:start}.rx-quick{min-height:auto;grid-row:span 2}.rx-hero-content{max-width:60%}.rx-hero-quote{right:15%}.rx-stats{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){.rx-hero-content{max-width:67%}.rx-work-grid{grid-template-columns:1fr}.rx-stats{grid-template-columns:repeat(2,1fr)}.rx-hero-quote{display:none}.rx-hero-art{inset:0 0 0 36%}}
+@media(max-width:760px){.rey-pro[data-page='career'] .content-grid{padding:12px!important}.rx-dashboard{gap:12px}.rx-main-column,.rx-side-column{gap:12px}.rx-hero{min-height:272px;padding:24px 18px}.rx-hero-content{max-width:100%}.rx-hero-art{inset:35% 0 0 19%;opacity:.38;mask-image:linear-gradient(to right,transparent,#000 30%)}.rx-hero h1{font-size:29px}.rx-hero h2{font-size:16px;max-width:320px}.rx-hero p{font-size:11px;max-width:300px}.rx-hero-buttons{margin-top:18px}.rx-hero-quote{display:none}.rx-stat{min-height:89px}.rx-stat-icon{width:38px;height:38px;min-width:38px}.rx-stat-info strong{font-size:22px}.rx-navigation{gap:0}.rx-tab{padding:11px 10px;font-size:10px}.rx-side-column{grid-template-columns:1fr}.rx-quick{grid-row:auto;min-height:0}.rx-quick>button{padding:10px 3px}.rx-card{padding:16px}.rx-command-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}.rx-command-tiles button{padding:10px 8px}.rx-command-tiles button span{font-size:8px}.rx-interior-top{padding:18px;flex-wrap:wrap}.rx-interior-top h1{font-size:22px}}
+@media(max-width:400px){.rx-hero{min-height:302px}.rx-hero-buttons{flex-direction:column;align-items:stretch}.rx-hero-buttons button{width:100%}.rx-stat-icon{display:none}.rx-stat-info strong{font-size:23px}.rx-stats{gap:8px}.rx-command-tiles{grid-template-columns:1fr}.rx-card-heading h3{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.rx-career *{transition:none!important;animation:none!important}}
