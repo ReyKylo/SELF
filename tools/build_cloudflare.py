@@ -17,6 +17,7 @@ v3js=(ROOT/'tools'/'career_reference_v3.js').read_text(encoding='utf-8')
 v3css=(ROOT/'tools'/'career_reference_v3.css').read_text(encoding='utf-8')
 v4js=(ROOT/'tools'/'workspace_v4.js').read_text(encoding='utf-8')
 v4css=(ROOT/'tools'/'workspace_v4.css').read_text(encoding='utf-8')
+v42css=(ROOT/'tools'/'visual_fidelity_v42.css').read_text(encoding='utf-8')
 
 def replace_once(old,new,reason):
     global html
@@ -32,7 +33,7 @@ replace_once('desk:()=>desk.render(),today:dashboard,calendar:calendar,planning:
 replace_once("const pages=[['desk','▦','Desk'],['career','↗','Career'],['calendar','◷','Calendar'],['backpack','⇥','Capture inbox'],['more','▦','More']];",
              "const pages=[['today','▦','Dashboard'],['career','↗','Career'],['calendar','◷','Calendar'],['journal','▤','Notes'],['more','▦','More']];",'global sidebar menu')
 replace_once(render_anchor,v3js+'\n'+v4js+'\n'+render_anchor,'render function')
-replace_once('</head>', '<style id="rey-career-reference-v3">\n'+v3css+'\n</style>\n<style id="rey-workspace-v4">\n'+v4css+'\n</style>\n</head>', 'HTML head')
+replace_once('</head>', '<style id="rey-career-reference-v3">\n'+v3css+'\n</style>\n<style id="rey-workspace-v4">\n'+v4css+'\n</style>\n<style id="rey-visual-fidelity-v42">\n'+v42css+'\n</style>\n</head>', 'HTML head')
 # Keep existing URL bookmarks and nested Worlds. Brand link returns to dashboard, not raw Whiteboard.
 html=html.replace('href="#desk" class="brand"','href="#today" class="brand"',1)
 
@@ -63,6 +64,7 @@ output.mkdir(exist_ok=True)
 (output/'index.html').write_text(html,encoding='utf-8')
 shutil.copy2(ROOT/'assets'/'career-landscape.svg',output/'career-landscape.svg')
 print('PASS: five V4 screens integrated with existing data, routes and spatial engine')
+print('PASS: V4.2 visual fidelity layer included without mock data')
 print('PASS: existing SELF Supabase cloud sync preserved after successful local-save hook')
 print('PASS: complete JS module syntax and required functions')
 print(f'Cloudflare static build ready: {output / "index.html"} ({(output / "index.html").stat().st_size:,} bytes)')

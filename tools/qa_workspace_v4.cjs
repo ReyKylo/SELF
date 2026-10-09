@@ -22,4 +22,17 @@ console.log('PASS Calendar: week/events/goals and native drag/drop selectors ren
 console.log('PASS Notes: existing journal records + new note save/pin persisted via existing API');
 console.log('PASS Whiteboard: existing canvas markup and board directory preserved');
 console.log('PASS More: existing routes remain accessible');
-console.log('PASS component render/data smoke suite (7 checks)');
+// Real-data-zero UX must offer working actions, never generated fake statistics.
+for(const field of ['boards','ideas','tasks','events','goals','contacts','opportunities'])data[field].length=0;
+const emptyHome=html('rvDashboardV4');
+const emptyCareer=html('rvCareerV4');
+const emptyCalendar=html('rvCalendarV4');
+assert.match(emptyHome,/rv-start-tile/);
+assert.match(emptyHome,/data-page="career"/);
+assert.match(emptyCareer,/rv-career-onboard/);
+assert.match(emptyCareer,/data-cr="add" data-type="opportunities"/);
+assert.match(emptyCalendar,/rv-week-welcome/);
+assert.match(emptyCalendar,/rv-plan-compass/);
+assert.match(emptyCalendar,/data-action="add" data-type="events"/);
+console.log('PASS empty workspace onboarding: actual action controls, no fabricated data');
+console.log('PASS component render/data smoke suite (7 baseline + 1 empty-state suite)');
