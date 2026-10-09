@@ -1,0 +1,33 @@
+{
+  "output": "app/index.html",
+  "sha256": "6a41ca200e68278c111d4a95a8298847dddbd471083f3fe903722c2ec73426c9",
+  "bytes": 4518845,
+  "parts": [
+    "app/segments/part_000.txt",
+    "app/segments/part_001.txt",
+    "app/segments/part_002.txt",
+    "app/segments/part_003.txt",
+    "app/segments/part_004.txt",
+    "app/segments/part_005.txt",
+    "app/segments/part_006.txt",
+    "app/segments/part_007.txt",
+    "app/segments/part_008.txt",
+    "app/segments/part_009.txt",
+    "app/segments/part_010.txt",
+    "app/segments/part_011.txt",
+    "app/segments/part_012.txt",
+    "app/segments/part_013.txt",
+    "app/segments/part_014.txt",
+    "app/segments/part_015.txt",
+    "app/segments/part_016.txt",
+    "app/segments/part_017.txt",
+    "app/segments/part_018.txt",
+    "app/segments/part_019.txt",
+    "app/segments/part_020.txt",
+    "app/segments/part_021.txt",
+    "app/segments/part_022.txt",
+    "app/segments/part_023.txt",
+    "app/segments/part_024.txt",
+    "app/segments/part_025.txt"
+  ]
+}

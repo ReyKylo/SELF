@@ -1,0 +1,5 @@
+# Generated from app/segments/* via tools/assemble.py
+app/index.html
+__pycache__/
+*.pyc
+.DS_Store
