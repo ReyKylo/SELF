@@ -1,0 +1,25 @@
+/* Isolated render/data smoke tests. Not a replacement for browser end-to-end QA. */
+const vm=require('node:vm'), fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const source=fs.readFileSync(path.join(__dirname,'workspace_v4.js'),'utf8');
+const sampleDate='2026-10-10';
+const data={boards:[{id:'b1',title:'Product Thinking',kind:'project'}],ideas:[{id:'i1',boardId:'b1',title:'Idea'}],tasks:[{id:'t1',title:'Prepare interview',date:sampleDate,status:'Belum selesai'},{id:'t2',title:'Read documents',date:sampleDate,status:'Selesai'}],events:[{id:'e1',title:'Intro Call',start:sampleDate+'T10:00',end:sampleDate+'T10:30'}],journals:[{id:'j1',title:'Market research',date:sampleDate,body:'A good question',updatedAt:'2026-10-10T03:00:00.000Z'}],goals:[{id:'g1',title:'Career next step',deadline:'2026-11-01'}],contacts:[{id:'c1',title:'Contact A',connection:'Invitation pending',followup:sampleDate}],opportunities:[{id:'o1',title:'VC Internship',deadline:sampleDate,stage:'Dikirim'}],resources:[{id:'r1',title:'CV v1',category:'Career Document'}],companies:[{id:'x1',title:'Company A'}]};
+let saved=0,rendered=0;
+const c={document:{addEventListener() {},getElementById:()=>({value:'Career'})},rxIcon:(name)=>`<svg aria-label="${name}"></svg>`,RX_ICON_PATHS:{},h:v=>String(v??'').replaceAll('<','&lt;').replaceAll('"','&quot;'),active:kind=>data[kind]||[],data,uid:()=>`j${Date.now()}`,today:()=>sampleDate,dateLabel:(x)=>x?.slice(0,10)||'',monday:()=>sampleDate,addDays:(x,n)=>n?`2026-10-${String(10+n).padStart(2,'0')}`:x,find:(t,id)=>(data[t]||[]).find(x=>x.id===id),company:()=>'',careerCompanyName:()=> 'Company A',rxCareerNav:()=>'<nav>Career tabs</nav>',careerStudioReference:()=>'<section>Original Career</section>',careerCompanyId:'',careerTab:'today',careerTargets:()=>({}),calView:'week',calDate:sampleDate,monthCalendar:()=>'<div>Existing month view</div>',activity:[{title:'Added note',date:'2026-10-10T10:00:00'}],desk:{render:()=>'<section class="desk-surface"><div id="deskViewport"></div></section>'},journal:()=>'<div class="journal-workspace">Original editor</div>',journalId:'j1',persist:()=>{saved++;return Promise.resolve(true)},render:()=>{rendered++},writeJournal:(id)=>{c.journalId=id;c.rvNotesMode='editor'},toast:()=>{},navigator:{},clearInterval,setInterval};
+const ctx=vm.createContext(c);vm.runInContext(source,ctx,{filename:'workspace_v4.js'});
+const html=(f)=>vm.runInContext(f+'()',ctx);
+const dashboard=html('rvDashboardV4');assert.match(dashboard,/Workspace Saya/);assert.match(dashboard,/Product Thinking/);assert.match(dashboard,/Prepare interview/);assert.match(dashboard,/Intro Call/);
+const career=html('rvCareerV4');assert.match(career,/Focus Board/);assert.match(career,/rv-kanban-col/g);assert.match(career,/Waiting/);assert.match(career,/VC Internship/);
+const calendar=html('rvCalendarV4');assert.match(calendar,/Planning & Review/);assert.match(calendar,/Intro Call/);assert.match(calendar,/Career next step/);assert.match(calendar,/data-cal-drop/);
+const notes=html('rvNotesV4');assert.match(notes,/Catatan Saya/);assert.match(notes,/Market research/);assert.match(notes,/rvNotesQuick/);
+const wb=html('rvWhiteboardV4');assert.match(wb,/Whiteboard Studio/);assert.match(wb,/deskViewport/);assert.match(wb,/Product Thinking/);
+const more=html('rvMoreV4');assert.match(more,/All your spaces/);assert.match(more,/data-page="backpack"/);assert.match(more,/data-page="worlds"/);
+vm.runInContext('rvStartNote("New user thought\\nSave me")',ctx);assert.equal(data.journals.length,2);assert.equal(saved,1);assert.equal(rendered,1);assert.equal(data.journals[1].noteCollection,'Career');
+vm.runInContext('rvSetNote("j1","notePinned",true)',ctx);assert.equal(data.journals[0].notePinned,true);
+assert.equal(saved,2);
+console.log('PASS Dashboard: existing workspace/task/event content rendered');
+console.log('PASS Career: real opportunity/contact/task-derived Focus Board rendered');
+console.log('PASS Calendar: week/events/goals and native drag/drop selectors rendered');
+console.log('PASS Notes: existing journal records + new note save/pin persisted via existing API');
+console.log('PASS Whiteboard: existing canvas markup and board directory preserved');
+console.log('PASS More: existing routes remain accessible');
+console.log('PASS component render/data smoke suite (7 checks)');
