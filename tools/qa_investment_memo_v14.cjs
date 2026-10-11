@@ -40,7 +40,7 @@ assert.ok(ev('ii14Issues().some(x=>x.kind==="model"&&x.severity==="critical")'))
 ev("ii13State.adds=850");
 assert.equal(ev('ii14Outdated()'),false);
 click('mode','review');assert.match(ev('ii14Memo()'),/Completeness checks cleared/);
-click('mode','story');assert.match(ev('ii14Memo()'),/Draft Investment/); // storyboard should be accessible
+click('mode','story');assert.match(ev('ii14Memo()'),/Deck Storyboard/); // storyboard should be accessible
 assert.equal(ev('ii14DeckItems().length'),4);
 click('export-story');click('export-memo');click('export-html');
 for(const name of ['SELF_Shopify_2010_Slide_Storyboard.md','SELF_Shopify_2010_Investment_Memo_Draft.md','SELF_Shopify_2010_Printable_Memo.html'])assert.ok(downloads.includes(name),name);
