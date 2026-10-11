@@ -1,7 +1,7 @@
 /* SELF Investment Phase 1.3 model: deterministic finance mathematics, persistence, exports, research provenance. */
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 const root=__dirname;
-const inputs=['investment_intelligence_v1.js','investment_lab_v12.js','investment_model_v13.js','investment_memo_v14.js'].map(n=>fs.readFileSync(path.join(root,n),'utf8'));
+const inputs=['investment_intelligence_v1.js','investment_lab_v12.js','investment_model_v13.js','investment_memo_v14.js','investment_ic_deck_v15.js'].map(n=>fs.readFileSync(path.join(root,n),'utf8'));
 const store=new Map(),listeners={},notifications=[],downloads=[];let renders=0;
 const document={
  addEventListener:(kind,fn)=>{(listeners[kind]??=[]).push(fn)},
@@ -18,7 +18,7 @@ const context=vm.createContext({console,Math,Date,Number,Blob,URL:SafeURL,setTim
  rvMoreV4:()=>'<section><header>More</header></section>',
  toast:x=>notifications.push(x),render:()=>{renders++}
 });
-inputs.forEach((s,i)=>vm.runInContext(s,context,{filename:['v1.js','v12.js','v13.js','v14.js'][i]}));
+inputs.forEach((s,i)=>vm.runInContext(s,context,{filename:['v1.js','v12.js','v13.js','v14.js','v15.js'][i]}));
 const get=code=>vm.runInContext(code,context);
 const close=(got,want)=>assert.ok(Math.abs(got-want)<.00001,got+' expected '+want);
 const base=get("ii13Compute(ii13Params('base'))");
