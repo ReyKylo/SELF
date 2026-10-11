@@ -3,6 +3,7 @@ const II16_BASELINE='self.investment.cloud.baseline.v1';
 function ii16GetBaseline(id){const all=ii16Parse(localStorage.getItem(II16_BASELINE))||{};return all[id]||{}}
 function ii16SetBaseline(id,v){const all=ii16Parse(localStorage.getItem(II16_BASELINE))||{};all[id]=v;localStorage.setItem(II16_BASELINE,JSON.stringify(all))}
 function ii16CloudSnapshot(rows){const documents={};for(const r of rows){if(Object.hasOwn(II16_DOCS,r.document_key))documents[r.document_key]=r.payload}return {format:'SELF-Investment-Backup-v1',created:new Date().toISOString(),documents}}
+function ii16Canonical(value){if(Array.isArray(value))return '['+value.map(ii16Canonical).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+ii16Canonical(value[k])).join(',')+'}';return JSON.stringify(value)}
 let ii16CloudBusy=false;
 async function ii16CloudAction(action){
  if(ii16CloudBusy)throw Error('Previous cloud request is still running.');
@@ -32,7 +33,7 @@ async function ii16CloudAction(action){
   const local=ii16Snapshot(),remote=new Map(rows.map(r=>[r.document_key,r])),baseline=ii16GetBaseline(id);let n=0,skipped=0;
   for(const [kind,payload] of Object.entries(local.documents)){
    const existing=remote.get(kind);
-   if(existing&&JSON.stringify(existing.payload)===JSON.stringify(payload)){baseline[kind]=existing.revision;ii16SetBaseline(id,baseline);skipped++;continue}
+   if(existing&&ii16Canonical(existing.payload)===ii16Canonical(payload)){baseline[kind]=existing.revision;ii16SetBaseline(id,baseline);skipped++;continue}
    if(existing&&baseline[kind]!==existing.revision)throw Error('Conflict for '+kind+'. Cloud contains a different revision. Download and compare its backup before overwriting. '+n+' other drafts already uploaded.');
    const out=await bridge.write(kind,payload,existing?existing.revision:0);
    if(!Array.isArray(out)||out.length!==1)throw Error('Cloud update conflict for '+kind+'. Nothing overwritten for this document.');
