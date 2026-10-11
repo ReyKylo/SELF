@@ -214,16 +214,67 @@ async function run(){
  assert.match(await page.locator('.ii12-notes-list').innerText(),/Analyst scenario \(NOT historical\): Upside/);
  checks.push('Financial model CSV/Markdown export, sensitivity, keyboard exercise and assumption promotion survive reload');
 
+ await click(page,'view','memo');
+ await page.locator('.ii14-app').waitFor();
+ assert.equal(await page.locator('.ii14-section-pill').count(),6);
+ assert.match(await page.locator('.ii14-edit-canvas').innerText(),/Executive recommendation/);
+ await screenshot(page,'26-memo-editor');
+ await page.locator('[data-ii14="mode"][data-value="review"]').click();
+ assert.ok(await page.locator('.ii14-issue.critical').count()>0);
+ await screenshot(page,'27-memo-review-incomplete');
+ await page.locator('.ii14-toolbar-tab[data-ii14="mode"][data-value="write"]').click();
+ const thesisSentence='My independent view on Shopify in October 2010 considers merchant growth, retention risk, the expanding ecommerce software market, customer acquisition economics and valuation uncertainty. The original investor memo supports some initial assumptions, but the deal must be assessed without later outcomes. Additional cohort diligence and scenario checks are important before an investment committee decision.';
+ for(const key of ['summary','business','traction','model','risks','decision']){
+  await page.locator('.ii14-section-pill[data-ii14="section"][data-value="'+key+'"]').click();
+  await page.locator('textarea[data-ii14-draft="'+key+'"]').fill(thesisSentence);
+  const reference=page.locator('[data-ii14="toggle-ref"][data-value="'+key+'|source-mrr"]');
+  await reference.click();
+  assert.equal(await reference.getAttribute('aria-pressed'),'true');
+ }
+ await page.locator('select[data-ii14-select="recommendation"]').selectOption('invest');
+ await page.locator('textarea[data-ii14-pricing]').fill('Invest only if acquisition economics, merchant retention, and financing terms can be independently verified, including pre-money valuation.');
+ await page.locator('.ii14-toolbar-tab[data-ii14="mode"][data-value="review"]').click();
+ for(const k of ['terms','mrr','hindsight'])await page.locator('[data-ii14-flag="'+k+'"]').check();
+ await page.locator('.ii14-review-clear').waitFor();
+ await screenshot(page,'28-memo-review-clear');
+ checks.push('Investment memo six source-linked sections, as-of reconciliation and actionable review');
+ const mdPromise=page.waitForEvent('download');
+ await page.locator('[data-ii14="export-memo"]').click();
+ const memoDl=await mdPromise;
+ assert.equal(memoDl.suggestedFilename(),'SELF_Shopify_2010_Investment_Memo_Draft.md');
+ const mdText=fs.readFileSync(await memoDl.path(),'utf8');
+ assert.ok(mdText.includes('Executive recommendation')&&mdText.includes('Bessemer'));
+ const htmlPromise=page.waitForEvent('download');
+ await page.locator('[data-ii14="export-html"]').click();
+ const htmlDl=await htmlPromise;
+ assert.equal(htmlDl.suggestedFilename(),'SELF_Shopify_2010_Printable_Memo.html');
+ assert.match(fs.readFileSync(await htmlDl.path(),'utf8'),/<!DOCTYPE html>/);
+ await page.locator('.ii14-toolbar-tab[data-ii14="mode"][data-value="story"]').click();
+ assert.equal(await page.locator('.ii14-slide-tile').count(),4);
+ await page.locator('textarea[data-ii14-slide="thesis"]').fill('Why Shopify could be venture-scale in October 2010');
+ await screenshot(page,'29-memo-deck-storyboard');
+ const storyPromise=page.waitForEvent('download');
+ await page.locator('[data-ii14="export-story"]').click();
+ const storyDl=await storyPromise;
+ assert.equal(storyDl.suggestedFilename(),'SELF_Shopify_2010_Slide_Storyboard.md');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.locator('.ii14-app').waitFor();
+ assert.equal(await page.locator('textarea[data-ii14-slide="thesis"]').inputValue(),'Why Shopify could be venture-scale in October 2010');
+ const persisted=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.memo.v14')||'{}'));
+ assert.equal(persisted.drafts.summary,thesisSentence);
+ checks.push('Investment memo PDF-printable HTML, Markdown and story exports; authored sections survive refresh');
+
+
 
  await page.setViewportSize({width:390,height:844});
- for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile'],['model','24-model-mobile']]){
+ for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile'],['model','24-model-mobile'],['memo','30-memo-mobile']]){
   await click(page,'view',view);
   await page.waitForTimeout(120);
   await noOverflow(page,view+' mobile');
   await screenshot(page,file);
  }
  await page.setViewportSize({width:768,height:1024});
- for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet'],['model','25-model-tablet']]){
+ for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet'],['model','25-model-tablet'],['memo','31-memo-tablet']]){
   await click(page,'view',view);
   await noOverflow(page,view+' tablet');
   await screenshot(page,file);
@@ -258,7 +309,7 @@ async function run(){
  checks.push('Storage failure shows warning instead of falsely claiming success');
  await screenshot(blocked,'10-storage-warning');
  await deny.close();
- const report={ok:true,checkedAt:new Date().toISOString(),screenshots:25,checks};
+ const report={ok:true,checkedAt:new Date().toISOString(),screenshots:31,checks};
  fs.writeFileSync(path.join(ART,'report.json'),JSON.stringify(report,null,2));
  console.log('PASS Chromium E2E Investment Intelligence — '+checks.length+' checks');
  checks.forEach(item=>console.log('  PASS '+item));
