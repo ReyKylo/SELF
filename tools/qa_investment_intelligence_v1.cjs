@@ -3,6 +3,7 @@
 const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
 const path=require('node:path');
 const src=fs.readFileSync(path.join(__dirname,'investment_intelligence_v1.js'),'utf8');
+const src12=fs.readFileSync(path.join(__dirname,'investment_lab_v12.js'),'utf8');
 const storage=new Map(),listeners={};
 let renders=0,notifications=[];
 const document={
@@ -19,6 +20,7 @@ const ctx={document,localStorage,console,rvI:name=>'<svg>'+name+'</svg>',
  render:()=>{renders++},toast:v=>notifications.push(v),
  window:{},setTimeout:()=>{},Blob:function(){},URL:{createObjectURL:()=>'',revokeObjectURL:()=>{}}};
 const c=vm.createContext(ctx);vm.runInContext(src,c,{filename:'investment_intelligence_v1.js'});
+vm.runInContext(src12,c,{filename:'investment_lab_v12.js'});
 const call=expr=>vm.runInContext(expr,c);
 const home=call('iiAcademy()');
 assert.match(home,/Your Analyst Journey|Learn the thinking/);
