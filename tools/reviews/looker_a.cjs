@@ -23,6 +23,12 @@ function snapshot(populated){
  return {version:1,data,activity:populated?[{title:'Sample note created',date:'2026-10-11T01:00:00Z',type:'journals',id:'sample-journal'}]:[]};
 }
 const routes=[['today','.rv-home'],['career','.rv-focus-page'],['calendar','.rc5-page'],['journal','.rv-notes'],['desk','.rv-whiteboard']];
+async function settle(page){
+ // Wait for finite entrance animations rather than suppressing product motion.
+ await page.evaluate(async()=>{const finite=document.getAnimations().filter(a=>Number.isFinite(a.effect?.getComputedTiming().endTime));await Promise.race([Promise.allSettled(finite.map(a=>a.finished)),new Promise(r=>setTimeout(r,1500))]);});
+ await page.waitForTimeout(150); // One documented stabilization margin after entrance.
+ return page.evaluate(()=>[...document.querySelectorAll('main,.rv-page,.rc5-page')].map(e=>{let p=e;const ancestors=[];while(p){const s=getComputedStyle(p);ancestors.push({tag:p.tagName,class:p.className,opacity:s.opacity,animation:s.animationName});p=p.parentElement;}return {selector:e.className,ancestors};}));
+}
 async function observations(page){return page.evaluate(()=>{
  const visible=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none'};
  const describe=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {text:(e.innerText||e.getAttribute('aria-label')||'').trim().slice(0,160),tag:e.tagName,x:r.x,y:r.y,width:r.width,height:r.height,fontSize:s.fontSize,color:s.color,background:s.backgroundColor,scrollWidth:e.scrollWidth,clientWidth:e.clientWidth}};
@@ -30,7 +36,7 @@ async function observations(page){return page.evaluate(()=>{
  });}
 (async()=>{
  fs.mkdirSync(out,{recursive:true});
- const result={reviewer:'Looker A',build:process.env.GITHUB_SHA||'unspecified',evidence:'Automated remote Chromium runtime; not live normal-speed visual review',limits:['No continuous-motion judgement','No broad persistence/failure/performance signoff','Screenshots require independent visual inspection'],captures:[],defects:[],errors:[]};
+ const result={reviewer:'Looker A',build:process.env.GITHUB_SHA||'unspecified',evidence:'Automated remote Chromium runtime; not live normal-speed visual review',settling:'Finite animation finished promises with 1500ms ceiling, followed by 150ms stabilization',limits:['No continuous-motion judgement','No broad persistence/failure/performance signoff','Screenshots require independent visual inspection'],captures:[],interactions:[],defects:[],errors:[]};
  let browser;
  try{
   browser=await chromium.launch({headless:true});
@@ -44,13 +50,35 @@ async function observations(page){return page.evaluate(()=>{
     try{
      await page.goto(`${url}/#${route}`,{waitUntil:'domcontentloaded'});
      await page.locator(selector).waitFor({state:'visible',timeout:15000});
+     const opacity=await settle(page);
      await page.screenshot({path:path.join(out,`${name}-${route}.png`),fullPage:true});
-     const evidence=await observations(page);result.captures.push({fixture:populated?'Explicit synthetic sample':'Empty snapshot',route,...evidence});
+     const evidence=await observations(page);result.captures.push({fixture:populated?'Explicit synthetic sample':'Empty snapshot',route,opacity,...evidence});
      if(evidence.documentWidth>viewport.width+2)result.defects.push({severity:'major',route,name,issue:'Unintended document-level horizontal overflow',actual:evidence.documentWidth,expected:viewport.width,anchor:'V02'});
      if(evidence.overflowCandidates.length)result.defects.push({severity:'review',route,name,issue:'Controls outside viewport: inspect whether scoped canvas/table scrolling is intentional',controls:evidence.overflowCandidates,anchor:'V02/I04'});
      if(route==='today'&&populated){await page.locator('[data-rv="board-next"]').click();await page.locator('.rv-workspace-detail strong').filter({hasText:'Sample workspace 6'}).waitFor();await page.screenshot({path:path.join(out,`${name}-gallery-page2.png`),fullPage:true});}
      if(route==='journal'&&populated){await page.locator('[data-rv="notes-open"]').first().click();await page.locator('#writerBody').waitFor();await page.screenshot({path:path.join(out,`${name}-notes-editor.png`),fullPage:true});}
      if(route==='career'){await page.locator('[data-cr="tab"][data-id="pursue"]').first().click();await page.locator('.rx-career').waitFor();await page.screenshot({path:path.join(out,`${name}-career-opportunities.png`),fullPage:true});}
+     if(route==='calendar'&&populated){
+      const scroll=page.locator('.rc5-time-scroll');
+      const geometry=await scroll.evaluate(el=>{const before=el.scrollLeft;el.scrollLeft=el.scrollWidth;return {before,after:el.scrollLeft,clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,overflowX:getComputedStyle(el).overflowX};});
+      const event=page.locator('[data-cal-event="sample-event"]');
+      await event.scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`${name}-calendar-sunday.png`),fullPage:true});
+      await event.click();await page.locator('#detail[open] h2').filter({hasText:'Sample: Research conversation with a deliberately long title'}).waitFor();
+      await page.screenshot({path:path.join(out,`${name}-calendar-detail.png`),fullPage:true});
+      result.interactions.push({name,route,check:'A4 scoped calendar scroll and complete event identity',geometry,detail:await page.locator('#detail[open] h2').innerText(),result:'PASS'});
+      await page.keyboard.press('Escape');
+     }
+     if(route==='desk'&&populated){
+      const strip=page.locator('.desk-board-strip');
+      const geometry=await strip.evaluate(el=>{el.scrollLeft=el.scrollWidth;return {after:el.scrollLeft,clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,overflowX:getComputedStyle(el).overflowX};});
+      const later=strip.locator('.board-tab').filter({hasText:'Sample workspace 6'});await later.focus();
+      await page.keyboard.press('Tab');const next=await page.evaluate(()=>document.activeElement.textContent.trim());
+      if(!next.includes('Sample workspace 7'))throw Error('Desk keyboard traversal did not reach seventh board');
+      await page.keyboard.press('Tab');const newSpace=await page.evaluate(()=>document.activeElement.textContent.trim());
+      if(!newSpace.includes('Ruang baru'))throw Error('Desk keyboard traversal did not reach new-space control');
+      await page.screenshot({path:path.join(out,`${name}-desk-strip-keyboard.png`),fullPage:true});
+      result.interactions.push({name,route,check:'A7 later boards and new-space keyboard traversal',geometry,next,newSpace,result:'PASS'});
+     }
     }catch(e){result.defects.push({severity:'major',route,name,issue:'Review route or required interaction failed',error:e.message,anchor:'I01/V02'});}
    }
    await context.close();
