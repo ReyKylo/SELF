@@ -1,6 +1,6 @@
 /* Phase 1.4 independent memo editor & historical source-integrity regression checks. */
 const vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const modules=['investment_intelligence_v1.js','investment_lab_v12.js','investment_model_v13.js','investment_memo_v14.js'].map(x=>fs.readFileSync(path.join(__dirname,x),'utf8'));
+const modules=['investment_intelligence_v1.js','investment_lab_v12.js','investment_model_v13.js','investment_memo_v14.js','investment_ic_deck_v15.js'].map(x=>fs.readFileSync(path.join(__dirname,x),'utf8'));
 const listeners={},store=new Map(),downloads=[],messages=[];let renders=0;
 const document={addEventListener:(name,fn)=>{(listeners[name]??=[]).push(fn)},querySelector:()=>null,querySelectorAll:()=>[],getElementById:()=>null,body:{appendChild(){}},createElement:()=>({remove(){},click(){downloads.push(this.download)},set href(v){},set download(v){this._name=v},get download(){return this._name}})};
 class BlobURL extends URL{static createObjectURL(){return 'blob:unit'}static revokeObjectURL(){}}
