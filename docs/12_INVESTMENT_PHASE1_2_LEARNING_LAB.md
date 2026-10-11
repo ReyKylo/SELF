@@ -30,6 +30,7 @@
 - Correct choice is a practice completion signal, not professional analysis mastery.
 - Starter observations are **source-backed statements**, but a learner's added interpretation is not automatically verified.
 - Custom observations must include a URL, dated source, and adequate text. HTTP/HTTPS only; entries should be manually reviewed for historical relevance.
+- An entry dated after 2010-10-12 cannot be labeled as historical as-of evidence. Retrospective data cannot be used to save an as-of-2010 slide seed and is visibly flagged in preview.
 - The slide storyboard requires a user-written claim, a selected saved evidence note, and an implication. It **does not** create an editable PPTX, or certify investment recommendation quality.
 
 ## Storage, backups, and privacy
