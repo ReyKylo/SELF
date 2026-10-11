@@ -299,6 +299,7 @@ async function run(){
  const addedId=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.icdeck.v15')).activeSlide);
  await page.locator('[data-ii15="slide-delete"][data-value="'+addedId+'"]').click();
  assert.equal(await page.locator('.ii15-mini-slide').count(),6);
+ await page.locator('[data-ii15="select-slide"][data-value="seed-1"]').click();
  const powerpointPromise=page.waitForEvent('download');
  await page.locator('[data-ii15="export-pptx"]').click();
  const pptxDl=await powerpointPromise;
