@@ -38,8 +38,8 @@ click('step','video');assert.match(call('iiAcademy()'),/Startup Investor School/
 click('video-done');assert.equal(call('iiState.videoReviewed'),true);
 click('step','visual');assert.match(call('iiAcademy()'),/HYPOTHETICAL CUSTOMER GROWTH/);
 click('visual-done');assert.equal(call('iiState.exploreDone'),true);
-click('step','recall');click('quiz','','A');assert.equal(call('iiState.quizCorrect'),false);
-click('quiz','','B');assert.equal(call('iiState.quizCorrect'),true);
+click('step','recall');click('quiz-choice','A');click('quiz');assert.equal(call('iiState.quizCorrect'),false);
+click('quiz-choice','B');click('quiz');assert.equal(call('iiState.quizCorrect'),true);
 click('step','apply');assert.match(call('iiAcademy()'),/Your investment thesis/);
 const inputHandler=listeners.input[0];
 inputHandler({target:{closest:s=>s==='[data-ii-field]'?{dataset:{iiField:'thesis'},value:'The company demonstrates strong organic demand, but we must check retention.'}:null,id:''}});
