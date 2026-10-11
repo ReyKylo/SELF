@@ -32,3 +32,27 @@ The Notes editor's single-line title input clips a long title visually while ret
 V01/V04: FAIL for stated A1/A2 concerns. V05: bounded PASS for adult identity and differentiated representations. V02: no document overflow in captures; whole core-workflow pass withheld pending A3/A4/A7. S01: mostly supported; A5 minor remains. I01: only gallery pagination, Notes editor opening and Career tab transitions reproduced; all-control pass withheld. A01: Whiteboard BLOCKED and no formal full contrast audit. I03–I06, D01–D03 and P01–P04 are NOT VERIFIED by this visual scenario.
 
 No live normal-speed independent review occurred. No persistence/failure, mobile/tablet, full interaction, Investment-module or production-font claim is made. This report is one reviewer's first pass, not a joint council or release signoff. Builder should repair confirmed major craft gaps and provide settled-state evidence; Looker A will inspect changed states on the next named build.
+
+## Leader challenge clarification
+
+A2 is not a blanket rule that below-fold content fails or that a gallery-led home must be reordered. The concern is the disproportionate emphasis in this fixture: four empty preview regions take a second gallery row while one real active task becomes harder to locate. Compact preview height, a one-row scoped gallery, or panel ordering are all acceptable repairs while retaining the approved gallery-led identity and five-record page capacity. Reinspection must assess first-task/agenda discoverability at both laptop sizes, allowing ordinary deliberate scrolling. No arbitrary no-scroll or line-count threshold is imposed. A1 can be consolidated with an independently matching density finding from another reviewer after first-pass independence is complete.
+
+The round-two harness now waits for finite entrance animations (1500ms ceiling) plus a documented 150ms stabilization margin, captures ancestor opacity/animation data, and adds scoped Calendar Sunday/full-event-detail and Desk later-board/new-space keyboard traversal. These additions are unexecuted until the next CI run; A3 remains BLOCKED, not an accusation of persistent opacity.
+
+## Round 2 — independent closure
+
+Build `a44f0cce122ea9b2fe0c17216e17534bf5367500`, Actions run `38182485043`. Actual artifacts: `council/runtime-round2/looker-a`. Independently inspected repaired populated Dashboard and Career at both laptop sizes, settled Whiteboard, Calendar Sunday/detail, keyboard-focused board strip, and empty Dashboard/Notes. Twenty captures, no major automated findings or pageerrors.
+
+| Issue | Decision | Actual evidence |
+|---|---|---|
+| A1 Career density | CLOSED / bounded PASS | Side panels move below the main board at both reviewed laptop widths. Full record titles now have meaningful line lengths; metadata remains subordinate and the four states scan clearly. `sample-1366-career.png`, `sample-1440-career.png`. |
+| A2 Dashboard emphasis | CLOSED / bounded PASS | Five-card gallery capacity is preserved in a compact single row. Actual task and agenda are plainly visible in the first laptop view; previews remain honest. `sample-1366-today.png`, `sample-1440-today.png`. |
+| A3 Whiteboard fade | CLOSED as evidence gap | Settled captures are readable; main/page and all measured ancestors have opacity 1. `desk-enter` remains the named animation, so round-one fade is consistent with an early capture rather than evidence of lasting unreadability. No normal-speed easing judgement is made. |
+| A4 Calendar clipped Sunday | CLOSED / VERIFIED bounded disclosure | Actual scoped overflow auto, 655/720px at1366 and702/720px at1440. Scrolling exposes Sunday; ordinary event click opens the complete expected title in detail. Event truncation in a compact one-hour block is acceptable with this reproduced detail access. Horizontal-scroll discoverability remains a minor polish opportunity. |
+| A5 Zero-note copy | OPEN minor | Empty Notes still reports no matches despite zero notes/no search. Fast note capture remains visible and enabled. |
+| A6 Empty tile overlap | OPEN minor | First empty Dashboard tile still overlaps START HERE and its icon locally; title/action remain legible. |
+| A7 Desk later-board bounds | CLOSED / VERIFIED bounded traversal | Strip overflow auto; at1366 client861/scroll1658, at1440 client935/scroll1658. Later boards are revealed by scoped scrolling. After focused board6, real Tab reaches board7 then new-space; screenshot shows visible focus on new-space. No force-click. |
+
+**Round-two Looker A decision: bounded visual craft PASS, with A5/A6 minor issues disclosed.** No open major craft finding from my inspection remains. This covers the specified laptop fixtures and reviewed states, not all runtime criteria. Calendar/Desk scoped scrolling does not represent document overflow. Whiteboard uses deliberate workspace around actual notes and retains its engine rather than a reference workflow graph.
+
+QA's separate reported failed groups are not adjudicated by this visual pass and must be resolved independently. No whole-council release approval, Investment compatibility, real-font parity, live normal-speed motion, mobile review, persistence/failure or broad performance signoff is issued. Earlier blanket FAIL above is historical round-one status; this round-two decision supersedes it only within the described visual scope.
