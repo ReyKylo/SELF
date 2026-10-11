@@ -5,12 +5,18 @@ on:
       - feature/investment-intelligence-academy-v1
     paths:
       - 'tools/investment_intelligence_v1.*'
+      - 'tools/investment_lab_v12.*'
+      - 'tools/investment_model_v13.*'
+      - 'tools/qa_investment_model_v13.cjs'
       - 'tools/qa_investment_browser_v1.cjs'
       - 'tools/build_cloudflare.py'
       - '.github/workflows/investment-browser-qa.yml'
   pull_request:
     paths:
       - 'tools/investment_intelligence_v1.*'
+      - 'tools/investment_lab_v12.*'
+      - 'tools/investment_model_v13.*'
+      - 'tools/qa_investment_model_v13.cjs'
       - 'tools/qa_investment_browser_v1.cjs'
       - 'tools/build_cloudflare.py'
       - '.github/workflows/investment-browser-qa.yml'
