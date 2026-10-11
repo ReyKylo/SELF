@@ -94,7 +94,6 @@ function ii14Issues(){
  if(!ii14State.flags.terms)issues.push({kind:'historical',section:'model',severity:'critical',text:'Acknowledge the original memo’s conflicting US$20M vs US$25M pre-money figures before final price claims.'});
  if(!ii14State.flags.mrr)issues.push({kind:'historical',section:'traction',severity:'critical',text:'Acknowledge MRR growth discrepancy: 164K→438K implies ~167%, versus +151% stated in the memo.'});
  if(!ii14State.flags.hindsight)issues.push({kind:'historical',section:'summary',severity:'critical',text:'Confirm you are excluding outcomes or commentary only known after October 12, 2010.'});
- if(ii14State.pricing.trim?.length===0){} // intentionally no pricing requirement; price could be unknown
  if(ii14State.recommendation==='invest'&&ii14State.pricing.trim().length<15)issues.push({kind:'decision',section:'decision',severity:'action',text:'An invest recommendation should describe pricing, conditions, or why a price cannot be determined.'});
  return issues;
 }
