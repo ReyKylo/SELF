@@ -24,6 +24,8 @@ ii_js=(ROOT/'tools'/'investment_intelligence_v1.js').read_text(encoding='utf-8')
 ii_css=(ROOT/'tools'/'investment_intelligence_v1.css').read_text(encoding='utf-8')
 ii12_js=(ROOT/'tools'/'investment_lab_v12.js').read_text(encoding='utf-8')
 ii12_css=(ROOT/'tools'/'investment_lab_v12.css').read_text(encoding='utf-8')
+ii13_js=(ROOT/'tools'/'investment_model_v13.js').read_text(encoding='utf-8')
+ii13_css=(ROOT/'tools'/'investment_model_v13.css').read_text(encoding='utf-8')
 
 def replace_once(old,new,reason):
     global html
@@ -38,8 +40,8 @@ replace_once('desk:()=>desk.render(),today:dashboard,calendar:calendar,planning:
              'desk:rvWhiteboardV4,today:iiDashboard,calendar:rvCalendarV5,planning:planning,journal:rvNotesV4,','five legacy route mappings')
 replace_once("const pages=[['desk','▦','Desk'],['career','↗','Career'],['calendar','◷','Calendar'],['backpack','⇥','Capture inbox'],['more','▦','More']];",
              "const pages=[['today','▦','Dashboard'],['career','↗','Career'],['calendar','◷','Calendar'],['journal','▤','Notes'],['more','▦','More']];",'global sidebar menu')
-replace_once(render_anchor,v3js+'\n'+v4js+'\n'+v5js+'\n'+ii_js+'\n'+ii12_js+'\n'+render_anchor,'render function')
-replace_once('</head>', '<style id="rey-career-reference-v3">\n'+v3css+'\n</style>\n<style id="rey-workspace-v4">\n'+v4css+'\n</style>\n<style id="rey-visual-fidelity-v42">\n'+v42css+'\n</style>\n<style id="rey-calendar-studio-v5">\n'+v5css+'\n</style>\n<style id="self-investment-intelligence-v1">\n'+ii_css+'\n</style>\n<style id="self-investment-lab-v12">\n'+ii12_css+'\n</style>\n</head>', 'HTML head')
+replace_once(render_anchor,v3js+'\n'+v4js+'\n'+v5js+'\n'+ii_js+'\n'+ii12_js+'\n'+ii13_js+'\n'+render_anchor,'render function')
+replace_once('</head>', '<style id="rey-career-reference-v3">\n'+v3css+'\n</style>\n<style id="rey-workspace-v4">\n'+v4css+'\n</style>\n<style id="rey-visual-fidelity-v42">\n'+v42css+'\n</style>\n<style id="rey-calendar-studio-v5">\n'+v5css+'\n</style>\n<style id="self-investment-intelligence-v1">\n'+ii_css+'\n</style>\n<style id="self-investment-lab-v12">\n'+ii12_css+'\n</style>\n<style id="self-investment-model-v13">\n'+ii13_css+'\n</style>\n</head>', 'HTML head')
 # Keep existing URL bookmarks and nested Worlds. Brand link returns to dashboard, not raw Whiteboard.
 html=html.replace('href="#desk" class="brand"','href="#today" class="brand"',1)
 
@@ -66,7 +68,8 @@ subprocess.run(['node', str(ROOT/'tools'/'qa_workspace_v4.cjs')], cwd=ROOT, chec
 subprocess.run(['node', str(ROOT/'tools'/'qa_calendar_studio_v5.cjs')], cwd=ROOT, check=True)
 subprocess.run(['node', str(ROOT/'tools'/'qa_investment_intelligence_v1.cjs')], cwd=ROOT, check=True)
 subprocess.run(['node', str(ROOT/'tools'/'qa_investment_lab_v12.cjs')], cwd=ROOT, check=True)
-for must in ('iiAcademy','ii12Growth','ii12Notebook','iiMoreHub','iiDashboard','rvDashboardV4','rvCareerV4','rvCalendarV4','rvNotesV4','rvWhiteboardV4','rvMoreV4','createDesk(','createVoiceCapture(','createBackpack('):
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_model_v13.cjs')], cwd=ROOT, check=True)
+for must in ('iiAcademy','ii12Growth','ii12Notebook','ii13View','iiMoreHub','iiDashboard','rvDashboardV4','rvCareerV4','rvCalendarV4','rvNotesV4','rvWhiteboardV4','rvMoreV4','createDesk(','createVoiceCapture(','createBackpack('):
     if must not in html: raise SystemExit('FAIL: missing required feature: '+must)
 output=ROOT/'dist'
 output.mkdir(exist_ok=True)
@@ -75,6 +78,7 @@ shutil.copy2(ROOT/'assets'/'career-landscape.svg',output/'career-landscape.svg')
 print('PASS: five V4 screens integrated with existing data, routes and spatial engine')
 print('PASS: isolated Investment Intelligence V1 Academy, browser-only learner drafts, lesson QA')
 print('PASS: Phase 1.2 microlearning and source-aware research notebook integrated')
+print('PASS: Phase 1.3 finance scenario, sensitivity and model review integrated')
 print('PASS: Calendar Studio V5 replaces only the Calendar route, data and Supabase remain untouched')
 print('PASS: V4.2 visual fidelity layer included without mock data')
 print('PASS: existing SELF Supabase cloud sync preserved after successful local-save hook')
