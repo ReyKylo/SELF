@@ -162,15 +162,68 @@ async function run(){
  assert.match(await page.locator('.ii12-notebook-count').innerText(),/2/);
  checks.push('Phase 1.2 lesson, original-source reference, keyboard quiz, research capture, slide seed, export and reload');
 
+ await click(page,'view','model');
+ await page.locator('.ii13-page').waitFor();
+ await screenshot(page,'21-financial-model');
+ assert.match(await page.locator('.ii13-guide').innerText(),/Shopify.*2010|2010 HISTORICAL ANCHOR/s);
+ assert.equal(await page.locator('.ii13-table tbody tr').count(),12);
+ const beforeRevenue=await page.locator('#ii13-revenue').innerText();
+ await page.locator('input[data-ii13-input="adds"]').fill('1100');
+ const afterRevenue=await page.locator('#ii13-revenue').innerText();
+ assert.notEqual(afterRevenue,beforeRevenue,'Editing new customer assumption should recalculate revenue');
+ await page.locator('[data-ii13="scenario"][data-value="downside"]').click();
+ const downsideMRR=await page.locator('.ii13-metric').nth(1).locator('strong').innerText();
+ await page.locator('[data-ii13="scenario"][data-value="upside"]').click();
+ const upsideMRR=await page.locator('.ii13-metric').nth(1).locator('strong').innerText();
+ assert.notEqual(downsideMRR,upsideMRR,'Scenario choice should change projected ending MRR');
+ await page.locator('[data-ii13="save-model"]').click();
+ const modelSave=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.model.v13')||'{}'));
+ assert.equal(modelSave.adds,1100);
+ assert.equal(modelSave.snapshot.scenario,'upside');
+ checks.push('Financial model live inputs, 12-month calculation, scenarios and snapshot save in Chromium');
+ const csvEvent=page.waitForEvent('download');
+ await page.locator('[data-ii13="export-csv"]').click();
+ const csv=await csvEvent;assert.equal(csv.suggestedFilename(),'SELF_Shopify_2010_Analyst_Scenario.csv');
+ assert.equal(fs.readFileSync(await csv.path(),'utf8').trim().split(/\r?\n/).length,13);
+ const notesEvent=page.waitForEvent('download');
+ await page.locator('[data-ii13="export-md"]').click();
+ const notes=await notesEvent;
+ const notesText=fs.readFileSync(await notes.path(),'utf8');
+ assert.ok(notesText.includes('NOT actual 2011 Shopify numbers'));
+ await page.locator('[data-ii13="tab"][data-value="sensitivity"]').click();
+ await page.locator('.ii13-sensitivity-table').waitFor();
+ assert.equal(await page.locator('.ii13-sensitivity-table tbody tr').count(),3);
+ await screenshot(page,'22-sensitivity-lab');
+ await page.locator('[data-ii13="tab"][data-value="challenge"]').click();
+ const quizB=page.locator('[data-ii13="quiz"][data-value="B"]');
+ await quizB.focus();await page.keyboard.press('Enter');
+ await page.locator('[data-ii13="quiz-check"]').click();
+ assert.match(await page.locator('.ii13-feedback').innerText(),/Benar/);
+ const reasoning='The downside is customer churn and potentially high acquisition cost, so this projection needs cohort data and evidence before being used in an investment recommendation.';
+ await page.locator('textarea[data-ii13-reasoning]').fill(reasoning);
+ await page.locator('[data-ii13="save-reasoning"]').click();
+ await screenshot(page,'23-model-challenge');
+ await page.locator('[data-ii13="tab"][data-value="model"]').click();
+ await page.locator('[data-ii13="promote-model"]').click();
+ await page.locator('.ii12-notebook-head').waitFor();
+ assert.match(await page.locator('.ii12-notes-list').innerText(),/Analyst scenario \(NOT historical\): Upside/);
+ const scenarioState=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.lab.v12')||'{}'));
+ assert.equal(scenarioState.notes.find(n=>n.id==='model13-upside').kind,'assumption');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.locator('.ii12-notebook-head').waitFor();
+ assert.match(await page.locator('.ii12-notes-list').innerText(),/Analyst scenario \(NOT historical\): Upside/);
+ checks.push('Financial model CSV/Markdown export, sensitivity, keyboard exercise and assumption promotion survive reload');
+
+
  await page.setViewportSize({width:390,height:844});
- for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile']]){
+ for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile'],['model','24-model-mobile']]){
   await click(page,'view',view);
   await page.waitForTimeout(120);
   await noOverflow(page,view+' mobile');
   await screenshot(page,file);
  }
  await page.setViewportSize({width:768,height:1024});
- for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet']]){
+ for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet'],['model','25-model-tablet']]){
   await click(page,'view',view);
   await noOverflow(page,view+' tablet');
   await screenshot(page,file);
@@ -205,7 +258,7 @@ async function run(){
  checks.push('Storage failure shows warning instead of falsely claiming success');
  await screenshot(blocked,'10-storage-warning');
  await deny.close();
- const report={ok:true,checkedAt:new Date().toISOString(),screenshots:20,checks};
+ const report={ok:true,checkedAt:new Date().toISOString(),screenshots:25,checks};
  fs.writeFileSync(path.join(ART,'report.json'),JSON.stringify(report,null,2));
  console.log('PASS Chromium E2E Investment Intelligence — '+checks.length+' checks');
  checks.forEach(item=>console.log('  PASS '+item));
