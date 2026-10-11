@@ -128,6 +128,7 @@ async function initSelfCloudV1() {
     if (authenticated) await refreshTokenIfNeeded();
     const headers = {'apikey':API_KEY};
     if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+    if (options.body !== undefined && path.startsWith('/rest/v1/self_investment_documents')) headers.Prefer = 'return=representation';
     if (authenticated) headers.Authorization = 'Bearer ' + session.access_token;
     const response = await fetch(URL_BASE + path, {
       method: options.method || 'GET',
@@ -418,6 +419,23 @@ async function initSelfCloudV1() {
     setMemberUI();
   });
   window.addEventListener('online', schedule);
+  // Reuse authenticated SELF Cloud session for separately RLS-scoped Investment Vault.
+  // The bridge never exposes a secret key or session token to Investment modules.
+  window.selfInvestmentCloudBridge = Object.freeze({
+    async list(){
+      if(!user)throw Error('Sign in using the SELF Cloud panel first.');
+      return {userId:user.id,rows:await api('/rest/v1/self_investment_documents?select=document_key,revision,payload,updated_at&user_id=eq.'+encodeURIComponent(user.id))};
+    },
+    async write(kind,payload,revision){
+      if(!user)throw Error('Sign in using the SELF Cloud panel first.');
+      if(!['academy','research','model','memo','icdeck','curriculum'].includes(kind))throw Error('Invalid investment document.');
+      if(!Number.isSafeInteger(revision)||revision<0)throw Error('Invalid cloud revision.');
+      if(JSON.stringify(payload).length>450000)throw Error('Investment document exceeds cloud limit.');
+      if(revision===0)return api('/rest/v1/self_investment_documents',{method:'POST',body:{user_id:user.id,document_key:kind,revision:1,payload}});
+      const query='?user_id=eq.'+encodeURIComponent(user.id)+'&document_key=eq.'+encodeURIComponent(kind)+'&revision=eq.'+revision;
+      return api('/rest/v1/self_investment_documents'+query,{method:'PATCH',body:{payload,revision:revision+1,updated_at:new Date().toISOString()}});
+    }
+  });
   selfCloudOnSave = schedule;
 
   // Supabase's implicit magic-link callback arrives in the fragment.
