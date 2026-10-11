@@ -60,3 +60,7 @@ body.rey-pro.blue-desk-page .self-desk-toolbar .tool-group{display:flex;flex-dir
 @media(max-width:430px){.rey-pro .rv-kanban{grid-template-columns:1fr}.rey-pro .rv-board-grid{grid-template-columns:1fr}.rey-pro .rv-cover{height:92px}}
 /* QA round 3: cloud utility remains reachable above the mobile navigation. */
 @media(max-width:760px){body.rey-pro #scOpen{bottom:calc(88px + env(safe-area-inset-bottom))!important;right:14px!important}body.rey-pro #scPanel{bottom:calc(140px + env(safe-area-inset-bottom))!important;max-height:calc(100dvh - 165px);overflow-y:auto}}
+/* QA round 4 edge identity: preserve complete metadata without page overflow. */
+.rey-pro .rv-focus-item,.rey-pro .rv-focus-item>div,.rey-pro .rv-kanban-col,.rey-pro .rv-focus-layout>div{min-width:0}
+.rey-pro .rv-focus-item strong,.rey-pro .rv-focus-item small{overflow-wrap:anywhere;word-break:normal;white-space:normal;max-width:100%}
+.rey-pro .rv-notes-filters{min-width:0}.rey-pro .rv-notes-filters>label{min-width:0;flex:1 1 0}.rey-pro .rv-notes-filters select{min-width:0;max-width:40%}.rey-pro .rv-notes-filters input{width:0;min-width:0;flex:1 1 0}
