@@ -7,6 +7,9 @@ const src12=fs.readFileSync(path.join(__dirname,'investment_lab_v12.js'),'utf8')
 const src13=fs.readFileSync(path.join(__dirname,'investment_model_v13.js'),'utf8');
 const src14=fs.readFileSync(path.join(__dirname,'investment_memo_v14.js'),'utf8');
 const src15=fs.readFileSync(path.join(__dirname,'investment_ic_deck_v15.js'),'utf8');
+const src16=fs.readFileSync(path.join(__dirname,'investment_vault_v16.js'),'utf8');
+const src17=fs.readFileSync(path.join(__dirname,'investment_vault_cloud_v16.js'),'utf8');
+const src18=fs.readFileSync(path.join(__dirname,'investment_curriculum_v2.js'),'utf8');
 const storage=new Map(),listeners={};
 let renders=0,notifications=[];
 const document={
@@ -27,6 +30,9 @@ vm.runInContext(src12,c,{filename:'investment_lab_v12.js'});
 vm.runInContext(src13,c,{filename:'investment_model_v13.js'});
 vm.runInContext(src14,c,{filename:'investment_memo_v14.js'});
 vm.runInContext(src15,c,{filename:'investment_ic_deck_v15.js'});
+vm.runInContext(src16,c,{filename:'investment_vault_v16.js'});
+vm.runInContext(src17,c,{filename:'investment_vault_cloud_v16.js'});
+vm.runInContext(src18,c,{filename:'investment_curriculum_v2.js'});
 const call=expr=>vm.runInContext(expr,c);
 const home=call('iiAcademy()');
 assert.match(home,/Your Analyst Journey|Learn the thinking/);
