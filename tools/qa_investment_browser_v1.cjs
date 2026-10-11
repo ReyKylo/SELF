@@ -322,18 +322,69 @@ async function run(){
  assert.equal(await page.locator('.ii15-mini-slide').count(),6);
  checks.push('Phase 1.5 IC interview, learner answers, editable slide layout, source links, ZIP/XML-validated native PPTX and JSON export');
 
+ await click(page,'view','curriculum');
+ await page.locator('.ii2-app').waitFor();
+ assert.equal(await page.locator('.ii2-lesson-link').count(),9);
+ await screenshot(page,'37-vc-academy-desktop');
+ assert.match(await page.locator('.ii2-paper').innerText(),/A good company is not automatically/);
+ await page.locator('[data-ii2="done-brief"]').click();
+ assert.match(await page.locator('.ii2-source-card').innerText(),/Bessemer/);
+ await page.locator('[data-ii2="done-source"]').click();
+ await page.locator('[data-ii2="choice"][data-val="0"]').click();
+ await page.locator('[data-ii2="check"]').click();
+ assert.match(await page.locator('.ii2-feedback').innerText(),/Coba lagi/);
+ await page.locator('[data-ii2="choice"][data-val="1"]').click();
+ await page.locator('[data-ii2="check"]').click();
+ assert.match(await page.locator('.ii2-feedback').innerText(),/Benar/);
+ await page.locator('.ii2-stage[data-ii2="stage"][data-val="apply"]').click();
+ const reflection='My investment reasoning is that a growing SMB commerce platform still needs a defendable entry valuation, cohort retention, and a falsifiable competition thesis before an investment committee can approve financing.';
+ await page.locator('textarea[data-ii2-reflect="investor"]').fill(reflection);
+ await page.locator('[data-ii2="done-apply"]').click();
+ await page.locator('[data-ii2="promote"]').click();
+ const curriculumSaved=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.curriculum.v2')));
+ assert.equal(curriculumSaved.progress.investor.apply,true);
+ const notesNow=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.lab.v12')).notes);
+ assert.equal(notesNow.find(n=>n.id==='curriculum-investor').kind,'assumption');
+ await page.locator('.ii2-lesson-link[data-ii2="lesson"][data-val="safe"]').click();
+ assert.match(await page.locator('.ii2-current').innerText(),/MODERN FINANCING/);
+ await page.locator('.ii2-stage[data-ii2="stage"][data-val="apply"]').click();
+ await page.locator('textarea[data-ii2-reflect="safe"]').fill('Post-money SAFEs were introduced well after Shopify 2010, so this contemporary financing document should never be cited as if it existed in the original Series A investment.');
+ await page.locator('[data-ii2="promote"]').click();
+ const modernNote=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.lab.v12')).notes.find(n=>n.id==='curriculum-safe'));
+ assert.equal(modernNote.kind,'retrospective');
+ assert.equal(modernNote.asOf,'2026-10-11');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.locator('.ii2-app').waitFor();
+ assert.equal(await page.locator('.ii2-lesson-link').count(),9);
+ checks.push('Phase 2 nine-lesson VC Academy, verified practice, independent teach-back and historical/modern source separation');
+ await click(page,'view','vault');
+ await page.locator('.ii16-vault').waitFor();
+ await screenshot(page,'38-investment-vault-desktop');
+ const vaultPromise=page.waitForEvent('download');
+ await page.locator('[data-ii16="backup"]').click();
+ const vaultDl=await vaultPromise;
+ assert.match(vaultDl.suggestedFilename(),/SELF_Investment_Backup_/);
+ const backupJson=JSON.parse(fs.readFileSync(await vaultDl.path(),'utf8'));
+ assert.equal(backupJson.format,'SELF-Investment-Backup-v1');
+ assert.ok(backupJson.documents.curriculum);
+ assert.ok(backupJson.documents.icdeck);
+ assert.ok(backupJson.documents.memo);
+ assert.ok(!JSON.stringify(backupJson).includes('self-cloud-session-v1'),'Cloud auth tokens must never enter Investment Vault export');
+ checks.push('Phase 1.6 local Investment Vault backup includes work and omits cloud authentication session');
+
+
 
 
 
  await page.setViewportSize({width:390,height:844});
- for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile'],['model','24-model-mobile'],['memo','30-memo-mobile'],['ic','35-ic-deck-mobile']]){
+ for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile'],['model','24-model-mobile'],['memo','30-memo-mobile'],['ic','35-ic-deck-mobile'],['curriculum','39-curriculum-mobile'],['vault','40-vault-mobile']]){
   await click(page,'view',view);
   await page.waitForTimeout(120);
   await noOverflow(page,view+' mobile');
   await screenshot(page,file);
  }
  await page.setViewportSize({width:768,height:1024});
- for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet'],['model','25-model-tablet'],['memo','31-memo-tablet'],['ic','36-ic-deck-tablet']]){
+ for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet'],['model','25-model-tablet'],['memo','31-memo-tablet'],['ic','36-ic-deck-tablet'],['curriculum','41-curriculum-tablet'],['vault','42-vault-tablet']]){
   await click(page,'view',view);
   await noOverflow(page,view+' tablet');
   await screenshot(page,file);
@@ -368,7 +419,7 @@ async function run(){
  checks.push('Storage failure shows warning instead of falsely claiming success');
  await screenshot(blocked,'10-storage-warning');
  await deny.close();
- const report={ok:true,checkedAt:new Date().toISOString(),screenshots:36,checks};
+ const report={ok:true,checkedAt:new Date().toISOString(),screenshots:42,checks};
  fs.writeFileSync(path.join(ART,'report.json'),JSON.stringify(report,null,2));
  console.log('PASS Chromium E2E Investment Intelligence — '+checks.length+' checks');
  checks.forEach(item=>console.log('  PASS '+item));
