@@ -155,6 +155,12 @@
 .rey-pro .ii-quiz input{accent-color:#1a65b6;flex-shrink:0}
 .rey-pro .ii-quiz label span{font-size:13px;color:#455a73;line-height:1.5}
 .rey-pro .ii-quiz label b{display:inline-grid;place-items:center;margin-right:11px;width:24px;height:24px;background:#f0f5fb;border-radius:6px;color:#33679a}
+.rey-pro .ii-quiz .ii-choice{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #dfe8f1;border-radius:10px;padding:15px;margin-bottom:9px;width:100%;font-family:inherit;cursor:pointer;text-align:left;color:#455a73;font-size:13px;line-height:1.5}
+.rey-pro .ii-quiz .ii-choice:hover{border-color:#a9c8e8;background:#f7faff}
+.rey-pro .ii-quiz .ii-choice.is-selected{border-color:#2366b1;background:#edf5ff;box-shadow:0 0 0 1px #2366b11d}
+.rey-pro .ii-quiz .ii-choice>b{flex-shrink:0;display:inline-grid;place-items:center;width:26px;height:26px;background:#eef4fb;border-radius:6px;color:#33679a}
+.rey-pro .ii-quiz .ii-choice.is-selected>b{background:#286cbb;color:white}
+.rey-pro .ii-quiz .ii-choice span{flex:1}
 .rey-pro .ii-feedback{margin-top:14px;background:#fff7e9;border:1px solid #eac98b;padding:13px 17px;border-radius:9px;font-size:12px}
 .rey-pro .ii-feedback.is-correct{background:#ecf7f2;border-color:#aedbcc;color:#1b6754}
 .rey-pro .ii-field{display:block;color:#344d68;font-size:12px;font-weight:800;margin:18px 0}
