@@ -67,8 +67,10 @@ async function run(){
  assert.ok(await page.locator('[data-ii="quiz-choice"][data-val="A"]').getAttribute('class').then(v=>v.includes('is-selected')));
  await click(page,'quiz');
  assert.match(await page.locator('.ii-feedback').innerText(),/Belum tepat/);
- await click(page,'quiz-choice','B');
- assert.ok(await page.locator('[data-ii="quiz-choice"][data-val="B"]').getAttribute('class').then(v=>v.includes('is-selected')));
+ const choiceB=page.locator('[data-ii="quiz-choice"][data-val="B"]');
+ await choiceB.focus();
+ await page.keyboard.press('Enter');
+ assert.equal(await choiceB.getAttribute('aria-pressed'),'true','Quiz choice should support keyboard selection');
  await click(page,'quiz');
  assert.match(await page.locator('.ii-feedback').innerText(),/Betul/);
  await click(page,'step','apply');
@@ -111,6 +113,12 @@ async function run(){
   await noOverflow(page,view+' mobile');
   await screenshot(page,file);
  }
+ await page.setViewportSize({width:768,height:1024});
+ for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet']]){
+  await click(page,'view',view);
+  await noOverflow(page,view+' tablet');
+  await screenshot(page,file);
+ }
  await page.setViewportSize({width:1280,height:800});
  await click(page,'view','home');
  await noOverflow(page,'Academy laptop 1280');
@@ -141,7 +149,7 @@ async function run(){
  checks.push('Storage failure shows warning instead of falsely claiming success');
  await screenshot(blocked,'10-storage-warning');
  await deny.close();
- const report={ok:true,checkedAt:new Date().toISOString(),screenshots:10,checks};
+ const report={ok:true,checkedAt:new Date().toISOString(),screenshots:14,checks};
  fs.writeFileSync(path.join(ART,'report.json'),JSON.stringify(report,null,2));
  console.log('PASS Chromium E2E Investment Intelligence — '+checks.length+' checks');
  checks.forEach(item=>console.log('  PASS '+item));
