@@ -142,7 +142,7 @@ function ii14MemoMarkdown(){
   '**Author:** Independent analyst / learning simulation','**As-of investment decision:** '+II14_CUTOFF,
   '**Recommendation:** '+ii14State.recommendation.toUpperCase(),
   '**This was not an actual investment assignment or deal participation.**','',
-  'Primary historical memo: '+II_MEMO_URL,'',
+  'Primary historical memo: Bessemer Venture Partners — '+II_MEMO_URL,'',
   '## Deal-terms and as-of data flags',
   '- Pre-money $20M vs $25M discrepancy acknowledged: '+(ii14State.flags.terms?'yes':'no'),
   '- Published MRR growth % discrepancy acknowledged: '+(ii14State.flags.mrr?'yes':'no'),
