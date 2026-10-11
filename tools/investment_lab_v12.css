@@ -138,3 +138,5 @@
 .rey-pro .ii12-case-nudge p{font-size:12px;line-height:1.65;color:#567897;margin:6px 0 0}
 .rey-pro .ii12-case-nudge .ii-btn{flex-shrink:0}
 @media(max-width:650px){.rey-pro .ii12-home-launch,.rey-pro .ii12-case-nudge{flex-direction:column;gap:12px;padding:19px}.rey-pro .ii12-home-launch h2{font-size:24px}.rey-pro .ii12-case-nudge .ii-btn{align-self:flex-start}}
+
+.rey-pro .ii12-slide-preview .ii12-hindsight-warning{color:#ffdbab;font-size:11px;font-weight:750;line-height:1.5;padding:9px 11px;border:1px solid #eec08a83;border-radius:6px;background:#784f2b5c;margin:9px 0}
