@@ -100,7 +100,7 @@ document.addEventListener('click',function(e){
  if(action==='promote'){
   if((r.reflection||'').trim().length<80){if(typeof toast==='function')toast('Tulis reflection minimal 80 karakter sebelum linking ke case.');return}
   const id='curriculum-'+x.id;
-  const note={id,title:'My VC Academy analysis: '+x.name,detail:'LEARNER-AUTHORED JUDGMENT (not historical company fact). Mission: '+x.mission,interpretation:r.reflection,source:x.url,section:'External learning material for '+x.name+'; independent hypothesis, not source-verified claim.',kind:'assumption',asOf:'2010-10-12',curated:false};
+  const note={id,title:'My VC Academy analysis: '+x.name,detail:'LEARNER-AUTHORED JUDGMENT (not historical company fact). Mission: '+x.mission,interpretation:r.reflection,source:x.url,section:'External learning material for '+x.name+'; independent hypothesis, not source-verified claim.',kind:x.modern?'retrospective':'assumption',asOf:x.modern?'2026-10-11':'2010-10-12',curated:false};
   const existing=ii12State.notes.findIndex(n=>n.id===id);
   if(existing>=0)ii12State.notes[existing]=note;else if(ii12State.notes.length<80)ii12State.notes.push(note);else{if(typeof toast==='function')toast('Notebook full; export and remove old notes first.');return}
   if(!ii12Save()){if(typeof toast==='function')toast('Notebook could not be saved; export the data.');return}
