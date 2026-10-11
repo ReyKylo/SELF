@@ -234,7 +234,7 @@ async function run(){
  await page.locator('select[data-ii14-select="recommendation"]').selectOption('invest');
  await page.locator('textarea[data-ii14-pricing]').fill('Invest only if acquisition economics, merchant retention, and financing terms can be independently verified, including pre-money valuation.');
  await page.locator('.ii14-toolbar-tab[data-ii14="mode"][data-value="review"]').click();
- for(const k of ['terms','mrr','hindsight'])await page.locator('[data-ii14-flag="'+k+'"]').check();
+ for(const k of ['terms','mrr','hindsight']){await page.locator('[data-ii14-flag="'+k+'"]').click();await page.waitForFunction(name=>JSON.parse(localStorage.getItem('self.investment.memo.v14')||'{}').flags?.[name]===true,k);}
  await page.locator('.ii14-review-clear').waitFor();
  await screenshot(page,'28-memo-review-clear');
  checks.push('Investment memo six source-linked sections, as-of reconciliation and actionable review');
