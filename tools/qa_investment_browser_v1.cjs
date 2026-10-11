@@ -190,11 +190,11 @@ async function run(){
  const notes=await notesEvent;
  const notesText=fs.readFileSync(await notes.path(),'utf8');
  assert.ok(notesText.includes('NOT actual 2011 Shopify numbers'));
- await page.locator('[data-ii13="tab"][data-value="sensitivity"]').click();
+ await page.locator('.ii13-stage[data-ii13="tab"][data-value="sensitivity"]').click();
  await page.locator('.ii13-sensitivity-table').waitFor();
  assert.equal(await page.locator('.ii13-sensitivity-table tbody tr').count(),3);
  await screenshot(page,'22-sensitivity-lab');
- await page.locator('[data-ii13="tab"][data-value="challenge"]').click();
+ await page.locator('.ii13-stage[data-ii13="tab"][data-value="challenge"]').click();
  const quizB=page.locator('[data-ii13="quiz"][data-value="B"]');
  await quizB.focus();await page.keyboard.press('Enter');
  await page.locator('[data-ii13="quiz-check"]').click();
@@ -203,7 +203,7 @@ async function run(){
  await page.locator('textarea[data-ii13-reasoning]').fill(reasoning);
  await page.locator('[data-ii13="save-reasoning"]').click();
  await screenshot(page,'23-model-challenge');
- await page.locator('[data-ii13="tab"][data-value="model"]').click();
+ await page.locator('.ii13-stage[data-ii13="tab"][data-value="model"]').click();
  await page.locator('[data-ii13="promote-model"]').click();
  await page.locator('.ii12-notebook-head').waitFor();
  assert.match(await page.locator('.ii12-notes-list').innerText(),/Analyst scenario \(NOT historical\): Upside/);
