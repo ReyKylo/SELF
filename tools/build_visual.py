@@ -5,7 +5,7 @@ Future integration: invoke this wrapper only after both workstreams review it.
 The base builder remains authoritative for scripts, routes and investment checks.
 """
 from pathlib import Path
-import subprocess, sys
+import subprocess, sys, re
 
 ROOT = Path(__file__).resolve().parents[1]
 subprocess.run([sys.executable, str(ROOT/'tools/build_cloudflare.py')], cwd=ROOT, check=True)
@@ -16,5 +16,21 @@ if html.count('</head>') != 1:
 css = (ROOT/'tools/cobalt_precision_v6.css').read_text(encoding='utf-8')
 html = html.replace('</head>', '<style id="self-cobalt-precision-v6">\n'+css+'\n</style>\n</head>', 1)
 html = html.replace('<strong>Rey Workspace</strong>', '<strong>SELF</strong>', 1)
+# Baseline compatibility: body[data-page] marks the route, not an actionable control.
+# Without this guard, ordinary input/button clicks bubble to body and re-render
+# before native change/submit; no other delegated listener is intercepted.
+delegate = "const el=e.target.closest('[data-action],[data-page],.close');if(!el)return;"
+if html.count(delegate) != 1:
+    raise SystemExit('FAIL: expected one native click delegate; refusing unsafe guard')
+html = html.replace(delegate, delegate.replace('if(!el)return;', 'if(!el||el===document.body)return;'), 1)
+module = re.search(r'<script\s+type="module">(.*?)</script>', html, re.S)
+if not module:
+    raise SystemExit('FAIL: missing final application module')
+checker = ROOT/'tools/_qa_visual_final.mjs'
+try:
+    checker.write_text(module.group(1), encoding='utf-8')
+    subprocess.run(['node', '--check', str(checker)], cwd=ROOT, check=True)
+finally:
+    checker.unlink(missing_ok=True)
 target.write_text(html, encoding='utf-8')
 print(f'Visual candidate ready: {target} ({target.stat().st_size:,} bytes)')
