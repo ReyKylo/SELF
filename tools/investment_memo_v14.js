@@ -115,7 +115,7 @@ function ii14ReviewView(){
   ['terms','Pre-money valuation conflict','US$20M in opening section vs US$25M in Deal section. Flag until reconciled.'],
   ['mrr','MRR growth percentage conflict','Memo states +151% versus implied ~167% using displayed US$164K and US$438K values.'],
   ['hindsight','No hindsight in original investment decision','Do not use Shopify’s later success or modern commentary to justify an October 2010 decision.']
- ].map(x=>'<label class="ii14-check"><input data-ii14-flag="'+x[0]+'" type="checkbox"'+(ii14State.flags[x[0]]?' checked':'')+'><span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></span></label>').join('')+'</div><aside class="ii14-review-model"><span class="ii-overline">FINANCIAL SOURCE / VERSION CONTROL</span>'+ii14ModelContext()+'<div class="ii14-review-question"><strong>Real analyst question</strong><p>Kalau terms deal aslinya berbeda, apa implikasinya terhadap ownership dan return? Tandai ketidakpastian daripada memaksakan satu angka.</p></div></aside></div><section class="ii14-issues"><div class="ii14-issues-head"><h3>What needs work</h3><span>'+actions.length+' required · '+notes.length+' disclosures</span></div>'+(items.length?items.map((x,i)=>'<div class="ii14-issue '+x.severity+'"><b>'+ii14Escape(x.severity.toUpperCase())+'</b><p>'+ii14Escape(x.text)+'</p>'+ii14Button('Open section →','review-jump',x.section,'ii14-text-action')+'</div>').join(''):'<div class="ii14-review-clear"><strong>Completeness checks cleared.</strong><p>This is still an independent draft. A qualified reviewer should examine the financial assumptions, interpretation of sources, and narrative before you present it externally.</p></div>')+'</section><div class="ii14-review-actions">'+ii14Button('Recheck the memo','recheck','','ii14-btn ii14-btn-primary')+ii14Button('Back to editor','mode','write','ii14-btn ii14-btn-outline')+'</div></section>';
+ ].map(x=>'<button type="button" class="ii14-check'+(ii14State.flags[x[0]]?' is-active':'')+'" data-ii14="toggle-flag" data-value="'+x[0]+'" aria-pressed="'+(ii14State.flags[x[0]]?'true':'false')+'"><span class="ii14-check-state">'+(ii14State.flags[x[0]]?'✓':'+')+'</span><span><strong>'+x[1]+'</strong><small>'+x[2]+'</small></span></button>').join('')+'</div><aside class="ii14-review-model"><span class="ii-overline">FINANCIAL SOURCE / VERSION CONTROL</span>'+ii14ModelContext()+'<div class="ii14-review-question"><strong>Real analyst question</strong><p>Kalau terms deal aslinya berbeda, apa implikasinya terhadap ownership dan return? Tandai ketidakpastian daripada memaksakan satu angka.</p></div></aside></div><section class="ii14-issues"><div class="ii14-issues-head"><h3>What needs work</h3><span>'+actions.length+' required · '+notes.length+' disclosures</span></div>'+(items.length?items.map((x,i)=>'<div class="ii14-issue '+x.severity+'"><b>'+ii14Escape(x.severity.toUpperCase())+'</b><p>'+ii14Escape(x.text)+'</p>'+ii14Button('Open section →','review-jump',x.section,'ii14-text-action')+'</div>').join(''):'<div class="ii14-review-clear"><strong>Completeness checks cleared.</strong><p>This is still an independent draft. A qualified reviewer should examine the financial assumptions, interpretation of sources, and narrative before you present it externally.</p></div>')+'</section><div class="ii14-review-actions">'+ii14Button('Recheck the memo','recheck','','ii14-btn ii14-btn-primary')+ii14Button('Back to editor','mode','write','ii14-btn ii14-btn-outline')+'</div></section>';
 }
 function ii14DeckItems(){
  const map={thesis:{title:'01 / Why this investment?',value:ii14Draft('summary'),refs:'summary'},evidence:{title:'02 / Evidence supporting growth',value:ii14Draft('traction'),refs:'traction'},risks:{title:'03 / What could go wrong?',value:ii14Draft('risks'),refs:'risks'},decision:{title:'04 / Decision & conditions',value:ii14Draft('decision'),refs:'decision'}};
@@ -209,6 +209,9 @@ document.addEventListener('click',function(event){
  }
  else if(action==='go'){iiState.view=value;iiSave();render()}
  else if(action==='review-jump'){ii14State.section=value;ii14State.mode='write';ii14Refresh()}
+ else if(action==='toggle-flag'){
+  if(Object.prototype.hasOwnProperty.call(ii14State.flags,value)){ii14State.flags[value]=!ii14State.flags[value];ii14Progress();ii14Refresh()}
+ }
  else if(action==='toggle-ref'){
   const p=value.indexOf('|'),section=value.slice(0,p),id=value.slice(p+1),notes=ii14Evidences();
   if(p<0||!II14_SECTIONS.some(s=>s.id===section)||!notes.some(n=>n.id===id))return;
@@ -229,8 +232,6 @@ document.addEventListener('input',function(event){
  if(el){ii14State.pricing=el.value.slice(0,1500);ii14Progress()}
 },true);
 document.addEventListener('change',function(event){
- const flag=event.target.closest('[data-ii14-flag]');
- if(flag){const k=flag.dataset.ii14Flag;if(Object.prototype.hasOwnProperty.call(ii14State.flags,k)){ii14State.flags[k]=flag.checked;ii14Progress();ii14Refresh()}return}
  const select=event.target.closest('[data-ii14-select]');
  if(select&&select.dataset.ii14Select==='recommendation'){
   if(['invest','pass','diligence'].includes(select.value)){ii14State.recommendation=select.value;ii14Progress();ii14Refresh()}
