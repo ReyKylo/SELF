@@ -6,6 +6,7 @@ const src=fs.readFileSync(path.join(__dirname,'investment_intelligence_v1.js'),'
 const src12=fs.readFileSync(path.join(__dirname,'investment_lab_v12.js'),'utf8');
 const src13=fs.readFileSync(path.join(__dirname,'investment_model_v13.js'),'utf8');
 const src14=fs.readFileSync(path.join(__dirname,'investment_memo_v14.js'),'utf8');
+const src15=fs.readFileSync(path.join(__dirname,'investment_ic_deck_v15.js'),'utf8');
 const storage=new Map(),listeners={};
 let renders=0,notifications=[];
 const document={
@@ -25,6 +26,7 @@ const c=vm.createContext(ctx);vm.runInContext(src,c,{filename:'investment_intell
 vm.runInContext(src12,c,{filename:'investment_lab_v12.js'});
 vm.runInContext(src13,c,{filename:'investment_model_v13.js'});
 vm.runInContext(src14,c,{filename:'investment_memo_v14.js'});
+vm.runInContext(src15,c,{filename:'investment_ic_deck_v15.js'});
 const call=expr=>vm.runInContext(expr,c);
 const home=call('iiAcademy()');
 assert.match(home,/Your Analyst Journey|Learn the thinking/);
