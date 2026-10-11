@@ -63,10 +63,15 @@ async function run(){
  await screenshot(page,'03-interactive-growth');
  await click(page,'visual-done');
  await click(page,'step','recall');
- await page.locator('input[name="iiRecallAnswer"][value="A"]').check();
+ await page.evaluate(()=>{window.__radioEvents=[];document.addEventListener('click',e=>{if(e.target.matches?.('input[name="iiRecallAnswer"]'))window.__radioEvents.push('click:defaultPrevented='+e.defaultPrevented)},true);document.addEventListener('change',e=>{if(e.target.matches?.('input[name="iiRecallAnswer"]'))window.__radioEvents.push('change:'+e.target.value+':'+e.target.checked)},true);});
+ await page.locator('input[name="iiRecallAnswer"][value="A"]').click();
+ const radioChecked=await page.locator('input[name="iiRecallAnswer"][value="A"]').isChecked();
+ console.log('RADIO DIAGNOSTIC '+JSON.stringify({checked:radioChecked,events:await page.evaluate(()=>window.__radioEvents)}));
+ assert.equal(radioChecked,true,'Radio input A must accept real pointer selection');
  await click(page,'quiz');
  assert.match(await page.locator('.ii-feedback').innerText(),/Belum tepat/);
- await page.locator('input[name="iiRecallAnswer"][value="B"]').check();
+ await page.locator('input[name="iiRecallAnswer"][value="B"]').click();
+ assert.equal(await page.locator('input[name="iiRecallAnswer"][value="B"]').isChecked(),true,'Radio B must accept real pointer selection');
  await click(page,'quiz');
  assert.match(await page.locator('.ii-feedback').innerText(),/Betul/);
  await click(page,'step','apply');
