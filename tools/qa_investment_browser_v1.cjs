@@ -106,15 +106,71 @@ async function run(){
  assert.ok(downloaded.includes(thesis));
  assert.ok(downloaded.includes('As-of date: 2010-10-12'));
  checks.push('Portfolio export contains authored analysis and historical label');
+
+ await click(page,'view','growth');
+ await page.locator('.ii12-lesson-header').waitFor();
+ await screenshot(page,'15-growth-lesson');
+ assert.match(await page.locator('.ii12-paper').innerText(),/Revenue growth itu bagus/);
+ await page.locator('[data-ii12="simpler"]').click();
+ assert.match(await page.locator('.ii12-paper').innerText(),/Isi ember/);
+ await page.locator('[data-ii12="mark-brief"]').click();
+ await page.locator('[data-ii12="growth-step"][data-val="video"]').click();
+ assert.ok(await page.locator('a[href*="startup-investor-school-preview-with-geoff-ralston"]').count());
+ await page.locator('[data-ii12="mark-video"]').click();
+ await page.locator('[data-ii12="growth-step"][data-val="exercise"]').click();
+ await page.locator('[data-ii12="exercise-choice"][data-val="A"]').click();
+ await page.locator('[data-ii12="exercise-check"]').click();
+ assert.match(await page.locator('.ii12-feedback').innerText(),/Coba lagi/);
+ const correct=page.locator('[data-ii12="exercise-choice"][data-val="B"]');
+ await correct.focus();await page.keyboard.press('Enter');
+ assert.equal(await correct.getAttribute('aria-pressed'),'true');
+ await page.locator('[data-ii12="exercise-check"]').click();
+ assert.match(await page.locator('.ii12-feedback').innerText(),/Tepat/);
+ await page.locator('[data-ii12="growth-step"][data-val="write"]').click();
+ await page.locator('[data-ii12-field="teachback"]').fill('Customer acquisition may grow quickly, but many existing merchants can churn, so cohort retention determines recurring revenue quality.');
+ await page.locator('[data-ii12="save-teachback"]').click();
+ assert.match(await page.locator('.ii12-lesson-count').innerText(),/4\/4/);
+ await click(page,'view','notebook');
+ await page.locator('.ii12-notebook-head').waitFor();
+ await screenshot(page,'16-research-notebook');
+ assert.match(await page.locator('.ii12-source-grid').innerText(),/MRR growth percentage: reconcile it/);
+ await page.locator('[data-ii12="import-source"][data-val="mrr"]').click();
+ assert.match(await page.locator('.ii12-notebook-count').innerText(),/1/);
+ await page.locator('[data-ii12-field="draftTitle"]').fill('Shopify app ecosystem');
+ await page.locator('[data-ii12-field="draftObservation"]').fill('The Bessemer memo says roughly two thirds of customers use a third party app.');
+ await page.locator('[data-ii12-field="draftInterpretation"]').fill('App use may support product stickiness but does not replace cohort retention analysis.');
+ await page.locator('[data-ii12-field="draftUrl"]').fill('https://www.bvp.com/memos/shopify');
+ await page.locator('[data-ii12-field="draftDate"]').fill('2010-10-12');
+ await page.locator('[data-ii12="save-note"]').click();
+ assert.match(await page.locator('.ii12-notebook-count').innerText(),/2/);
+ await page.locator('[data-ii12-field="slideClaim"]').fill('Shopify can scale recurring revenues if merchant retention offsets SMB churn.');
+ await page.locator('[data-ii12-field="slideSourceId"]').selectOption('source-mrr');
+ await page.locator('[data-ii12-field="slideImplication"]').fill('Stress-test cohort economics and entry valuation before making a capital commitment.');
+ await page.locator('[data-ii12="save-slide"]').click();
+ assert.match(await page.locator('.ii12-slide-preview').innerText(),/Shopify can scale recurring revenues/);
+ await screenshot(page,'17-slide-seed');
+ const packEvent=page.waitForEvent('download');
+ await page.locator('[data-ii12="export-notebook"]').first().click();
+ const pack=await packEvent;
+ assert.equal(pack.suggestedFilename(),'SELF_Shopify_2010_Research_Pack.md');
+ const packText=fs.readFileSync(await pack.path(),'utf8');
+ assert.ok(packText.includes('Shopify app ecosystem'));
+ assert.ok(packText.includes('Independent Historical Re-Underwriting'));
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.locator('.ii12-notebook-head').waitFor();
+ assert.equal(await page.locator('[data-ii12-field="slideClaim"]').inputValue(),'Shopify can scale recurring revenues if merchant retention offsets SMB churn.');
+ assert.match(await page.locator('.ii12-notebook-count').innerText(),/2/);
+ checks.push('Phase 1.2 lesson, original-source reference, keyboard quiz, research capture, slide seed, export and reload');
+
  await page.setViewportSize({width:390,height:844});
- for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile']]){
+ for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile']]){
   await click(page,'view',view);
   await page.waitForTimeout(120);
   await noOverflow(page,view+' mobile');
   await screenshot(page,file);
  }
  await page.setViewportSize({width:768,height:1024});
- for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet']]){
+ for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet']]){
   await click(page,'view',view);
   await noOverflow(page,view+' tablet');
   await screenshot(page,file);
@@ -149,7 +205,7 @@ async function run(){
  checks.push('Storage failure shows warning instead of falsely claiming success');
  await screenshot(blocked,'10-storage-warning');
  await deny.close();
- const report={ok:true,checkedAt:new Date().toISOString(),screenshots:14,checks};
+ const report={ok:true,checkedAt:new Date().toISOString(),screenshots:20,checks};
  fs.writeFileSync(path.join(ART,'report.json'),JSON.stringify(report,null,2));
  console.log('PASS Chromium E2E Investment Intelligence — '+checks.length+' checks');
  checks.forEach(item=>console.log('  PASS '+item));
