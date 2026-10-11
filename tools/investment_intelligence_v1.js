@@ -121,6 +121,7 @@ document.addEventListener('click',function(event){
   if(iiState.thesis.trim().length<30){if(typeof toast==='function')toast('Tulis thesis sedikit lebih lengkap (minimal 30 karakter).');return}
   const ok=iiSave();
   if(typeof toast==='function')toast(ok?'Case draft tersimpan di browser ini.':'Penyimpanan belum tersedia. Silakan ekspor draft.');
+  if(typeof render==='function')render(); // Update lesson milestone + portfolio status immediately.
   return;
  }
  else if(act==='export'){iiExport();return}
