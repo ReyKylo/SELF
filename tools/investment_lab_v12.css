@@ -127,3 +127,14 @@
 @media(max-width:870px){.rey-pro .ii12-layout{grid-template-columns:1fr}.rey-pro .ii12-side{grid-template-columns:1fr 1fr}.rey-pro .ii12-slide-section{grid-template-columns:1fr}.rey-pro .ii12-slide-preview{min-height:340px}}
 @media(max-width:650px){.rey-pro .ii12-page h1{font-size:35px}.rey-pro .ii12-lesson-header,.rey-pro .ii12-notebook-head{align-items:flex-start;flex-direction:column;gap:11px}.rey-pro .ii12-notebook-head{padding:23px}.rey-pro .ii12-lesson-count,.rey-pro .ii12-notebook-count{padding:9px 13px;flex-direction:row;gap:8px;align-items:center}.rey-pro .ii12-lesson-count strong,.rey-pro .ii12-notebook-count strong{font-size:23px}.rey-pro .ii12-stage-nav{gap:4px}.rey-pro .ii12-step{display:flex;flex-direction:column;gap:0;padding:10px 3px;font-size:10px}.rey-pro .ii12-step small{font-size:16px}.rey-pro .ii12-paper{padding:22px 18px}.rey-pro .ii12-article h2{font-size:27px}.rey-pro .ii12-contrast,.rey-pro .ii12-source-grid,.rey-pro .ii12-notes-list,.rey-pro .ii12-form-grid,.rey-pro .ii12-side{grid-template-columns:1fr}.rey-pro .ii12-section-head{flex-direction:column;align-items:flex-start}.rey-pro .ii12-section-head h2{font-size:28px}.rey-pro .ii12-source{min-height:0}.rey-pro .ii12-slide-preview{min-height:330px}}
 @media(prefers-reduced-motion:reduce){.rey-pro .ii12-page *{scroll-behavior:auto}}
+
+/* Additional links from original Academy and Active Case to Phase 1.2 */
+.rey-pro .ii12-home-launch{display:flex;justify-content:space-between;align-items:flex-start;gap:25px;background:#f5f7f2;border:1px solid #d6e0d1;border-left:4px solid #528274;border-radius:11px;padding:23px 27px;margin:21px 0 0}
+.rey-pro .ii12-home-launch h2{font-family:Georgia,serif;font-weight:500;font-size:27px;line-height:1.15;letter-spacing:-.6px;margin:7px 0 10px}
+.rey-pro .ii12-home-launch p{font-size:12px;color:#65766d;line-height:1.65;max-width:650px;margin-bottom:15px}
+.rey-pro .ii12-home-launch>div>div{display:flex;gap:9px;flex-wrap:wrap}
+.rey-pro .ii12-launch-counter{font-size:10px;letter-spacing:1.15px;font-weight:800;color:#80a194;white-space:nowrap}
+.rey-pro .ii12-case-nudge{display:flex;align-items:center;justify-content:space-between;gap:22px;border:1px solid #d8e7f4;border-radius:10px;background:#ecf5fc;padding:17px 20px;margin:0 0 17px}
+.rey-pro .ii12-case-nudge p{font-size:12px;line-height:1.65;color:#567897;margin:6px 0 0}
+.rey-pro .ii12-case-nudge .ii-btn{flex-shrink:0}
+@media(max-width:650px){.rey-pro .ii12-home-launch,.rey-pro .ii12-case-nudge{flex-direction:column;gap:12px;padding:19px}.rey-pro .ii12-home-launch h2{font-size:24px}.rey-pro .ii12-case-nudge .ii-btn{align-self:flex-start}}
