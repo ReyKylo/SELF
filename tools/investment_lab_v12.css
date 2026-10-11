@@ -1,0 +1,129 @@
+/* SELF Investment Intelligence / Phase 1.2: original-source microlearning and research notebook.
+   Separate classroom and desk visual languages, scoped to investment only. */
+.rey-pro .ii12-page{--ii12-ink:#182e4e;--ii12-accent:#235e9e;--ii12-border:#d9e4ee;--ii12-muted:#647d96;color:var(--ii12-ink);padding:8px 0 55px}
+.rey-pro .ii12-page h1,.rey-pro .ii12-page h2,.rey-pro .ii12-page h3,.rey-pro .ii12-page p{margin-top:0}
+.rey-pro .ii12-page h1,.rey-pro .ii12-page h2{font-family:Georgia,'Times New Roman',serif;font-weight:500;letter-spacing:-1px}
+.rey-pro .ii12-page h1{font-size:clamp(34px,4vw,56px);line-height:1.09;margin:8px 0}
+.rey-pro .ii12-page h2{font-size:clamp(26px,3vw,35px);line-height:1.18;margin:14px 0 21px}
+.rey-pro .ii12-page p{color:#57718b;font-size:13px;line-height:1.75}
+.rey-pro .ii12-page a{font-weight:700;color:#18599e}
+.rey-pro .ii12-lesson-header,.rey-pro .ii12-notebook-head{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin:12px 0 24px}
+.rey-pro .ii12-lesson-header>div>p,.rey-pro .ii12-notebook-head>div>p{margin:0}
+.rey-pro .ii12-lesson-count,.rey-pro .ii12-notebook-count{background:#eff5fb;border:1px solid #d9e5f0;padding:16px 22px;border-radius:12px;min-width:115px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.rey-pro .ii12-lesson-count strong,.rey-pro .ii12-notebook-count strong{font-family:Georgia,serif;font-size:34px;line-height:1.1;font-weight:500;color:#1b4e84}
+.rey-pro .ii12-lesson-count small,.rey-pro .ii12-notebook-count small{font-size:10px;line-height:1.3;color:#67809a}
+.rey-pro .ii12-warning{padding:12px 16px;background:#fff2d9;border:1px solid #edc38c;color:#815524;font-size:12px;font-weight:600;border-radius:9px;margin:13px 0}
+.rey-pro .ii12-stage-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:13px 0 22px}
+.rey-pro .ii12-step{display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 9px;border:1px solid #dce5ed;border-radius:9px;background:#fafcfe;color:#5f7991;font-weight:800;font-size:12px;text-align:center}
+.rey-pro .ii12-step small{font-family:Georgia,serif;font-size:19px;font-weight:400;color:#99adc1}
+.rey-pro .ii12-step.is-active{background:#1c4f85;border-color:#1c4f85;color:#fff}
+.rey-pro .ii12-step.is-active small{color:#c0daf4}
+.rey-pro .ii12-layout{display:grid;grid-template-columns:minmax(0,1fr) 275px;gap:17px;align-items:start}
+.rey-pro .ii12-paper{background:#fff;border:1px solid #dfe8ef;border-radius:14px;min-height:520px;padding:clamp(22px,3.4vw,42px)}
+.rey-pro .ii12-article{max-width:800px}
+.rey-pro .ii12-article h2{max-width:690px;font-size:clamp(27px,3.1vw,38px);letter-spacing:-1.3px}
+.rey-pro .ii12-article>p{font-size:14px;color:#3e5873;line-height:1.88;margin:0 0 20px}
+.rey-pro .ii12-article strong{color:#183b65}
+.rey-pro .ii12-contrast{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:25px 0}
+.rey-pro .ii12-contrast>div{background:#f1f6fb;border:1px solid #d9e6f1;padding:21px;border-radius:10px;display:flex;flex-direction:column}
+.rey-pro .ii12-contrast>div:nth-child(2){background:#faf5ed;border-color:#e9dbca}
+.rey-pro .ii12-contrast small{font-size:10px;color:#7191b1;font-weight:800;letter-spacing:1px}
+.rey-pro .ii12-contrast>div:nth-child(2) small{color:#a58565}
+.rey-pro .ii12-contrast strong{font-family:Georgia,serif;font-size:39px;font-weight:500;line-height:1.2;margin:10px 0 4px;color:#164c87}
+.rey-pro .ii12-contrast>div:nth-child(2) strong{color:#956d41}
+.rey-pro .ii12-contrast span{font-size:12px;color:#607e9c}
+.rey-pro .ii12-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:21px 0 13px}
+.rey-pro .ii12-simpler{margin:15px 0;padding:19px 21px;border-left:3px solid #427ab3;background:#eaf4fe;border-radius:5px}
+.rey-pro .ii12-simpler p{margin:5px 0 0;font-size:13px;color:#3d6489}
+.rey-pro .ii12-resource{border:1px solid #dce7f2;border-radius:10px;background:#f1f6fc;margin:19px 0;padding:23px 25px}
+.rey-pro .ii12-resource-secondary{background:#faf8f3;border-color:#e9e1d4}
+.rey-pro .ii12-resource small{letter-spacing:1px;font-size:10px;color:#5981a9;font-weight:800}
+.rey-pro .ii12-resource h3{margin:9px 0 9px;font-size:18px;color:#1e476f}
+.rey-pro .ii12-resource p{font-size:12px;margin-bottom:12px}
+.rey-pro .ii12-resource a{font-size:12px}
+.rey-pro .ii12-question{padding:17px 21px;margin:22px 0;background:#f4f7fa;border:1px solid #e0e8ef;border-radius:9px}
+.rey-pro .ii12-question strong{font-size:12px;color:#28527d}
+.rey-pro .ii12-question p{margin:5px 0 0;font-size:12px}
+.rey-pro .ii12-choices{display:grid;gap:8px;margin:21px 0}
+.rey-pro .ii12-choice{width:100%;display:flex;align-items:center;gap:12px;border:1px solid #dce6ed;border-radius:9px;background:white;padding:16px 18px;cursor:pointer;font-family:inherit;text-align:left}
+.rey-pro .ii12-choice b{flex-shrink:0;display:grid;place-items:center;width:29px;height:29px;background:#edf3fa;border-radius:6px;color:#22629e}
+.rey-pro .ii12-choice span{font-size:13px;color:#425d7c}
+.rey-pro .ii12-choice.is-selected{border-color:#2165aa;background:#eef5fd;box-shadow:inset 0 0 0 1px #2165aa}
+.rey-pro .ii12-choice.is-selected b{background:#2165aa;color:#fff}
+.rey-pro .ii12-feedback{font-size:12px;border:1px solid #ead5ab;background:#fdf7ea;padding:14px;border-radius:8px;margin:15px 0}
+.rey-pro .ii12-feedback.good{border-color:#b3d9c8;background:#eef9f3}
+.rey-pro .ii12-side{display:grid;gap:13px}
+.rey-pro .ii12-side section{padding:23px;background:#15335a;color:#fff;border-radius:12px}
+.rey-pro .ii12-side .ii-overline{color:#97badf}
+.rey-pro .ii12-side h3{font-family:Georgia,serif;font-weight:500;font-size:26px;margin:15px 0 12px}
+.rey-pro .ii12-side p{font-size:12px;color:#ccddec}
+.rey-pro .ii12-side a{color:#d4eafd;font-size:12px}
+.rey-pro .ii12-side .ii12-side-note{background:#f8f2e8;border:1px solid #e9ddcd;color:#254566}
+.rey-pro .ii12-side-note .ii-overline{color:#a57f51}
+.rey-pro .ii12-side-note p{color:#6a7680}
+.rey-pro .ii12-side-note .ii-btn{width:100%;margin-top:8px}
+.rey-pro .ii12-notebook-head{padding:28px 32px;background:#122c52;color:#fff;border-radius:14px}
+.rey-pro .ii12-notebook-head .ii-overline{color:#98c2f1}
+.rey-pro .ii12-notebook-head h1{color:#fff}
+.rey-pro .ii12-notebook-head p{color:#bfcfe2}
+.rey-pro .ii12-notebook-count{background:#ffffff1c;border-color:#ffffff30}
+.rey-pro .ii12-notebook-count strong{color:#fff}
+.rey-pro .ii12-notebook-count small{color:#c1d6ee}
+.rey-pro .ii12-notebook-jump{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 26px}
+.rey-pro .ii12-notebook-jump button{background:#eef3f8;border:1px solid #dce7f1;border-radius:8px;padding:10px 14px;color:#365d86;font-size:12px;font-weight:800;cursor:pointer}
+.rey-pro .ii12-starter-library,.rey-pro .ii12-notes-section,.rey-pro .ii12-slide-section{scroll-margin-top:25px;margin-top:31px}
+.rey-pro .ii12-section-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:16px}
+.rey-pro .ii12-section-head h2{margin:6px 0;font-size:32px}
+.rey-pro .ii12-section-head p{margin:0;max-width:710px}
+.rey-pro .ii12-section-head>a{font-size:12px;white-space:nowrap;margin-bottom:7px}
+.rey-pro .ii12-source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rey-pro .ii12-source{border:1px solid #dce5ed;background:#fff;border-radius:11px;padding:20px;display:flex;flex-direction:column;min-height:258px}
+.rey-pro .ii12-source header{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#92a0ad;font-size:9px;letter-spacing:.7px;font-weight:800}
+.rey-pro .ii12-source-kind{color:#28649f;background:#eef5fb;padding:4px 6px;border-radius:5px}
+.rey-pro .ii12-source h3{font-family:Georgia,serif;font-size:20px;font-weight:500;line-height:1.2;margin:13px 0 8px;color:#1a3e65}
+.rey-pro .ii12-source>p{flex:1;font-size:12px;color:#61758a;line-height:1.66}
+.rey-pro .ii12-source-footer{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:9px}
+.rey-pro .ii12-source-footer a{font-size:11px;line-height:1.35;max-width:55%}
+.rey-pro .ii12-source-footer .ii-btn{font-size:10px;padding:8px 10px;min-height:32px}
+.rey-pro .ii12-source-footer .ii12-imported{background:#e8f4ee;border-color:#b8dbcb;color:#368069}
+.rey-pro .ii12-source .ii12-prompt{display:block;margin-top:15px;padding-top:11px;border-top:1px solid #e7edf3;font-size:11px;color:#748aa1;font-style:italic}
+.rey-pro .ii12-notes-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rey-pro .ii12-note{background:#fafcff;border:1px solid #dde7f0;border-radius:10px;padding:19px 20px}
+.rey-pro .ii12-note-head{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#6787a7;font-size:10px}
+.rey-pro .ii12-note-head>span{font-weight:800}
+.rey-pro .ii12-note-head small{font-size:10px;color:#8399b0}
+.rey-pro .ii12-note h3{font-family:Georgia,serif;font-size:21px;font-weight:500;margin:10px 0 8px}
+.rey-pro .ii12-note>p{color:#5f748a;font-size:12px;line-height:1.68}
+.rey-pro .ii12-interpretation,.rey-pro .ii12-interp-prompt{padding:13px;background:#fff;border:1px solid #e1e8ef;border-radius:8px;font-size:11px;color:#7289a0;margin:13px 0}
+.rey-pro .ii12-interpretation strong{font-size:10px;color:#336998}
+.rey-pro .ii12-interpretation p{margin:5px 0 0;font-size:12px;white-space:pre-wrap}
+.rey-pro .ii12-note-actions{display:flex;flex-wrap:wrap;gap:13px;align-items:center}
+.rey-pro .ii12-note-actions a,.rey-pro .ii12-textbutton{font-size:11px;font-weight:750}
+.rey-pro .ii12-textbutton{padding:3px;background:none;border:0;color:#3f709f;cursor:pointer}
+.rey-pro .ii12-danger{color:#a66066}
+.rey-pro .ii12-link-missing{color:#a76553;font-size:10px}
+.rey-pro .ii12-empty{grid-column:1/-1;padding:35px;border:1px dashed #bdcedf;border-radius:10px;text-align:center;background:#f8fbff}
+.rey-pro .ii12-empty strong{font-family:Georgia,serif;font-size:19px}
+.rey-pro .ii12-empty p{margin:7px 0}
+.rey-pro .ii12-new-note{background:#f3f7fb;border:1px solid #dae5ee;padding:clamp(22px,3vw,30px);border-radius:13px;margin-top:18px}
+.rey-pro .ii12-new-note h3{font-family:Georgia,serif;font-weight:500;font-size:26px;margin:9px 0 13px}
+.rey-pro .ii12-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.rey-pro .ii12-page .ii-field{margin:12px 0;font-size:12px}
+.rey-pro .ii12-page .ii-field input,.rey-pro .ii12-page .ii-field select,.rey-pro .ii12-page .ii-field textarea{display:block;width:100%;margin:7px 0 0;min-height:39px;background:#fff;border:1px solid #c9d8e5;border-radius:8px;padding:11px 12px;font-family:inherit;font-size:12px;line-height:1.5;color:#1b4168}
+.rey-pro .ii12-page .ii-field textarea{min-height:90px;resize:vertical}
+.rey-pro .ii12-new-note .ii12-actions small{font-size:10px;color:#7c90a4;max-width:320px}
+.rey-pro .ii12-slide-section{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;align-items:stretch}
+.rey-pro .ii12-slide-section>div:first-child{background:#fff;border:1px solid #e1e8ee;padding:clamp(22px,3vw,30px);border-radius:13px}
+.rey-pro .ii12-slide-section h2{margin:10px 0}
+.rey-pro .ii12-slide-preview{background:#122c51;border-radius:11px;color:#fff;min-height:390px;padding:clamp(24px,3vw,33px);display:flex;flex-direction:column;justify-content:space-between;gap:20px;box-shadow:inset 0 0 0 1px #345276;overflow-wrap:anywhere}
+.rey-pro .ii12-slide-preview>span,.rey-pro .ii12-slide-preview>small{font-size:10px;font-weight:800;color:#b5cce5;letter-spacing:1px}
+.rey-pro .ii12-slide-preview>strong{font-family:Georgia,serif;font-size:clamp(22px,2.6vw,36px);font-weight:500;line-height:1.2;white-space:pre-wrap;color:#fff}
+.rey-pro .ii12-slide-evidence{border-top:1px solid #5c7693;padding-top:18px}
+.rey-pro .ii12-slide-evidence>small{font-weight:800;letter-spacing:1.2px;font-size:10px;color:#95b9dc}
+.rey-pro .ii12-slide-preview .ii12-slide-evidence p,.rey-pro .ii12-slide-preview .ii12-slide-impact{font-size:12px;color:#d8e7f4;line-height:1.6;margin:7px 0;white-space:pre-wrap}
+.rey-pro .ii12-notebook-footnote{margin-top:25px;font-size:11px!important;color:#889cad!important}
+.rey-pro .ii12-page button:focus-visible,.rey-pro .ii12-page a:focus-visible,.rey-pro .ii12-page input:focus-visible,.rey-pro .ii12-page select:focus-visible,.rey-pro .ii12-page textarea:focus-visible{outline:3px solid #70b3ed;outline-offset:2px}
+@media(max-width:1120px){.rey-pro .ii12-layout{grid-template-columns:minmax(0,1fr) 235px}.rey-pro .ii12-slide-section{grid-template-columns:1fr 1fr}}
+@media(max-width:870px){.rey-pro .ii12-layout{grid-template-columns:1fr}.rey-pro .ii12-side{grid-template-columns:1fr 1fr}.rey-pro .ii12-slide-section{grid-template-columns:1fr}.rey-pro .ii12-slide-preview{min-height:340px}}
+@media(max-width:650px){.rey-pro .ii12-page h1{font-size:35px}.rey-pro .ii12-lesson-header,.rey-pro .ii12-notebook-head{align-items:flex-start;flex-direction:column;gap:11px}.rey-pro .ii12-notebook-head{padding:23px}.rey-pro .ii12-lesson-count,.rey-pro .ii12-notebook-count{padding:9px 13px;flex-direction:row;gap:8px;align-items:center}.rey-pro .ii12-lesson-count strong,.rey-pro .ii12-notebook-count strong{font-size:23px}.rey-pro .ii12-stage-nav{gap:4px}.rey-pro .ii12-step{display:flex;flex-direction:column;gap:0;padding:10px 3px;font-size:10px}.rey-pro .ii12-step small{font-size:16px}.rey-pro .ii12-paper{padding:22px 18px}.rey-pro .ii12-article h2{font-size:27px}.rey-pro .ii12-contrast,.rey-pro .ii12-source-grid,.rey-pro .ii12-notes-list,.rey-pro .ii12-form-grid,.rey-pro .ii12-side{grid-template-columns:1fr}.rey-pro .ii12-section-head{flex-direction:column;align-items:flex-start}.rey-pro .ii12-section-head h2{font-size:28px}.rey-pro .ii12-source{min-height:0}.rey-pro .ii12-slide-preview{min-height:330px}}
+@media(prefers-reduced-motion:reduce){.rey-pro .ii12-page *{scroll-behavior:auto}}
