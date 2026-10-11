@@ -264,17 +264,75 @@ async function run(){
  assert.equal(persisted.drafts.summary,thesisSentence);
  checks.push('Investment memo PDF-printable HTML, Markdown and story exports; authored sections survive refresh');
 
+ await click(page,'view','ic');
+ await page.locator('.ii15-app').waitFor();
+ assert.equal(await page.locator('.ii15-question-nav').count(),6);
+ assert.match(await page.locator('.ii15-interview').innerText(),/Which pre-money valuation/);
+ await screenshot(page,'32-ic-defense');
+ const defend='The memo contains contradictory pre-money numbers. I would inspect primary term sheet evidence, calculate ownership and return under both prices, and use a conservative downside case rather than silently claiming a certain deal price.';
+ await page.locator('textarea[data-ii15-answer="valuation"]').fill(defend);
+ await page.locator('textarea[data-ii15-followup="valuation"]').fill('If pricing is higher, ownership would be lower for the same investment and our target exit could become too optimistic.');
+ await page.locator('select[data-ii15-evidence="valuation"]').selectOption('source-mrr');
+ await page.locator('.ii15-interview').waitFor();
+ assert.match(await page.locator('.ii15-linked-evidence').innerText(),/Monthly recurring revenue/);
+ await page.locator('[data-ii15="save-defense"]').click();
+ const defEvent=page.waitForEvent('download');
+ await page.locator('[data-ii15="export-defense"]').click();
+ const defense=await defEvent;
+ assert.equal(defense.suggestedFilename(),'SELF_Shopify_2010_IC_Defense_Notes.md');
+ assert.ok(fs.readFileSync(await defense.path(),'utf8').includes(defend));
+ await page.locator('[data-ii15="screen"][data-value="deck"]').click();
+ assert.equal(await page.locator('.ii15-mini-slide').count(),6);
+ await screenshot(page,'33-ic-deck-initial');
+ await page.locator('select[data-ii15-edit="layout"]').selectOption('numbers');
+ await page.locator('input[data-ii15-edit="title"]').fill('Shopify had compelling demand, but requires retention diligence');
+ await page.locator('textarea[data-ii15-edit="body"]').fill('The original memo points to strong growth in merchants and MRR. Churn remains material, so acquisition economics and scenario assumptions need independent review.');
+ await page.locator('input[data-ii15-edit="metric"]').fill('US$438K');
+ await page.locator('input[data-ii15-edit="metricLabel"]').fill('Historical MRR as-of October 2010');
+ await page.locator('select[data-ii15-edit="evidenceId"]').selectOption('source-mrr');
+ await page.locator('[data-ii15="save-slide"]').click();
+ assert.match(await page.locator('.ii15-preview').innerText(),/Shopify had compelling demand/);
+ await page.locator('[data-ii15="theme"][data-value="paper"]').click();
+ await screenshot(page,'34-ic-deck-edited-paper');
+ await page.locator('[data-ii15="add-slide"]').click();
+ assert.equal(await page.locator('.ii15-mini-slide').count(),7);
+ const addedId=await page.evaluate(()=>JSON.parse(localStorage.getItem('self.investment.icdeck.v15')).activeSlide);
+ await page.locator('[data-ii15="slide-delete"][data-value="'+addedId+'"]').click();
+ assert.equal(await page.locator('.ii15-mini-slide').count(),6);
+ const powerpointPromise=page.waitForEvent('download');
+ await page.locator('[data-ii15="export-pptx"]').click();
+ const pptxDl=await powerpointPromise;
+ assert.equal(pptxDl.suggestedFilename(),'SELF_Shopify_2010_Editable_IC_Deck.pptx');
+ const pptxPath=await pptxDl.path();
+ assert.equal(fs.readFileSync(pptxPath).subarray(0,2).toString('ascii'),'PK');
+ const validateCode="import sys,zipfile,xml.etree.ElementTree as ET; p=sys.argv[1]; z=zipfile.ZipFile(p); names=set(z.namelist()); assert '[Content_Types].xml' in names; slides=sorted(n for n in names if n.startswith('ppt/slides/slide') and n.endswith('.xml')); assert len(slides)==6; [ET.fromstring(z.read(n)) for n in names if n.endswith('.xml')]; texts=z.read('ppt/slides/slide1.xml'); assert b'Shopify had compelling demand' in texts; assert b'<p:txBody>' in texts; print('VALID PPTX: 6 slides, native editable shapes/text, valid XML and ZIP')";
+ const validation=await new Promise((resolve,reject)=>{let proc=spawn('python3',['-c',validateCode,pptxPath]);let stdout='',stderr='';proc.stdout.on('data',x=>stdout+=x);proc.stderr.on('data',x=>stderr+=x);proc.on('close',code=>code===0?resolve(stdout):reject(new Error('PPTX validation failed: '+stderr)))});
+ assert.match(validation,/VALID PPTX/);
+ const jsonPromise=page.waitForEvent('download');
+ await page.locator('[data-ii15="export-json"]').click();
+ const deckJson=await jsonPromise;
+ assert.equal(deckJson.suggestedFilename(),'SELF_Shopify_2010_Deck_Source.json');
+ const source=JSON.parse(fs.readFileSync(await deckJson.path(),'utf8'));
+ assert.equal(source.slides.length,6);
+ assert.equal(source.theme,'paper');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.locator('.ii15-app').waitFor();
+ assert.match(await page.locator('.ii15-preview').innerText(),/Shopify had compelling demand/);
+ assert.equal(await page.locator('.ii15-mini-slide').count(),6);
+ checks.push('Phase 1.5 IC interview, learner answers, editable slide layout, source links, ZIP/XML-validated native PPTX and JSON export');
+
+
 
 
  await page.setViewportSize({width:390,height:844});
- for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile'],['model','24-model-mobile'],['memo','30-memo-mobile']]){
+ for(const [view,file] of [['home','06-academy-mobile'],['lesson','07-lesson-mobile'],['case','08-case-mobile'],['portfolio','09-portfolio-mobile'],['growth','18-growth-mobile'],['notebook','19-notebook-mobile'],['model','24-model-mobile'],['memo','30-memo-mobile'],['ic','35-ic-deck-mobile']]){
   await click(page,'view',view);
   await page.waitForTimeout(120);
   await noOverflow(page,view+' mobile');
   await screenshot(page,file);
  }
  await page.setViewportSize({width:768,height:1024});
- for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet'],['model','25-model-tablet'],['memo','31-memo-tablet']]){
+ for(const [view,file] of [['home','11-academy-tablet'],['lesson','12-lesson-tablet'],['case','13-case-tablet'],['portfolio','14-portfolio-tablet'],['notebook','20-notebook-tablet'],['model','25-model-tablet'],['memo','31-memo-tablet'],['ic','36-ic-deck-tablet']]){
   await click(page,'view',view);
   await noOverflow(page,view+' tablet');
   await screenshot(page,file);
@@ -309,7 +367,7 @@ async function run(){
  checks.push('Storage failure shows warning instead of falsely claiming success');
  await screenshot(blocked,'10-storage-warning');
  await deny.close();
- const report={ok:true,checkedAt:new Date().toISOString(),screenshots:31,checks};
+ const report={ok:true,checkedAt:new Date().toISOString(),screenshots:36,checks};
  fs.writeFileSync(path.join(ART,'report.json'),JSON.stringify(report,null,2));
  console.log('PASS Chromium E2E Investment Intelligence — '+checks.length+' checks');
  checks.forEach(item=>console.log('  PASS '+item));
