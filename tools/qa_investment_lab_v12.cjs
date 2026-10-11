@@ -41,8 +41,9 @@ click12('exercise-choice','B');click12('exercise-check');assert.equal(run('ii12S
 click12('growth-step','write');
 input12('teachback','Growing subscriber acquisition can mask customers who cancel frequently, so we must evaluate cohort retention.');
 click12('save-teachback');assert.equal(run('ii12Mark()'),4);
-assert.equal(run('II12_STARTER.length'),5);
+assert.equal(run('II12_STARTER.length'),6);
 assert.match(run('ii12Notebook()'),/Verified starter evidence/);
+assert.match(run('ii12Notebook()'),/MRR growth percentage: reconcile it/);
 click12('import-source','mrr');
 click12('import-source','mrr');assert.equal(run('ii12State.notes.length'),1);
 assert.match(run('ii12Notebook()'),/Monthly recurring revenue/);
