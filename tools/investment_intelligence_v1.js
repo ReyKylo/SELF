@@ -4,7 +4,7 @@
 const II_STORAGE_KEY='self.investment.academy.v1';
 const II_MEMO_URL='https://www.bvp.com/memos/shopify';
 const II_VIDEO_URL='https://www.ycombinator.com/blog/startup-investor-school-day-1-videos/';
-const iiDefaults={view:'home',step:'brief',briefDone:false,videoReviewed:false,exploreDone:false,quizCorrect:false,quizFeedback:'',thesis:'',risk:'',evidence:'',reflection:'',deckClaim:'',customerGrowth:81};
+const iiDefaults={view:'home',step:'brief',briefDone:false,videoReviewed:false,exploreDone:false,quizCorrect:false,quizFeedback:'',quizSelection:'',thesis:'',risk:'',evidence:'',reflection:'',deckClaim:'',customerGrowth:81};
 let iiStorageOK=true;
 function iiLoad(){
  try {
@@ -64,7 +64,7 @@ function iiVisual(){
 }
 function iiRecall(){
  const choices=[['A','Kenaikan jumlah pengguna saja cukup membuktikan hasil investasi yang tinggi.'],['B','Pertumbuhan pelanggan dan MRR menunjukkan demand, tetapi harus dievaluasi bersama retention, market, dan harga investasi.'],['C','Startup kecil pasti tidak layak didanai karena jumlah pelanggan belum besar.']];
- return '<div class="ii-reading"><span class="ii-overline">04 / QUICK RECALL</span><h2>Coba jawab tanpa membuka memo.</h2><p>Dengan data yang diketahui investor pada 2010, manakah interpretasi yang paling masuk akal?</p><fieldset class="ii-quiz"><legend>Choose one answer</legend>'+choices.map(c=>'<label><input type="radio" name="iiRecallAnswer" value="'+c[0]+'"><span><b>'+c[0]+'</b>'+c[1]+'</span></label>').join('')+'</fieldset>'+iiButton('Check my reasoning →','quiz','','ii-btn ii-btn-primary')+(iiState.quizFeedback?'<div class="ii-feedback '+(iiState.quizCorrect?'is-correct':'')+'" role="status">'+iiEsc(iiState.quizFeedback)+'</div>':'')+'<p class="ii-footnote">Quiz ini menguji pemahaman dasar; satu jawaban benar belum membuktikan investment mastery.</p></div>';
+ return '<div class="ii-reading"><span class="ii-overline">04 / QUICK RECALL</span><h2>Coba jawab tanpa membuka memo.</h2><p>Dengan data yang diketahui investor pada 2010, manakah interpretasi yang paling masuk akal?</p><fieldset class="ii-quiz"><legend>Choose one answer</legend>'+choices.map(c=>iiButton('<b>'+c[0]+'</b><span>'+c[1]+'</span>','quiz-choice',c[0],'ii-choice'+(iiState.quizSelection===c[0]?' is-selected':''))).join('')+'</fieldset>'+iiButton('Check my reasoning →','quiz','','ii-btn ii-btn-primary')+(iiState.quizFeedback?'<div class="ii-feedback '+(iiState.quizCorrect?'is-correct':'')+'" role="status">'+iiEsc(iiState.quizFeedback)+'</div>':'')+'<p class="ii-footnote">Quiz ini menguji pemahaman dasar; satu jawaban benar belum membuktikan investment mastery.</p></div>';
 }
 function iiApply(){
  return '<div class="ii-reading"><span class="ii-overline">05 / YOUR FIRST ANALYST NOTE</span><h2>Now form your own view.</h2><p>Lu tidak harus benar dulu. Tulis satu argumen yang mendukung kemungkinan investasi Shopify pada 2010, lalu satu hal yang bisa membuat lu berubah pikiran.</p><label class="ii-field">Your investment thesis (minimum 30 characters)<textarea data-ii-field="thesis" maxlength="4000" rows="4" placeholder="Menurut gue, Shopify menarik karena...">'+iiEsc(iiState.thesis)+'</textarea></label><label class="ii-field">What could go wrong?<textarea data-ii-field="risk" maxlength="4000" rows="3" placeholder="Risiko terbesarnya adalah...">'+iiEsc(iiState.risk)+'</textarea></label><div class="ii-callout"><strong>Analyst writing tip</strong><p>Investment memo bukan deskripsi perusahaan. Setiap paragraf sebaiknya punya claim, evidence, dan implication terhadap keputusan investasi.</p></div><div class="ii-reading-actions">'+iiButton('Save to Active Case →','save-draft','','ii-btn ii-btn-primary')+iiButton('View case workspace','view','case','ii-btn ii-btn-quiet')+'</div><small class="ii-footnote">Draft belum di-review investor atau AI. Lu adalah penulis dan pemilik kesimpulan.</small></div>';
@@ -111,11 +111,12 @@ document.addEventListener('click',function(event){
  else if(act==='brief-done'){iiState.briefDone=true}
  else if(act==='video-done'){iiState.videoReviewed=true}
  else if(act==='visual-done'){iiState.exploreDone=true}
+ else if(act==='quiz-choice'){iiState.quizSelection=val;iiState.quizFeedback=''}
  else if(act==='quiz'){
-  const checked=document.querySelector('input[name="iiRecallAnswer"]:checked');
-  if(!checked){iiState.quizFeedback='Pilih satu jawaban dulu, baru kita bahas alasannya.'}
-  else if(checked.value==='B'){iiState.quizCorrect=true;iiState.quizFeedback='Betul. Growth memberi sinyal demand, tetapi risiko retention, market, dan valuation tetap harus diuji.'}
-  else{iiState.quizFeedback='Belum tepat. Pertumbuhan adalah evidence, bukan jaminan return. Coba bedakan sinyal positif dari keputusan investasi final.'}
+  const selected=iiState.quizSelection;
+  if(!selected){iiState.quizFeedback='Pilih satu jawaban dulu, baru kita bahas alasannya.'}
+  else if(selected==='B'){iiState.quizCorrect=true;iiState.quizFeedback='Betul. Growth memberi sinyal demand, tetapi risiko retention, market, dan valuation tetap harus diuji.'}
+  else{iiState.quizCorrect=false;iiState.quizFeedback='Belum tepat. Pertumbuhan adalah evidence, bukan jaminan return. Coba bedakan sinyal positif dari keputusan investasi final.'}
  }
  else if(act==='save-draft'){
   if(iiState.thesis.trim().length<30){if(typeof toast==='function')toast('Tulis thesis sedikit lebih lengkap (minimal 30 karakter).');return}
