@@ -1,6 +1,6 @@
 /* Phase 1.5 IC Defense and editable PowerPoint structure, deterministic isolated QA. */
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
-const modules=['investment_intelligence_v1.js','investment_lab_v12.js','investment_model_v13.js','investment_memo_v14.js','investment_ic_deck_v15.js'];
+const modules=['investment_intelligence_v1.js','investment_lab_v12.js','investment_model_v13.js','investment_memo_v14.js','investment_ic_deck_v15.js','investment_vault_v16.js','investment_vault_cloud_v16.js','investment_curriculum_v2.js'];
 const memory=new Map(),listeners={},downloads=[],messages=[];
 let renders=0;
 const doc={addEventListener:(name,cb)=>{(listeners[name]??=[]).push(cb)},body:{appendChild(){}},querySelector:()=>null,querySelectorAll:()=>[],getElementById:()=>null,createElement:()=>({remove(){},click(){downloads.push(this.download)},set href(h){},set download(n){this._name=n},get download(){return this._name}})};
