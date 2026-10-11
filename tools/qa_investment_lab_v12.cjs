@@ -4,6 +4,7 @@ const source1=fs.readFileSync(path.join(__dirname,'investment_intelligence_v1.js
 const source12=fs.readFileSync(path.join(__dirname,'investment_lab_v12.js'),'utf8');
 const source13=fs.readFileSync(path.join(__dirname,'investment_model_v13.js'),'utf8');
 const source14=fs.readFileSync(path.join(__dirname,'investment_memo_v14.js'),'utf8');
+const source15=fs.readFileSync(path.join(__dirname,'investment_ic_deck_v15.js'),'utf8');
 const store=new Map(),listeners={},toasts=[];let renderCount=0,downloadName='';
 const document={
  addEventListener:(type,handler)=>{(listeners[type]??=[]).push(handler)},
@@ -23,6 +24,7 @@ vm.runInContext(source1,c,{filename:'investment_intelligence_v1.js'});
 vm.runInContext(source12,c,{filename:'investment_lab_v12.js'});
 vm.runInContext(source13,c,{filename:'investment_model_v13.js'});
 vm.runInContext(source14,c,{filename:'investment_memo_v14.js'});
+vm.runInContext(source15,c,{filename:'investment_ic_deck_v15.js'});
 const run=x=>vm.runInContext(x,c);
 function click12(action,val=''){
  const el={dataset:{ii12:action,val},getAttribute:()=>null};
