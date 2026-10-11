@@ -29,7 +29,7 @@ for(const section of ['summary','business','traction','model','risks','decision'
  click('toggle-ref',section+'|original-mrr');
 }
 assert.equal(ev('ii14DraftWordCount()')>200,true);
-for(const k of ['terms','mrr','hindsight'])changeFlag(k,true);
+for(const k of ['terms','mrr','hindsight'])click('toggle-flag',k);
 ev("ii13SaveSnapshot()");
 assert.equal(ev('ii14Outdated()'),false);
 let issues=ev('ii14Issues().filter(x=>x.severity!=="note").length');
