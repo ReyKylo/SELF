@@ -28,7 +28,7 @@ function iiSave(){
 }
 function iiEsc(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function iiIcon(name){return typeof rvI==='function'?rvI(name):'◇'}
-function iiButton(label,act,value='',cls='ii-btn'){return '<button type="button" class="'+cls+'" data-ii="'+act+'" data-val="'+iiEsc(value)+'">'+label+'</button>'}
+function iiButton(label,act,value='',cls='ii-btn'){const pressed=act==='quiz-choice'?' aria-pressed="'+(iiState.quizSelection===value?'true':'false')+'"':'';return '<button type="button" class="'+cls+'"'+pressed+' data-ii="'+act+'" data-val="'+iiEsc(value)+'">'+label+'</button>'}
 function iiCompleted(){return [iiState.briefDone,iiState.videoReviewed,iiState.exploreDone,iiState.quizCorrect,iiState.thesis.trim().length>=30].filter(Boolean).length}
 function iiPill(s){return '<span class="ii-pill">'+iiEsc(s)+'</span>'}
 function iiNav(){
