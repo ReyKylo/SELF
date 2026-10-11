@@ -48,7 +48,7 @@ function ii15Save(){
 function ii15E(s){return iiEsc(String(s==null?'':s))}
 function ii15Btn(label,action,val='',cls='ii15-btn'){return '<button type="button" data-ii15="'+action+'" data-value="'+ii15E(val)+'" class="'+cls+'">'+label+'</button>'}
 function ii15Notes(){return Array.isArray(ii12State.notes)?ii12State.notes:[]}
-function ii15CanCite(n){return n&&n.kind!=='retrospective'&&(!n.asOf||n.asOf<='2010-10-12')&&ii14Source(n)}
+function ii15CanCite(n){return Boolean(n&&n.kind!=='retrospective'&&(!n.asOf||n.asOf<='2010-10-12')&&ii14Source(n))}
 function ii15Source(id){return ii15Notes().find(n=>n.id===id)||null}
 function ii15DeckId(){return 'slide-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
 function ii15DefaultSlides(){
