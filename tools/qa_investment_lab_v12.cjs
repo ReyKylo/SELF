@@ -5,6 +5,9 @@ const source12=fs.readFileSync(path.join(__dirname,'investment_lab_v12.js'),'utf
 const source13=fs.readFileSync(path.join(__dirname,'investment_model_v13.js'),'utf8');
 const source14=fs.readFileSync(path.join(__dirname,'investment_memo_v14.js'),'utf8');
 const source15=fs.readFileSync(path.join(__dirname,'investment_ic_deck_v15.js'),'utf8');
+const source16=fs.readFileSync(path.join(__dirname,'investment_vault_v16.js'),'utf8');
+const source17=fs.readFileSync(path.join(__dirname,'investment_vault_cloud_v16.js'),'utf8');
+const source18=fs.readFileSync(path.join(__dirname,'investment_curriculum_v2.js'),'utf8');
 const store=new Map(),listeners={},toasts=[];let renderCount=0,downloadName='';
 const document={
  addEventListener:(type,handler)=>{(listeners[type]??=[]).push(handler)},
@@ -25,6 +28,9 @@ vm.runInContext(source12,c,{filename:'investment_lab_v12.js'});
 vm.runInContext(source13,c,{filename:'investment_model_v13.js'});
 vm.runInContext(source14,c,{filename:'investment_memo_v14.js'});
 vm.runInContext(source15,c,{filename:'investment_ic_deck_v15.js'});
+vm.runInContext(source16,c,{filename:'investment_vault_v16.js'});
+vm.runInContext(source17,c,{filename:'investment_vault_cloud_v16.js'});
+vm.runInContext(source18,c,{filename:'investment_curriculum_v2.js'});
 const run=x=>vm.runInContext(x,c);
 function click12(action,val=''){
  const el={dataset:{ii12:action,val},getAttribute:()=>null};
