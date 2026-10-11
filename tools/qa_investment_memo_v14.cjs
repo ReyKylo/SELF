@@ -48,5 +48,5 @@ assert.match(ev('ii14MemoMarkdown()'),/Bessemer/);
 assert.match(ev('ii14PrintableHTML()'),/<!DOCTYPE html>/);
 assert.ok(store.has('self.investment.memo.v14'));
 assert.ok(renders>=10);
-assert.match(ev('ii14Memo()'),/not evidence of deal participation/i);
+assert.match(ev('ii14Memo()'),/nor evidence of deal participation/i);
 console.log('PASS Phase 1.4: memo sections, original source citations, hindsight guard, frozen model staleness, deterministic review, storyboard, HTML+Markdown exports and storage');
