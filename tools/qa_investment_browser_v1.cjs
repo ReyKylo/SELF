@@ -219,7 +219,7 @@ async function run(){
  assert.equal(await page.locator('.ii14-section-pill').count(),6);
  assert.match(await page.locator('.ii14-edit-canvas').innerText(),/Executive recommendation/);
  await screenshot(page,'26-memo-editor');
- await page.locator('[data-ii14="mode"][data-value="review"]').click();
+ await page.locator('.ii14-toolbar-tab[data-ii14="mode"][data-value="review"]').click();
  assert.ok(await page.locator('.ii14-issue.critical').count()>0);
  await screenshot(page,'27-memo-review-incomplete');
  await page.locator('.ii14-toolbar-tab[data-ii14="mode"][data-value="write"]').click();
