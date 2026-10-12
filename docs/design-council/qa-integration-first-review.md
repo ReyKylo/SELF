@@ -1,0 +1,22 @@
+# Independent integration QA — first actual joint run
+
+**Decision: NOT READY for scoped completion.** Existing functional compatibility has bounded passing evidence; one actual new layout major and malformed review records keep the joint gate closed.
+
+Build `a3118f23ff8e696841443c80565a5b71dafeebef`, run `38205383080`, artifact `11726702711`. Independently read `evidence-joint1` source identity, canonical hash, original investment report, legacy QA report, supplemental contract, both integration review reports and actual Case screenshots. No local browser execution or production DB/auth action is claimed.
+
+Canonical artifact SHA256 is `ce111eb8336c3f5831cd571699910fd96bfb0ad40d365542be02bd58005632ae`. The saved canonical identity and supplemental contract's actually served SHA agree. Static contract verifies all eight investment JS modules and six investment stylesheets occur verbatim in that compiled artifact, a single B stylesheet follows all investment styles in the real document head, and the native BODY-route compatibility guard occurs exactly once. This checks assembly/interlock, not financial correctness, cloud behavior or origin provenance beyond the retained source manifest.
+
+## Actual bounded compatibility
+
+- Unchanged original investment browser suite reports37 checks and `ok:true`. Its assertions include authored drafts/progress/evidence reload, numeric models, memo/IC/backup paths, desktop/mobile/tablet representations, existing SELF entrypoints, and an induced Academy localStorage warning. That specific rejected-localStorage scenario does not certify IndexedDB failure recovery, live sync or every investment storage key.
+- Existing legacy QA passes8 groups, including actual Notes creation/editor/reload, task state/filter, Calendar edits, CSV, native Desk controls/drag/Undo/reload, Fit and30 route-size measurements, Menu and guest Cloud panel. This is scoped local compatibility on the joint canonical build; prior legacy signoff alone would not have established it.
+- Supplemental isolated contract passes four real interaction outcomes: Dashboard opens Academy; an authored investment draft survives browser reload; More opens the retained Case draft; a native Notes form submit/reload retains its record without changing the independent investment draft. It reports no uncaught browser errors and independently matches the served canonical hash.
+- Looker A's native numeric input/reload checks pass at1366 and1440. Looker B records real numeric editing, notebook assumption/source interaction, memo edit/reload, selected IC slide, and Vault download interactions with no recorded browser error. These are interface/local-data observations, not researched financial-content validation.
+
+## Remaining major and report defect
+
+Looker A's actual Active Case at1366 has document width1440. Its screenshot shows a compressed paragraph and five nonshrinking contextual shortcut buttons extending past the right edge of the nudge panel; the last Investment Vault button reaches outside the agreed laptop viewport. Source `.ii12-case-nudge` uses nonwrapping flex plus `flex-shrink:0` buttons. Severity MAJOR under V02/S03: whole-page overflow and a context action outside the laptop boundary. This is directly visible and measured in the fallback-font environment, not a generic density preference. Looker B's font-loaded1366 screenshot happens to fit; that does not invalidate the independently failing variant. Repair layout wrapping/shrink behavior in the integration presentation layer and rerun the same assertions under both environments.
+
+Three Looker B Vault records put the message `6 local document types downloaded.` into the `status` field. That is malformed evidence schema, not a demonstrated product failure. The strict collector correctly rejects a non-PASS verdict. Preserve the download message in a separate field, retain the actual interaction assertions, and rerun; do not weaken the gate to accept arbitrary status text. No FAILED product case or uncaught error appears in that report, but its old malformed records cannot grant formal final approval.
+
+No all-pass assertion or merge-readiness signoff. Fresh canonical joint evidence must close the layout major and malformed reports. Full Council KB remains the same inspected baseline. Excluded scope remains live DB/auth/cloud restore/migrations, physical touch browsers, full accessibility, normal-speed motion/performance, financial research accuracy and every cancellation/concurrency/write-failure branch not exercised by the original suites.

@@ -16,7 +16,13 @@ if html.count(boundary) != 1:
 if 'id="self-cobalt-precision-v6"' in html:
     raise SystemExit('FAIL: visual layer already applied; refusing double injection')
 css = (ROOT/'tools/cobalt_precision_v6.css').read_text(encoding='utf-8')
-html = html.replace(boundary, '<style id="self-cobalt-precision-v6">\n'+css+'\n</style>'+boundary, 1)
+compat_css = (ROOT/'tools/investment_cobalt_compat.css').read_text(encoding='utf-8')
+compat_id = 'self-investment-cobalt-compat'
+if ('id="'+compat_id+'"') in html:
+    raise SystemExit('FAIL: integration compatibility layer already applied')
+html = html.replace(boundary, '<style id="'+compat_id+'">\n'+compat_css+'\n</style>\n<style id="self-cobalt-precision-v6">\n'+css+'\n</style>'+boundary, 1)
+if html.count('id="'+compat_id+'"') != 1:
+    raise SystemExit('FAIL: compatibility style count differs from one')
 if html.count('id="self-cobalt-precision-v6"') != 1:
     raise SystemExit('FAIL: visual style count differs from one')
 html = html.replace('<strong>Rey Workspace</strong>', '<strong>SELF</strong>', 1)
