@@ -1,0 +1,149 @@
+/* SELF / Phase 1.3 Financial Analyst Workbench.
+   Deliberately distinct from editorial Academy: high-density, credible financial terminal.
+   Scoped only to Investment Intelligence route. */
+.rey-pro .ii13-page{--ii13-ink:#183352;--ii13-border:#d9e3eb;--ii13-muted:#71849a;--ii13-blue:#1b5eaa;--ii13-teal:#327b7a;--ii13-amber:#a77831;color:var(--ii13-ink);font-family:Inter,'DM Sans',system-ui,sans-serif;margin:0 0 35px;line-height:1.6}
+.rey-pro .ii13-page *{box-sizing:border-box}
+.rey-pro .ii13-page h1,.rey-pro .ii13-page h2,.rey-pro .ii13-page h3,.rey-pro .ii13-page p{margin-top:0}
+.rey-pro .ii13-page h1,.rey-pro .ii13-page h2,.rey-pro .ii13-page h3{color:var(--ii13-ink)}
+.rey-pro .ii13-page .ii-overline{color:#6080a3}
+.rey-pro .ii13-page a{color:var(--ii13-blue)}
+.rey-pro .ii13-page button,.rey-pro .ii13-page input,.rey-pro .ii13-page textarea{font-family:inherit}
+.rey-pro .ii13-page button:focus-visible,.rey-pro .ii13-page a:focus-visible,.rey-pro .ii13-page input:focus-visible,.rey-pro .ii13-page textarea:focus-visible{outline:3px solid #77b7ed;outline-offset:3px}
+.rey-pro .ii13-topline{background:#f8fafb;border:1px solid var(--ii13-border);border-top:4px solid #285c91;border-radius:12px;padding:26px 31px;display:flex;justify-content:space-between;align-items:center;gap:25px}
+.rey-pro .ii13-topline h1{font:500 clamp(31px,3.5vw,43px)/1.15 Georgia,serif;letter-spacing:-1.5px;margin:8px 0}
+.rey-pro .ii13-topline h1 em{color:#5b7c9d;font-weight:400}
+.rey-pro .ii13-topline p{color:#67829a;font-size:12px;margin:0}
+.rey-pro .ii13-provenance{border-left:1px solid #dbe5ee;padding-left:22px;min-width:220px;max-width:290px;display:flex;flex-direction:column;gap:6px}
+.rey-pro .ii13-provenance strong{font-size:9px;letter-spacing:1.5px;color:#4e80ad}
+.rey-pro .ii13-provenance span{font-weight:750;font-size:13px}
+.rey-pro .ii13-provenance small{color:#8496a8;font-size:10px}
+.rey-pro .ii13-stage-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:18px}
+.rey-pro .ii13-stage{border:1px solid #dce5ee;background:#fff;border-radius:10px;min-height:53px;display:flex;gap:10px;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#617e99;cursor:pointer}
+.rey-pro .ii13-stage small{font-family:Georgia,serif;font-size:20px;font-weight:400;color:#9daebd}
+.rey-pro .ii13-stage.is-active{background:#1c416d;border-color:#1c416d;color:#fff}
+.rey-pro .ii13-stage.is-active small{color:#acc6e5}
+.rey-pro .ii13-scenario-toolbar{display:flex;justify-content:space-between;gap:25px;align-items:center;margin:13px 0 19px;padding:13px 17px;border:1px solid #e1e8ee;background:#fafcfd;border-radius:9px}
+.rey-pro .ii13-scenario-toolbar>div{display:flex;align-items:center;gap:12px}
+.rey-pro .ii13-scenario-toolbar>div>span{font-size:10px;font-weight:850;color:#8295a8;letter-spacing:1.2px}
+.rey-pro .ii13-scenarios{display:flex;gap:5px;flex-wrap:wrap}
+.rey-pro .ii13-scenario{font-size:11px;padding:7px 12px;background:#fff;border:1px solid #d4e0e9;color:#66819a;font-weight:800;border-radius:6px;cursor:pointer}
+.rey-pro .ii13-scenario.is-active{background:#e7f1fc;border-color:#91b5db;color:#1c609f}
+.rey-pro .ii13-textbutton{font-size:11px;background:none;border:0;color:#2169ac;font-weight:850;cursor:pointer;padding:8px}
+.rey-pro .ii13-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(245px,.46fr);gap:17px;align-items:stretch}
+.rey-pro .ii13-workbench,.rey-pro .ii13-guide,.rey-pro .ii13-results,.rey-pro .ii13-sensitivity,.rey-pro .ii13-challenge{border:1px solid #d9e4ed;border-radius:12px;padding:clamp(20px,2.7vw,29px);background:#fff}
+.rey-pro .ii13-guide{background:#f5f1e8;border-color:#e8ddc9}
+.rey-pro .ii13-panel-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
+.rey-pro .ii13-panel-heading h2,.rey-pro .ii13-sensitivity h2,.rey-pro .ii13-challenge h2{font:500 clamp(25px,2.6vw,31px)/1.18 Georgia,serif;letter-spacing:-.6px;margin:8px 0 12px}
+.rey-pro .ii13-panel-heading p{font-size:12px;color:#6a7f92;margin:0 0 23px}
+.rey-pro .ii13-input-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.rey-pro .ii13-input-label{display:flex;flex-direction:column;gap:5px;font-weight:800;font-size:12px;color:#2e4e70}
+.rey-pro .ii13-input-label span{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.rey-pro .ii13-input-label small{font-size:10px;color:#99a8b8;font-weight:650}
+.rey-pro .ii13-input-label input{display:block;border:1px solid #cddce9;background:#fafdff;color:#173b5f;border-radius:8px;padding:10px 13px;min-height:42px;font-size:19px;font-variant-numeric:tabular-nums;font-weight:750;max-width:100%;min-width:0}
+.rey-pro .ii13-input-label em{font-size:10px;color:#8aa0b2;font-weight:500;line-height:1.4;font-style:normal}
+.rey-pro .ii13-method-box{border-radius:9px;background:#edf5fc;border:1px solid #d7e7f4;margin-top:25px;padding:18px 20px}
+.rey-pro .ii13-method-box strong{font-size:12px;color:#255b93}
+.rey-pro .ii13-method-box p{font-size:11px;color:#53718e;line-height:1.65;margin:6px 0}
+.rey-pro .ii13-guide .ii-overline{color:#9e8159}
+.rey-pro .ii13-guide h3{font:500 28px/1.17 Georgia,serif;letter-spacing:-.5px;margin:22px 0}
+.rey-pro .ii13-guide p{font-size:12px;line-height:1.8;color:#6f6c61;margin:0 0 17px}
+.rey-pro .ii13-guide a{font-size:11px;font-weight:800;color:#896540}
+.rey-pro .ii13-anchors{display:flex;flex-direction:column;gap:3px;background:#fffaf2;border:1px solid #e4d8c3;border-radius:9px;padding:18px;margin:23px 0}
+.rey-pro .ii13-anchors small{font-size:10px;letter-spacing:1.1px;color:#ac8554;font-weight:800;margin-bottom:9px}
+.rey-pro .ii13-anchors strong{font-family:Georgia,serif;font-size:22px;font-weight:500;color:#845e3c}
+.rey-pro .ii13-anchors span{font-size:10px;color:#9b866d;margin-top:7px}
+.rey-pro .ii13-results{margin-top:18px}
+.rey-pro .ii13-caveat{white-space:nowrap;background:#fdf4e6;color:#986728;border:1px solid #efddb8;font-size:9px;font-weight:850;letter-spacing:.9px;border-radius:5px;padding:6px 8px}
+.rey-pro .ii13-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:17px 0}
+.rey-pro .ii13-metric{display:flex;flex-direction:column;gap:7px;background:#f2f6fa;border-radius:9px;border:1px solid #dae6ef;padding:16px 15px;min-width:0}
+.rey-pro .ii13-metric small{font-size:9px;font-weight:850;letter-spacing:1px;color:#6e8aa4}
+.rey-pro .ii13-metric strong{font-family:Georgia,serif;font-size:clamp(21px,2.1vw,30px);font-weight:500;letter-spacing:-.5px;line-height:1.18;color:#18477b;white-space:nowrap}
+.rey-pro .ii13-metric span{font-size:10px;color:#7b8fa2;line-height:1.5}
+.rey-pro .ii13-metric-amber{background:#fbf5eb;border-color:#ede0c9}
+.rey-pro .ii13-metric-amber strong{color:#946c39}
+.rey-pro .ii13-analysis-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(220px,.65fr);gap:11px}
+.rey-pro .ii13-chart-panel,.rey-pro .ii13-annual{border:1px solid #dfe8ef;background:#fcfefe;border-radius:10px;padding:19px;min-width:0}
+.rey-pro .ii13-chart-panel h3,.rey-pro .ii13-table-heading h3{font-size:14px;margin:8px 0;color:#2c4f70}
+.rey-pro .ii13-chart{height:213px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:13px;align-items:end;border-bottom:1px solid #cfdee9;margin:15px 0 7px}
+.rey-pro .ii13-bar-group{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0;height:100%}
+.rey-pro .ii13-bar-group>span{font-size:10px;font-weight:800;color:#517496;white-space:nowrap}
+.rey-pro .ii13-bar-group>small{font-size:10px;color:#8195a8;font-weight:800;margin-top:5px}
+.rey-pro .ii13-bar-shell{height:160px;width:min(35px,100%);display:flex;align-items:flex-end}
+.rey-pro .ii13-bar-shell>i{display:block;width:100%;background:#8bb3d8;border-radius:3px 3px 0 0;transition:height .15s ease}
+.rey-pro .ii13-bar-shell>i.ii13-historical{background:#c99f64}
+.rey-pro .ii13-chart-key{display:flex;gap:15px;flex-wrap:wrap;font-size:10px;color:#8396a7;margin:12px 0 3px}
+.rey-pro .ii13-chart-key span{display:flex;align-items:center;gap:6px}
+.rey-pro .ii13-chart-key i{width:8px;height:8px;border-radius:2px;background:#c99f64}
+.rey-pro .ii13-chart-key span:nth-child(2) i{background:#8bb3d8}
+.rey-pro .ii13-annual{background:#f5f8fa}
+.rey-pro .ii13-annual>small{font-weight:850;font-size:9px;color:#7593ae;letter-spacing:1px}
+.rey-pro .ii13-annual>div{display:flex;flex-direction:column;gap:4px;border-bottom:1px solid #e0e9ee;padding:11px 0}
+.rey-pro .ii13-annual span{font-size:11px;color:#75889d}
+.rey-pro .ii13-annual strong{font-size:19px;color:#2b4e71;font-variant-numeric:tabular-nums}
+.rey-pro .ii13-annual p{font-size:10px;color:#8190a1;line-height:1.65;margin:13px 0 0}
+.rey-pro .ii13-table-heading{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:23px 0 9px}
+.rey-pro .ii13-table-heading span{color:#95a7b6;font-size:9px;letter-spacing:1px;font-weight:850}
+.rey-pro .ii13-table-wrap{max-width:100%;overflow-x:auto;border:1px solid #dae5ee;border-radius:9px}
+.rey-pro .ii13-table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums;color:#46637e}
+.rey-pro .ii13-table th,.rey-pro .ii13-table td{text-align:right;padding:10px 12px;border-bottom:1px solid #e5edf2}
+.rey-pro .ii13-table thead th{background:#f0f5f9;color:#6783a0;font-size:10px;font-weight:850}
+.rey-pro .ii13-table th:first-child,.rey-pro .ii13-table td:first-child{text-align:left}
+.rey-pro .ii13-table tbody tr:nth-child(even){background:#f9fbfd}
+.rey-pro .ii13-table tfoot th,.rey-pro .ii13-table tfoot td{background:#dfeefc;font-weight:850;color:#22538a;border-bottom:0}
+.rey-pro .ii13-method-foot{font-size:10px;color:#8397ab;line-height:1.5;margin:10px 0}
+.rey-pro .ii13-actions{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 12px}
+.rey-pro .ii13-button{background:#f6f9fb;border:1px solid #c8d9e8;color:#30608e;cursor:pointer;padding:11px 14px;border-radius:8px;font-size:11px;font-weight:800;min-height:40px}
+.rey-pro .ii13-button:hover{background:#e9f3fc}
+.rey-pro .ii13-button-primary{background:#1d5d9f;color:#fff;border-color:#1d5d9f}
+.rey-pro .ii13-button-primary:hover{background:#10477f}
+.rey-pro .ii13-save-status{display:flex;flex-direction:column;gap:3px;border-top:1px solid #e4ecf2;margin-top:10px;padding:14px 0 0;color:#8195a7;font-size:10px}
+.rey-pro .ii13-save-status strong{color:#346887}
+.rey-pro .ii13-sensitivity>p,.rey-pro .ii13-challenge>p{font-size:13px;color:#637e96;max-width:810px}
+.rey-pro .ii13-compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:25px 0}
+.rey-pro .ii13-compare>div{padding:20px;background:#f3f7fb;border:1px solid #d9e5ef;border-radius:10px;display:flex;flex-direction:column;gap:5px}
+.rey-pro .ii13-compare>div:first-child{background:#fdf4ee;border-color:#e9d6c6}
+.rey-pro .ii13-compare>div:last-child{background:#edf8f6;border-color:#cbe3dc}
+.rey-pro .ii13-compare span{font-size:10px;letter-spacing:1px;font-weight:800;color:#7690a7}
+.rey-pro .ii13-compare strong{font:500 clamp(23px,2.6vw,34px) Georgia,serif;color:#24527e}
+.rey-pro .ii13-compare small{font-size:10px;color:#8498ac}
+.rey-pro .ii13-sensitivity-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(220px,.65fr);gap:18px}
+.rey-pro .ii13-sensitivity-grid>div{min-width:0}
+.rey-pro .ii13-sensitivity-grid h3{font-size:16px;margin:10px 0 20px}
+.rey-pro .ii13-sensitivity-grid p{font-size:11px;color:#7890a5;margin:12px 0}
+.rey-pro .ii13-sensitivity-table td{min-width:110px}
+.rey-pro .ii13-sensitivity-table td strong{display:block;color:#265783;font-size:14px}
+.rey-pro .ii13-sensitivity-table td span{display:block;color:#8196a7;font-size:9px}
+.rey-pro .ii13-center-cell{background:#e3f0fb}
+.rey-pro .ii13-question-card{border:1px solid #e0dbc9;border-radius:11px;background:#f9f5ed;padding:22px}
+.rey-pro .ii13-question-card .ii-overline{color:#a08359}
+.rey-pro .ii13-question-card h3{font:500 24px/1.17 Georgia,serif;margin:16px 0}
+.rey-pro .ii13-question-card p{font-size:12px;color:#857865;line-height:1.72}
+.rey-pro .ii13-question-card .ii13-button{margin-top:14px}
+.rey-pro .ii13-challenge-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(220px,.6fr);gap:25px}
+.rey-pro .ii13-challenge-main h3{font-size:16px;color:#234768;margin:18px 0 8px}
+.rey-pro .ii13-challenge-main>p{font-size:13px;color:#647b91}
+.rey-pro .ii13-answers{display:grid;gap:8px;margin:16px 0}
+.rey-pro .ii13-answer{padding:15px;background:#fff;border:1px solid #dce6ee;border-radius:9px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left}
+.rey-pro .ii13-answer:hover{background:#f4f9fc}
+.rey-pro .ii13-answer.is-selected{background:#e8f3fc;border-color:#6192bd;box-shadow:inset 0 0 0 1px #6192bd}
+.rey-pro .ii13-answer>b{background:#edf4f9;color:#376da0;display:grid;place-items:center;width:27px;height:27px;border-radius:5px;flex-shrink:0}
+.rey-pro .ii13-answer.is-selected>b{background:#1e619e;color:#fff}
+.rey-pro .ii13-answer span{font-size:12px;color:#527089}
+.rey-pro .ii13-feedback{border:1px solid #e3cca7;background:#fff7e9;padding:13px 15px;border-radius:8px;font-size:12px;margin:15px 0}
+.rey-pro .ii13-feedback.is-correct{background:#eef9f3;border-color:#b5dbc5}
+.rey-pro .ii13-reasoning{display:flex;flex-direction:column;gap:9px;margin:16px 0}
+.rey-pro .ii13-reasoning span{font-size:11px;color:#617e98;font-weight:800}
+.rey-pro .ii13-reasoning textarea{width:100%;border-radius:9px;border:1px solid #ccdfec;background:#fff;padding:13px 15px;font-size:13px;line-height:1.7;resize:vertical;color:#244c71}
+.rey-pro .ii13-footer{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;padding:21px 22px;background:#f0f4f7;border-radius:10px}
+.rey-pro .ii13-footer strong{font-size:12px;color:#3e688e}
+.rey-pro .ii13-footer p{font-size:10px;color:#7b90a5;line-height:1.65;margin:7px 0 0}
+.rey-pro .ii13-storage-warning{background:#fff1df;border:1px solid #eac08a;color:#885b24;padding:13px;margin:15px 0;border-radius:8px;font-size:12px}
+.rey-pro .ii13-entry{margin:16px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#eaf4f9;border-left:4px solid #3e799f;border-radius:10px;padding:19px 22px}
+.rey-pro .ii13-entry .ii-overline{color:#5b87a6}
+.rey-pro .ii13-entry h2{font-family:Georgia,serif;font-weight:500;font-size:25px;color:#20527b;margin:6px 0}
+.rey-pro .ii13-entry p{font-size:11px;color:#61809b;margin:0}
+.rey-pro .ii13-entry button{white-space:nowrap;flex-shrink:0}
+@media(max-width:1160px){.rey-pro .ii13-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.rey-pro .ii13-analysis-grid{grid-template-columns:1fr}.rey-pro .ii13-grid{grid-template-columns:minmax(0,1fr) 235px}}
+@media(max-width:850px){.rey-pro .ii13-grid,.rey-pro .ii13-challenge-layout,.rey-pro .ii13-sensitivity-grid{grid-template-columns:1fr}.rey-pro .ii13-topline{flex-wrap:wrap}.rey-pro .ii13-provenance{border:0;border-top:1px solid #dbe5ee;padding:15px 0 0;max-width:none;width:100%}.rey-pro .ii13-guide{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px}.rey-pro .ii13-guide>span,.rey-pro .ii13-guide>h3{grid-column:1/-1}.rey-pro .ii13-guide a{align-self:start}.rey-pro .ii13-anchors{margin:0}.rey-pro .ii13-footer{grid-template-columns:1fr}}
+@media(max-width:620px){.rey-pro .ii13-topline{padding:21px}.rey-pro .ii13-topline h1{font-size:32px}.rey-pro .ii13-stage{flex-direction:column;gap:0;font-size:9px;min-height:55px}.rey-pro .ii13-stage small{font-size:15px}.rey-pro .ii13-scenario-toolbar{flex-wrap:wrap;gap:9px}.rey-pro .ii13-scenario-toolbar>div{flex-wrap:wrap}.rey-pro .ii13-grid,.rey-pro .ii13-input-grid,.rey-pro .ii13-compare,.rey-pro .ii13-guide{grid-template-columns:1fr}.rey-pro .ii13-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.rey-pro .ii13-metric{padding:14px 12px}.rey-pro .ii13-metric strong{font-size:20px}.rey-pro .ii13-analysis-grid{grid-template-columns:1fr}.rey-pro .ii13-chart{gap:5px;height:175px}.rey-pro .ii13-bar-shell{height:120px}.rey-pro .ii13-bar-group>span{font-size:8px}.rey-pro .ii13-caveat{white-space:normal}.rey-pro .ii13-entry{flex-direction:column;align-items:start}.rey-pro .ii13-entry button{white-space:normal}}
+@media(prefers-reduced-motion:reduce){.rey-pro .ii13-page .ii13-bar-shell>i{transition:none}}

@@ -1,0 +1,74 @@
+name: Investment Intelligence — Browser QA
+on:
+  push:
+    branches:
+      - feature/investment-intelligence-academy-v1
+    paths:
+      - 'tools/investment_intelligence_v1.*'
+      - 'tools/investment_lab_v12.*'
+      - 'tools/investment_model_v13.*'
+      - 'tools/investment_memo_v14.*'
+      - 'tools/investment_ic_deck_v15.*'
+      - 'tools/investment_vault_v16.*'
+      - 'tools/investment_vault_cloud_v16.js'
+      - 'tools/investment_curriculum_v2.*'
+      - 'tools/investment_learning_v2.css'
+      - 'tools/qa_investment_vault_v16.cjs'
+      - 'tools/qa_investment_curriculum_v2.cjs'
+      - 'tools/self_cloud_runtime.js'
+      - 'supabase/migrations/20261011_self_investment_vault_v1.sql'
+      - 'tools/qa_investment_ic_deck_v15.cjs'
+      - 'tools/qa_investment_memo_v14.cjs'
+      - 'tools/qa_investment_model_v13.cjs'
+      - 'tools/qa_investment_browser_v1.cjs'
+      - 'tools/build_cloudflare.py'
+      - '.github/workflows/investment-browser-qa.yml'
+  pull_request:
+    paths:
+      - 'tools/investment_intelligence_v1.*'
+      - 'tools/investment_lab_v12.*'
+      - 'tools/investment_model_v13.*'
+      - 'tools/investment_memo_v14.*'
+      - 'tools/investment_ic_deck_v15.*'
+      - 'tools/investment_vault_v16.*'
+      - 'tools/investment_vault_cloud_v16.js'
+      - 'tools/investment_curriculum_v2.*'
+      - 'tools/investment_learning_v2.css'
+      - 'tools/qa_investment_vault_v16.cjs'
+      - 'tools/qa_investment_curriculum_v2.cjs'
+      - 'tools/self_cloud_runtime.js'
+      - 'supabase/migrations/20261011_self_investment_vault_v1.sql'
+      - 'tools/qa_investment_ic_deck_v15.cjs'
+      - 'tools/qa_investment_memo_v14.cjs'
+      - 'tools/qa_investment_model_v13.cjs'
+      - 'tools/qa_investment_browser_v1.cjs'
+      - 'tools/build_cloudflare.py'
+      - '.github/workflows/investment-browser-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assemble and validate SELF without changing storage
+        run: python3 tools/build_cloudflare.py
+      - name: Install headless browser dependencies
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Run desktop/mobile Academy and historical-case browser checks
+        run: node tools/qa_investment_browser_v1.cjs
+      - name: Preserve QA screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: self-investment-chromium-qa
+          path: artifacts/investment-qa/
+          if-no-files-found: warn
+          retention-days: 7

@@ -20,6 +20,20 @@ v4css=(ROOT/'tools'/'workspace_v4.css').read_text(encoding='utf-8')
 v42css=(ROOT/'tools'/'visual_fidelity_v42.css').read_text(encoding='utf-8')
 v5js=(ROOT/'tools'/'calendar_studio_v5.js').read_text(encoding='utf-8')
 v5css=(ROOT/'tools'/'calendar_studio_v5.css').read_text(encoding='utf-8')
+ii_js=(ROOT/'tools'/'investment_intelligence_v1.js').read_text(encoding='utf-8')
+ii_css=(ROOT/'tools'/'investment_intelligence_v1.css').read_text(encoding='utf-8')
+ii12_js=(ROOT/'tools'/'investment_lab_v12.js').read_text(encoding='utf-8')
+ii12_css=(ROOT/'tools'/'investment_lab_v12.css').read_text(encoding='utf-8')
+ii13_js=(ROOT/'tools'/'investment_model_v13.js').read_text(encoding='utf-8')
+ii13_css=(ROOT/'tools'/'investment_model_v13.css').read_text(encoding='utf-8')
+ii14_js=(ROOT/'tools'/'investment_memo_v14.js').read_text(encoding='utf-8')
+ii14_css=(ROOT/'tools'/'investment_memo_v14.css').read_text(encoding='utf-8')
+ii15_js=(ROOT/'tools'/'investment_ic_deck_v15.js').read_text(encoding='utf-8')
+ii15_css=(ROOT/'tools'/'investment_ic_deck_v15.css').read_text(encoding='utf-8')
+ii16_js=(ROOT/'tools'/'investment_vault_v16.js').read_text(encoding='utf-8')
+ii16_cloud_js=(ROOT/'tools'/'investment_vault_cloud_v16.js').read_text(encoding='utf-8')
+ii2_js=(ROOT/'tools'/'investment_curriculum_v2.js').read_text(encoding='utf-8')
+ii2_css=(ROOT/'tools'/'investment_learning_v2.css').read_text(encoding='utf-8')
 
 def replace_once(old,new,reason):
     global html
@@ -29,13 +43,13 @@ def replace_once(old,new,reason):
     html=html.replace(old,new,1)
 
 render_anchor='function render(){document.body.dataset.page=page;'
-replace_once('career:careerStudio,more:moreHub,','career:rvCareerV4,more:rvMoreV4,','Career+More routes')
+replace_once('career:careerStudio,more:moreHub,','career:rvCareerV4,more:iiMoreHub,investment:iiAcademy,','Career+More routes')
 replace_once('desk:()=>desk.render(),today:dashboard,calendar:calendar,planning:planning,journal:journal,',
-             'desk:rvWhiteboardV4,today:rvDashboardV4,calendar:rvCalendarV5,planning:planning,journal:rvNotesV4,','five legacy route mappings')
+             'desk:rvWhiteboardV4,today:iiDashboard,calendar:rvCalendarV5,planning:planning,journal:rvNotesV4,','five legacy route mappings')
 replace_once("const pages=[['desk','▦','Desk'],['career','↗','Career'],['calendar','◷','Calendar'],['backpack','⇥','Capture inbox'],['more','▦','More']];",
              "const pages=[['today','▦','Dashboard'],['career','↗','Career'],['calendar','◷','Calendar'],['journal','▤','Notes'],['more','▦','More']];",'global sidebar menu')
-replace_once(render_anchor,v3js+'\n'+v4js+'\n'+v5js+'\n'+render_anchor,'render function')
-replace_once('</head>', '<style id="rey-career-reference-v3">\n'+v3css+'\n</style>\n<style id="rey-workspace-v4">\n'+v4css+'\n</style>\n<style id="rey-visual-fidelity-v42">\n'+v42css+'\n</style>\n<style id="rey-calendar-studio-v5">\n'+v5css+'\n</style>\n</head>', 'HTML head')
+replace_once(render_anchor,v3js+'\n'+v4js+'\n'+v5js+'\n'+ii_js+'\n'+ii12_js+'\n'+ii13_js+'\n'+ii14_js+'\n'+ii15_js+'\n'+ii16_js+'\n'+ii16_cloud_js+'\n'+ii2_js+'\n'+render_anchor,'render function')
+replace_once('\n</head><body', '<style id="rey-career-reference-v3">\n'+v3css+'\n</style>\n<style id="rey-workspace-v4">\n'+v4css+'\n</style>\n<style id="rey-visual-fidelity-v42">\n'+v42css+'\n</style>\n<style id="rey-calendar-studio-v5">\n'+v5css+'\n</style>\n<style id="self-investment-intelligence-v1">\n'+ii_css+'\n</style>\n<style id="self-investment-lab-v12">\n'+ii12_css+'\n</style>\n<style id="self-investment-model-v13">\n'+ii13_css+'\n</style>\n<style id="self-investment-memo-v14">\n'+ii14_css+'\n</style>\n<style id="self-investment-ic-deck-v15">\n'+ii15_css+'\n</style>\n<style id="self-investment-phase2">\n'+ii2_css+'\n</style>\n</head><body', 'HTML head / exact document boundary')
 # Keep existing URL bookmarks and nested Worlds. Brand link returns to dashboard, not raw Whiteboard.
 html=html.replace('href="#desk" class="brand"','href="#today" class="brand"',1)
 
@@ -60,15 +74,30 @@ try:
 finally: checker.unlink(missing_ok=True)
 subprocess.run(['node', str(ROOT/'tools'/'qa_workspace_v4.cjs')], cwd=ROOT, check=True)
 subprocess.run(['node', str(ROOT/'tools'/'qa_calendar_studio_v5.cjs')], cwd=ROOT, check=True)
-for must in ('rvDashboardV4','rvCareerV4','rvCalendarV4','rvNotesV4','rvWhiteboardV4','rvMoreV4','createDesk(','createVoiceCapture(','createBackpack('):
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_intelligence_v1.cjs')], cwd=ROOT, check=True)
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_lab_v12.cjs')], cwd=ROOT, check=True)
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_model_v13.cjs')], cwd=ROOT, check=True)
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_memo_v14.cjs')], cwd=ROOT, check=True)
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_ic_deck_v15.cjs')], cwd=ROOT, check=True)
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_vault_v16.cjs')], cwd=ROOT, check=True)
+subprocess.run(['node', str(ROOT/'tools'/'qa_investment_curriculum_v2.cjs')], cwd=ROOT, check=True)
+for must in ('iiAcademy','ii12Growth','ii12Notebook','ii13View','ii14Memo','ii15Defense','ii16Vault','ii2Page','iiMoreHub','iiDashboard','rvDashboardV4','rvCareerV4','rvCalendarV4','rvNotesV4','rvWhiteboardV4','rvMoreV4','createDesk(','createVoiceCapture(','createBackpack('):
     if must not in html: raise SystemExit('FAIL: missing required feature: '+must)
 output=ROOT/'dist'
 output.mkdir(exist_ok=True)
 (output/'index.html').write_text(html,encoding='utf-8')
 shutil.copy2(ROOT/'assets'/'career-landscape.svg',output/'career-landscape.svg')
 print('PASS: five V4 screens integrated with existing data, routes and spatial engine')
+print('PASS: isolated Investment Intelligence V1 Academy, browser-only learner drafts, lesson QA')
+print('PASS: Phase 1.2 microlearning and source-aware research notebook integrated')
+print('PASS: Phase 1.3 finance scenario, sensitivity and model review integrated')
+print('PASS: Phase 1.4 memo editor, source review, linked model and deck storyboard integrated')
+print('PASS: Phase 1.5 independent IC Defense and editable native PowerPoint Deck Studio integrated')
+print('PASS: Phase 1.6 investment backup/restore, opt-in SELF Supabase Cloud Vault and Phase 2 curriculum integrated')
 print('PASS: Calendar Studio V5 replaces only the Calendar route, data and Supabase remain untouched')
 print('PASS: V4.2 visual fidelity layer included without mock data')
 print('PASS: existing SELF Supabase cloud sync preserved after successful local-save hook')
 print('PASS: complete JS module syntax and required functions')
-print(f'Cloudflare static build ready: {output / "index.html"} ({(output / "index.html").stat().st_size:,} bytes)')
+# Canonical output includes approved B once after all legacy/investment checks.
+subprocess.run([sys.executable, str(ROOT/'tools/apply_visual.py')], cwd=ROOT, check=True)
+print(f'Cloudflare static build ready: {output / "index.html"} ({(output / "index.html").stat().st_size:,} bytes)', flush=True)

@@ -1,0 +1,90 @@
+/* SELF Phase 1.6 Investment Vault & Phase 2 VC Academy.
+   Purpose-built editorial classroom distinct from Investment Desk. */
+.rey-pro .ii16-vault,.rey-pro .ii2-app{font-family:Inter,'DM Sans',system-ui,sans-serif;color:#1a3753;line-height:1.65;min-width:0}
+.rey-pro .ii16-vault *, .rey-pro .ii2-app *{box-sizing:border-box}
+.rey-pro .ii16-vault h1,.rey-pro .ii16-vault h2,.rey-pro .ii16-vault h3,.rey-pro .ii2-app h1,.rey-pro .ii2-app h2,.rey-pro .ii2-app h3{font-family:Georgia,serif;font-weight:500;letter-spacing:-.7px;margin-top:0}
+.rey-pro .ii16-vault h1,.rey-pro .ii2-app h1{font-size:clamp(31px,3.5vw,46px);line-height:1.1;margin:8px 0}
+.rey-pro .ii16-vault p,.rey-pro .ii2-app p{font-size:13px;color:#667f95;line-height:1.77}
+.rey-pro .ii16-vault button,.rey-pro .ii2-app button{font-family:inherit;cursor:pointer}
+.rey-pro .ii16-vault button:focus-visible,.rey-pro .ii2-app button:focus-visible,.rey-pro .ii2-app textarea:focus-visible,.rey-pro .ii2-app a:focus-visible{outline:3px solid #7eb5e6;outline-offset:2px}
+.rey-pro .ii16-vault>header,.rey-pro .ii2-nav-header{background:#f3f7fa;border:1px solid #dce7ee;border-radius:13px;padding:clamp(20px,3vw,30px);margin:12px 0 20px}
+.rey-pro .ii2-nav-header{display:flex;align-items:center;justify-content:space-between;gap:30px}
+.rey-pro .ii16-vault>header>p,.rey-pro .ii2-nav-header p{margin:0}
+.rey-pro .ii2-count{min-width:175px;border-left:1px solid #d8e3ee;padding:14px 0 14px 23px;display:flex;flex-direction:column;gap:5px}
+.rey-pro .ii2-count strong{font-family:Georgia,serif;font-size:30px;font-weight:500;color:#1b568d}
+.rey-pro .ii2-count span{font-size:10px;color:#7d97ad}
+.rey-pro .ii16-columns{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(230px,.7fr);gap:16px;align-items:stretch}
+.rey-pro .ii16-columns>section,.rey-pro .ii16-columns>aside,.rey-pro .ii16-import{border:1px solid #dbe4ed;border-radius:12px;padding:clamp(22px,3vw,30px);background:white}
+.rey-pro .ii16-columns>aside{background:#173656;color:#fff}
+.rey-pro .ii16-columns>aside h3{color:#fff;font-size:24px}
+.rey-pro .ii16-columns>aside p{color:#ccdaea;font-size:12px}
+.rey-pro .ii16-columns>section h2{font-size:28px}
+.rey-pro .ii16-doc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:22px 0}
+.rey-pro .ii16-doc{border:1px solid #dbe7f0;border-radius:8px;background:#f5f9fc;padding:17px;display:flex;flex-direction:column;gap:7px}
+.rey-pro .ii16-doc strong{font-size:11px;letter-spacing:1px;color:#225d93}
+.rey-pro .ii16-doc span{color:#8ba1b4;font-size:11px}
+.rey-pro .ii16-actions{display:flex;gap:9px;flex-wrap:wrap}
+.rey-pro .ii16-vault button{border:1px solid #c6d9e8;border-radius:8px;background:#f5f9fc;color:#316792;padding:11px 15px;font-size:11px;font-weight:850}
+.rey-pro .ii16-vault button.ii16-primary{background:#1c5b92;border-color:#1c5b92;color:#fff}
+.rey-pro .ii16-status{margin:17px 0 0;border-top:1px solid #e3ebf1;padding-top:12px;overflow-wrap:anywhere;font-size:11px!important}
+.rey-pro .ii16-import{margin-top:17px}
+.rey-pro .ii16-import h2{font-size:25px;margin-bottom:5px}
+.rey-pro .ii16-import input{max-width:100%;display:block;margin:15px 0;color:#56728d}
+.rey-pro .ii2-layout{display:grid;grid-template-columns:minmax(215px,.35fr) minmax(0,1fr);gap:16px;align-items:start}
+.rey-pro .ii2-course-rail{background:#f6f8fa;border:1px solid #dce6ed;border-radius:12px;padding:20px 13px;position:sticky;top:13px;max-height:800px;overflow:auto}
+.rey-pro .ii2-course-rail>.ii-overline{display:block;padding:4px 10px 14px}
+.rey-pro .ii2-lesson-link{background:transparent;border:1px solid transparent;border-radius:8px;width:100%;text-align:left;padding:11px 9px;margin:3px 0;display:flex;gap:10px;align-items:center;color:#587b99}
+.rey-pro .ii2-lesson-link>b{font:500 20px Georgia,serif;color:#91a6b8;flex-shrink:0}
+.rey-pro .ii2-lesson-link>span{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.rey-pro .ii2-lesson-link strong{font-size:11px;line-height:1.3;overflow-wrap:anywhere}
+.rey-pro .ii2-lesson-link small{font-size:9px;color:#96aab9}
+.rey-pro .ii2-lesson-link em{font-size:10px;font-style:normal;color:#8fa3b6;flex-shrink:0}
+.rey-pro .ii2-lesson-link.is-active{border-color:#d0dfec;background:white;box-shadow:0 3px 12px #1638580d}
+.rey-pro .ii2-lesson-link.is-active strong,.rey-pro .ii2-lesson-link.is-active b{color:#1b6298}
+.rey-pro .ii2-current{padding:19px 25px;background:#213e5f;color:white;border-radius:12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px}
+.rey-pro .ii2-current .ii-overline{color:#adcbe4;flex-basis:100%}
+.rey-pro .ii2-current h3{color:#fff;font-size:24px;margin:0;flex:1}
+.rey-pro .ii2-modern,.rey-pro .ii2-historical{font-size:9px;letter-spacing:.8px;font-weight:850;border:1px solid #7da2c1;padding:7px 9px;border-radius:7px;color:#c4e0f0}
+.rey-pro .ii2-modern{border-color:#d9ad6c;color:#ffdc9d}
+.rey-pro .ii2-stages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
+.rey-pro .ii2-stage{display:flex;align-items:center;justify-content:center;gap:6px;background:#f8fafc;border:1px solid #dde7ee;border-radius:8px;color:#71899f;padding:12px 5px;font-size:11px;font-weight:850}
+.rey-pro .ii2-stage small{font:500 17px Georgia,serif;color:#a0b3c5}
+.rey-pro .ii2-stage.is-active{background:#235987;color:white;border-color:#235987}
+.rey-pro .ii2-stage.is-completed:not(.is-active){background:#eff8f4;border-color:#c9e4d5;color:#4f876f}
+.rey-pro .ii2-paper{background:#fffefb;border:1px solid #e0e4e5;border-radius:12px;min-height:490px;padding:clamp(23px,3.5vw,41px)}
+.rey-pro .ii2-paper .ii-overline{color:#a0845b}
+.rey-pro .ii2-paper h2{font-size:clamp(28px,3vw,39px);line-height:1.18;max-width:810px;margin:16px 0 24px}
+.rey-pro .ii2-paper>p{font-size:14px;line-height:1.92;color:#3f5b70;max-width:850px;margin-bottom:21px}
+.rey-pro .ii2-paper blockquote{padding:21px;border-left:3px solid #2c719c;background:#eef5fa;color:#235b86;font:italic 21px Georgia,serif;border-radius:5px}
+.rey-pro .ii2-btn{background:#f6f9fb;border:1px solid #cbdbe7;color:#326c97;border-radius:8px;padding:11px 15px;font-size:11px;font-weight:850;margin-top:13px}
+.rey-pro .ii2-btn.ii2-primary{background:#1d5d95;border-color:#1d5d95;color:white}
+.rey-pro .ii2-source-card{padding:22px;border:1px solid #d6e3ed;border-radius:10px;background:#f1f7fc;margin:21px 0}
+.rey-pro .ii2-source-card small{font-size:10px;font-weight:850;letter-spacing:1px;color:#7291a9}
+.rey-pro .ii2-source-card h3{font-size:22px;margin:10px 0}
+.rey-pro .ii2-source-card p{font-size:12px;margin:7px 0}
+.rey-pro .ii2-source-card a,.rey-pro .ii2-source-video a{font-weight:850;font-size:12px;color:#1b679e}
+.rey-pro .ii2-source-video{padding:21px;background:#faf5eb;border:1px solid #ede1ce;border-radius:10px;margin:17px 0}
+.rey-pro .ii2-source-video strong{font-size:13px;color:#8d6e48}
+.rey-pro .ii2-source-video p{font-size:12px}
+.rey-pro .ii2-choices{display:grid;gap:9px;margin:24px 0}
+.rey-pro .ii2-choice{display:flex;align-items:center;gap:14px;text-align:left;padding:16px 19px;border:1px solid #dde6ee;border-radius:9px;background:white;color:#53718b;margin:0!important}
+.rey-pro .ii2-choice b{background:#eef5fb;border-radius:6px;display:grid;place-items:center;width:31px;height:31px;flex-shrink:0;color:#296395}
+.rey-pro .ii2-choice span{font-size:13px}
+.rey-pro .ii2-choice.is-selected{background:#eaf4fc;border-color:#3577ad;box-shadow:inset 0 0 0 1px #3577ad}
+.rey-pro .ii2-feedback{padding:15px;margin:16px 0;border:1px solid #e7ca94;background:#fff6e5;border-radius:8px;color:#815c30;font-size:12px}
+.rey-pro .ii2-feedback.good{background:#eaf8f0;border-color:#b8dac8;color:#397958}
+.rey-pro .ii2-mission-tip,.rey-pro .ii2-numeric{background:#f0f6fb;border-radius:9px;border:1px solid #d9e8f2;padding:18px;margin:20px 0;color:#51728f;font-size:12px}
+.rey-pro .ii2-numeric span{color:#5e86aa;font-size:10px;font-weight:850;letter-spacing:.9px}
+.rey-pro .ii2-numeric p{font:500 18px Georgia,serif;margin:10px 0 0}
+.rey-pro .ii2-field{display:flex;flex-direction:column;gap:10px;margin:23px 0;font-size:12px;font-weight:850;color:#4c6c89}
+.rey-pro .ii2-field textarea{width:100%;border:1px solid #d2dee8;border-radius:8px;background:white;color:#1e466a;padding:18px;font:14px/1.75 Georgia,serif;resize:vertical;min-height:180px}
+.rey-pro .ii2-apply-actions{display:flex;gap:9px;flex-wrap:wrap}
+.rey-pro .ii2-progress{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:10px;color:#8ba1b4;padding:14px 4px}
+.rey-pro .ii2-foot{padding:25px 0;font-size:10px;color:#8398a9;line-height:1.7}
+.rey-pro .ii2-disclaimer{font-size:11px!important;color:#869aab!important;margin-top:13px}
+.rey-pro .ii2-home-entry{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:23px 25px;border-radius:12px;background:#eaf3ee;border:1px solid #cfe1d5;margin:16px 0}
+.rey-pro .ii2-home-entry h2{font:500 27px Georgia,serif;margin:6px 0;color:#35654d}
+.rey-pro .ii2-home-entry p{font-size:12px;color:#698978;margin:0}
+.rey-pro .ii2-home-entry .ii-overline{color:#608c73}
+@media(max-width:940px){.rey-pro .ii2-layout{grid-template-columns:1fr}.rey-pro .ii2-course-rail{position:static;max-height:290px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rey-pro .ii2-course-rail>.ii-overline{grid-column:1/-1}.rey-pro .ii2-lesson-link{margin:0}.rey-pro .ii16-columns{grid-template-columns:1fr}}
+@media(max-width:650px){.rey-pro .ii2-nav-header{flex-direction:column;align-items:flex-start}.rey-pro .ii2-count{border:0;border-top:1px solid #d8e3ee;padding:12px 0 0;width:100%}.rey-pro .ii2-course-rail{grid-template-columns:repeat(2,minmax(0,1fr))}.rey-pro .ii2-stages{gap:4px}.rey-pro .ii2-stage{display:flex;flex-direction:column;font-size:9px;padding:8px 3px;gap:2px}.rey-pro .ii2-current{padding:17px}.rey-pro .ii2-current h3{font-size:21px}.rey-pro .ii2-paper{padding:23px 18px}.rey-pro .ii2-paper h2{font-size:28px}.rey-pro .ii16-doc-grid{grid-template-columns:1fr}.rey-pro .ii2-home-entry{flex-direction:column;align-items:flex-start}}

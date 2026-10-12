@@ -1,0 +1,12 @@
+const fs = require('node:fs');
+const read = p => JSON.parse(fs.readFileSync(p, 'utf8'));
+const sha = process.env.GITHUB_SHA;
+const original = read('artifacts/investment-qa/report.json');
+if (!original.ok || original.checks.length !== 37) throw Error('Original investment suite incomplete');
+const a = read('artifacts/looker-a-integration/report.json');
+if (a.build !== sha || a.captures.length !== 22 || a.defects.length) throw Error('Integration Looker A incomplete or failed');
+const b = read('artifacts/looker-b-integration/report.json');
+if (b.build !== sha || b.cases.length < 33 || b.cases.some(c => c.status !== 'PASS') || b.errors.length) throw Error('Integration Looker B incomplete or failed');
+const q = read('artifacts/integration-contract/report.json');
+if (q.source.buildId !== sha || q.status !== 'BOUNDED PASS' || q.runtime.errors.length || q.runtime.events.length < 4) throw Error('Supplemental integration QA incomplete or failed');
+console.log(JSON.stringify({build:sha,investmentChecks:original.checks.length,integrationACaptures:a.captures.length,integrationBCases:b.cases.length,contract:q.status,scope:'Automated reports; independent visual critique still required'},null,2));
