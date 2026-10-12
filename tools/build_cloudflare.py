@@ -98,4 +98,6 @@ print('PASS: Calendar Studio V5 replaces only the Calendar route, data and Supab
 print('PASS: V4.2 visual fidelity layer included without mock data')
 print('PASS: existing SELF Supabase cloud sync preserved after successful local-save hook')
 print('PASS: complete JS module syntax and required functions')
-print(f'Cloudflare static build ready: {output / "index.html"} ({(output / "index.html").stat().st_size:,} bytes)')
+# Canonical output includes approved B once after all legacy/investment checks.
+subprocess.run([sys.executable, str(ROOT/'tools/apply_visual.py')], cwd=ROOT, check=True)
+print(f'Cloudflare static build ready: {output / "index.html"} ({(output / "index.html").stat().st_size:,} bytes)', flush=True)
