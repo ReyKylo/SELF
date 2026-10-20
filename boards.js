@@ -47,7 +47,7 @@ return '<article class="wb-node wb-'+safe(c.kind)+(selected?' wb-selected':'')+c
 const point=(p,side)=>{const r=rect(p);return {x:r.x+(side==='right'?r.w:0),y:r.y+r.h/2}};
 function edgeMarkup(e){const a=placements().find(p=>p.id===e.source_item_id),b=placements().find(p=>p.id===e.target_item_id);if(!a||!b)return '';
 const from=point(a,'right'),to=point(b,'left'),dx=Math.max(65,Math.abs(to.x-from.x)*.43);
-return '<path data-edge="'+safe(e.id)+'" d="M '+from.x+' '+from.y+' C '+(from.x+dx)+' '+from.y+', '+(to.x-dx)+' '+to.y+', '+to.x+' '+to.y+'" stroke="var(--wb-edge)" stroke-width="2.5" stroke-linecap="round" fill="none"/>';}
+return '<path data-edge="'+safe(e.id)+'" d="M '+from.x+' '+from.y+' C '+(from.x+dx)+' '+from.y+', '+(to.x-dx)+' '+to.y+', '+to.x+' '+to.y+'" stroke="var(--wb-edge)" stroke-width="2.5" stroke-linecap="round" marker-end="url(#wb-arrow)" fill="none"/>';}
 function editor(){const b=board();if(!b)return renderLibrary();
 return '<div class="self-board-editor"><div class="wb-top"><div class="wb-crumb"><button data-board-action="back" class="wb-icon-btn" title="Back to boards">←</button><div><small>'+safe(spaceLabel(b.space_id))+' / Whiteboard</small><h1>'+safe(b.title)+'</h1></div></div><div class="wb-top-controls">'+viewButton('＋ Add Card','menu-card')+viewButton('⊞ Existing Card','menu-existing')+viewButton('✎ Rename','rename-board')+viewButton('⋯','board-options')+'</div></div>'+
 '<div class="wb-layout"><aside class="wb-toolbar" aria-label="Whiteboard tools">'+viewButton('↖ Select','tool-select')+viewButton('✎ Note','quick-note')+viewButton('☑ Task','quick-task')+viewButton('↗ Link','quick-link')+viewButton('▧ Group','quick-group')+viewButton('▦ Board','quick-board')+'</aside>'+
@@ -92,7 +92,7 @@ async function placeCard(cardId,bid=ui.boardId){const used=data().boardItems.fil
 function screenToWorld(x,y){const vp=$('#wb-viewport');if(!vp)return {x:0,y:0};const r=vp.getBoundingClientRect();return {x:(x-r.left-ui.pan.x)/ui.zoom,y:(y-r.top-ui.pan.y)/ui.zoom}}
 function applyCamera(save=false){const world=$('#wb-world');if(world)world.style.transform='translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')';const label=$('#wb-zoom-label');if(label)label.textContent=Math.round(ui.zoom*100)+'%';if(save)persistCamera();}
 let cameraTimer;
-function persistCamera(){clearTimeout(cameraTimer);cameraTimer=setTimeout(async()=>{if(ui.boardId)try{await host.patch('boards',ui.boardId,{pan_x:ui.pan.x,pan_y:ui.pan.y,zoom:ui.zoom})}catch(e){status('Could not save canvas position: '+e.message,true)}},380)}
+function persistCamera(){clearTimeout(cameraTimer);const id=ui.boardId;const snapshot={pan_x:ui.pan.x,pan_y:ui.pan.y,zoom:ui.zoom};cameraTimer=setTimeout(async()=>{if(id)try{await host.patch('boards',id,snapshot)}catch(e){status('Could not save canvas position: '+e.message,true)}},380)}
 function zoomAt(factor,clientX,clientY){const vp=$('#wb-viewport');if(!vp)return;const r=vp.getBoundingClientRect(),px=clientX-r.left,py=clientY-r.top;const x=(px-ui.pan.x)/ui.zoom,y=(py-ui.pan.y)/ui.zoom;ui.zoom=clamp(ui.zoom*factor,.25,2.5);ui.pan.x=px-x*ui.zoom;ui.pan.y=py-y*ui.zoom;applyCamera(true)}
 function redrawEdges(){const layer=$('#wb-wires-list');if(layer)layer.innerHTML=edges().map(edgeMarkup).join('')}
 function gestureStart(e){const vp=e.target.closest('#wb-viewport');if(!vp||e.button!==0||ui.modal)return;
