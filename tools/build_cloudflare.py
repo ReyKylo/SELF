@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the SELF static frontend for Cloudflare Pages (no dependencies)."""
+"""Build the SELF static frontend for Cloudflare Workers Static Assets (no dependencies)."""
 from pathlib import Path
 import shutil
 import sys
@@ -30,7 +30,7 @@ def main() -> int:
         print("SELF build failed: index.html asset references changed.", file=sys.stderr)
         return 1
 
-    print("SELF Cloudflare Pages build succeeded. Set Build output directory to: dist")
+    print("SELF Workers static assets build succeeded. Wrangler deploy reads ./dist from wrangler.jsonc")
     return 0
 
 
