@@ -1,5 +1,5 @@
 # SELF — Personal Thinking Workspace
-A personal workspace for work, learning, notes, tasks and links. **Phase 2** of the three-phase rebuild (Hybrid Whiteboards).
+A personal workspace for work, learning, notes, tasks and links. **Phase 2.5 Concept C build** of the three-phase rebuild (Creative + Smart Diagramming).
 
 ## Run
 No build tooling or dependency installation needed. Serve the directory over HTTP:
@@ -28,9 +28,20 @@ Open http://localhost:8080. A Supabase email/password account is required. The c
 - Persistent board geometry and camera in Supabase, user-scoped RLS and FK integrity
 - Dedicated `boards.js` / `boards.css`; existing Phase 1 interaction and themes preserved
 
+## Phase 2.5 Concept C — current active editor
+- Blank-first shapes (rectangle, ellipse, diamond, sticky, text, frame), rich knowledge cards and task/reference blocks. One click creates an object before asking for content.
+- Premium floating vector toolbar, spacious dotted canvas, sidebar and contextual four-tab inspector; preserved Phase 1 theme and font scaling.
+- Resize, move, marquee and multi-select; magnetic four-side ports, dynamic connectors recalculated during pointer moves/resizes, straight/curved/elbow routing and connector labels.
+- Inline double-click title editing; deep card notes, task and linked-board references; automatic Important Links extraction.
+- Context-aware object style, alignment, distribution, stacking, Smart Layout (flow/tree/cluster/tidy), undo/redo for geometry, style and connections.
+- Image uploads to private Supabase Storage (10 MB max, JPEG/PNG/WebP/GIF) with signed read URLs; drag/drop and clipboard paste.
+- Opt-in example board button **Explore Concept C starter** adds real editable objects, without silently inserting demonstration data.
+- Legacy editor remains available with `?canvas=legacy` on the SELF URL. Both editors use the same underlying boards/cards and data; no data reset.
+- Back-end migration: `20261021030100_self_concept_c_canvas_scene_storage.sql` (additive).
+
 ## Phases
 - **Phase 1**: Daily workspace, Spaces, My Work, Tasks, Quick Capture, dark/light theme.
-- **Phase 2**: Hybrid Whiteboards and connected cards (implemented, runtime smoke-tested).
+- **Phase 2.5**: Creative + Smart Diagramming whiteboard (implementation committed, smoke-tested; browser visual QA still open).
 - **Phase 3**: Richer block editor, consolidated link management, advanced global search and final polish.
 
 ## Checks
@@ -38,6 +49,7 @@ Open http://localhost:8080. A Supabase email/password account is required. The c
 node tests/smoke_render.cjs
 node tests/smoke_api.cjs
 node tests/smoke_whiteboards.cjs
+node tests/smoke_concept_c.cjs
 python3 tools/build_cloudflare.py
 ```
 A passing smoke test isn't a browser screenshot or live deployment verification. Visual and real-device checks remain required before signing off the visual contract.
@@ -53,7 +65,7 @@ No service-role keys in the browser. Users can select/change only their own reco
 SELF is a zero-dependency static application deployed as **Cloudflare Workers Static Assets**, not as a Cloudflare Pages project.
 
 The repository includes:
-- `tools/build_cloudflare.py`: creates `dist/` with the five static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`).
+- `tools/build_cloudflare.py`: creates `dist/` with seven static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`, `canvas-v3.css`, `canvas-v3.js`).
 - `wrangler.jsonc`: preserves the existing Worker name `self` and points Wrangler to `dist/` as static assets.
 
 In **Cloudflare dashboard > Workers & Pages > self > Settings > Builds**, set:
@@ -80,7 +92,7 @@ A new commit to `main` should trigger a new Workers Build. Use **Deployments** t
 
 ## Phase 2.5 — Concept C whiteboard rebuild (design locked)
 
-The current Phase 2 whiteboard experience is **not yet accepted**. The user reported incorrectly attached connectors (particularly after resizing/rearranging) and forced form-first card creation. Do not proceed directly to Phase 3.
+Concept C replacement has been implemented and committed on `main`. The user-reported defects (floating endpoints and forced form-first card creation) are addressed in code and regression-tested. Final actual-browser screenshot parity and production confirmation remain unverified. Do not start Phase 3 before user visual acceptance.
 
 Required reading before writing whiteboard code:
 1. [Concept C Implementation Blueprint](docs/CONCEPT_C_IMPLEMENTATION_BLUEPRINT.md): architecture, geometry, gestures, engineering and QA gates.
@@ -90,5 +102,5 @@ Required reading before writing whiteboard code:
 
 **Approved visual reference:** "Concept C — Creative + Smart Diagramming" image, 1672 x 941, SHA256 5bab2bb9cc33be729efe00e31bccf82d2bd58978f64ff7d6d31a5f09254b25b7. Supplied in the chat as a reference pack. The older docs/wireframe-v2.webp is NOT the Concept C whiteboard reference. The builder must obtain the approved image before visual QA.
 
-No destructive migrations, new Cloudflare Worker or whole-app replacement. Implement behind an isolated branch or feature flag, compare actual browser screenshots to the approved image and obtain acceptance before Phase 3.
+No destructive migrations, new Cloudflare Worker or whole-app replacement were performed. The original editor is preserved behind `?canvas=legacy`; compare actual browser screenshots to the approved image and obtain acceptance before Phase 3.
 
