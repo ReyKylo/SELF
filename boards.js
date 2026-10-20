@@ -95,8 +95,9 @@ let cameraTimer;
 function persistCamera(){clearTimeout(cameraTimer);cameraTimer=setTimeout(async()=>{if(ui.boardId)try{await host.patch('boards',ui.boardId,{pan_x:ui.pan.x,pan_y:ui.pan.y,zoom:ui.zoom})}catch(e){status('Could not save canvas position: '+e.message,true)}},380)}
 function zoomAt(factor,clientX,clientY){const vp=$('#wb-viewport');if(!vp)return;const r=vp.getBoundingClientRect(),px=clientX-r.left,py=clientY-r.top;const x=(px-ui.pan.x)/ui.zoom,y=(py-ui.pan.y)/ui.zoom;ui.zoom=clamp(ui.zoom*factor,.25,2.5);ui.pan.x=px-x*ui.zoom;ui.pan.y=py-y*ui.zoom;applyCamera(true)}
 function redrawEdges(){const layer=$('#wb-wires-list');if(layer)layer.innerHTML=edges().map(edgeMarkup).join('')}
-function gestureStart(e){const vp=e.target.closest('#wb-viewport');if(!vp||e.button!==0||ui.modal||e.target.closest('button,input,textarea,select'))return;
+function gestureStart(e){const vp=e.target.closest('#wb-viewport');if(!vp||e.button!==0||ui.modal)return;
 const port=e.target.closest('[data-board-port]');
+if(!port&&e.target.closest('button,input,textarea,select'))return;
 if(port){const id=port.dataset.boardPort;ui.gesture={type:'connect',id,start:{x:e.clientX,y:e.clientY},moved:false};e.preventDefault();e.stopPropagation();return}
 const resize=e.target.closest('[data-board-resize]'),drag=e.target.closest('[data-board-drag]');
 const el=resize||drag, id=el?.dataset.boardResize||el?.dataset.boardDrag;
