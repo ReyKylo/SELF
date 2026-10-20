@@ -411,7 +411,7 @@ function fitBoard(){
  updateCam();saveCam();
 }
 function liveRefresh(){const layer=$('#c3-wires');if(layer)layer.innerHTML=renderWires();for(const i of items()){const n=document.querySelector('[data-c3-item="'+i.id+'"]');if(n){n.style.left=i.x+'px';n.style.top=i.y+'px';n.style.width=i.w+'px';n.style.height=i.h+'px';n.style.transform='rotate('+num(i.rotation)+'deg)'}}refreshNavigationUI()}
-function selection(ids){ui.selected=new Set(ids);ui.edge=null;api.render()}
+function selection(ids){ui.selected=new Set(ids);ui.edge=null;ui.quickAdd=null;api.render()}
 function entries(){return [...ui.selected].map(itm).filter(Boolean)}
 function positions(ids){const d={};for(const id of ids){const i=itm(id);if(i)d[id]={x:i.x,y:i.y,w:i.w,h:i.h,z:i.z};}return d}
 async function persistPositions(before,after,msg){const ids=Object.keys(after);await transact(async()=>{for(const id of ids)await api.patchSimple('board_items',id,after[id])},msg);history(async()=>{for(const id of ids)await api.patchSimple('board_items',id,before[id])},async()=>{for(const id of ids)await api.patchSimple('board_items',id,after[id])})}
@@ -453,7 +453,7 @@ function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.butt
  if(edge){ui.edge=edge.dataset.c3Edge;ui.selected.clear();api.render();return}
  if(node&&ui.tool!=='hand'&&!ui.spaceDown){const id=node.dataset.c3Item;
  if(e.shiftKey){let ids=new Set(ui.selected);ids.has(id)?ids.delete(id):ids.add(id);selection(ids);return}
- if(!ui.selected.has(id)){ui.selected=new Set([id]);api.render()}
+ if(!ui.selected.has(id)){ui.selected=new Set([id]);ui.quickAdd=null;api.render()}
  const rect=res?.dataset.dir,selected=entries().map(i=>i.id);
  const root=itm(id);
  if(!res&&root&&kind(root)==='frame'){for(const child of items()){if(child.id!==root.id&&child.x>=root.x&&child.y>=root.y&&child.x+child.w<=root.x+root.w&&child.y+child.h<=root.y+root.h&&!selected.includes(child.id))selected.push(child.id)}}
@@ -513,6 +513,31 @@ function wheel(e){if(state().view!=='board-editor'||!e.target.closest('#c3-canva
 async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;const a=el.dataset.c3;
  if(a==='close-modal'&&el.classList.contains('c3-modal-overlay')&&e.target.closest('.c3-modal'))return;
  e.preventDefault();e.stopPropagation();const id=el.dataset.id;
+ if(a==='quick-create'){const point=ui.quickAdd?.point;ui.quickAdd=null;await create(el.dataset.kind||'rectangle',point?{x:snap(point.x),y:snap(point.y)}:null);return}
+ if(a==='quick-edit'){
+  const selected=entries()[0],node=selected?document.querySelector('[data-c3-item="'+selected.id+'"]'):null;
+  if(node)dbl({target:node,preventDefault(){},stopPropagation(){}});
+  return
+ }
+ if(a==='quick-duplicate'){await cloneSelection();return}
+ if(a==='quick-delete'){await removeSelection();return}
+ if(a==='quick-connect'){
+  const selected=entries()[0];if(!selected)return;
+  ui.connectFrom=selected.id;ui.quickAdd=null;ui.tool='connect';api.render();
+  say('Click another object to connect, or drag a dot to make a new one');return
+ }
+ if(a==='view-back'){goPreviousCamera();return}
+ if(a==='fit-selection'){fitSelection();return}
+ if(a==='minimap-toggle'){ui.mapCollapsed=!ui.mapCollapsed;refreshNavigationUI();return}
+ if(a==='minimap-jump'){
+  const map=$('#c3-minimap-svg'),viewport=$('#c3-canvas'),geom=ui.mapGeometry;if(!map||!viewport||!geom)return;
+  const rect=map.getBoundingClientRect(),w=rect.width||220,hgt=rect.height||130;
+  const localX=clamp((e.clientX-rect.left)/w*220,0,220),localY=clamp((e.clientY-rect.top)/hgt*130,0,130);
+  const x=geom.left+(localX-geom.offsetX)/geom.scale,y=geom.top+(localY-geom.offsetY)/geom.scale;
+  rememberCamera(true);
+  ui.pan={x:viewport.clientWidth/2-x*ui.zoom,y:viewport.clientHeight/2-y*ui.zoom};
+  updateCam();saveCam();return
+ }
  if(a==='open-board'){open(id);return}
  if(a==='back'){ui.boardId=null;api.navigate('boards');return}
  if(a==='new-board'){ui.modal={type:'board',space:el.dataset.space|| (state().view==='space'?state().spaceId:null)};api.render();return}
@@ -558,9 +583,11 @@ function change(e){const field=e.target.dataset.c3Style;if(field){applyStyle(fie
 function keydown(e){if(state().view!=='board-editor')return;const typing=e.target.closest('input,textarea,select,[contenteditable=true]');
  if(e.key===' '&&!typing){ui.spaceDown=true;e.preventDefault()}
  if(typing)return;
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){e.preventDefault();cloneSelection();return}
+ if(e.key.toLowerCase()==='f'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();fitSelection();return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();step(e.shiftKey?'redo':'undo');return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();step('redo');return}
- if(e.key==='Escape'){ui.modal=null;ui.tool='select';ui.gesture=null;selection([]);return}
+ if(e.key==='Escape'){ui.modal=null;ui.quickAdd=null;ui.connectFrom=null;ui.tool='select';gestureCancel();selection([]);return}
  if(e.key==='Delete'||e.key==='Backspace'){if(ui.selected.size){e.preventDefault();let records=entries().map(i=>({...i})),ids=records.map(i=>i.id);ui.selected.clear();transact(async()=>{for(const id of ids)await api.del('board_items',id)},'Objects removed');history(async()=>{for(const i of records)await api.insert('board_items',i)},async()=>{for(const i of records)await api.del('board_items',i.id)})}return}
  if(e.key.toLowerCase()==='r'){e.preventDefault();create('rectangle')}
  if(e.key.toLowerCase()==='n'){e.preventDefault();create('sticky')}
