@@ -1,0 +1,41 @@
+name: SELF quality gate
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  regression:
+    name: Static app and Concept C smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: |
+          node --check app.js
+          node --check boards.js
+          node --check canvas-v3.js
+      - name: Phase 1 render smoke
+        run: node tests/smoke_render.cjs
+      - name: Phase 1 API smoke
+        run: node tests/smoke_api.cjs
+      - name: Phase 2 legacy canvas smoke
+        run: node tests/smoke_whiteboards.cjs
+      - name: Concept C canvas smoke
+        run: node tests/smoke_concept_c.cjs
+      - name: Cloudflare static build
+        run: |
+          python3 tools/build_cloudflare.py
+          test -s dist/index.html
+          test -s dist/app.js
+          test -s dist/styles.css
+          test -s dist/boards.js
+          test -s dist/boards.css
+          test -s dist/canvas-v3.js
+          test -s dist/canvas-v3.css
