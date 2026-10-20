@@ -3,6 +3,7 @@
  * Old boards.js remains a fallback source; this module implements the same host API.
  */
 (()=>{'use strict';
+if(window.location?.search&&new URLSearchParams(window.location.search).get('canvas')==='legacy')return;
 let api;
 const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:''};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
