@@ -286,9 +286,19 @@ function gestureStart(e){if(state().view!=='board-editor'||e.button!==0)return;c
  if(ui.tool!=='select'&&ui.tool!=='connect'){const k=ui.tool,pt=worldPoint(e.clientX,e.clientY);ui.tool='select';create(k,{x:snap(pt.x),y:snap(pt.y)});e.preventDefault();return}
  if(ui.tool==='connect'){ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};return}
  ui.gesture={type:'marquee',from:{x:e.clientX,y:e.clientY},at:{x:e.clientX,y:e.clientY},shift:e.shiftKey,moved:false};e.preventDefault();}
+function nearTarget(e,g){
+ const element=document.elementFromPoint(e.clientX,e.clientY),node=element?.closest('[data-c3-item]'),port=element?.closest('[data-c3-port]');
+ const id=port?.dataset.c3Port||node?.dataset.c3Item;
+ if(!id||id===g.id)return null;
+ const target=itm(id);if(!target)return null;
+ const cursor=worldPoint(e.clientX,e.clientY);
+ const sides=['n','e','s','w'];
+ const ranked=sides.map(side=>{const p=anchor(target,side);return {side,dist:Math.hypot(p.x-cursor.x,p.y-cursor.y),point:p}}).sort((a,b)=>a.dist-b.dist);
+ return {id,side:port?.dataset.side||ranked[0].side,point:port?anchor(target,port.dataset.side):ranked[0].point};
+}
 function gestureMove(e){const g=ui.gesture;if(!g)return;const dx=e.clientX-g.from.x,dy=e.clientY-g.from.y;g.moved=g.moved||Math.hypot(dx,dy)>3;
  if(g.type==='pan'){ui.pan={x:g.orig.x+dx,y:g.orig.y+dy};updateCam();return}
- if(g.type==='connect'){g.toWorld=worldPoint(e.clientX,e.clientY);const el=$('#c3-wires');if(el)el.innerHTML=renderWires();return}
+ if(g.type==='connect'){g.snap=nearTarget(e,g);g.toWorld=g.snap?.point||worldPoint(e.clientX,e.clientY);for(const node of document.querySelectorAll('[data-c3-item].c3-magnet'))node.classList.remove('c3-magnet');if(g.snap)document.querySelector('[data-c3-item="'+g.snap.id+'"]')?.classList.add('c3-magnet');const el=$('#c3-wires');if(el)el.innerHTML=renderWires();return}
  if(g.type==='marquee'){g.at={x:e.clientX,y:e.clientY};const r=$('#c3-canvas')?.getBoundingClientRect();const el=$('#c3-marquee');if(!el||!r)return;el.hidden=false;el.style.cssText='left:'+(Math.min(g.from.x,e.clientX)-r.left)+'px;top:'+(Math.min(g.from.y,e.clientY)-r.top)+'px;width:'+Math.abs(dx)+'px;height:'+Math.abs(dy)+'px';return}
  if(!g.moved)return;
  const k=ui.zoom,i=itm(g.id);if(!i)return;
@@ -304,7 +314,7 @@ async function gestureEnd(e){const g=ui.gesture;if(!g)return;ui.gesture=null;
  if(g.type==='marquee'){let el=$('#c3-marquee');if(el)el.hidden=true;if(!g.moved){if(!g.shift)selection([]);return}
  const a=worldPoint(g.from.x,g.from.y),b=worldPoint(e.clientX,e.clientY),bounds={x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),x2:Math.max(a.x,b.x),y2:Math.max(a.y,b.y)};
  const found=items().filter(i=>i.x<bounds.x2&&i.x+i.w>bounds.x&&i.y<bounds.y2&&i.y+i.h>bounds.y).map(i=>i.id);selection(g.shift?[...ui.selected,...found]:found);return}
- if(g.type==='connect'){const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-c3-port]');if(target&&target.dataset.c3Port!==g.id)await addEdge(g.id,target.dataset.c3Port,g.side,target.dataset.side);else say('Drag to a connection dot on another shape');const el=$('#c3-wires');if(el)el.innerHTML=renderWires();return}
+ if(g.type==='connect'){const target=g.snap||nearTarget(e,g);for(const node of document.querySelectorAll('[data-c3-item].c3-magnet'))node.classList.remove('c3-magnet');if(target&&target.id!==g.id)await addEdge(g.id,target.id,g.side,target.side);else say('Drop on another shape to connect');const el=$('#c3-wires');if(el)el.innerHTML=renderWires();return}
  if(!g.moved){ui.tab='style';api.render();return}
  const after=positions(g.ids);await persistPositions(g.original,after,g.type==='resize'?'Size saved':'Position saved');}
 function wheel(e){if(state().view!=='board-editor'||!e.target.closest('#c3-canvas'))return;e.preventDefault();
