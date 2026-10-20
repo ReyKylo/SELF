@@ -97,3 +97,18 @@
 @media(max-width:1060px){.wb-top{align-items:flex-start;flex-direction:column}.wb-viewport{height:calc(100vh - 250px)}.wb-canvas-hint{display:none}}
 @media(max-width:650px){.body:has(.self-board-editor){padding:8px 9px 88px}.wb-top-controls{flex-wrap:wrap}.wb-top-controls .wb-btn{padding:9px 11px;font-size:.84em}.wb-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.wb-library-tile{min-height:180px;padding:9px}.wb-preview{height:95px}.wb-library-head,.wb-library-space-head{align-items:flex-start;flex-direction:column}.wb-viewport{height:calc(100dvh - 315px);min-height:420px}.wb-toolbar{top:8px;left:8px;gap:4px;padding:5px}.wb-toolbar .wb-btn{min-width:0;font-size:.78em;padding:8px}.wb-detail{padding:20px 18px 100px}.wb-detail-title{font-size:1.65em}.wb-node-head{min-height:53px}.wb-zoom-controls{right:9px;bottom:9px}.wb-detail-meta{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.self-board-editor,.wb-panel-backdrop,.wb-modal-overlay,.wb-detail,.wb-modal{animation:none!important}}
+
+
+/* Detail-note formatting: keyboard-friendly, clicky and readable. */
+.wb-notes-label{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;color:var(--muted);font-weight:750;font-size:.8em;letter-spacing:.04em;margin-bottom:9px}
+.wb-notes-label small{font-weight:400;letter-spacing:0}
+.wb-formatbar{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--line);padding:5px;border-radius:10px}
+.wb-formatbar button{min-width:32px;min-height:32px;background:transparent;color:var(--text);border:0;border-radius:7px;font-weight:750;font-size:.9em;cursor:pointer;transition:background .16s,transform .16s}
+.wb-formatbar button:hover{background:var(--hover);transform:translateY(-1px)}
+.wb-formatbar button:active{transform:scale(.94)}
+.wb-notes-preview{padding:18px;background:var(--card2);border:1px solid var(--line);border-radius:12px;line-height:1.65;margin:12px 0 18px;word-break:break-word}
+.wb-notes-preview[hidden]{display:none}
+.wb-notes-preview p{margin:5px 0 12px}
+.wb-notes-preview h2,.wb-notes-preview h3,.wb-notes-preview h4{margin:15px 0 7px}
+.wb-notes-preview a{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.wb-note-bullet{padding-left:8px}
