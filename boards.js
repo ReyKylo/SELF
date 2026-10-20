@@ -66,7 +66,7 @@ return '<div class="wb-panel-backdrop" data-board-action="close-detail"></div><a
 '<div class="wb-detail-meta"><label class="wb-field-label">CARD TYPE<select name="kind" class="wb-input">'+['note','task','link','group','board'].map(k=>opt(k,k[0].toUpperCase()+k.slice(1),k===c.kind)).join('')+'</select></label><label class="wb-field-label">ACCENT<select name="accent" class="wb-input">'+Object.keys(col).map(k=>opt(k,k[0].toUpperCase()+k.slice(1),k===c.accent)).join('')+'</select></label></div>'+
 '<label class="wb-field-label">VISIBLE SUMMARY<textarea name="summary" class="wb-input" rows="2" placeholder="Short description visible on your canvas">'+safe(c.summary)+'</textarea></label>'+
 '<label class="wb-field-label">KEY POINTS <small>(one per line)</small><textarea name="key_points" class="wb-input" rows="4" placeholder="• Key takeaway&#10;• What matters">'+safe(c.key_points)+'</textarea></label>'+
-'<label class="wb-field-label">DETAILED NOTES<textarea name="body" class="wb-input wb-notes" rows="7" placeholder="Explain the concept, write detailed notes, add references...">'+safe(c.body)+'</textarea></label>'+
+'<div class="wb-notes-label"><span>DETAILED NOTES <small>Markdown supported</small></span><div class="wb-formatbar"><button type="button" data-board-action="format-note" data-mark="bold" title="Bold" aria-label="Bold selection"><b>B</b></button><button type="button" data-board-action="format-note" data-mark="heading" title="Heading" aria-label="Insert heading">H</button><button type="button" data-board-action="format-note" data-mark="bullet" title="Bullet list" aria-label="Insert bullet">☰</button><button type="button" data-board-action="format-note" data-mark="link" title="Link" aria-label="Insert link">↗</button><button type="button" data-board-action="preview-note" title="Preview" aria-label="Preview formatted notes">Preview</button></div></div><textarea id="wb-body-note" name="body" class="wb-input wb-notes" rows="7" placeholder="Explain the concept, write detailed notes, add references...">'+safe(c.body)+'</textarea><div class="wb-notes-preview" id="wb-note-preview" hidden></div>'+
 '<label class="wb-field-label">WEBSITE LINK<input name="url" class="wb-input" type="url" placeholder="https://..." value="'+safe(c.url||'')+'"></label>'+
 '<label class="wb-field-label">LINKED TASK<select name="task_id" class="wb-input">'+opt('','No linked task',!c.task_id)+data().tasks.map(t=>opt(t.id,t.title,t.id===c.task_id)).join('')+'</select></label>'+
 '<label class="wb-field-label">LINKED BOARD<select name="target_board_id" class="wb-input">'+opt('','No linked board',!c.target_board_id)+data().boards.filter(b=>b.id!==ui.boardId).map(b=>opt(b.id,b.title,b.id===c.target_board_id)).join('')+'</select></label>'+
@@ -120,9 +120,36 @@ if(!g.moved){ui.selected=g.id;host.render();return}
 const p=placements().find(p=>p.id===g.id);if(!p)return;
 const attrs=g.type==='move'?{x:p.x,y:p.y}:{w:p.w,h:p.h};
 try{await host.patchSimple('board_items',g.id,attrs);if(g.type==='move')await Promise.all(g.members.map(m=>{const q=placements().find(p=>p.id===m.id);return host.patchSimple('board_items',m.id,{x:q.x,y:q.y})}));status('Saved canvas changes')}catch(err){status('Position was not saved: '+err.message,true);await host.reload();host.render()}}
+function notePreview(text){
+ const raw=safe(text||'');
+ const html=raw.split(/\r?\n/).map(line=>{
+   let t=line.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+   t=t.replace(/\[(.+?)\]\((https?:\/\/[^)\s]+)\)/g,(_m,label,url)=>{
+     const valid=normalUrl(url);
+     return valid?'<a href="'+safe(valid)+'" target="_blank" rel="noopener noreferrer">'+label+'</a>':label;
+   });
+   if(t.startsWith('### '))return '<h4>'+t.slice(4)+'</h4>';
+   if(t.startsWith('## '))return '<h3>'+t.slice(3)+'</h3>';
+   if(t.startsWith('# '))return '<h2>'+t.slice(2)+'</h2>';
+   if(t.startsWith('- '))return '<p class="wb-note-bullet">• '+t.slice(2)+'</p>';
+   return t?'<p>'+t+'</p>':'<p class="wb-note-empty"> </p>';
+ }).join('');
+ return html;
+}
 async function onClick(e){const b=e.target.closest('[data-board-action]');if(!b)return;const a=b.dataset.boardAction,id=b.dataset.id;
 if(a==='close-modal'&&b.classList.contains('wb-modal-overlay')&&e.target.closest('.wb-modal'))return;
 e.preventDefault();e.stopPropagation();
+if(a==='format-note'){
+ const area=$('#wb-body-note');if(!area)return;
+ const start=area.selectionStart,end=area.selectionEnd,selected=area.value.slice(start,end);
+ const mark=b.dataset.mark;
+ const snippet=mark==='bold'?'**'+(selected||'important idea')+'**':mark==='heading'?'# '+(selected||'Heading'):mark==='bullet'?'- '+(selected||'Key point'):'['+(selected||'Resource title')+'](https://)';
+ area.setRangeText(snippet,start,end,'end');area.focus();return;
+}
+if(a==='preview-note'){
+ const area=$('#wb-body-note'),preview=$('#wb-note-preview');if(!area||!preview)return;
+ preview.innerHTML=notePreview(area.value);preview.hidden=!preview.hidden;return;
+}
 if(a==='open'){open(id);return}
 if(a==='open-target'){open(id);return}
 if(a==='back'){host.navigate('boards');ui.selected=null;ui.boardId=null;return}
