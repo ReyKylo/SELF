@@ -153,5 +153,5 @@ document.addEventListener('submit',e=>{handleSubmit(e).catch(error=>toast(error.
 document.addEventListener('change',e=>{handleChange(e).catch(error=>toast(error.message,true))});
 document.addEventListener('input',handleInput);
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(state.user)go('search')}if(e.key==='Escape'){if(state.modal)state.modal=null;else if(state.pageId)state.pageId=null;else state.taskId=null;render()}if(e.key==='Enter'&&e.target?.id==='quick-text'){e.preventDefault();quickCapture().catch(err=>toast(err.message,true))}});
-window.SELFBoards?.init?.({state:()=>state,render,navigate:go,openTask:(id)=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
+window.SELFBoards?.init?.({state:()=>state,render,navigate:go,openTask:(id)=>{window.SELFBoards.ui.selected=null;state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
 verifySession();
