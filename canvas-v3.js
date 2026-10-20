@@ -355,6 +355,21 @@ function dbl(e){if(state().view!=='board-editor')return;const node=e.target.clos
  area.addEventListener('keydown',ev=>{if(ev.key==='Escape'){ev.stopPropagation();complete(false)}else if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();complete(true)}});
  area.addEventListener('blur',()=>complete(true));}
 function links(){const found=new Map();for(const c of state().knowledgeCards){const hits=[c.url,...(String(c.body||'')+' '+String(c.key_points||'')+' '+String(c.summary||'')).match(/https?:\/\/[^\s<>"']+/gi)||[]];for(let raw of hits){let u=url(String(raw||'').replace(/[),.;!?]+$/,''));if(u&&!found.has(u)){const i=state().boardItems.find(i=>i.card_id===c.id);const b=state().boards.find(b=>b.id===i?.board_id);found.set(u,{id:c.id,title:c.title||new URL(u).hostname,url:u,boardName:b?.title||'Knowledge'})}}}return [...found.values()]}
-function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});}
+
+function dropOver(e){if(state().view!=='board-editor'||!e.target.closest('#c3-canvas'))return;e.preventDefault()}
+function dropOn(e){if(state().view!=='board-editor'||!e.target.closest('#c3-canvas'))return;e.preventDefault();
+ const f=[...(e.dataTransfer?.files||[])].find(file=>file.type.startsWith('image/'));
+ if(f){upload(f);return}
+ const raw=e.dataTransfer?.getData('text/uri-list')||e.dataTransfer?.getData('text/plain')||'';
+ const first=String(raw).trim().split(/\s+/)[0];if(url(first))create('reference',worldPoint(e.clientX,e.clientY),{url:first,title:new URL(first).hostname});
+}
+function pasteOn(e){if(state().view!=='board-editor'||e.target.closest('input,textarea,[contenteditable=true]'))return;
+ const file=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));
+ if(file){e.preventDefault();upload(file);return}
+ const raw=e.clipboardData?.getData('text/plain')||'';
+ if(url(raw.trim())){e.preventDefault();create('reference',null,{url:raw.trim(),title:new URL(raw.trim()).hostname})}
+}
+
+function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
 window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{queueMicrotask(imageResolve);return canvas()},links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
 })();
