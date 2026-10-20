@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const code=fs.readFileSync(path.join(__dirname,'..','canvas-v3.js'),'utf8');
 const handlers={};const elements={};
-const viewport={clientWidth:1100,clientHeight:720,getBoundingClientRect:()=>({left:100,top:90,width:1100,height:720})};
+const viewport={clientWidth:1100,clientHeight:720,classList:{add(){},remove(){},toggle(){}},getBoundingClientRect:()=>({left:100,top:90,width:1100,height:720})};
 const doc={
  addEventListener(name,fn){(handlers[name]??=[]).push(fn)},
  querySelector(q){
@@ -39,11 +39,38 @@ function evt(target,x=380,y=260){return {target,button:0,clientX:x,clientY:y,pre
 function act(a,props={}){const el={dataset:{c3:a,...props},classList:{contains:()=>false},closest(q){return q==='[data-c3]'?this:null}};return handlers.click[0](evt(el))}
 async function main(){
  assert.match(window.SELFBoards.renderEditor(),/c3-toolbar/);
+ // Dragging the background must move the board without any tool/keyboard modifier.
+ const blankTarget={closest:q=>q==='#c3-canvas'?viewport:null};
+ const p0={...window.SELFBoards.ui.pan};
+ handlers.pointerdown[0](evt(blankTarget,300,250));
+ assert.equal(window.SELFBoards.ui.gesture?.type,'pan','default empty-canvas drag uses pan');
+ handlers['window:pointermove'][0](evt(blankTarget,380,290));
+ assert(window.SELFBoards.ui.pan.x>p0.x&&window.SELFBoards.ui.pan.y>p0.y,'board follows drag');
+ await handlers['window:pointerup'][0](evt(blankTarget,380,290));
+ assert.equal(window.SELFBoards.ui.gesture,null,'drag releases gesture');
+ // Shift+drag still supports selection rather than moving the canvas.
+ const shiftStart={...evt(blankTarget,300,250),shiftKey:true};
+ handlers.pointerdown[0](shiftStart);
+ assert.equal(window.SELFBoards.ui.gesture?.type,'marquee','shift-drag uses marquee');
+ await handlers['window:pointerup'][0]({...evt(blankTarget,340,280),shiftKey:true});
+ // Middle mouse button also works without selecting a shape.
+ const middle={...evt(blankTarget,320,260),button:1};
+ handlers.pointerdown[0](middle);
+ assert.equal(window.SELFBoards.ui.gesture?.type,'pan','middle mouse pans');
+ await handlers['window:pointerup'][0](middle);
  for(let n=0;n<6;n++)await act('add',{kind:'rectangle'});
  assert.equal(data.boardItems.length,6,'six shapes created without a title/form');
  assert(data.knowledgeCards.every(c=>c.title===''),'all blank cards remain blank');
  assert.match(window.SELFBoards.renderEditor(),/c3-inspector/,'inspector exists');
  const first=data.boardItems[0],second=data.boardItems[1];secondId=second.id;
+ // Fit now brings content into the viewport instead of resetting to arbitrary coordinates.
+ await act('fit');
+ const fitted=window.SELFBoards.ui;
+ assert(fitted.zoom>=.25&&fitted.zoom<=2.5,'fitted zoom is valid');
+ const l=Math.min(...data.boardItems.map(i=>i.x)),t=Math.min(...data.boardItems.map(i=>i.y));
+ const right=Math.max(...data.boardItems.map(i=>i.x+i.w)),bottom=Math.max(...data.boardItems.map(i=>i.y+i.h));
+ assert(l*fitted.zoom+fitted.pan.x<viewport.clientWidth&&right*fitted.zoom+fitted.pan.x>0,'fit intersects visible viewport horizontally');
+ assert(t*fitted.zoom+fitted.pan.y<viewport.clientHeight&&bottom*fitted.zoom+fitted.pan.y>0,'fit intersects visible viewport vertically');
  let markup=window.SELFBoards.renderEditor();
  assert.equal((markup.match(new RegExp('data-c3-port="'+first.id+'"','g'))||[]).length,4,'four ports rendered at all times');
  const geo=window.SELFBoards.geometry;
@@ -69,6 +96,6 @@ async function main(){
  assert(window.SELFBoards.links().some(x=>x.url.includes('idx.co.id')),'note URLs reach Important Links');
  data.knowledgeCards.find(c=>c.id===first.card_id).title='<img src=x onerror=alert(1)>';
  assert(!window.SELFBoards.renderEditor().includes('<img src=x onerror=alert(1)>'),'HTML text escaped');
- console.log('Concept C PASS: blank-first, 4 anchors, resize/move rebind, edge persistence, smart tidy, undo, notes, links, XSS escaping.');
+ console.log('Concept C PASS: blank-first, drag-to-pan, Shift marquee, fit contents, 4 anchors, resize/move rebind, edge persistence, smart tidy, undo, notes, links, XSS escaping.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
