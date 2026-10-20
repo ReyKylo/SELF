@@ -5,7 +5,7 @@
 (()=>{'use strict';
 if(window.location?.search&&new URLSearchParams(window.location.search).get('canvas')==='legacy')return;
 let api;
-const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:''};
+const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:''};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const esc=h, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), num=(x,d=0)=>Number.isFinite(Number(x))?Number(x):d;
@@ -111,7 +111,7 @@ function inspector(){
  (c?.target_board_id?button('open-board','↗ Open board','data-id="'+h(c.target_board_id)+'"'):'')+
  '</form>';
  }
- return '<aside class="c3-inspector"><div class="c3-inspector-head"><span>Properties</span><span class="c3-subtle">'+(sel.length?sel.length+' selected':'Canvas')+'</span></div>'+
+ return '<aside class="c3-inspector" id="c3-inspector"><div class="c3-inspector-head"><span>Properties</span><span class="c3-subtle">'+(sel.length?sel.length+' selected':'Canvas')+'</span></div>'+
  '<div class="c3-inspector-tabs">'+tabs.map(k=>'<button class="'+(ui.tab===k?'active':'')+'" data-c3="tab" data-tab="'+k+'">'+({style:'Style',arrange:'Arrange',smart:'Smart Layout',notes:'Notes'}[k])+'</button>').join('')+'</div>'+
  '<div class="c3-inspector-content">'+body+'</div></aside>';
 }
@@ -153,7 +153,8 @@ function objectMarkup(i){const k=kind(i),s=style(i),c=card(i.card_id),isSel=ui.s
 function canvas(){
  const b=board();if(!b)return library();
  const objects=[...items()].sort((a,b)=>num(a.z)-num(b.z));
- return '<div class="self-board-editor c3-shell"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
+ ui.domSnapshots=new Map(objects.map(i=>[i.id,objectMarkup(i)]));
+ return '<div class="self-board-editor c3-shell" data-board-id="'+h(b.id)+'"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
  '<div class="c3-toolbar">'+['select','rectangle','ellipse','diamond','connect','text','image','sticky','frame','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note',ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>'+
  '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo"')+button('redo','↷','title="Redo"')+'<span class="c3-scale">'+Math.round(ui.zoom*100)+'%</span>'+button('fit','⛶','title="Fit view"')+'</div></div>'+
  '<div class="c3-content"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
@@ -167,6 +168,58 @@ function canvas(){
  '<div id="c3-marquee" hidden></div><input id="c3-upload" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"/></section>'+
  inspector()+'</div>'+modal()+'</div>';
 }
+// Prevent whole-screen re-mounts during board editing.
+// Keep the canvas, viewport and surrounding app shell stable.
+function updateInPlace(){
+ if(state().view!=='board-editor'||!ui.boardId)return false;
+ const shell=$('.c3-shell'),world=$('#c3-world'),scene=$('#c3-canvas');
+ if(!shell||!world||!scene||shell.dataset.boardId!==ui.boardId)return false;
+ const next=items(),wanted=new Set(next.map(i=>i.id));
+ for(const node of [...world.querySelectorAll('.c3-object[data-c3-item]')]){
+   if(!wanted.has(node.dataset.c3Item)){node.remove();ui.domSnapshots.delete(node.dataset.c3Item)}
+ }
+ for(const i of next){
+   const markup=objectMarkup(i);
+   if(ui.domSnapshots.get(i.id)===markup)continue;
+   const existing=world.querySelector('[data-c3-item="'+i.id+'"]');
+   if(existing)existing.outerHTML=markup;
+   else world.insertAdjacentHTML('beforeend',markup);
+   ui.domSnapshots.set(i.id,markup);
+ }
+ const wires=$('#c3-wires'),wireContent=renderWires();
+ if(wires&&wires.innerHTML!==wireContent)wires.innerHTML=wireContent;
+ const empty=scene.querySelector('.c3-empty');
+ if(next.length&&empty)empty.remove();
+ else if(!next.length&&!empty){
+   scene.insertAdjacentHTML('beforeend','<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>');
+ }
+ const oldInspector=$('#c3-inspector'),newInspector=inspector();
+ if(oldInspector&&oldInspector.outerHTML!==newInspector){
+   const active=document.activeElement;
+   if(!active||!oldInspector.contains(active)||!active.matches('input,textarea,select')){
+     const scroll=oldInspector.scrollTop;
+     oldInspector.outerHTML=newInspector;
+     const refreshed=$('#c3-inspector');if(refreshed)refreshed.scrollTop=scroll;
+   }
+ }
+ for(const btn of document.querySelectorAll('.c3-tool')){
+   const enabled=btn.dataset.kind===ui.tool;btn.classList.toggle('active',enabled);btn.setAttribute('aria-pressed',String(enabled));
+ }
+ const existingModal=shell.querySelector('.c3-modal-overlay');
+ if(ui.modal){
+   const content=modal();
+   if(existingModal?.getAttribute('data-modal-type')!==ui.modal.type){
+     existingModal?.remove();
+     const markup=content.replace('class="c3-modal-overlay"','class="c3-modal-overlay" data-modal-type="'+h(ui.modal.type)+'"');
+     shell.insertAdjacentHTML('beforeend',markup);
+   }
+ }else existingModal?.remove();
+ const title=$('.c3-breadcrumb strong');if(title&&board())title.textContent=board().title;
+ const label=$('.c3-scale');if(label)label.textContent=Math.round(ui.zoom*100)+'%';
+ const save=$('#c3-save');if(save)save.textContent=ui.dirty?'● Saving':'✓ Saved';
+ return true;
+}
+
 function modal(){if(!ui.modal)return '';const m=ui.modal;let content='',title='',action='';
  if(m.type==='board'){title='Create a board';action='create-board';content='<label>Board name<input name="title" class="c3-input" placeholder="My next idea" maxlength="160" required autofocus/></label><label>Space<select name="space_id" class="c3-input"><option value="">Personal Workspace</option>'+state().spaces.map(s=>'<option value="'+h(s.id)+'" '+(s.id===m.space?'selected':'')+'>'+h(s.name)+'</option>').join('')+'</select></label>';}
  if(m.type==='rename'){title='Board settings';action='rename-board';content='<label>Name<input class="c3-input" name="title" required value="'+h(board()?.title)+'"/></label>';}
@@ -402,5 +455,5 @@ function pasteOn(e){if(state().view!=='board-editor'||e.target.closest('input,te
 }
 
 function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
-window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{restorePending();queueMicrotask(imageResolve);return canvas()},links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
+window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{restorePending();queueMicrotask(imageResolve);return canvas()},updateInPlace,links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
 })();
