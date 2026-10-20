@@ -27,23 +27,32 @@ Read `docs/DESIGN_CONTRACT.md`. Wireframe V2 is the visual baseline, not disposa
 ## Security
 No service-role keys in the browser. Users can select/change only their own records via RLS. Task child rows have composite foreign keys enforcing same-user ownership. Keep security checks and test authorization between accounts before production launch.
 
-## Deploy to Cloudflare Pages
-This is a static HTML/CSS/JS project. It does not use npm, Vite or a framework.
-The repository includes `tools/build_cloudflare.py`, which copies only the three app assets into `dist/` (no secret files or source folders are published).
+## Deploy on Cloudflare Workers Builds (existing Worker: `self`)
 
-Cloudflare Pages > Settings > Builds & deployments (production and preview):
+SELF is a zero-dependency static application deployed as **Cloudflare Workers Static Assets**, not as a Cloudflare Pages project.
+
+The repository includes:
+- `tools/build_cloudflare.py`: creates `dist/` with only `index.html`, `styles.css` and `app.js`.
+- `wrangler.jsonc`: preserves the existing Worker name `self` and points Wrangler to `dist/` as static assets.
+
+In **Cloudflare dashboard > Workers & Pages > self > Settings > Builds**, set:
 
 | Setting | Value |
 | --- | --- |
-| Framework preset | None |
+| Connected repository | `ReyKylo/SELF` |
 | Production branch | `main` |
 | Root directory | `/` (repository root) |
 | Build command | `python3 tools/build_cloudflare.py` |
-| Build output directory | `dist` |
+| Deploy command | `npx wrangler deploy` |
 
-To verify locally:
+Do not look for a Pages-specific build output directory in Workers Builds. Wrangler reads `assets.directory` from `wrangler.jsonc`. Do not change the deploy command to `wrangler pages deploy`, as this is an existing Worker.
+
+Local verification:
+
 ```sh
 python3 tools/build_cloudflare.py
-ls -la dist
+python3 -c "import json; c=json.load(open('wrangler.jsonc')); assert c['name']=='self' and c['assets']['directory']=='./dist'"
+ls dist/
 ```
-The `dist` folder must contain `index.html`, `styles.css`, and `app.js`. Cloudflare's Git integration must be connected to `ReyKylo/SELF` branch `main`. After changing settings, retry deployment of the latest commit.
+
+A new commit to `main` should trigger a new Workers Build. Use **Deployments** to check the build and deployment status; a successful GitHub commit alone does not mean Cloudflare is live.
