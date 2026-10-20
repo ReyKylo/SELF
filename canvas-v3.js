@@ -54,7 +54,18 @@ function inspector(){
  const sel=[...ui.selected].map(itm).filter(Boolean),first=sel[0],s=first?style(first):presets.knowledge,c=first?card(first.card_id):null;
  const tabs=['style','arrange','smart','notes'];
  let body='';
- if(!first)body='<div class="c3-no-selection"><span>✳</span><h3>Make something yours.</h3><p>Select an object to adjust its appearance, align a group, or add detailed notes.</p><div class="c3-hint">Tip: click any shape tool to add it without entering text first.</div></div>';
+ if(ui.edge){
+ const e=edges().find(x=>x.id===ui.edge);
+ if(e)body='<form id="c3-edge-form" data-id="'+h(e.id)+'"><div class="c3-section-title">SMART CONNECTOR</div>'+
+ '<label class="c3-label">Label<input name="label" class="c3-input" value="'+h(e.label||'')+'" placeholder="Yes, No, Related..."/></label>'+
+ '<label class="c3-label">Routing<select name="route_type" class="c3-input">'+['curved','elbow','straight'].map(v=>'<option value="'+v+'" '+(v===e.route_type?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'+
+ '<label class="c3-label">Start anchor<select name="from_anchor" class="c3-input">'+['auto','n','e','s','w'].map(v=>'<option value="'+v+'" '+(v===e.from_anchor?'selected':'')+'>'+v.toUpperCase()+'</option>').join('')+'</select></label>'+
+ '<label class="c3-label">End anchor<select name="to_anchor" class="c3-input">'+['auto','n','e','s','w'].map(v=>'<option value="'+v+'" '+(v===e.to_anchor?'selected':'')+'>'+v.toUpperCase()+'</option>').join('')+'</select></label>'+
+ '<button type="submit" class="c3-primary c3-wide">✓ Save connector</button>'+
+ button('delete-edge','Delete connection','data-id="'+h(e.id)+'"')+'</form>';
+ else ui.edge=null;
+ }
+ if(!first&&!ui.edge)body='<div class="c3-no-selection"><span>✳</span><h3>Make something yours.</h3><p>Select an object to adjust its appearance, align a group, or add detailed notes.</p><div class="c3-hint">Tip: click any shape tool to add it without entering text first.</div></div>';
  else if(ui.tab==='style')body='<div class="c3-controls"><label>Fill <input type="color" data-c3-style="fill" value="'+validColour(s.fill==='transparent'?'#222b38':s.fill)+'"/></label>'+
  '<label>Border <input type="color" data-c3-style="stroke" value="'+validColour(s.stroke==='transparent'?'#222b38':s.stroke)+'"/></label>'+
  '<label>Text color <input type="color" data-c3-style="color" value="'+validColour(s.color)+'"/></label>'+
@@ -115,7 +126,7 @@ function objectMarkup(i){const k=kind(i),s=style(i),c=card(i.card_id),isSel=ui.s
  return '<div class="c3-object c3-kind-'+k+(isSel?' selected':'')+'" data-c3-item="'+h(i.id)+'" tabindex="0" role="button" aria-label="'+label+'" style="left:'+i.x+'px;top:'+i.y+'px;width:'+i.w+'px;height:'+i.h+'px;transform:rotate('+num(i.rotation)+'deg);--fill:'+fill+';--stroke:'+stroke+';--ink:'+validColour(s.color)+';--corner:'+num(s.radius,12)+'px;--font-size:'+num(s.fontSize,20)+'px;opacity:'+clamp(num(s.opacity,1),.3,1)+';z-index:'+num(i.z)+'">'+
  '<div class="c3-object-face">'+body+'</div>'+
  (isSel?'<div class="c3-selection-border"></div>':'')+
- (isSel||ui.tool==='connect'?['n','e','s','w'].map(a=>'<button type="button" class="c3-anchor anchor-'+a+'" data-c3-port="'+h(i.id)+'" data-side="'+a+'" aria-label="Connect '+label+' '+a+'"></button>').join(''):'')+
+ (['n','e','s','w'].map(a=>'<button type="button" class="c3-anchor anchor-'+a+'" data-c3-port="'+h(i.id)+'" data-side="'+a+'" aria-label="Connect '+label+' '+a+'"></button>').join(''))+
  (isSel?['nw','n','ne','e','se','s','sw','w'].map(x=>'<div class="c3-handle handle-'+x+'" data-c3-resize="'+h(i.id)+'" data-dir="'+x+'"></div>').join(''):'')+
  '</div>';
 }
@@ -207,7 +218,10 @@ function gestureStart(e){if(state().view!=='board-editor'||e.button!==0)return;c
  if(node&&ui.tool!=='hand'&&!ui.spaceDown){const id=node.dataset.c3Item;
  if(e.shiftKey){let ids=new Set(ui.selected);ids.has(id)?ids.delete(id):ids.add(id);selection(ids);return}
  if(!ui.selected.has(id)){ui.selected=new Set([id]);api.render()}
- const rect=res?.dataset.dir,selected=entries().map(i=>i.id);ui.gesture={type:res?'resize':'move',id,handle:rect,from:{x:e.clientX,y:e.clientY},original:positions(selected),ids:selected,moved:false};
+ const rect=res?.dataset.dir,selected=entries().map(i=>i.id);
+ const root=itm(id);
+ if(!res&&root&&kind(root)==='frame'){for(const child of items()){if(child.id!==root.id&&child.x>=root.x&&child.y>=root.y&&child.x+child.w<=root.x+root.w&&child.y+child.h<=root.y+root.h&&!selected.includes(child.id))selected.push(child.id)}}
+ ui.gesture={type:res?'resize':'move',id,handle:rect,from:{x:e.clientX,y:e.clientY},original:positions(selected),ids:selected,moved:false};
  e.preventDefault();return}
  if(t.closest('button,input,textarea,select'))return;
  if(ui.spaceDown||ui.tool==='hand'||e.button===1){ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};e.preventDefault();return}
@@ -262,6 +276,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='layout-cluster'){await applyLayout('cluster');return}
  if(a==='straighten'){await transact(async()=>{for(const edge of edges())await api.patchSimple('board_edges',edge.id,{route_type:'elbow'})},'Connectors straightened');return}
  if(a==='layer'){const arr=entries();if(!arr.length)return;await transact(async()=>{for(const i of arr)await api.patchSimple('board_items',i.id,{z:el.dataset.dir==='front'?Math.max(...items().map(x=>num(x.z)))+1:Math.min(...items().map(x=>num(x.z)))-1})},'Layer updated');return}
+ if(a==='delete-edge'){ui.edge=null;await transact(()=>api.del('board_edges',id),'Connector removed');return}
  if(a==='open-task'){api.openTask(id);return}
  if(a==='existing'){ui.modal={type:'existing'};api.render();return}
 }
@@ -271,6 +286,10 @@ async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-'))return;e.p
  if(a==='rename-board'){await transact(()=>api.patch('boards',ui.boardId,{title:o.title.trim()}),'Board renamed');return}
  if(a==='add-reference'){const u=url(o.url);if(!u)return say('Use a valid http(s) link',true);await create('reference',null,{url:u});return}
  if(a==='add-existing'){if(!o.card_id)return;await transact(()=>api.insert('board_items',{board_id:ui.boardId,card_id:o.card_id,visual_kind:'knowledge',...centerPosition(255,170),w:255,h:170}),'Shared card placed');return}}
+ if(f.id==='c3-edge-form'){
+ const e=edges().find(v=>v.id===f.dataset.id);if(!e)return;
+ await transact(()=>api.patchSimple('board_edges',e.id,{label:o.label||'',route_type:o.route_type,from_anchor:o.from_anchor,to_anchor:o.to_anchor}),'Connector updated');return;
+ }
  if(f.id==='c3-note-form'){const one=itm(f.dataset.id);if(!one)return;const u=o.url?.trim();if(u&&!url(u))return say('Invalid URL',true);
  await transact(()=>api.patch('knowledge_cards',one.card_id,{title:o.title||'',body:o.body||'',key_points:o.key_points||'',url:u||null,task_id:o.task_id||null,target_board_id:o.target_board_id||null}),'Notes saved to your knowledge library');return}}
 function change(e){const field=e.target.dataset.c3Style;if(field){applyStyle(field,e.target.value);return}
