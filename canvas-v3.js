@@ -4,7 +4,7 @@
  */
 (()=>{'use strict';
 let api;
-const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:''};
+const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:''};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const esc=h, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), num=(x,d=0)=>Number.isFinite(Number(x))?Number(x):d;
@@ -34,7 +34,11 @@ const url=s=>{try{let u=new URL(s);return ['https:','http:'].includes(u.protocol
 const validColour=s=>/^#[0-9a-fA-F]{3,8}$/.test(s||'')?s:'#719cff';
 function say(msg,bad=false){ui.notice=msg;api.notify(msg,bad)}
 function setBusy(v){ui.dirty=v;let e=$('#c3-save');if(e)e.textContent=v?'● Saving':'✓ Saved'}
-async function sync(message){await api.reload();api.render();setBusy(false);if(message)say(message)}
+async function sync(message){await api.reload();restorePending();api.render();setBusy(ui.pending.size>0);if(message)say(message)}
+function restorePending(){for(const pending of ui.pending.values()){
+ if(!state().knowledgeCards.some(x=>x.id===pending.c.id))state().knowledgeCards.push(pending.c);
+ if(!state().boardItems.some(x=>x.id===pending.i.id))state().boardItems.push(pending.i);
+}}
 async function transact(operation,message){setBusy(true);try{await operation();await sync(message)}catch(e){setBusy(false);say(e?.message||String(e),true);try{await api.reload();api.render()}catch{}}}
 function history(undo,redo){ui.history.push({undo,redo});if(ui.history.length>70)ui.history.shift();ui.redo.length=0}
 async function step(direction){const src=direction==='undo'?ui.history:ui.redo,dst=direction==='undo'?ui.redo:ui.history;const op=src.pop();if(!op){say('Nothing to '+direction);return}setBusy(true);try{await op[direction]();dst.push(op);await sync(direction==='undo'?'Undone':'Redone')}catch(e){src.push(op);setBusy(false);say(e.message,true)}}
@@ -167,10 +171,11 @@ async function create(k,position=null,extra={}){
  let c,i;
  const fakeCardId='pending-card-'+crypto.randomUUID(),fakeItemId='pending-item-'+crypto.randomUUID();
  const record={board_id:ui.boardId,card_id:fakeCardId,visual_kind:k,x:Math.round(positionFinal.x),y:Math.round(positionFinal.y),w,h:hg,z:items().length+1,style:{...presets[k]}};
- state().knowledgeCards.push({id:fakeCardId,...data});
- state().boardItems.push({id:fakeItemId,...record});
+const pendingCard={id:fakeCardId,...data},pendingItem={id:fakeItemId,...record};
+ ui.pending.set(fakeItemId,{c:pendingCard,i:pendingItem});
+ state().knowledgeCards.push(pendingCard);state().boardItems.push(pendingItem);
  ui.selected=new Set([fakeItemId]);ui.tab='style';setBusy(true);api.render();
- const clearPending=()=>{state().knowledgeCards=state().knowledgeCards.filter(x=>x.id!==fakeCardId);state().boardItems=state().boardItems.filter(x=>x.id!==fakeItemId)};
+ const clearPending=()=>{ui.pending.delete(fakeItemId);state().knowledgeCards=state().knowledgeCards.filter(x=>x.id!==fakeCardId);state().boardItems=state().boardItems.filter(x=>x.id!==fakeItemId)};
  try{
    c=await api.insert('knowledge_cards',data);
    try{i=await api.insert('board_items',{...record,card_id:c.id})}
@@ -371,5 +376,5 @@ function pasteOn(e){if(state().view!=='board-editor'||e.target.closest('input,te
 }
 
 function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
-window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{queueMicrotask(imageResolve);return canvas()},links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
+window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{restorePending();queueMicrotask(imageResolve);return canvas()},links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
 })();
