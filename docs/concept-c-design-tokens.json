@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "SELF Concept C Phase 2.5 design tokens",
+  "status": "design-contract-proposal-not-live-code",
+  "reference": {
+    "title": "Concept C — Creative + Smart Diagramming",
+    "resolution": {
+      "width": 1672,
+      "height": 941
+    },
+    "file": "Concept_C_Approved_Reference.png",
+    "sha256": "5bab2bb9cc33be729efe00e31bccf82d2bd58978f64ff7d6d31a5f09254b25b7",
+    "authority": "approved generated image in SELF project discussion",
+    "note": "Concept C is NOT old wireframe-v2.webp. See CONCEPT_C_IMPLEMENTATION_BLUEPRINT.md."
+  },
+  "viewport": {
+    "desktopReference": {
+      "width": 1672,
+      "height": 941,
+      "sidebarWidth": 185,
+      "headerHeight": 78,
+      "inspectorWidth": 310,
+      "canvasLeft": 194,
+      "canvasTop": 143,
+      "canvasRight": 1340,
+      "canvasBottom": 917
+    },
+    "breakpoints": {
+      "inspectorDrawerAt": 768,
+      "compactAt": 1024
+    },
+    "canvasAlwaysPrioritized": true
+  },
+  "appearance": {
+    "dark": {
+      "shell": "#171E25",
+      "header": "#13191E",
+      "canvas": "#191F26",
+      "inspector": "#1D242E",
+      "outline": "#354152",
+      "text": "#F1F4F9",
+      "muted": "#AAB4C3",
+      "primary": "#3B7DFD",
+      "selected": "#8B5CF6",
+      "good": "#72D5AE",
+      "warning": "#FFD38E"
+    },
+    "light": {
+      "shell": "#F2F5FA",
+      "header": "#FFFFFF",
+      "canvas": "#F7F8FC",
+      "inspector": "#FFFFFF",
+      "outline": "#DCE3EF",
+      "text": "#172238",
+      "muted": "#596B83",
+      "primary": "#286DEA",
+      "selected": "#7651D0",
+      "good": "#208767",
+      "warning": "#9B682C"
+    },
+    "contentFontPx": 16,
+    "inspectorLabelFontPx": 14,
+    "headingMinPx": 22,
+    "headingMaxPx": 30,
+    "cardRadiusPx": 16,
+    "fontScalePercent": [
+      100,
+      110,
+      120,
+      130,
+      140,
+      150
+    ],
+    "notes": "Color hex samples are starting points; review against original PNG on actual browser screenshots."
+  },
+  "interactions": {
+    "buttonHitMinPx": 42,
+    "touchHitMinPx": 44,
+    "handleHitMinPx": 24,
+    "touchHandleHitMinPx": 40,
+    "portMagnetRadiusPx": 12,
+    "maxConnectorEndpointDriftPx": 3,
+    "hoverMs": 140,
+    "pressMs": 120,
+    "panelMs": 200,
+    "reducedMotionRequired": true
+  },
+  "regions": [
+    "SELF sidebar",
+    "breadcrumb/top tools",
+    "infinite dotted canvas",
+    "smart action strip",
+    "contextual inspector",
+    "bottom zoom controls"
+  ],
+  "objectKinds": [
+    "rectangle",
+    "ellipse",
+    "diamond",
+    "sticky",
+    "text",
+    "media",
+    "frame",
+    "knowledge_card",
+    "reference",
+    "task"
+  ],
+  "inspectorTabs": [
+    "Style",
+    "Arrange",
+    "Smart Layout",
+    "Notes"
+  ],
+  "connectorModes": [
+    "straight",
+    "curved",
+    "elbow"
+  ],
+  "requiredBehaviors": [
+    "blank-first create",
+    "inline edit",
+    "multi-select",
+    "precision anchors",
+    "magnetic connectors",
+    "undo redo",
+    "auto tidy",
+    "reference images",
+    "supabase persistence",
+    "theme fidelity",
+    "text scaling",
+    "reduced motion"
+  ],
+  "gates": {
+    "A": "blank creation, move, resize, select and shell fidelity",
+    "B": "precise bindings and routes while moving/resizing",
+    "C": "inspector, smart tidy, layering and undo",
+    "D": "images, knowledge, persistence, visual screenshot QA and user approval"
+  }
+}
