@@ -18,7 +18,7 @@ const doc={
  elementFromPoint(){return {closest:q=>q==='[data-c3-port]'?{dataset:{c3Port:secondId,side:'w'}}:null}}
 };
 const window={addEventListener(name,fn){(handlers['window:'+name]??=[]).push(fn)}};
-class FD{constructor(form){this.fields=form.fields||{}}*[Symbol.iterator](){yield* Object.entries(this.fields)}}
+class FD{constructor(form){this.fields=form.fields||{}}*[Symbol.iterator](){yield* Object.entries(this.fields)}entries(){return Object.entries(this.fields)[Symbol.iterator]()}}
 const ctx={window,document:doc,URL,FormData:FD,queueMicrotask,crypto:require('node:crypto').webcrypto,setTimeout,clearTimeout,confirm:()=>true,console};
 vm.runInNewContext(code,ctx);
 const data={view:'boards',spaces:[{id:'s1',name:'Finance'}],boards:[{id:'b1',space_id:'s1',title:'Learning',pan_x:50,pan_y:50,zoom:1},{id:'b2',title:'Other board',pan_x:50,pan_y:50,zoom:1}],tasks:[],knowledgeCards:[],boardItems:[],boardEdges:[]};
