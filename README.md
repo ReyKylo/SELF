@@ -77,3 +77,18 @@ ls dist/
 ```
 
 A new commit to `main` should trigger a new Workers Build. Use **Deployments** to check the build and deployment status; a successful GitHub commit alone does not mean Cloudflare is live.
+
+## Phase 2.5 — Concept C whiteboard rebuild (design locked)
+
+The current Phase 2 whiteboard experience is **not yet accepted**. The user reported incorrectly attached connectors (particularly after resizing/rearranging) and forced form-first card creation. Do not proceed directly to Phase 3.
+
+Required reading before writing whiteboard code:
+1. [Concept C Implementation Blueprint](docs/CONCEPT_C_IMPLEMENTATION_BLUEPRINT.md): architecture, geometry, gestures, engineering and QA gates.
+2. [Concept C Design Tokens](docs/concept-c-design-tokens.json): reference viewport, sizing, appearance and motion.
+3. [Phase 1 Design Contract](docs/DESIGN_CONTRACT.md): maintain the existing working shell, text scaling and clicky interactions.
+4. [Phase 2 Known Gaps](docs/PHASE2_RELEASE_GATE.md): tests still needing live browser verification.
+
+**Approved visual reference:** "Concept C — Creative + Smart Diagramming" image, 1672 x 941, SHA256 5bab2bb9cc33be729efe00e31bccf82d2bd58978f64ff7d6d31a5f09254b25b7. Supplied in the chat as a reference pack. The older docs/wireframe-v2.webp is NOT the Concept C whiteboard reference. The builder must obtain the approved image before visual QA.
+
+No destructive migrations, new Cloudflare Worker or whole-app replacement. Implement behind an isolated branch or feature flag, compare actual browser screenshots to the approved image and obtain acceptance before Phase 3.
+
