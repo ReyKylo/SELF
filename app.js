@@ -153,5 +153,30 @@ document.addEventListener('submit',e=>{handleSubmit(e).catch(error=>toast(error.
 document.addEventListener('change',e=>{handleChange(e).catch(error=>toast(error.message,true))});
 document.addEventListener('input',handleInput);
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(state.user)go('search')}if(e.key==='Escape'){if(state.modal)state.modal=null;else if(state.pageId)state.pageId=null;else state.taskId=null;render()}if(e.key==='Enter'&&e.target?.id==='quick-text'){e.preventDefault();quickCapture().catch(err=>toast(err.message,true))}});
-window.SELFBoards?.init?.({state:()=>state,render,navigate:go,openTask:(id)=>{window.SELFBoards.ui.selected=null;state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
+
+/* Private image assets for the authenticated Concept C whiteboard. */
+async function uploadBoardImage(file){
+ if(!state.user?.id||!state.session?.access_token)throw new Error('Sign in before uploading images');
+ const extByMime={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'};
+ if(!extByMime[file.type]||file.size>10*1024*1024)throw new Error('Use a PNG, JPG, WebP or GIF under 10MB');
+ const uuid=crypto.randomUUID();
+ const objectPath=state.user.id+'/'+uuid+'.'+extByMime[file.type];
+ const endpoint=SUPABASE_URL+'/storage/v1/object/self-board-assets/'+objectPath;
+ let response=await fetch(endpoint,{method:'POST',headers:{apikey:PUBLIC_KEY,Authorization:'Bearer '+state.session.access_token,'Content-Type':file.type,'x-upsert':'false'},body:file});
+ if(response.status===401&&await refresh()){
+  response=await fetch(endpoint,{method:'POST',headers:{apikey:PUBLIC_KEY,Authorization:'Bearer '+state.session.access_token,'Content-Type':file.type,'x-upsert':'false'},body:file});
+ }
+ if(!response.ok){const err=await response.json().catch(()=>({message:response.statusText}));throw new Error(err.message||err.error||'Image upload failed')}
+ return objectPath;
+}
+async function signBoardImage(path){
+ if(!state.user?.id||!path?.startsWith(state.user.id+'/'))throw new Error('Image does not belong to your account');
+ const parts=path.split('/').map(encodeURIComponent).join('/');
+ const data=await request('/storage/v1/object/sign/self-board-assets/'+parts,{method:'POST',body:{expiresIn:3600}});
+ const signed=data.signedURL||data.signedUrl;if(!signed)throw new Error('Could not create signed image URL');
+ if(signed.startsWith('https://'))return signed;
+ return SUPABASE_URL+(signed.startsWith('/storage/v1/')?'':'/storage/v1')+(signed.startsWith('/')?'':'/')+signed;
+}
+
+window.SELFBoards?.init?.({state:()=>state,render,navigate:go,uploadImage:uploadBoardImage,signImage:signBoardImage,openTask:(id)=>{window.SELFBoards.ui.selected=null;state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
 verifySession();
