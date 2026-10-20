@@ -21,7 +21,22 @@ const presets={
  image:{fill:'#2b3443',stroke:'#65768e',color:'#ffffff',fontSize:18,radius:10,opacity:1},
  frame:{fill:'transparent',stroke:'#7790af',color:'#dde8ff',fontSize:18,radius:11,opacity:1}
 };
-const glyph={select:'↖',hand:'✋',rectangle:'▢',ellipse:'◯',diamond:'◇',sticky:'▣',text:'T',knowledge:'✧',task:'☑',reference:'↗',image:'▧',frame:'▤',connect:'⤳'};
+const shapes={
+ select:'<path d="m5 3 14 9-6 1.5L10 20z"/>',
+ hand:'<path d="M8 12V6a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v7-5a2 2 0 0 1 4 0v8a7 7 0 0 1-7 7H9a6 6 0 0 1-4.8-2.4L2 14a2 2 0 0 1 3-2.7z"/>',
+ rectangle:'<rect x="4" y="5" width="16" height="14" rx="2"/>',
+ ellipse:'<circle cx="12" cy="12" r="8"/>',
+ diamond:'<path d="M12 2 22 12 12 22 2 12z"/>',
+ connect:'<path d="M4 18 20 6M5 14v4h4M15 6h5v5"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="6" r="2"/>',
+ sticky:'<path d="M5 3h14a2 2 0 0 1 2 0v10l-6 6H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM15 21v-6h6"/><path d="M7 8h10M7 12h7"/>',
+ text:'<path d="M4 7V4h16v3M12 4v16M8 20h8"/>',
+ knowledge:'<path d="m12 2 2.3 7.7L22 12l-7.7 2.3L12 22l-2.3-7.7L2 12l7.7-2.3z"/>',
+ task:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m7 12 3 3 7-7"/>',
+ reference:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/>',
+ image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 16-6-6L5 20"/>',
+ frame:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18M8 8v13"/>'
+};
+const glyph=n=>'<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(shapes[n]||shapes.rectangle)+'</svg>';
 const state=()=>api.state(), board=()=>state().boards.find(b=>b.id===ui.boardId);
 const items=()=>state().boardItems.filter(i=>i.board_id===ui.boardId);
 const edges=()=>state().boardEdges.filter(e=>e.board_id===ui.boardId);
@@ -53,7 +68,7 @@ function library(spaceId=null){
  '<button class="c3-lib-card c3-lib-new" data-c3="new-board" '+(spaceId?'data-space="'+h(spaceId)+'"':'')+'><span>＋</span><strong>Create board</strong><small>Start with a blank canvas</small></button></div>'+modal()+'</section>'
 }
 function button(action,text,extra=''){return '<button type="button" class="c3-btn" data-c3="'+action+'" '+extra+'>'+text+'</button>'}
-function tool(name,label){const active=ui.tool===name;return '<button type="button" class="c3-tool'+(active?' active':'')+'" data-c3="tool" data-kind="'+name+'" title="'+label+'" aria-label="'+label+'" aria-pressed="'+active+'"><span>'+glyph[name]+'</span></button>'}
+function tool(name,label){const active=ui.tool===name;return '<button type="button" class="c3-tool'+(active?' active':'')+'" data-c3="tool" data-kind="'+name+'" title="'+label+'" aria-label="'+label+'" aria-pressed="'+active+'"><span>'+glyph(name)+'</span></button>'}
 function inspector(){
  const sel=[...ui.selected].map(itm).filter(Boolean),first=sel[0],s=first?style(first):presets.knowledge,c=first?card(first.card_id):null;
  const tabs=['style','arrange','smart','notes'];
