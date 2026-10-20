@@ -1,5 +1,5 @@
 # SELF — Personal Thinking Workspace
-A personal workspace for work, learning, notes, tasks and links. **Phase 1** of the three-phase rebuild.
+A personal workspace for work, learning, notes, tasks and links. **Phase 2** of the three-phase rebuild (Hybrid Whiteboards).
 
 ## Run
 No build tooling or dependency installation needed. Serve the directory over HTTP:
@@ -17,9 +17,30 @@ Open http://localhost:8080. A Supabase email/password account is required. The c
 - Dark/Light themes, persistent scalable text 100–150%, responsive navigation
 - RLS-protected tables with real PostgREST persistence and Auth
 
+## Phase 2 delivered
+- Hybrid board library, boards inside Spaces, and Quick Capture for new boards
+- Interactive infinite canvas: drag to move cards, resize corners, pan background and wheel, zoom controls and Ctrl/Cmd + wheel zoom
+- Create Note, Task, Link, Group, Board cards, with editable summaries, key points and detailed notes
+- Drag from a card's connection dot to another card to create directed relationships
+- Reuse existing cards across multiple boards: **same content, separate placement**
+- Linked boards and linked tasks; task opens the existing Notion-style task details
+- URL extraction from knowledge card notes and automatic inclusion in My Links
+- Persistent board geometry and camera in Supabase, user-scoped RLS and FK integrity
+- Dedicated `boards.js` / `boards.css`; existing Phase 1 interaction and themes preserved
+
 ## Phases
-- **Phase 2**: Infinite Hybrid Whiteboards, movable/resizable cards, connectors, board links.
-- **Phase 3**: Knowledge relationships, deeper global link library, advanced search and final refinement.
+- **Phase 1**: Daily workspace, Spaces, My Work, Tasks, Quick Capture, dark/light theme.
+- **Phase 2**: Hybrid Whiteboards and connected cards (implemented, runtime smoke-tested).
+- **Phase 3**: Richer block editor, consolidated link management, advanced global search and final polish.
+
+## Checks
+```sh
+node tests/smoke_render.cjs
+node tests/smoke_api.cjs
+node tests/smoke_whiteboards.cjs
+python3 tools/build_cloudflare.py
+```
+A passing smoke test isn't a browser screenshot or live deployment verification. Visual and real-device checks remain required before signing off the visual contract.
 
 ## Design contract
 Read `docs/DESIGN_CONTRACT.md`. Wireframe V2 is the visual baseline, not disposable inspiration.
@@ -32,7 +53,7 @@ No service-role keys in the browser. Users can select/change only their own reco
 SELF is a zero-dependency static application deployed as **Cloudflare Workers Static Assets**, not as a Cloudflare Pages project.
 
 The repository includes:
-- `tools/build_cloudflare.py`: creates `dist/` with only `index.html`, `styles.css` and `app.js`.
+- `tools/build_cloudflare.py`: creates `dist/` with the five static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`).
 - `wrangler.jsonc`: preserves the existing Worker name `self` and points Wrangler to `dist/` as static assets.
 
 In **Cloudflare dashboard > Workers & Pages > self > Settings > Builds**, set:
