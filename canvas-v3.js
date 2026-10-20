@@ -135,12 +135,12 @@ function canvas(){
  const objects=[...items()].sort((a,b)=>num(a.z)-num(b.z));
  return '<div class="self-board-editor c3-shell"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
  '<div class="c3-toolbar">'+['select','rectangle','ellipse','diamond','connect','text','image','sticky','frame','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note',ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>'+
- '<div class="c3-header-right">'+button('undo','↶','title="Undo"')+button('redo','↷','title="Redo"')+'<span class="c3-scale">'+Math.round(ui.zoom*100)+'%</span>'+button('fit','⛶','title="Fit view"')+'</div></div>'+
+ '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo"')+button('redo','↷','title="Redo"')+'<span class="c3-scale">'+Math.round(ui.zoom*100)+'%</span>'+button('fit','⛶','title="Fit view"')+'</div></div>'+
  '<div class="c3-content"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
  '<div class="c3-world" id="c3-world" style="transform:translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')">'+
  '<svg class="c3-wires" id="c3-wires" aria-label="Connected objects">'+renderWires()+'</svg>'+
  objects.map(objectMarkup).join('')+'</div>'+
- (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button></div>':'')+
+ (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
  '<div class="c3-smart-strip">'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
  '<div class="c3-bottom-tools">'+button('hand','✋ Pan')+button('select-tool','↖ Select')+'<span class="c3-divider"></span>'+button('zoom-out','−')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋')+'</div>'+
  '<div class="c3-canvas-help">Shift+click multi-select · drag background to select · Space+drag pan · double-click text</div>'+
@@ -165,15 +165,53 @@ async function create(k,position=null,extra={}){
  const positionFinal=position||centerPosition(w,hg);
  const data={title:extra.title||'',kind:k==='task'?'task':k==='reference'?'link':'note',summary:extra.summary||'',url:extra.url||null,asset_path:extra.asset_path||null};
  let c,i;
- await transact(async()=>{
+ const fakeCardId='pending-card-'+crypto.randomUUID(),fakeItemId='pending-item-'+crypto.randomUUID();
+ const record={board_id:ui.boardId,card_id:fakeCardId,visual_kind:k,x:Math.round(positionFinal.x),y:Math.round(positionFinal.y),w,h:hg,z:items().length+1,style:{...presets[k]}};
+ state().knowledgeCards.push({id:fakeCardId,...data});
+ state().boardItems.push({id:fakeItemId,...record});
+ ui.selected=new Set([fakeItemId]);ui.tab='style';setBusy(true);api.render();
+ const clearPending=()=>{state().knowledgeCards=state().knowledgeCards.filter(x=>x.id!==fakeCardId);state().boardItems=state().boardItems.filter(x=>x.id!==fakeItemId)};
+ try{
    c=await api.insert('knowledge_cards',data);
-   try{i=await api.insert('board_items',{board_id:ui.boardId,card_id:c.id,visual_kind:k,x:Math.round(positionFinal.x),y:Math.round(positionFinal.y),w,h:hg,z:items().length+1,style:{...presets[k]}})}
+   try{i=await api.insert('board_items',{...record,card_id:c.id})}
    catch(e){try{await api.del('knowledge_cards',c.id)}catch{}throw e}
-   ui.selected=new Set([i.id]);ui.tab='style';
- },'Object added');
- if(c&&i){history(async()=>{await api.del('board_items',i.id);await api.del('knowledge_cards',c.id)},async()=>{await api.insert('knowledge_cards',{...c});await api.insert('board_items',{...i})})}
+   clearPending();ui.selected=new Set([i.id]);await sync();
+   history(async()=>{await api.del('board_items',i.id);await api.del('knowledge_cards',c.id)},async()=>{await api.insert('knowledge_cards',{...c});await api.insert('board_items',{...i})});
+ }catch(e){clearPending();setBusy(false);say('Object could not be saved: '+e.message,true);try{await api.reload();api.render()}catch{}}
  return i;
 }
+
+async function makeStarter(){
+ if(items().length)return say('Use an empty board for the starter layout',true);
+ const blueprint=[
+  {kind:'frame',x:40,y:390,w:480,h:300,title:'Moodboard — Visual Direction',style:{stroke:'#7d90b8',fill:'transparent'}},
+  {kind:'sticky',x:35,y:110,w:155,h:165,title:'Big idea',style:{fill:'#a7efd5',color:'#183b36',stroke:'#8ddabf'}},
+  {kind:'image',x:220,y:60,w:265,h:218,title:'Reference image'},
+  {kind:'knowledge',x:560,y:85,w:220,h:145,title:'Idea',summary:'Connect your thoughts'},
+  {kind:'task',x:870,y:92,w:210,h:135,title:'Research'},
+  {kind:'reference',x:1180,y:80,w:205,h:160,title:'Reference'},
+  {kind:'diamond',x:695,y:345,w:220,h:220,title:'Concept'},
+  {kind:'sticky',x:540,y:390,w:135,h:140,title:'Key Point',style:{fill:'#ffd782',color:'#463919',stroke:'#dfc46a'}},
+  {kind:'task',x:555,y:690,w:215,h:170,title:'Next Step'},
+  {kind:'knowledge',x:815,y:685,w:215,h:170,title:'Key Points'},
+  {kind:'reference',x:1080,y:660,w:235,h:180,title:'Source Links'},
+  {kind:'sticky',x:85,y:540,w:180,h:130,title:'Research notes'},
+  {kind:'image',x:305,y:540,w:178,h:135,title:'Drop a photo'}
+ ];
+ setBusy(true);
+ const all=[];
+ try{
+  for(const spec of blueprint){
+   const c=await api.insert('knowledge_cards',{title:spec.title,kind:spec.kind==='task'?'task':spec.kind==='reference'?'link':'note'});
+   const place=await api.insert('board_items',{board_id:ui.boardId,card_id:c.id,visual_kind:spec.kind,x:spec.x,y:spec.y,w:spec.w,h:spec.h,z:all.length+1,style:{...presets[spec.kind],...spec.style}});
+   all.push(place);
+  }
+  const joins=[[3,4],[4,5],[3,6],[6,8],[6,9],[6,10]];
+  for(const [a,b] of joins)await api.insert('board_edges',{board_id:ui.boardId,source_item_id:all[a].id,target_item_id:all[b].id,route_type:'curved'});
+  ui.pan={x:26,y:25};ui.zoom=.75;saveCam();await sync('Starter created — customize everything.');
+ }catch(e){setBusy(false);say('Starter incomplete: '+e.message,true);await api.reload();api.render()}
+}
+
 async function newBoard(title,space){let b;await transact(async()=>{b=await api.insert('boards',{title:title.trim(),space_id:space||null})},'Board created');if(b)open(b.id)}
 function snap(x){return ui.grid?Math.round(x/12)*12:x}
 function saveCam(){clearTimeout(ui.saveTimer);let id=ui.boardId,v={pan_x:ui.pan.x,pan_y:ui.pan.y,zoom:ui.zoom};ui.saveTimer=setTimeout(async()=>{if(id)try{await api.patch('boards',id,v)}catch(e){say('Canvas position not saved: '+e.message,true)}},550)}
@@ -260,6 +298,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='close-modal'){ui.modal=null;api.render();return}
  if(a==='rename'){ui.modal={type:'rename'};api.render();return}
  if(a==='tool'){let k=el.dataset.kind;ui.tool=k;if(k==='image'){$('#c3-upload')?.click();return}if(k==='knowledge'||k==='sticky'||k==='text'||k==='rectangle'||k==='ellipse'||k==='diamond'||k==='frame'){await create(k);ui.tool='select'}else api.render();return}
+ if(a==='starter'){await makeStarter();return}
  if(a==='add'){await create(el.dataset.kind||'rectangle');return}
  if(a==='tab'){ui.tab=el.dataset.tab;api.render();return}
  if(a==='select-tool'){ui.tool='select';api.render();return}
