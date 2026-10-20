@@ -121,7 +121,7 @@ const p=placements().find(p=>p.id===g.id);if(!p)return;
 const attrs=g.type==='move'?{x:p.x,y:p.y}:{w:p.w,h:p.h};
 try{await host.patchSimple('board_items',g.id,attrs);if(g.type==='move')await Promise.all(g.members.map(m=>{const q=placements().find(p=>p.id===m.id);return host.patchSimple('board_items',m.id,{x:q.x,y:q.y})}));status('Saved canvas changes')}catch(err){status('Position was not saved: '+err.message,true);await host.reload();host.render()}}
 async function onClick(e){const b=e.target.closest('[data-board-action]');if(!b)return;const a=b.dataset.boardAction,id=b.dataset.id;
-if(a==='close-modal'&&e.target.closest('.wb-modal')&&!e.target.closest('button'))return;
+if(a==='close-modal'&&b.classList.contains('wb-modal-overlay')&&e.target.closest('.wb-modal'))return;
 e.preventDefault();e.stopPropagation();
 if(a==='open'){open(id);return}
 if(a==='open-target'){open(id);return}
