@@ -5,7 +5,7 @@
 (()=>{'use strict';
 if(window.location?.search&&new URLSearchParams(window.location.search).get('canvas')==='legacy')return;
 let api;
-const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:''};
+const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',quickAdd:null,connectFrom:null,mapCollapsed:false,mapGeometry:null,previousCameras:[],lastCameraAt:0};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const esc=h, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), num=(x,d=0)=>Number.isFinite(Number(x))?Number(x):d;
@@ -150,6 +150,109 @@ function objectMarkup(i){const k=kind(i),s=style(i),c=card(i.card_id),isSel=ui.s
  (isSel?['nw','n','ne','e','se','s','sw','w'].map(x=>'<div class="c3-handle handle-'+x+'" data-c3-resize="'+h(i.id)+'" data-dir="'+x+'"></div>').join(''):'')+
  '</div>';
 }
+
+const QUICK_TYPES=[['rectangle','▢ Shape'],['sticky','▣ Sticky'],['knowledge','✧ Card'],['text','T Text'],['ellipse','◯ Circle'],['diamond','◇ Decision']];
+function rememberCamera(force=false){
+ const now=Date.now();
+ if(!force&&now-ui.lastCameraAt<500)return;
+ const old={boardId:ui.boardId,x:ui.pan.x,y:ui.pan.y,z:ui.zoom};
+ const last=ui.previousCameras[ui.previousCameras.length-1];
+ if(last&&last.boardId===old.boardId&&Math.abs(last.x-old.x)+Math.abs(last.y-old.y)<2&&Math.abs(last.z-old.z)<.002)return;
+ ui.previousCameras.push(old);if(ui.previousCameras.length>25)ui.previousCameras.shift();
+ ui.lastCameraAt=now;
+}
+function goPreviousCamera(){
+ const previous=ui.previousCameras.pop();if(!previous||previous.boardId!==ui.boardId)return say('No previous view');
+ const current={boardId:ui.boardId,x:ui.pan.x,y:ui.pan.y,z:ui.zoom};
+ ui.pan={x:previous.x,y:previous.y};ui.zoom=previous.z;
+ if(Math.hypot(current.x-ui.pan.x,current.y-ui.pan.y)>1||Math.abs(current.z-ui.zoom)>.001){updateCam();saveCam()}
+}
+function fitSelection(){
+ const selected=entries();if(!selected.length){fitBoard();return}
+ fitEntities(selected);
+}
+function fitEntities(nodes){
+ const viewport=$('#c3-canvas');if(!viewport)return;
+ const w=viewport.clientWidth||viewport.getBoundingClientRect().width,hgt=viewport.clientHeight||viewport.getBoundingClientRect().height;
+ rememberCamera(true);
+ if(!nodes.length){ui.zoom=1;ui.pan={x:Math.round(w*.4),y:Math.round(hgt*.32)}}
+ else{
+  const left=Math.min(...nodes.map(o=>o.x)),top=Math.min(...nodes.map(o=>o.y)),right=Math.max(...nodes.map(o=>o.x+o.w)),bottom=Math.max(...nodes.map(o=>o.y+o.h));
+  const pad=Math.min(90,Math.max(36,Math.min(w,hgt)*.12));
+  ui.zoom=clamp(Math.min((w-pad*2)/Math.max(1,right-left),(hgt-pad*2)/Math.max(1,bottom-top)),.25,2.5);
+  ui.pan={x:Math.round((w-(right-left)*ui.zoom)/2-left*ui.zoom),y:Math.round((hgt-(bottom-top)*ui.zoom)/2-top*ui.zoom)};
+ }
+ updateCam();saveCam();
+}
+function floatingUI(){
+ const selected=entries();
+ if(ui.quickAdd){
+  const q=ui.quickAdd;
+  return '<div class="c3-quick-add" id="c3-quick-add" role="menu" aria-label="Create an object" style="left:'+q.x+'px;top:'+q.y+'px"><div class="c3-quick-title">CREATE SOMETHING</div><div class="c3-quick-grid">'+QUICK_TYPES.map(([type,label])=>'<button data-c3="quick-create" data-kind="'+type+'" role="menuitem">'+label+'</button>').join('')+'</div><div class="c3-quick-hint">Create first. Write when ready.</div></div>';
+ }
+ if(selected.length!==1||ui.gesture?.type==='move'||ui.gesture?.type==='resize')return '';
+ const item=selected[0],s=style(item),map=$('#c3-canvas');
+ const vw=map?.clientWidth||950,vh=map?.clientHeight||700;
+ const top=clamp(item.y*ui.zoom+ui.pan.y-58,12,vh-72);
+ const left=clamp((item.x+item.w/2)*ui.zoom+ui.pan.x-171,12,Math.max(12,vw-360));
+ return '<div class="c3-contextbar" id="c3-contextbar" style="left:'+left+'px;top:'+top+'px" role="toolbar" aria-label="Selected object quick actions">'+
+ '<button data-c3="quick-edit" title="Edit text" aria-label="Edit text">✎</button>'+
+ '<button data-c3="quick-duplicate" title="Duplicate object (Ctrl+D)" aria-label="Duplicate object">⧉</button>'+
+ '<button data-c3="quick-connect" title="Connect to another object" aria-label="Connect to another object">⤳</button>'+
+ '<span class="c3-context-sep"></span>'+
+ ['blue','green','yellow','purple'].map(key=>'<button data-c3="swatch" data-value="'+palette[key]+'" class="c3-context-color" aria-label="Set fill '+key+'" title="'+key+'" style="--swatch:'+palette[key]+'"></button>').join('')+
+ '<span class="c3-context-sep"></span><button data-c3="quick-delete" title="Remove from board" aria-label="Remove from board">⌫</button></div>';
+}
+function minimapMarkup(){
+ if(ui.mapCollapsed)return '<div class="c3-minimap c3-minimap-closed" id="c3-minimap"><button data-c3="minimap-toggle" aria-label="Show minimap">▧ Map</button></div>';
+ const vp=$('#c3-canvas'),W=vp?.clientWidth||1000,H=vp?.clientHeight||700;
+ const visible={x:-ui.pan.x/ui.zoom,y:-ui.pan.y/ui.zoom,w:W/ui.zoom,h:H/ui.zoom};
+ const nodes=items();
+ const left=Math.min(visible.x,...nodes.map(n=>n.x))-80,right=Math.max(visible.x+visible.w,...nodes.map(n=>n.x+n.w))+80;
+ const top=Math.min(visible.y,...nodes.map(n=>n.y))-80,bottom=Math.max(visible.y+visible.h,...nodes.map(n=>n.y+n.h))+80;
+ const scale=Math.min(202/Math.max(1,right-left),112/Math.max(1,bottom-top));
+ const offsetX=(220-(right-left)*scale)/2,offsetY=(130-(bottom-top)*scale)/2;
+ const projectX=x=>(x-left)*scale+offsetX,projectY=y=>(y-top)*scale+offsetY;
+ ui.mapGeometry={left,top,scale,offsetX,offsetY};
+ const shapes=nodes.slice(0,250).map(n=>'<rect x="'+projectX(n.x).toFixed(1)+'" y="'+projectY(n.y).toFixed(1)+'" width="'+Math.max(1,n.w*scale).toFixed(1)+'" height="'+Math.max(1,n.h*scale).toFixed(1)+'" rx="2" fill="'+(ui.selected.has(n.id)?'#a9bfff':'#6684a9')+'" fill-opacity="'+(ui.selected.has(n.id)?'.96':'.7')+'"/>').join('');
+ const viewBox='<rect x="'+projectX(visible.x).toFixed(1)+'" y="'+projectY(visible.y).toFixed(1)+'" width="'+Math.max(1,visible.w*scale).toFixed(1)+'" height="'+Math.max(1,visible.h*scale).toFixed(1)+'" rx="2" fill="#5c95f6" fill-opacity=".11" stroke="#98b7ff" stroke-width="1.5"/>';
+ return '<div class="c3-minimap" id="c3-minimap"><div class="c3-minimap-title"><span>OVERVIEW</span><button data-c3="minimap-toggle" aria-label="Hide minimap" title="Hide overview">−</button></div><svg data-c3="minimap-jump" id="c3-minimap-svg" viewBox="0 0 220 130" role="button" tabindex="0" aria-label="Navigate board from minimap" preserveAspectRatio="xMidYMid meet"><rect x="0" y="0" width="220" height="130" fill="transparent"/>'+shapes+viewBox+'</svg></div>';
+}
+function refreshNavigationUI(){
+ const shell=$('#c3-canvas');if(!shell)return;
+ const float=$('#c3-floating-ui');
+ if(float){const markup=floatingUI();if(float.innerHTML!==markup)float.innerHTML=markup;}
+ const map=$('#c3-minimap');if(map){const markup=minimapMarkup();if(map.outerHTML!==markup)map.outerHTML=markup;}
+ const back=$('#c3-view-back');if(back)back.disabled=!ui.previousCameras.some(c=>c.boardId===ui.boardId);
+}
+function openQuickAdd(clientX,clientY){
+ const vp=$('#c3-canvas');if(!vp)return;
+ const bounds=vp.getBoundingClientRect();
+ ui.quickAdd={x:clamp(clientX-bounds.left,12,Math.max(12,bounds.width-296)),y:clamp(clientY-bounds.top,12,Math.max(12,bounds.height-257)),point:worldPoint(clientX,clientY)};
+ ui.selected.clear();ui.edge=null;refreshNavigationUI();api.render();
+}
+async function cloneSelection(){
+ const selected=entries();if(!selected.length)return;
+ const clones=[],createdCards=[];
+ try{
+  for(const original of selected){
+   const c=card(original.card_id);if(!c)continue;
+   const payload={title:c.title||'',kind:c.kind||'note',summary:c.summary||'',body:c.body||'',key_points:c.key_points||'',accent:c.accent||'blue',url:c.url||null,task_id:c.task_id||null,target_board_id:c.target_board_id||null,asset_path:c.asset_path||null};
+   const copied=await api.insert('knowledge_cards',payload);createdCards.push(copied.id);
+   const p=await api.insert('board_items',{board_id:ui.boardId,card_id:copied.id,visual_kind:kind(original),x:clamp(original.x+38,-99900,99900),y:clamp(original.y+38,-99900,99900),w:original.w,h:original.h,z:Math.max(0,...items().map(i=>num(i.z)))+1,style:{...original.style},rotation:num(original.rotation)});
+   clones.push(p);
+  }
+  ui.selected=new Set(clones.map(i=>i.id));ui.quickAdd=null;
+  await sync('Duplicated '+clones.length+' object'+(clones.length===1?'':'s'));
+ }catch(err){for(const p of clones)try{await api.del('board_items',p.id)}catch{}for(const id of createdCards)try{await api.del('knowledge_cards',id)}catch{}
+  await api.reload();api.render();say('Duplicate failed: '+err.message,true);}
+}
+async function removeSelection(){
+ const sel=entries();if(!sel.length)return;
+ ui.quickAdd=null;ui.selected.clear();
+ await transact(async()=>{for(const object of sel)await api.del('board_items',object.id)},'Removed from board');
+}
+
 function canvas(){
  const b=board();if(!b)return library();
  const objects=[...items()].sort((a,b)=>num(a.z)-num(b.z));
