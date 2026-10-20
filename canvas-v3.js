@@ -445,8 +445,8 @@ function formatPoint(i){return {x:i.x,y:i.y,w:i.w,h:i.h}}
 function startPan(e){rememberCamera(true);ui.quickAdd=null;refreshNavigationUI();ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};$('#c3-canvas')?.classList.add('is-panning');e.preventDefault()}
 function gestureCancel(){const gesture=ui.gesture;ui.gesture=null;$('#c3-canvas')?.classList.remove('is-panning');const box=$('#c3-marquee');if(box)box.hidden=true;if(gesture?.type==='pan'&&gesture.moved)saveCam()}
 function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
- if(e.button===1||ui.spaceDown||ui.tool==='hand'){startPan(e);return}
  const t=e.target;if(t.closest('.c3-quick-add,.c3-contextbar,.c3-minimap'))return;if(t.closest('input,textarea,select,[contenteditable]'))return;
+ if(e.button===1||ui.spaceDown||ui.tool==='hand'){startPan(e);return}
  const port=t.closest('[data-c3-port]'),res=t.closest('[data-c3-resize]'),node=t.closest('[data-c3-item]'),edge=t.closest('[data-c3-edge]');
  if(ui.connectFrom&&node){const target=node.dataset.c3Item,from=ui.connectFrom;ui.connectFrom=null;ui.tool='select';if(from!==target){const a=itm(from),b=itm(target);if(a&&b){const sides=choose(a,b);addEdge(from,target,sides.from,sides.to);}else say('Source is no longer available',true)}api.render();e.preventDefault();return}
  if(port){ui.gesture={type:'connect',id:port.dataset.c3Port,side:port.dataset.side,from:{x:e.clientX,y:e.clientY},toWorld:worldPoint(e.clientX,e.clientY)};e.preventDefault();return}
