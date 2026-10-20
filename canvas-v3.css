@@ -152,3 +152,6 @@ body[data-theme="light"] .c3-shell{--c3-shell:#f1f4fa;--c3-canvas:#f8f9fc;--c3-i
 .c3-explore{margin-top:10px;background:transparent;color:var(--c3-blue);border:1px solid var(--c3-blue);width:100%}
 .c3-live-save{font-size:.73em;color:var(--c3-muted);white-space:nowrap;margin-right:6px;font-weight:650}
 .c3-kind-frame:hover .c3-object-face{background:color-mix(in srgb,var(--c3-surface) 38%,transparent)}
+
+.c3-object.c3-magnet .c3-object-face{box-shadow:0 0 0 4px #86adff6e,0 0 28px #5b92ff55!important;filter:brightness(1.16)}
+.c3-object.c3-magnet .c3-anchor{opacity:1;pointer-events:auto;box-shadow:0 0 0 5px #4b89ff66}
