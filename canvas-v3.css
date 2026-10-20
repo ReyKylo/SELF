@@ -216,3 +216,102 @@ body[data-theme="light"] .c3-shell{--c3-shell:#f1f4fa;--c3-canvas:#f8f9fc;--c3-i
   background:var(--c3-raise);
   outline:1px solid var(--c3-blue);
 }
+
+
+/* Phase 2.5 UX discovery polish: contextual editing + spatial navigator.
+   Static states only; no dimming, pulsing, opacity flash or full-page animation. */
+.c3-shell .c3-contextbar{
+ position:absolute;z-index:26;display:flex;align-items:center;gap:5px;
+ min-height:48px;padding:6px 8px;border-radius:12px;
+ background:var(--c3-surface);border:1px solid var(--c3-border);
+ box-shadow:0 5px 22px #03081444;
+}
+.c3-shell .c3-contextbar button{
+ display:grid;place-items:center;height:36px;min-width:36px;
+ border:1px solid transparent;border-radius:8px;
+ background:transparent;color:var(--c3-text);font-size:1.16em;
+}
+.c3-shell .c3-contextbar button:hover,
+.c3-shell .c3-quick-add button:hover{
+ background:var(--c3-raise);border-color:var(--c3-blue);
+}
+.c3-shell .c3-contextbar button:active,
+.c3-shell .c3-quick-add button:active{transform:scale(.96)}
+.c3-shell .c3-contextbar .c3-context-color{
+ width:26px;min-width:26px;height:26px;border-radius:8px;
+ background:var(--swatch);border:2px solid var(--c3-surface);
+ box-shadow:0 0 0 1px var(--c3-border);
+}
+.c3-shell .c3-contextbar .c3-context-color:hover{background:var(--swatch);box-shadow:0 0 0 2px var(--c3-text);border-color:var(--c3-surface)}
+.c3-shell .c3-context-sep{height:25px;width:1px;background:var(--c3-border);margin:0 2px}
+.c3-shell .c3-quick-add{
+ position:absolute;z-index:31;width:285px;max-width:calc(100% - 24px);
+ background:var(--c3-surface);color:var(--c3-text);
+ border:1px solid var(--c3-border);box-shadow:var(--c3-shadow);
+ border-radius:14px;padding:13px;
+}
+.c3-shell .c3-quick-title{
+ letter-spacing:.12em;font-size:.68em;font-weight:800;
+ color:var(--c3-muted);margin:2px 3px 13px;
+}
+.c3-shell .c3-quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.c3-shell .c3-quick-grid button{
+ display:flex;align-items:center;justify-content:flex-start;
+ min-height:43px;padding:8px 10px;border-radius:9px;
+ border:1px solid var(--c3-border);background:var(--c3-inspector);
+ color:var(--c3-text);font-weight:650;font-size:.86em;text-align:left;
+}
+.c3-shell .c3-quick-hint{
+ padding:12px 3px 2px;font-size:.76em;color:var(--c3-muted);line-height:1.4;
+}
+.c3-shell .c3-minimap{
+ position:absolute;z-index:16;right:15px;bottom:17px;width:240px;
+ padding:8px 9px 9px;background:var(--c3-surface);
+ border:1px solid var(--c3-border);border-radius:13px;
+ box-shadow:0 7px 23px #060b1530;
+}
+.c3-shell .c3-minimap-title{
+ display:flex;align-items:center;justify-content:space-between;
+ color:var(--c3-muted);font-size:.68em;font-weight:800;
+ letter-spacing:.1em;padding:1px 1px 6px 5px;
+}
+.c3-shell .c3-minimap-title button{
+ border:0;border-radius:7px;background:transparent;
+ color:var(--c3-muted);font-size:1.25em;
+ min-height:26px;min-width:26px;
+}
+.c3-shell .c3-minimap-title button:hover{background:var(--c3-raise);color:var(--c3-text)}
+.c3-shell #c3-minimap-svg{
+ display:block;width:220px;height:130px;
+ background:var(--c3-canvas);
+ background-image:radial-gradient(var(--c3-border) .65px,transparent .75px);
+ background-size:12px 12px;
+ border-radius:8px;cursor:crosshair;border:1px solid var(--c3-border);
+}
+.c3-shell #c3-minimap-svg:focus-visible{
+ outline:2px solid var(--c3-blue);outline-offset:2px;
+}
+.c3-shell .c3-minimap-closed{width:auto;padding:5px}
+.c3-shell .c3-minimap-closed button{
+ padding:7px 12px;color:var(--c3-text);background:transparent;
+ border:0;border-radius:8px;min-height:36px;font-weight:700;font-size:.83em;
+}
+.c3-shell .c3-minimap-closed button:hover{background:var(--c3-raise)}
+.c3-shell #c3-view-back:disabled{opacity:.38;cursor:default}
+.c3-shell #c3-floating-ui:empty{display:none}
+.c3-shell .c3-canvas-help{right:268px;bottom:24px;max-width:410px;font-size:.76em}
+@media(max-width:1150px){
+ .c3-shell .c3-canvas-help{display:none}
+ .c3-shell .c3-minimap{right:12px;bottom:10px}
+}
+@media(max-width:650px){
+ .c3-shell .c3-contextbar{gap:3px;padding:5px;min-height:44px}
+ .c3-shell .c3-contextbar button{min-width:34px;height:35px}
+ .c3-shell .c3-minimap{width:165px;padding:6px}
+ .c3-shell #c3-minimap-svg{width:151px;height:90px}
+ .c3-shell .c3-quick-add{width:270px}
+ .c3-shell .c3-header-right #c3-view-back{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .c3-shell .c3-quick-add,.c3-shell .c3-contextbar,.c3-shell .c3-minimap{animation:none!important;transition:none!important}
+}
