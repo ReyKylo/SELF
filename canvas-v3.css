@@ -197,3 +197,22 @@ body[data-theme="light"] .c3-shell{--c3-shell:#f1f4fa;--c3-canvas:#f8f9fc;--c3-i
 .c3-shell .c3-primary:hover {
   transform: none !important;
 }
+
+
+/* Natural canvas navigation: visible hand affordance, zero-flash feedback. */
+.c3-shell .c3-canvas {cursor:grab}
+.c3-shell .c3-canvas.is-panning,
+.c3-shell .c3-canvas.is-hand-mode {cursor:grabbing}
+.c3-shell .c3-canvas-help {
+  font-size:.85em;
+  color:var(--c3-muted);
+  background:var(--c3-surface);
+  border:1px solid var(--c3-border);
+  padding:9px 12px;
+  border-radius:10px;
+}
+.c3-shell .c3-bottom-tools .c3-btn.is-active {
+  color:var(--c3-text);
+  background:var(--c3-raise);
+  outline:1px solid var(--c3-blue);
+}
