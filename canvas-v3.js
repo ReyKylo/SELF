@@ -156,7 +156,7 @@ function canvas(){
  ui.domSnapshots=new Map(objects.map(i=>[i.id,objectMarkup(i)]));
  return '<div class="self-board-editor c3-shell" data-board-id="'+h(b.id)+'"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
  '<div class="c3-toolbar">'+['select','rectangle','ellipse','diamond','connect','text','image','sticky','frame','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note',ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>'+
- '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo"')+button('redo','↷','title="Redo"')+'<span class="c3-scale">'+Math.round(ui.zoom*100)+'%</span>'+button('fit','⛶','title="Fit view"')+'</div></div>'+
+ '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo"')+button('redo','↷','title="Redo"')+'<span class="c3-scale">'+Math.round(ui.zoom*100)+'%</span>'+button('fit','⛶','title="Fit all objects" aria-label="Fit all objects"')+'</div></div>'+
  '<div class="c3-content"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
  '<div class="c3-world" id="c3-world" style="transform:translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')">'+
  '<svg class="c3-wires" id="c3-wires" aria-label="Connected objects">'+renderWires()+'</svg>'+
@@ -164,7 +164,7 @@ function canvas(){
  (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
  '<div class="c3-smart-strip">'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
  '<div class="c3-bottom-tools">'+button('hand','✋ Pan')+button('select-tool','↖ Select')+'<span class="c3-divider"></span>'+button('zoom-out','−')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋')+'</div>'+
- '<div class="c3-canvas-help">Shift+click multi-select · drag background to select · Space+drag pan · double-click text</div>'+
+ '<div class="c3-canvas-help">Drag empty canvas to move · Shift+drag selects · Double-click to write</div>'+
  '<div id="c3-marquee" hidden></div><input id="c3-upload" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"/></section>'+
  inspector()+'</div>'+modal()+'</div>';
 }
@@ -291,6 +291,19 @@ function snap(x){return ui.grid?Math.round(x/12)*12:x}
 function saveCam(){clearTimeout(ui.saveTimer);let id=ui.boardId,v={pan_x:ui.pan.x,pan_y:ui.pan.y,zoom:ui.zoom};ui.saveTimer=setTimeout(async()=>{if(id)try{await api.patch('boards',id,v)}catch(e){say('Canvas position not saved: '+e.message,true)}},550)}
 function updateCam(){let w=$('#c3-world');if(w)w.style.transform='translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')';let z=$('#c3-zoom-label');if(z)z.textContent=Math.round(ui.zoom*100)+'%'}
 function zoomAt(factor,x,y){const vp=$('#c3-canvas');if(!vp)return;const r=vp.getBoundingClientRect(),px=x-r.left,py=y-r.top,wx=(px-ui.pan.x)/ui.zoom,wy=(py-ui.pan.y)/ui.zoom;ui.zoom=clamp(ui.zoom*factor,.25,2.5);ui.pan={x:px-wx*ui.zoom,y:py-wy*ui.zoom};updateCam();saveCam()}
+function fitBoard(){
+ const vp=$('#c3-canvas');if(!vp)return;
+ const nodes=items(),w=vp.clientWidth||vp.getBoundingClientRect().width,h=vp.clientHeight||vp.getBoundingClientRect().height;
+ if(!nodes.length){ui.zoom=1;ui.pan={x:Math.round(w*.32),y:Math.round(h*.27)}}
+ else{
+  const l=Math.min(...nodes.map(i=>i.x)),t=Math.min(...nodes.map(i=>i.y));
+  const rt=Math.max(...nodes.map(i=>i.x+i.w)),bt=Math.max(...nodes.map(i=>i.y+i.h));
+  const pad=Math.min(95,Math.max(36,Math.min(w,h)*.1));
+  ui.zoom=clamp(Math.min((w-pad*2)/Math.max(1,rt-l),(h-pad*2)/Math.max(1,bt-t)),.25,2.5);
+  ui.pan={x:Math.round((w-(rt-l)*ui.zoom)/2-l*ui.zoom),y:Math.round((h-(bt-t)*ui.zoom)/2-t*ui.zoom)};
+ }
+ updateCam();saveCam();
+}
 function liveRefresh(){const layer=$('#c3-wires');if(layer)layer.innerHTML=renderWires();for(const i of items()){const n=document.querySelector('[data-c3-item="'+i.id+'"]');if(n){n.style.left=i.x+'px';n.style.top=i.y+'px';n.style.width=i.w+'px';n.style.height=i.h+'px';n.style.transform='rotate('+num(i.rotation)+'deg)'}}}
 function selection(ids){ui.selected=new Set(ids);ui.edge=null;api.render()}
 function entries(){return [...ui.selected].map(itm).filter(Boolean)}
@@ -323,7 +336,9 @@ async function upload(file){if(!file)return;const allowed=['image/jpeg','image/p
  setBusy(true);try{const path=await api.uploadImage(file);const signed=await api.signImage(path);ui.assetUrls.set(path,signed);await create('image',null,{asset_path:path,title:''})}catch(e){setBusy(false);say('Upload failed: '+e.message,true)}}
 async function imageResolve(){for(const c of state().knowledgeCards){if(!c.asset_path||ui.assetUrls.has(c.asset_path)||ui.loadingImages.has(c.asset_path))continue;ui.loadingImages.add(c.asset_path);api.signImage(c.asset_path).then(link=>{ui.assetUrls.set(c.asset_path,link);if(state().view==='board-editor')api.render()}).catch(()=>{}).finally(()=>ui.loadingImages.delete(c.asset_path))}}
 function formatPoint(i){return {x:i.x,y:i.y,w:i.w,h:i.h}}
-function gestureStart(e){if(state().view!=='board-editor'||e.button!==0)return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
+function startPan(e){ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};$('#c3-canvas')?.classList.add('is-panning');e.preventDefault()}
+function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
+ if(e.button===1||ui.spaceDown||ui.tool==='hand'){startPan(e);return}
  const t=e.target,port=t.closest('[data-c3-port]'),res=t.closest('[data-c3-resize]'),node=t.closest('[data-c3-item]'),edge=t.closest('[data-c3-edge]');
  if(port){ui.gesture={type:'connect',id:port.dataset.c3Port,side:port.dataset.side,from:{x:e.clientX,y:e.clientY},toWorld:worldPoint(e.clientX,e.clientY)};e.preventDefault();return}
  if(edge){ui.edge=edge.dataset.c3Edge;ui.selected.clear();api.render();return}
@@ -336,10 +351,10 @@ function gestureStart(e){if(state().view!=='board-editor'||e.button!==0)return;c
  ui.gesture={type:res?'resize':'move',id,handle:rect,from:{x:e.clientX,y:e.clientY},original:positions(selected),ids:selected,moved:false};
  e.preventDefault();return}
  if(t.closest('button,input,textarea,select'))return;
- if(ui.spaceDown||ui.tool==='hand'||e.button===1){ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};e.preventDefault();return}
  if(ui.tool!=='select'&&ui.tool!=='connect'){const k=ui.tool,pt=worldPoint(e.clientX,e.clientY);ui.tool='select';create(k,{x:snap(pt.x),y:snap(pt.y)});e.preventDefault();return}
- if(ui.tool==='connect'){ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};return}
- ui.gesture={type:'marquee',from:{x:e.clientX,y:e.clientY},at:{x:e.clientX,y:e.clientY},shift:e.shiftKey,moved:false};e.preventDefault();}
+ if(ui.tool==='select'&&e.shiftKey){ui.gesture={type:'marquee',from:{x:e.clientX,y:e.clientY},at:{x:e.clientX,y:e.clientY},shift:true,moved:false};e.preventDefault();return}
+ // Primary pointer action on blank canvas is moving the board.
+ startPan(e);}
 function nearTarget(e,g){
  const element=document.elementFromPoint(e.clientX,e.clientY),node=element?.closest('[data-c3-item]'),port=element?.closest('[data-c3-port]');
  const id=port?.dataset.c3Port||node?.dataset.c3Item;
@@ -364,7 +379,7 @@ function gestureMove(e){const g=ui.gesture;if(!g)return;const dx=e.clientX-g.fro
  liveRefresh();
 }
 async function gestureEnd(e){const g=ui.gesture;if(!g)return;ui.gesture=null;
- if(g.type==='pan'){if(g.moved)saveCam();return}
+ if(g.type==='pan'){$('#c3-canvas')?.classList.remove('is-panning');if(g.moved)saveCam();else if(ui.selected.size||ui.edge)selection([]);return}
  if(g.type==='marquee'){let el=$('#c3-marquee');if(el)el.hidden=true;if(!g.moved){if(!g.shift)selection([]);return}
  const a=worldPoint(g.from.x,g.from.y),b=worldPoint(e.clientX,e.clientY),bounds={x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),x2:Math.max(a.x,b.x),y2:Math.max(a.y,b.y)};
  const found=items().filter(i=>i.x<bounds.x2&&i.x+i.w>bounds.x&&i.y<bounds.y2&&i.y+i.h>bounds.y).map(i=>i.id);selection(g.shift?[...ui.selected,...found]:found);return}
@@ -389,7 +404,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='hand'){ui.tool='hand';api.render();return}
  if(a==='undo'||a==='redo'){await step(a);return}
  if(a==='zoom-in'||a==='zoom-out'){const r=$('#c3-canvas')?.getBoundingClientRect();if(r)zoomAt(a==='zoom-in'?1.2:1/1.2,r.left+r.width/2,r.top+r.height/2);return}
- if(a==='fit'){ui.zoom=1;ui.pan={x:95,y:90};updateCam();saveCam();return}
+ if(a==='fit'){fitBoard();return}
  if(a==='swatch'){await applyStyle('fill',el.dataset.value);return}
  if(a==='align'){await align(el.dataset.align);return}
  if(a==='distribute'){await distribute(el.dataset.axis);return}
