@@ -155,3 +155,45 @@ body[data-theme="light"] .c3-shell{--c3-shell:#f1f4fa;--c3-canvas:#f8f9fc;--c3-i
 
 .c3-object.c3-magnet .c3-object-face{box-shadow:0 0 0 4px #86adff6e,0 0 28px #5b92ff55!important;filter:brightness(1.16)}
 .c3-object.c3-magnet .c3-anchor{opacity:1;pointer-events:auto;box-shadow:0 0 0 5px #4b89ff66}
+
+
+/* Concept C accessibility hotfix: no brightness pulses or full-screen dimming. */
+.c3-shell,
+.c3-shell .c3-canvas,
+.c3-shell .c3-object,
+.c3-shell .c3-object-face,
+.c3-shell .c3-inspector,
+.c3-shell .c3-modal-overlay,
+.c3-shell .c3-modal,
+.c3-shell .c3-world {
+  animation: none !important;
+}
+.c3-shell .c3-modal-overlay {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+.c3-shell .c3-object,
+.c3-shell .c3-object.selected {
+  filter: none !important;
+}
+.c3-shell .c3-object-face,
+.c3-shell .c3-object:hover .c3-object-face,
+.c3-shell .c3-object.c3-magnet .c3-object-face {
+  filter: none !important;
+  transition: none !important;
+}
+.c3-shell .c3-object:hover .c3-object-face {
+  box-shadow: 0 0 0 1px var(--c3-blue), 0 5px 15px #05070f25;
+}
+.c3-shell .c3-object.c3-magnet .c3-object-face {
+  box-shadow: 0 0 0 3px #86adff, 0 5px 15px #05070f25 !important;
+}
+.c3-shell .c3-tool,
+.c3-shell .c3-btn,
+.c3-shell .c3-primary {
+  transition: border-color .12s ease, background-color .12s ease, color .12s ease !important;
+}
+.c3-shell .c3-tool:hover,
+.c3-shell .c3-primary:hover {
+  transform: none !important;
+}
