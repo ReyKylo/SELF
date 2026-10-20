@@ -193,8 +193,8 @@ function updateInPlace(){
  else if(!next.length&&!empty){
    scene.insertAdjacentHTML('beforeend','<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>');
  }
- scene.classList.toggle('is-hand-mode',ui.tool==='hand');
- for(const btn of scene.querySelectorAll('.c3-bottom-tools [data-c3]')){const active=(ui.tool==='hand'&&btn.dataset.c3==='hand')||(ui.tool==='select'&&btn.dataset.c3==='select-tool');btn.classList.toggle('is-active',active);btn.setAttribute('aria-pressed',String(active));}
+ scene.classList?.toggle?.('is-hand-mode',ui.tool==='hand');
+ for(const btn of (scene.querySelectorAll?.('.c3-bottom-tools [data-c3]')||[])){const active=(ui.tool==='hand'&&btn.dataset.c3==='hand')||(ui.tool==='select'&&btn.dataset.c3==='select-tool');btn.classList.toggle('is-active',active);btn.setAttribute('aria-pressed',String(active));}
  const oldInspector=$('#c3-inspector'),newInspector=inspector();
  if(oldInspector&&oldInspector.outerHTML!==newInspector){
    const active=document.activeElement;
