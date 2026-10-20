@@ -26,3 +26,24 @@ Read `docs/DESIGN_CONTRACT.md`. Wireframe V2 is the visual baseline, not disposa
 
 ## Security
 No service-role keys in the browser. Users can select/change only their own records via RLS. Task child rows have composite foreign keys enforcing same-user ownership. Keep security checks and test authorization between accounts before production launch.
+
+## Deploy to Cloudflare Pages
+This is a static HTML/CSS/JS project. It does not use npm, Vite or a framework.
+The repository includes `tools/build_cloudflare.py`, which copies only the three app assets into `dist/` (no secret files or source folders are published).
+
+Cloudflare Pages > Settings > Builds & deployments (production and preview):
+
+| Setting | Value |
+| --- | --- |
+| Framework preset | None |
+| Production branch | `main` |
+| Root directory | `/` (repository root) |
+| Build command | `python3 tools/build_cloudflare.py` |
+| Build output directory | `dist` |
+
+To verify locally:
+```sh
+python3 tools/build_cloudflare.py
+ls -la dist
+```
+The `dist` folder must contain `index.html`, `styles.css`, and `app.js`. Cloudflare's Git integration must be connected to `ReyKylo/SELF` branch `main`. After changing settings, retry deployment of the latest commit.
