@@ -29,6 +29,8 @@ jobs:
         run: node tests/smoke_whiteboards.cjs
       - name: Concept C canvas smoke
         run: node tests/smoke_concept_c.cjs
+      - name: No-flash canvas stability regression
+        run: node tests/smoke_canvas_stability.cjs
       - name: Cloudflare static build
         run: |
           python3 tools/build_cloudflare.py
