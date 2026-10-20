@@ -1,8 +1,0 @@
-/* Integration A-INT-01: preserve the five real case workbench actions and
-   complete research guidance within the approved B working width. */
-body.rey-pro[data-page='investment'] .ii12-case-nudge{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:12px;min-width:0}
-body.rey-pro[data-page='investment'] .ii12-case-nudge>div{flex:1 0 100%;min-width:0;width:100%;max-width:100%}
-body.rey-pro[data-page='investment'] .ii12-case-nudge>.ii-btn{flex:0 1 auto;max-width:100%;white-space:normal;text-align:left;overflow-wrap:break-word}
-/* Integration B minor: the workbench title, assumption status and instructions
-   retain their hierarchy on narrow workspaces instead of competing as columns. */
-@media(max-width:1000px){body.rey-pro[data-page='investment'] .ii13-workbench>.ii13-panel-heading{flex-direction:column;align-items:flex-start;gap:0}body.rey-pro[data-page='investment'] .ii13-workbench>.ii13-panel-heading>span,body.rey-pro[data-page='investment'] .ii13-workbench>.ii13-panel-heading>h2,body.rey-pro[data-page='investment'] .ii13-workbench>.ii13-panel-heading>p{width:100%;min-width:0;max-width:100%}}
