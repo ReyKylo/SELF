@@ -11,7 +11,7 @@ const doc={
   if(q==='#c3-zoom-label')return {textContent:''};
   if(q==='#c3-wires')return {set innerHTML(s){}};
   if(q==='#c3-marquee')return {style:{},hidden:true};
-  if(q.startsWith('[data-c3-item='))return elements[q]??(elements[q]={style:{}});
+  if(q.startsWith('[data-c3-item='))return elements[q]??(elements[q]={style:{},classList:{add(){},remove(){}}});
   return null;
  },
  querySelectorAll(){return []},
