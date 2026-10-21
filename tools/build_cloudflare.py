@@ -6,7 +6,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "dist"
-ASSETS = ("index.html", "styles.css", "app.js", "boards.css", "boards.js", "canvas-v3.css", "canvas-v3.js")
+ASSETS = ("index.html", "styles.css", "app.js", "boards.css", "boards.js", "canvas-v3.css", "canvas-v3.js", "concept-d.css")
 
 
 def main() -> int:
@@ -25,7 +25,7 @@ def main() -> int:
         print(f"  copied {asset} -> dist/{asset}")
 
     html = (OUTPUT / "index.html").read_text(encoding="utf-8")
-    required = ('href="./styles.css"', 'href="./boards.css"', 'src="./canvas-v3.js"', 'href="./canvas-v3.css"', 'src="./app.js"')
+    required = ('href="./styles.css"', 'href="./boards.css"', 'src="./canvas-v3.js"', 'href="./canvas-v3.css"', 'href="./concept-d.css"', 'src="./app.js"')
     if not all(reference in html for reference in required):
         print("SELF build failed: index.html asset references changed.", file=sys.stderr)
         return 1
