@@ -1,0 +1,45 @@
+{
+  "id": "self-vc-saas-retention-trap-01",
+  "track": "VC",
+  "version": "0.1.0",
+  "status": "training-draft",
+  "title": "ArusOps: ARR roket, churn tersembunyi, dan runway pendek",
+  "decision_question": "INVEST, PASS, atau REQUEST FURTHER DILIGENCE pada Series A US$6m (US$24m pre-money)? Jika berinvestasi, berapa harga dan syarat maksimum?",
+  "case_type": "simulated",
+  "historical_cutoff": "2026-09-30",
+  "units": "USD nominal; customers=paid live logos; MRR=USD per month; ARR=12x live MRR",
+  "source_ledger": "source-ledger.md",
+  "exhibits": [
+    "exhibits/cohorts.csv",
+    "exhibits/monthly-traction.csv",
+    "exhibits/acquisition.csv",
+    "exhibits/cash-runway.csv",
+    "exhibits/financing.json",
+    "exhibits/market-competition.csv"
+  ],
+  "competency_ids": [
+    "VC-01",
+    "VC-02",
+    "VC-03",
+    "VC-04",
+    "VC-05",
+    "VC-06",
+    "VC-07",
+    "VC-08",
+    "VC-09",
+    "VC-10",
+    "VC-11",
+    "VC-12"
+  ],
+  "learner_tasks": "learner-tasks.md",
+  "tutor_guide": "tutor-guide.md",
+  "assessment": "assessment.md",
+  "work_products": [
+    "Auditable SaaS cohort & cash model",
+    "2-page IC decision memo",
+    "cap table + dilution bridge",
+    "3-minute partner defense"
+  ],
+  "review_status": "worker-self-tested-not-independent-expert-reviewed",
+  "simulated_data_notice": "Every ArusOps fact, person, market estimate, competitor archetype, currency, pricing, contract and financing figure is SIMULATED. Published Bessemer historical memos are separate external references."
+}

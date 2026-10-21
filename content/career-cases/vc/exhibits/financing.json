@@ -1,0 +1,55 @@
+{
+  "disclosure": "SIMULATED; USD amounts; post-money fully diluted; common stock seed; shares illustrative and can be fractional in the computational model",
+  "round_date": "2026-10-31",
+  "existing_pre_round_fully_diluted_shares": 12000000,
+  "pre_round_shares": {
+    "founder_common": 8400000,
+    "seed_common": 2400000,
+    "existing_unallocated_options": 1200000
+  },
+  "series_a": {
+    "pre_money_usd": 24000000,
+    "raise_usd": 6000000,
+    "lead_fund_usd": 4000000,
+    "other_new_investors_usd": 2000000,
+    "target_post_close_unallocated_option_pool_pct": 15,
+    "option_top_up_paid_by": "pre_money_holders",
+    "liquidation_preference": "1x nonparticipating; pari passu A fund and A co-investors; senior to common"
+  },
+  "future_hypothetical": {
+    "round_date": "2028-01-01",
+    "new_money_usd": 15000000,
+    "pre_money_usd": 45000000,
+    "post_financing_extra_option_grant_fraction_of_final_fd_pct": 5,
+    "series_b_preference": "1x nonparticipating; SENIOR to Series A",
+    "pro_rata_exercised_by_lead": false
+  },
+  "return_model": {
+    "years_to_exit_from_series_a": 5,
+    "net_debt_exit_usd": 0,
+    "fees_and_carry_excluded": true,
+    "exit_equity_value_scenarios": [
+      {
+        "label": "distress",
+        "equity_exit_usd": 20000000,
+        "exit_arr_usd": 10000000
+      },
+      {
+        "label": "low",
+        "equity_exit_usd": 75000000,
+        "exit_arr_usd": 35000000
+      },
+      {
+        "label": "base",
+        "equity_exit_usd": 300000000,
+        "exit_arr_usd": 70000000
+      },
+      {
+        "label": "upside",
+        "equity_exit_usd": 800000000,
+        "exit_arr_usd": 110000000
+      }
+    ],
+    "waterfall_note": "Below preference thresholds, B takes senior pref first; residual to A pari passu to its $6m original liquidation preference; common zero until preferences satisfied. At higher exits all A and B holders convert."
+  }
+}
