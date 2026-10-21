@@ -315,3 +315,143 @@ body[data-theme="light"] .c3-shell{--c3-shell:#f1f4fa;--c3-canvas:#f8f9fc;--c3-i
 @media(prefers-reduced-motion:reduce){
  .c3-shell .c3-quick-add,.c3-shell .c3-contextbar,.c3-shell .c3-minimap{animation:none!important;transition:none!important}
 }
+
+
+/* SELF Phase 2.5 | Adaptive Quiet Canvas | Screenshot-grounded redesign, iteration 7
+   Visual rules: zero header collisions, idle inspector hidden, smart tools contextual.
+   No pulsing, no dimming, no forced page re-mounts. */
+body:has(.c3-shell) .sidebar{
+  width:210px;min-width:210px;padding:18px 10px 13px;
+}
+body:has(.c3-shell) .main{
+  width:calc(100% - 210px);margin-left:210px;min-width:0;
+}
+body:has(.c3-shell) .main > .body{max-width:none;padding:0}
+.c3-shell .c3-header{
+  height:73px;min-height:73px;padding:10px 21px;
+  align-items:center;justify-content:space-between;gap:12px;
+  overflow:visible;z-index:20;
+}
+.c3-shell .c3-breadcrumb{min-width:0;flex:1;max-width:440px}
+.c3-shell .c3-breadcrumb strong{font-size:1.04em;max-width:min(350px,32vw)}
+.c3-shell .c3-header-right{gap:7px;min-width:0;flex:0 0 auto}
+.c3-shell .c3-header-right .c3-btn{min-height:40px;min-width:40px;padding:8px 11px}
+.c3-shell .c3-header-right [data-c3="inspector-toggle"]{
+  min-width:113px;font-size:.82em;font-weight:700;
+  border-color:var(--c3-border);letter-spacing:0;
+}
+.c3-shell .c3-header-right [data-c3="inspector-toggle"].is-active{
+  border-color:var(--c3-blue);background:var(--c3-raise);color:var(--c3-text);
+}
+.c3-shell .c3-live-save{display:inline-flex;align-items:center;white-space:nowrap;margin-right:6px;font-size:.75em;min-width:47px}
+.c3-shell .c3-toolbar{
+  position:absolute;left:17px;top:calc(100% + 17px);
+  transform:none;display:flex;flex-direction:column;
+  align-items:center;gap:3px;padding:7px;
+  max-width:58px;min-width:58px;max-height:calc(100dvh - 125px);
+  overflow:visible;background:var(--c3-surface);box-shadow:0 8px 30px #050a1340;
+  border:1px solid var(--c3-border);border-radius:15px;
+}
+.c3-shell .c3-toolbar .c3-tool{
+  min-width:42px;width:42px;height:42px;
+  border-radius:10px;display:grid;place-items:center;
+  font-size:1em;color:var(--c3-muted);
+}
+.c3-shell .c3-toolbar .c3-tool svg{width:22px;height:22px}
+.c3-shell .c3-toolbar .c3-tool:hover{transform:none;color:var(--c3-text);background:var(--c3-raise)}
+.c3-shell .c3-toolbar .c3-tool.active{background:var(--c3-blue);color:#fff}
+.c3-shell .c3-tool-divider{display:block;width:30px;height:1px;background:var(--c3-border);margin:3px 0}
+.c3-shell .c3-toolbar [data-c3="tools-more"]{
+  display:grid;place-items:center;min-height:40px;min-width:42px;
+  padding:0;border:0;background:transparent;color:var(--c3-muted);
+  font-size:1.55em;font-weight:450;box-shadow:none;border-radius:10px;
+}
+.c3-shell .c3-toolbar [data-c3="tools-more"]:hover{background:var(--c3-raise);color:var(--c3-text)}
+.c3-shell .c3-more-tools{
+  position:absolute;left:calc(100% + 9px);bottom:0;
+  display:flex;flex-direction:column;gap:3px;align-items:center;
+  padding:7px;background:var(--c3-surface);border:1px solid var(--c3-border);
+  border-radius:13px;box-shadow:0 8px 28px #070d1940;
+}
+.c3-shell .c3-content{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  height:calc(100dvh - 73px);min-height:0;
+}
+.c3-shell .c3-content.c3-panel-open{
+  grid-template-columns:minmax(0,1fr) minmax(285px,318px);
+}
+.c3-shell .c3-content.c3-panel-closed>.c3-inspector{display:none!important}
+.c3-shell .c3-canvas{
+  height:calc(100dvh - 73px);min-height:0;
+  background-color:var(--c3-canvas);
+}
+.c3-shell .c3-smart-strip[hidden],
+.c3-shell .c3-canvas-help[hidden]{display:none!important}
+.c3-shell .c3-smart-strip{
+  left:50%;right:auto;transform:translateX(-50%);top:13px;z-index:12;
+  background:var(--c3-surface);white-space:nowrap;
+}
+.c3-shell .c3-bottom-tools{
+  left:18px;bottom:16px;z-index:12;
+  min-height:46px;padding:4px 6px;gap:1px;
+  border-radius:12px;
+}
+.c3-shell .c3-bottom-tools .c3-btn{
+  min-height:36px;min-width:36px;font-size:1em;
+  padding:6px 9px;display:grid;place-items:center;
+}
+.c3-shell .c3-bottom-tools #c3-zoom-label{
+  min-width:53px;font-size:.82em;font-weight:720;
+}
+.c3-shell .c3-minimap{bottom:16px;right:16px}
+.c3-shell .c3-contextbar{z-index:26}
+.c3-shell .c3-canvas-help{
+  left:auto;right:270px;bottom:24px;
+  transform:none;min-width:0;width:auto;
+}
+.c3-shell .c3-inspector{
+  min-width:0;width:auto;position:relative;right:auto;top:auto;bottom:auto;
+  transform:none;box-shadow:none;
+  background:var(--c3-inspector);
+  border-left:1px solid var(--c3-border);
+}
+.c3-shell .c3-inspector-head{padding:23px 18px 17px}
+.c3-shell .c3-inspector-content{padding:21px 18px}
+.c3-shell .c3-inspector-tabs{padding:0 10px}
+.c3-shell .c3-inspector-tabs button{min-height:41px;font-size:.77em}
+.c3-shell .c3-contextbar, .c3-shell .c3-quick-add,
+.c3-shell .c3-toolbar, .c3-shell .c3-inspector{
+  animation:none!important;
+}
+@media(max-width:1100px){
+ body:has(.c3-shell) .sidebar{width:75px;min-width:75px;padding:16px 8px}
+ body:has(.c3-shell) .main{margin-left:75px;width:calc(100% - 75px)}
+ .c3-shell .c3-header{padding:8px 12px}
+ .c3-shell .c3-header-right [data-c3="inspector-toggle"]{min-width:42px;width:42px;font-size:0}
+ .c3-shell .c3-header-right [data-c3="inspector-toggle"]::before{content:"⚙";font-size:18px}
+ .c3-shell .c3-content.c3-panel-open{grid-template-columns:minmax(0,1fr) minmax(280px,300px)}
+ .c3-shell .c3-toolbar{left:11px}
+}
+@media(max-width:760px){
+ body:has(.c3-shell) .sidebar{display:none}
+ body:has(.c3-shell) .main{width:100%;margin:0}
+ .c3-shell .c3-header{height:67px;min-height:67px}
+ .c3-shell .c3-breadcrumb{max-width:calc(100vw - 176px)}
+ .c3-shell .c3-breadcrumb strong{max-width:140px;font-size:.86em}
+ .c3-shell .c3-header-right{gap:3px}
+ .c3-shell .c3-header-right .c3-btn{min-width:35px;min-height:38px;padding:6px}
+ .c3-shell .c3-live-save{font-size:.65em;margin-right:0}
+ .c3-shell .c3-content{height:calc(100dvh - 67px)}
+ .c3-shell .c3-canvas{height:calc(100dvh - 67px)}
+ .c3-shell .c3-toolbar{top:calc(100% + 12px);left:9px;min-width:52px;max-width:52px;padding:5px}
+ .c3-shell .c3-toolbar .c3-tool{min-width:40px;width:40px;height:40px}
+ .c3-shell .c3-content.c3-panel-open{grid-template-columns:minmax(0,1fr)}
+ .c3-shell .c3-content.c3-panel-open>.c3-inspector{
+   position:fixed;display:block;z-index:35;right:0;top:67px;bottom:0;
+   width:min(345px,95vw);transform:none;box-shadow:-8px 0 22px #0004;
+ }
+ .c3-shell .c3-bottom-tools{left:10px;bottom:10px}
+ .c3-shell .c3-minimap{right:9px;bottom:10px}
+ .c3-shell .c3-smart-strip{top:7px;max-width:calc(100vw - 85px);overflow:auto}
+ .c3-shell .c3-canvas-help{left:78px;right:10px;bottom:75px;font-size:.72em}
+}
