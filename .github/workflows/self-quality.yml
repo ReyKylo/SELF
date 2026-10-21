@@ -21,10 +21,13 @@ jobs:
           node --check app.js
           node --check boards.js
           node --check canvas-v3.js
+          node --check career.js
       - name: Phase 1 render smoke
         run: node tests/smoke_render.cjs
       - name: Phase 1 API smoke
         run: node tests/smoke_api.cjs
+      - name: Career Phase 1 integration and ownership regression
+        run: node tests/smoke_career_phase1.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
@@ -50,3 +53,5 @@ jobs:
           test -s dist/canvas-v3.js
           test -s dist/canvas-v3.css
           test -s dist/concept-d.css
+          test -s dist/career.js
+          test -s dist/career.css
