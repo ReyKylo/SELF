@@ -259,6 +259,7 @@ function enter(){
 function setPage(id){
  if(!PAGES.some(x=>x[0]===id))return;
  if(ui.dirty&&!confirm('Discard unsaved edits?'))return;
+ if(window.SELFCareerPhase3?.beforeNavigate?.()===false)return;
  if(window.SELFCareerPhase2?.beforeNavigate?.()===false)return;
  ui.page=id;ui.drawer=null;ui.modal=null;ui.dirty=false;ui.saveError='';host.render();
 }
@@ -357,6 +358,7 @@ async function submit(e){
  await save(e.target);return true;
 }
 function input(e){
+ if(window.SELFCareerPhase3?.input?.(e))return true;
  if(window.SELFCareerPhase2?.input?.(e))return true;
  if(!e.target?.closest?.('.career-record-form'))return false;
  ui.dirty=true;ui.saveError='';
