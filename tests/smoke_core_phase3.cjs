@@ -37,6 +37,7 @@ const listeners={},doc={
  },
  querySelectorAll(){return []},
  addEventListener(name,cb){(listeners[name]??=[]).push(cb)},
+ getElementById(){return null},
  createElement(){return {className:'',innerHTML:'',remove(){}}}
 };
 function response(code,body){return Promise.resolve({ok:code>=200&&code<300,
@@ -133,8 +134,39 @@ async function main(){
  assert.equal(store.tasks[1].title,quick.value);
  assert.equal(await evaluate('state.captureDraft'),'');
  assert.equal(await evaluate('state.saveError'),null);
+ // Shared general links: duplicate URLs render only once even if referenced from 3 places.
+ ctx.window.SELFBoards={links:()=>[
+  {url:'https://docs.google.com/spreadsheets/d/abc',title:'Finance board source'},
+  {url:'https://example.com/research',title:'Board-only research'}
+ ],open(id){ctx.openedBoard=id}};
+ store.task_links.push({id:'link1',task_id:'task1',url:'https://docs.google.com/spreadsheets/d/abc',title:'Finance sheet'});
+ store.inbox.push({id:'inbox1',kind:'link',body:'https://docs.google.com/spreadsheets/d/abc',title:'Saved sheet'});
+ await evaluate("state.links=fixture.task_links;state.inbox=fixture.inbox;state.boards=[{id:'board1',title:'DSSA mindmap'}];state.linkSource='all';state.linkSearch=''");
+ const inventory=await evaluate('allGeneralLinks()');
+ assert.equal(inventory.length,2,'links from different sources deduplicate');
+ assert.equal(inventory.find(x=>x.url.includes('spreadsheets')).count,3,'source count preserved');
+ const library=await evaluate('renderLinks()');
+ assert.match(library,/general library/i,'My Links remains general');
+ assert.match(library,/3 references/,'duplicate reference count shown');
+ assert.match(library,/data-action="link-source"/,'source filters visible');
+ await evaluate("state.linkSource='Whiteboards';state.linkSearch='research'");
+ const onlyBoard=await evaluate('renderLinks()');
+ assert.match(onlyBoard,/Board-only research/);
+ assert.doesNotMatch(onlyBoard,/>Finance sheet</);
+ await evaluate("state.search='mindmap'");
+ const searchHtml=await evaluate('renderSearch()');
+ assert.match(searchHtml,/DSSA mindmap/,'global search includes boards');
+ assert.match(searchHtml,/data-action="open-board"/);
+ await evaluate("state.search='spreadsheets'");
+ assert.match(await evaluate('renderSearch()'),/href="https:\/\/docs.google.com\/spreadsheets\/d\/abc"/);
+ // Search result board links open in the existing SELF editor.
+ const boardButton={dataset:{action:'open-board',id:'board1'},closest(q){return q==='[data-action]'?this:null}};
+ ctx.boardEvent={target:boardButton};
+ await evaluate('handleAction(boardEvent)');
+ assert.equal(ctx.openedBoard,'board1');
+
  // No accidental transfer to a Career-specific table.
  assert.equal(Object.keys(store).some(k=>k.startsWith('career_')),false);
- console.log('PASS Core Phase 3: drag/drop, stage select, retryable Undo, failed saves, unsaved edits and safe Quick Capture.');
+ console.log('PASS Core Phase 3: drag/drop, stage select, retryable Undo, failed saves, unsaved edits and safe Quick Capture, general My Links, and global board search.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
