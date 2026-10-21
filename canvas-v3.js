@@ -5,7 +5,7 @@
 (()=>{'use strict';
 if(window.location?.search&&new URLSearchParams(window.location.search).get('canvas')==='legacy')return;
 let api;
-const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',dKnowledge:false,dPopover:null,dFocus:false,dEditing:null,dSaveTimer:null,dSaveQueue:Promise.resolve(),dCachedSelection:null,quickAdd:null,connectFrom:null,mapCollapsed:true,mapGeometry:null,inspectorOpen:false,toolsExpanded:false,toolsCollapsed:false,shapesOpen:false,helpOpen:false,styleSession:null,previousCameras:[],lastCameraAt:0};
+const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',dKnowledge:false,dPopover:null,dFocus:false,dEditing:null,dSaveTimer:null,dSaveQueue:Promise.resolve(),dFailedSave:null,dCachedSelection:null,quickAdd:null,connectFrom:null,mapCollapsed:true,mapGeometry:null,inspectorOpen:false,toolsExpanded:false,toolsCollapsed:false,shapesOpen:false,helpOpen:false,styleSession:null,previousCameras:[],lastCameraAt:0};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const esc=h, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), num=(x,d=0)=>Number.isFinite(Number(x))?Number(x):d;
@@ -251,8 +251,8 @@ async function dPersist(){
  ui.dSaveQueue=ui.dSaveQueue.catch(()=>{}).then(async()=>{
    await api.patch('knowledge_cards',cardId,payload);
  });
- try{await ui.dSaveQueue;if(ui.dEditing===edit)setBusy(false)}
- catch(err){say('Could not save writing — edit retained: '+err.message,true);setBusy(false)}
+ try{await ui.dSaveQueue;ui.dFailedSave=null;if(ui.dEditing===edit)setBusy(false);api.render()}
+ catch(err){ui.dFailedSave={cardId,payload};say('Writing not saved. Retry is available: '+err.message,true);setBusy(false);api.render()}
 }
 function dPlaceCaret(element,atEnd=true){
  if(!element?.focus)return;
@@ -427,7 +427,7 @@ async function cloneSelection(){
  try{
   for(const original of selected){
    const c=card(original.card_id);if(!c)continue;
-   const payload={title:c.title||'',kind:c.kind||'note',summary:c.summary||'',body:c.body||'',key_points:c.key_points||'',accent:c.accent||'blue',url:c.url||null,task_id:c.task_id||null,target_board_id:c.target_board_id||null,asset_path:c.asset_path||null};
+   const payload={title:c.title||'',kind:c.kind||'note',summary:c.summary||'',body:c.body||'',key_points:c.key_points||'',content_blocks:c.content_blocks?JSON.parse(JSON.stringify(c.content_blocks)):null,accent:c.accent||'blue',url:c.url||null,task_id:c.task_id||null,target_board_id:c.target_board_id||null,asset_path:c.asset_path||null};
    const copied=await api.insert('knowledge_cards',payload);createdCards.push(copied.id);
    const p=await api.insert('board_items',{board_id:ui.boardId,card_id:copied.id,visual_kind:kind(original),x:clamp(original.x+38,-99900,99900),y:clamp(original.y+38,-99900,99900),w:original.w,h:original.h,z:Math.max(0,...items().map(i=>num(i.z)))+1,style:{...original.style},rotation:num(original.rotation)});
    clones.push(p);
@@ -449,7 +449,7 @@ function canvas(){
  ui.domSnapshots=new Map(objects.map(i=>[i.id,objectMarkup(i)]));
  return '<div class="self-board-editor c3-shell" data-board-id="'+h(b.id)+'"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
  '<div class="c3-toolbar'+(ui.toolsCollapsed?' c3-toolbar-closed':'')+'" data-expanded="'+ui.toolsExpanded+'" data-collapsed="'+ui.toolsCollapsed+'" data-shapes="'+ui.shapesOpen+'" role="toolbar" aria-label="Create and edit on the board">'+dockInner()+'</div>'+ 
- '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo (Ctrl+Z)" aria-label="Undo"')+button('redo','↷','title="Redo (Ctrl+Shift+Z)" aria-label="Redo"')+button('inspector-toggle','⚙ Properties','id="c3-inspector-toggle" aria-label="'+(ui.inspectorOpen?'Close properties':'Open properties')+'" aria-expanded="'+ui.inspectorOpen+'"')+'</div></div>'+
+ '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dFailedSave?'⚠ Not saved':ui.dirty?'● Saving':'✓ Saved')+'</span>'+(ui.dFailedSave?button('d-retry','Retry','title="Retry unsaved writing"'):'')+button('undo','↶','title="Undo (Ctrl+Z)" aria-label="Undo"')+button('redo','↷','title="Redo (Ctrl+Shift+Z)" aria-label="Redo"')+button('inspector-toggle','⚙ Properties','id="c3-inspector-toggle" aria-label="'+(ui.inspectorOpen?'Close properties':'Open properties')+'" aria-expanded="'+ui.inspectorOpen+'"')+'</div></div>'+
  '<div class="c3-content '+(ui.inspectorOpen?'c3-panel-open':'c3-panel-closed')+'"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
  '<div class="c3-world" id="c3-world" style="transform:translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')">'+
  '<svg class="c3-wires" id="c3-wires" aria-label="Connected objects">'+renderWires()+'</svg>'+
@@ -524,7 +524,8 @@ function updateInPlace(){
  }else existingModal?.remove();
  const title=$('.c3-breadcrumb strong');if(title&&board())title.textContent=board().title;
  const label=$('.c3-scale');if(label)label.textContent=Math.round(ui.zoom*100)+'%';
- const save=$('#c3-save');if(save)save.textContent=ui.dirty?'● Saving':'✓ Saved';
+ const save=$('#c3-save');if(save)save.textContent=ui.dFailedSave?'⚠ Not saved':ui.dirty?'● Saving':'✓ Saved';
+ const retry=$('[data-c3="d-retry"]');if(ui.dFailedSave&&!retry)$('.c3-header-right')?.insertAdjacentHTML('beforeend',button('d-retry','Retry','title="Retry unsaved writing"'));if(!ui.dFailedSave&&retry)retry.remove();
  refreshNavigationUI();return true;
 }
 
@@ -816,6 +817,13 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='shape-create'){await createShape(el.dataset.shape);return}
  if(a==='help-toggle'){ui.helpOpen=!ui.helpOpen;api.render();return}
  if(a==='quick-notes'){ui.dKnowledge=true;api.render();return}
+ if(a==='d-retry'){
+  const failed=ui.dFailedSave;if(!failed)return;
+  setBusy(true);
+  try{await api.patch('knowledge_cards',failed.cardId,failed.payload);ui.dFailedSave=null;await sync('Writing saved')}
+  catch(error){ui.dFailedSave=failed;setBusy(false);say('Retry failed: '+error.message,true);api.render()}
+  return;
+ }
  if(a==='d-knowledge'){ui.dKnowledge=!ui.dKnowledge;ui.dPopover=null;api.render();return}
  if(a==='d-pop-sources'||a==='d-pop-task'||a==='d-pop-board'||a==='d-pop-files'||a==='d-pop-more'||a==='d-pop-format'||a==='d-pop-reuse'){
   const which=a.slice(6);ui.dKnowledge=true;ui.dPopover=ui.dPopover===which?null:which;api.render();return
