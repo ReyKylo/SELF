@@ -31,6 +31,8 @@ jobs:
         run: node tests/smoke_concept_c.cjs
       - name: Concept C usability regression
         run: node tests/smoke_canvas_ux.cjs
+      - name: Sidebar, Shapes, and live typography controls
+        run: node tests/smoke_canvas_controls.cjs
       - name: No-flash canvas stability regression
         run: node tests/smoke_canvas_stability.cjs
       - name: Cloudflare static build
