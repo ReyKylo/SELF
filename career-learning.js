@@ -5,7 +5,7 @@ const CONTENT_URL='./content/career-learning.json';
 const TABS=[['sprint','Sprint 3 hari'],['evidence','Expert Evidence'],['videos','YouTube'],['sources','Sumber']];
 const TRACKS=[['all','Semua bidang'],['PE','Private Equity'],['VC','Venture Capital'],['Consulting','Consulting']];
 const ui={tab:'sprint',track:'all',query:'',type:'all',panel:'PE01',video:null,day:'PE',backPanel:null,backContext:null,
- loading:false,error:'',data:null,owner:null,generation:0,busy:false,taskError:'',playing:false,start:0};
+ loading:false,error:'',data:null,owner:null,generation:0,busy:false,taskError:'',playing:false,start:0,workspace:null};
 let host=null,core=null,searchTimer=null,requestNumber=0;
 const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeUrl=v=>{try{const u=new URL(v);return u.protocol==='https:'?u.href:null}catch{return null}};
@@ -15,7 +15,7 @@ const trackName=id=>TRACKS.find(x=>x[0]===id)?.[1]||id;
 function focus(selector){Promise.resolve().then(()=>document.querySelector?.(selector)?.focus?.({preventScroll:true}))}
 function redraw(selector){host?.render();if(selector)focus(selector)}
 function reset(owner){
- clearTimeout(searchTimer);Object.assign(ui,{owner,generation:ui.generation+1,tab:'sprint',track:'all',query:'',type:'all',panel:'PE01',video:null,day:'PE',backPanel:null,backContext:null,busy:false,taskError:'',playing:false,start:0});
+ clearTimeout(searchTimer);Object.assign(ui,{owner,generation:ui.generation+1,tab:'sprint',track:'all',query:'',type:'all',panel:'PE01',video:null,day:'PE',backPanel:null,backContext:null,busy:false,taskError:'',playing:false,start:0,workspace:null});window.SELFCareerPortfolio?.reset?.(owner);
 }
 function ensureOwner(){const owner=host?.state?.()?.user?.id||null;if(ui.owner!==owner)reset(owner);return owner}
 function validateData(d){
@@ -148,7 +148,8 @@ function sprint(){
  '<article class="learning-day-detail"><div class="learning-assignment-head"><div><span class="learning-label">ASSIGNMENT · HARI '+day.day+'</span><h2 id="learning-day-title" tabindex="-1">'+h(day.title)+'</h2><p>'+h(day.summary)+'</p></div><div>'+button(ui.busy?'Memeriksa tugas…':task?'Buka task di My Work':'Tambah proyek ke My Work','task','data-id="'+h(day.id)+'" '+(ui.busy?'disabled':''),true)+'<small class="learning-task-note">'+(task?'Task SELF yang sama; status mengikuti My Work.':'Task dibuat saat lu memilih tombol ini.')+'</small></div></div>'+
  (ui.taskError?'<p class="learning-task-error" role="alert">'+h(ui.taskError)+'</p>':'')+
  '<div class="learning-workflow"><section><h3>01 · SEE</h3><p>Pelajari cara expert menyusun keputusan.</p><div class="learning-related">'+day.panels.map(evidenceButton).join('')+'</div></section><section><h3>02 · WATCH</h3><p>Tonton berurutan. Setelah tiap video, kerjakan hasilnya.</p><div class="learning-related">'+day.videos.map(id=>videoButton(ui.data.videos.find(v=>v.id===id)?.video_id)).join('')+'</div></section></div>'+
- '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief','download','data-id="'+h(day.id)+'" data-kind="brief"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+'</div>'+
+ '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief','download','data-id="'+h(day.id)+'" data-kind="brief"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+button(ui.workspace===day.id?'Tutup private workspace':'Buka private workspace','workspace','data-id="'+h(day.id)+'"')+'</div>'+
+ (ui.workspace===day.id?(window.SELFCareerPortfolio?.render?.(day.id)||''):'')+
  '<section class="learning-lesson"><h3>03 · DO → BUILD → REVIEW</h3><p class="learning-fixture-label">Data fiktif untuk latihan independen. Bukan transaksi atau proyek klien nyata.</p>'+markdown(day.lesson)+'</section></article>'+
  '<div class="learning-download"><a class="career-btn learning-link" href="./content/portfolio-sprint.md" download="SELF_Portfolio_Sprint.md">Download playbook lengkap ↓</a><p>Workbook, memo, dan deck dibuat sendiri dari latihan. Materi tidak menandakan pengalaman deal nyata.</p></div>';
 }
@@ -189,14 +190,16 @@ async function projectTask(id){
 }
 function switchTab(tab){clearTimeout(searchTimer);ui.tab=tab;ui.query='';ui.type='all';ui.playing=false;ui.taskError=''}
 async function action(event){
+ if(await window.SELFCareerPortfolio?.action?.(event))return true;
  const b=event.target.closest?.('[data-learning]');if(!b)return false;
  event.preventDefault();event.stopPropagation();ensureOwner();const action=b.dataset.learning;
  if(action==='download'){downloadStarter(b.dataset.id,b.dataset.kind).then(()=>host?.notify?.('File berhasil disiapkan untuk download')).catch(err=>host?.notify?.('Download gagal: '+(err?.message||String(err)),true));return true}
+ if(action==='workspace'){if(ui.workspace===b.dataset.id){ui.workspace=null;redraw()}else{ui.workspace=b.dataset.id;void window.SELFCareerPortfolio?.open?.(b.dataset.id);redraw()}return true}
  if(action==='retry'){void load();return true}
  if(action==='task'){await projectTask(b.dataset.id);return true}
  if(action==='tab'){ui.backPanel=null;ui.backContext=null;switchTab(b.dataset.tab);redraw('[data-learning="tab"][data-tab="'+ui.tab+'"]');return true}
  if(action==='clear'){clearTimeout(searchTimer);ui.query='';ui.track='all';ui.type='all';redraw('#learning-search');return true}
- if(action==='day'){ui.day=b.dataset.id;ui.taskError='';redraw('#learning-day-title');return true}
+ if(action==='day'){ui.day=b.dataset.id;ui.workspace=null;ui.taskError='';redraw('#learning-day-title');return true}
  if(action==='panel'||action==='panel-select'||action==='back-evidence'){
   const id=action==='back-evidence'?ui.backPanel:b.dataset.id;const p=ui.data?.panels.find(x=>x.id===id);if(!p)return true;
   ui.panel=p.id;if(action!=='panel-select'){const back=action==='back-evidence'?ui.backContext:null;switchTab('evidence');ui.track=p.track;if(back){ui.track=back.track;ui.query=back.query;ui.type=back.type}}ui.backPanel=null;ui.backContext=null;redraw('#learning-evidence-title');return true;
@@ -210,10 +213,11 @@ async function action(event){
  return true;
 }
 function input(event){
+ if(window.SELFCareerPortfolio?.input?.(event))return true;
  const node=event.target;if(node?.dataset?.learningFilter!=='query')return false;
  const value=node.value,position=node.selectionStart,owner=ui.owner,generation=ui.generation;clearTimeout(searchTimer);
  searchTimer=setTimeout(()=>{if(owner!==ui.owner||generation!==ui.generation)return;ui.query=value;ui.playing=false;host.render();const search=document.querySelector?.('#learning-search');search?.focus?.({preventScroll:true});search?.setSelectionRange?.(position,position)},160);return true;
 }
-function change(event){const node=event.target,key=node?.dataset?.learningFilter;if(!['track','type'].includes(key))return false;ensureOwner();ui[key]=node.value;ui.playing=false;redraw('#'+node.id);return true}
-window.SELFCareerLearning={init(api){host=api.host;core=api.career},render,action,input,change,reset,load,ui,taskId};
+function change(event){if(window.SELFCareerPortfolio?.change?.(event))return true;const node=event.target,key=node?.dataset?.learningFilter;if(!['track','type'].includes(key))return false;ensureOwner();ui[key]=node.value;ui.playing=false;redraw('#'+node.id);return true}
+window.SELFCareerLearning={init(api){host=api.host;core=api.career;window.SELFCareerPortfolio?.init?.(host)},render,action,input,change,reset,load,ui,taskId};
 })();
