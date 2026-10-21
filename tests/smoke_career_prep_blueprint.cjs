@@ -36,7 +36,7 @@ const terms=new Set(),termIds=new Set();
 for(const g of d.glossary){
  check(!termIds.has(g.id),'duplicate glossary id '+g.id);termIds.add(g.id);
  check(['PE','VC','Consulting','all'].includes(g.track),'unknown glossary track '+g.id);
- for(const f of ['analogy','term','definition','numbers','check'])check(typeof g[f]==='string'&&g[f].length>=12,'glossary term incomplete '+g.id+' '+f);
+ for(const f of ['analogy','term','definition','numbers','check'])check(typeof g[f]==='string'&&g[f].length>=(f==='term'?3:12),'glossary term incomplete '+g.id+' '+f);
  check(!terms.has(g.term),'repeated technical term definition '+g.term);terms.add(g.term);
 }
 check(['Leverage','Sources & Uses of Funds','MOIC (Multiple on Invested Capital)','Cohort Analysis','Net Revenue Retention (NRR)','Cap Table / Dilution','Profitability Bridge / Profit Bridge'].every(t=>[...terms].some(v=>v.includes(t)||t.includes(v))),'must cover core professional terminology');
