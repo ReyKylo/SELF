@@ -1384,6 +1384,27 @@
           "What is the maximum acquisition price at a 20% return hurdle?",
           "Which due-diligence issue could stop the transaction?"
         ]
+      },
+      "upgrade_case": {
+        "title": "Public-Filing Investment Screen — Astra Otoparts (AUTO)",
+        "status": "NEXT LEVEL · PUBLIC-DATA INDEPENDENT CASE",
+        "objective": "Build a historical 2024–2025 operating profile from company filings; evaluate normalized margins and cash conversion; then test a clearly hypothetical acquisition structure. This is not a real buyout proposal.",
+        "sources": [
+          {
+            "name": "Astra Otoparts FY2025 original company earnings release",
+            "url": "https://www.astra-otoparts.com/id/media/siaran-pers/astra-otoparts-raih-rekor-laba-bersih-rp221-t"
+          },
+          {
+            "name": "AUTO FY2025 detailed company filing record",
+            "url": "https://financialfilings.com/filings/astra-otoparts-tbk/annual-report/2026/57425822/"
+          }
+        ],
+        "required": [
+          "Reconcile audited financial-statement numbers and avoid mixing net profit with EBITDA",
+          "Build a sources ledger with exact financial statement page references",
+          "Set hypothetical leverage within defensible coverage and downside capacity",
+          "Decide a maximum hypothetical entry price, never claim actual M&A mandate"
+        ]
       }
     },
     {
@@ -1424,6 +1445,27 @@
           "Which cohort deserves the most skeptical treatment and why?",
           "What happens to the fund's return after a down round or 20% dilution?",
           "What evidence would justify investing today rather than waiting?"
+        ]
+      },
+      "upgrade_case": {
+        "title": "Public Memo Re-underwriting — Shopify 2010",
+        "status": "NEXT LEVEL · ORIGINAL INVESTOR EVIDENCE",
+        "objective": "Blind-date underwrite the historical 2010 investment using contemporaneous evidence only, compare your investment recommendation with the original BVP memo, and identify assumptions you would challenge. Do not use Shopify's later success as part of the original decision.",
+        "sources": [
+          {
+            "name": "Original BVP Shopify 2010 investment memo",
+            "url": "https://www.bvp.com/memos/shopify"
+          },
+          {
+            "name": "Original BVP Toast 2015 investment memo",
+            "url": "https://www.bvp.com/memos/toast"
+          }
+        ],
+        "required": [
+          "Write thesis / anti-thesis without future hindsight",
+          "Rebuild available pricing, ownership and revenue metrics independently",
+          "Audit risky assumptions and mark data not disclosed publicly",
+          "Defend invest/pass/diligence on the information available at the time"
         ]
       }
     },
@@ -1466,6 +1508,27 @@
           "Can procurement savings damage quality and customer retention?",
           "Are initiative A and B benefits independent or interacting?",
           "What exactly must the CEO approve today and how would you measure it?"
+        ]
+      },
+      "upgrade_case": {
+        "title": "Firm Case Defense — Bain Coffee & McKinsey Electro-Light",
+        "status": "NEXT LEVEL · OFFICIAL RECRUITMENT PRACTICE",
+        "objective": "Solve official consulting interview cases cold under timed conditions, create an independent 5–6-slide executive recommendation based only on disclosed case exhibits and clearly marked assumptions.",
+        "sources": [
+          {
+            "name": "Official Bain Coffee Shop case",
+            "url": "https://www.bain.com/careers/hiring-process/interviewing/coffee-case-study/"
+          },
+          {
+            "name": "Official McKinsey Electro-Light case",
+            "url": "https://www.mckinsey.com/careers/interviewing/electrolight"
+          }
+        ],
+        "required": [
+          "Issue tree tailored to the question, not a copied framework",
+          "Quantitative sizing and profitability math validated with official exhibits",
+          "Deck headline must express a decision, not describe a chart",
+          "State gaps, decision gates and how you'd follow up with client"
         ]
       }
     }
