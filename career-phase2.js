@@ -75,9 +75,9 @@ function section(title,description,add){
 function renderCVs(){
  return section('CV Library','Track real versions. PDF and DOCX are private, not public share links.',primary('+ CV Version','open-modal','data-type="cv"'))+
  (C.cvs.length?'<div class="career2-list">'+C.cvs.map(v=>'<section class="career-card career2-resource">'+
- '<div class="career2-resource-title"><div><strong>'+h(v.label)+'</strong><small>'+h(v.focus||'General')+'</small></div><span class="career2-chip">'+(v.storage_path?'Private file':'Notes only')+'</span></div>'+
+ '<div class="career2-resource-title"><div><strong>'+h(v.label)+'</strong><small>'+h(v.focus||'General')+'</small></div><span class="career2-chip">'+((v.storage_path||v.file_name)?'Private file':'Notes only')+'</span></div>'+
  (v.notes?'<p>'+h(v.notes)+'</p>':'')+
- '<div class="career2-actions">'+(v.storage_path?btn('Open file ↗','open-file','data-id="'+e(v.id)+'"'):'')+
+ '<div class="career2-actions">'+((v.storage_path||v.file_name)?btn(v.storage_path?'Open file ↗':'Download PDF','open-file','data-id="'+e(v.id)+'"'):'')+
  btn('Edit','open-modal','data-type="cv" data-id="'+e(v.id)+'"')+
  btn('Remove','delete-record','data-type="cv" data-id="'+e(v.id)+'"')+'</div></section>').join('')+'</div>':
  noData('No CV versions','Save your first CV profile or upload a private PDF/DOCX.'));
@@ -330,6 +330,41 @@ async function action(ev){
    if(!tab){notice('Allow pop-ups to open your private document.',true);return true}
    try{const uri=await host.signDocument(cv.storage_path);if(uri)tab.location.href=uri;else tab.close()}
    catch(error){tab.close();notice('Could not open document: '+error.message,true)}
+  }else if(cv?.file_name){
+   try{
+    const rows=await host.request('/rest/v1/career_cv_embedded_files?select=file_name,file_bytes&cv_id=eq.'+encodeURIComponent(cv.id)+'&limit=1');
+    const item=rows?.[0];
+    if(!item||item.file_name!==cv.file_name)throw new Error('No private PDF bytes found for this CV.');
+    const payload=item.file_bytes;
+    let packed;
+    if(typeof payload==='string'&&payload.startsWith('\\x')){
+     const hex=payload.slice(2);
+     if(hex.length%2)throw new Error('Invalid document encoding');
+     packed=new Uint8Array(hex.length/2);
+     for(let i=0;i<packed.length;i++)packed[i]=parseInt(hex.slice(i*2,i*2+2),16);
+    }else if(typeof payload==='string'){
+     packed=Uint8Array.from(atob(payload),x=>x.charCodeAt(0));
+    }else throw new Error('Invalid private document data');
+    if(!globalThis.DecompressionStream)throw new Error('Please update your browser to download this archive-backed CV.');
+    let raw=new Uint8Array(await new Response(new Blob([packed]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+    const decoder=new TextDecoder();
+    let offset=0,pdf=null;
+    while(offset+512<=raw.length){
+     const header=raw.slice(offset,offset+512);
+     if(header.every(x=>x===0))break;
+     const name=decoder.decode(header.slice(0,100)).split('\\0')[0];
+     const size=parseInt(decoder.decode(header.slice(124,136)).replace(/\\0/g,'').trim(),8);
+     if(!Number.isFinite(size)||size<0||size>8388608||offset+512+size>raw.length)throw new Error('Invalid CV archive');
+     if(name===cv.file_name){pdf=raw.slice(offset+512,offset+512+size);break}
+     offset+=512+Math.ceil(size/512)*512;
+    }
+    if(!pdf||decoder.decode(pdf.slice(0,5))!=='%PDF-')throw new Error('Requested CV PDF not found in private archive');
+    const url=URL.createObjectURL(new Blob([pdf],{type:'application/pdf'}));
+    const a=document.createElement('a');a.href=url;a.download=cv.file_name;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),30000);
+    notice('Download started: '+cv.file_name);
+   }catch(error){notice('Could not download private CV: '+(error?.message||String(error)),true)}
   }
  }else if(a==='delete-record'){
   const map=type==='cv'?C.cvs:type==='touchpoint'?C.touchpoints:type==='interview'?C.interviews:C.templates;
