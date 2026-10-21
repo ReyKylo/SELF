@@ -155,6 +155,16 @@ function recordForm(kind,rec,mode){
 }
 function modalMarkup(){
  if(!ui.modal)return '';
+ if(ui.modal==='choose')return '<div class="career-modal-layer" role="presentation"><section class="career-modal" role="dialog" aria-modal="true" aria-label="Career Quick Capture">'+
+ '<div class="career-drawer-header"><span>SELF / Career / Quick Capture</span>'+button('✕','close-modal','aria-label="Close Quick Capture"')+'</div>'+
+ '<h2>What are you capturing?</h2><p>Choose the record to create. Only essential details are required.</p>'+
+ '<div class="career-capture-choices">'+
+ button('▦  Application','choose-kind','data-kind="application" '+(ui.companies.length?'':'disabled title="Create a company first"'))+
+ button('♧  Person','choose-kind','data-kind="person"')+
+ button('◫  Company','choose-kind','data-kind="company"')+
+ button('☑  SELF Task','choose-kind','data-kind="task"')+
+ '</div>'+(ui.companies.length?'':'<p class="career-form-hint">Create a Company before adding its Application.</p>')+
+ '</section></div>';
  return '<div class="career-modal-layer" role="presentation"><section class="career-modal" role="dialog" aria-modal="true" aria-label="Create '+names[ui.modal]+'">'+
  '<div class="career-drawer-header"><span>SELF / Career / Quick Capture</span>'+button('✕','close-modal','aria-label="Close Quick Capture"')+'</div>'+
  '<h2>New '+names[ui.modal]+'</h2><p>Capture only what matters now. Details can be edited later.</p>'+
@@ -302,7 +312,8 @@ async function action(e){
   const root=document.querySelector('.career-workspace');
   root?.classList.toggle('career-sections-open');
  }
- if(x==='quick-capture'){ui.modal='company';ui.drawer=null;ui.saveError='';ui.dirty=false;host.render()}
+ if(x==='quick-capture'){ui.modal='choose';ui.drawer=null;ui.saveError='';ui.dirty=false;host.render()}
+ if(x==='choose-kind'){if(b.dataset.kind==='task'){ui.modal=null;host.newTask();return true}ui.modal=b.dataset.kind;ui.saveError='';host.render()}
  if(x==='new'){
   if(b.dataset.kind==='application'&&!ui.companies.length){ui.modal='company';ui.saveError='';ui.drawer=null;host.render();return true}
   ui.modal=b.dataset.kind;ui.drawer=null;ui.saveError='';ui.dirty=false;host.render();
@@ -331,5 +342,12 @@ function keydown(e){
  if(e.key!=='Escape'||(!ui.modal&&!ui.drawer))return false;
  e.stopImmediatePropagation?.();e.preventDefault();clearPanel();return true;
 }
-window.SELFCareer={init(api){host=api},enter,render,action,submit,input,keydown,ui};
+function links(){
+ return [
+  ...ui.companies.filter(x=>safeUrl(x.website)).map(x=>({id:x.id,title:x.name+' — website',url:safeUrl(x.website),boardName:'Career · Company'})),
+  ...ui.people.filter(x=>safeUrl(x.profile_url)).map(x=>({id:x.id,title:x.full_name+' — profile',url:safeUrl(x.profile_url),boardName:'Career · Person'})),
+  ...ui.applications.filter(x=>safeUrl(x.source_url)).map(x=>({id:x.id,title:x.role_title+' — posting',url:safeUrl(x.source_url),boardName:'Career · Application'}))
+ ];
+}
+window.SELFCareer={init(api){host=api},enter,render,action,submit,input,keydown,links,ui};
 })();
