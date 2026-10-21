@@ -1,5 +1,5 @@
 geography,target_segment,competitive_archetype,substitute_not_verified_live_competitor,likely_advantage,validation_needed,data_status
-Indonesia,multi_outlet_smb,direct_spreadsheets,Excel + chat approvals,Flexible cheap, manual error,Workflow reliability unproven,SIMULATED
-Indonesia,multi_outlet_mid,erp_module,Large ERP suites (archetype),Broad coverage, longer setup,Product breadth and procurement gate,SIMULATED
+Indonesia,multi_outlet_smb,direct_spreadsheets,Excel + chat approvals,Flexible but manual and error-prone,Workflow reliability unproven,SIMULATED
+Indonesia,multi_outlet_mid,erp_module,Large ERP suites (archetype),Broad coverage with longer setup,Product breadth and procurement gate,SIMULATED
 Indonesia,multi_outlet_both,vertical_point_solutions,Procurement / AP vertical tools (archetype),Specialist workflow depth,Integration and switching cost,SIMULATED
 Singapore_Malaysia,multi_outlet_mid,cross_border,Regional workflow SaaS (archetype),Network and compliance footprint,Local tax and data residency,SIMULATED
