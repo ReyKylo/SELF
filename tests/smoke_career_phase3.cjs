@@ -95,6 +95,7 @@ async function main(){
  const strong=radar.scoreOpportunity({role_title:'Investment Analyst',location_label:'Jakarta, Indonesia',publication_date:postingDate});
  assert(strong.score>=75);
  assert(radar.scoreOpportunity({role_title:'Investment Analyst',location_label:'USA only'})===null,'reject US-only');
+ assert(radar.scoreOpportunity({role_title:'Investment Analyst',location_label:'Remote'})===null,'unknown remote eligibility excluded');
  assert(radar.scoreOpportunity({role_title:'Backend Engineer',location_label:'Jakarta, Indonesia'})===null,'irrelevant title rejected');
  await button('scan');
  assert.equal(feedCalls,1);
@@ -106,6 +107,7 @@ async function main(){
  await button('save',{url:first.job_url});
  assert.equal(records.career_opportunities.length,1);
  assert.equal(records.career_opportunities[0].status,'saved');
+ assert.equal(radar.links().length,1,'saved source appears in general My Links');
  await button('save',{url:first.job_url});
  assert.equal(records.career_opportunities.length,1,'no duplicates saved');
  await button('assist',{url:first.job_url});
@@ -135,6 +137,7 @@ async function main(){
  await radar.submit({target:f,preventDefault(){},stopPropagation(){}});
  assert.equal(records.career_opportunities.length,before+1);
  assert.equal(records.career_opportunities.at(-1).provider,'Manual');
+ assert(radar.links().some(x=>x.url==='https://example.org/open-role'),'manually captured saved source is linked generally');
  assert.equal(records.career_opportunities.at(-1).status,'saved');
  await button('manual');
  const broken={id:'career3-form',fields:{role_title:'Bad URL',company_name:'Firm',location_label:'Jakarta',
@@ -145,6 +148,7 @@ async function main(){
  user.id='owner2';radar.reset(user.id);await radar.load(user.id);
  assert.equal(radar.ui.items.length,0,'no previous owner cached results');
  assert.equal(radar.ui.results.length,0);
+ assert.equal(radar.links().length,0,'new account sees no saved general links from another user');
  assert.equal(radar.render().includes('Local Employer'),false);
  assert.equal(records.career_applications.length,1,'old account data untouched');
  assert(confirmCalls>=1);
