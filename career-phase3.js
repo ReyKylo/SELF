@@ -132,7 +132,7 @@ function modalMarkup(){
  '<label class="career-form-label">Location / eligibility *<input class="career-field" name="location_label" required maxlength="160" placeholder="Jakarta, Indonesia"></label>'+
  '<label class="career-form-label">Official job posting URL *<input class="career-field" name="job_url" type="url" required placeholder="https://..."></label>'+
  '<label class="career-form-label">Cluster<select class="career-field" name="cluster">'+CLUSTERS.map(c=>'<option value="'+c+'">'+c+'</option>').join('')+'</select></label>'+
- '<button class="career-btn career-primary" type="submit">Save verified source</button></form>';
+ '<span class="career-save-note" role="status"></span><button class="career-btn career-primary" type="submit">Save source link</button></form>';
  if(m.kind==='assist')body=previewAssist(o);
  if(m.kind==='convert')body='<p>This will create a draft entry in your existing Applications pipeline. No external application is submitted.</p>'+
  '<div class="career3-summary"><strong>'+h(o.role_title)+'</strong> at '+h(o.company_name)+'</div>'+
@@ -201,8 +201,8 @@ async function saveManual(form){
  const raw=Object.fromEntries(new FormData(form).entries());
  const title=String(raw.role_title||'').trim(),company=String(raw.company_name||'').trim();
  const url=safeUrl(raw.job_url),place=String(raw.location_label||'').trim();
- if(!title||!company||!place||!url){RADAR.error='Enter a valid HTTPS job link and complete all required fields.';host.render();return}
- if(RADAR.items.some(x=>urlKey(x.job_url)===urlKey(url))){RADAR.error='Already in your Radar. Open History to update its status.';RADAR.modal=null;host.render();return}
+ if(!title||!company||!place||!url){RADAR.error='Enter a valid HTTPS job link and complete all required fields.';const box=form.querySelector?.('.career-save-note');if(box)box.textContent=RADAR.error;return}
+ if(RADAR.items.some(x=>urlKey(x.job_url)===urlKey(url))){RADAR.error='Already in your Radar. Open History to update its status.';const box=form.querySelector?.('.career-save-note');if(box)box.textContent=RADAR.error;return}
  const rank=scoreOpportunity({role_title:title,location_label:place,cluster:raw.cluster});
  const o={provider:'Manual',provider_id:'',role_title:title.slice(0,200),company_name:company.slice(0,200),
  location_label:place.slice(0,180),job_url:url,cluster:CLUSTERS.includes(raw.cluster)?raw.cluster:'investment',
@@ -231,12 +231,13 @@ async function convert(o){
   let record=detected(o);
   try{
    if(!record)record=await persist(o,'converted');
-   await update(record.id,'converted');
+   const linked=await host.patch('career_opportunities',record.id,{status:'converted',application_id:existing.id});
+   Object.assign(record,linked);
    // Stage remains Wishlist until user changes it. No external application submission.
    await host.reloadCareer?.();
    RADAR.modal=null;RADAR.view='history';RADAR.error='';host.notify('Draft added to Applications');
-  }catch(error){RADAR.error='Application saved, but Radar status did not sync. Refresh Radar; do not add the role twice: '+error.message;host.render()}
- }catch(error){RADAR.error='Could not add draft: '+error.message;host.render()}
+  }catch(error){RADAR.error='Application saved, but Radar status did not sync. The original job URL prevents duplicate imports when retried: '+error.message;host.render()}
+ }catch(error){RADAR.error='Could not finish adding draft: '+error.message+'. Check Applications before retrying.';host.render()}
  finally{RADAR.busy=false;if(owner===RADAR.owner)host.render()}
 }
 async function action(event){
