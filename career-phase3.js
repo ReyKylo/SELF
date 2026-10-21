@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 let host=null,core=null;
-const RADAR={owner:null,ready:false,items:[],results:[],scanning:false,error:'',view:'discover',modal:null,busy:false,filter:'all',lastScanAt:null};
+const RADAR={owner:null,ready:false,items:[],results:[],scanning:false,error:'',view:'discover',modal:null,dirty:false,busy:false,filter:'all',lastScanAt:null};
 const MIN=75,MAX=15,FEED='https://remotive.com/api/remote-jobs?limit=250';
 const CLUSTERS=['investment','strategy','venture','fintech'];
 const MATCH={
@@ -54,7 +54,7 @@ function scoreOpportunity(raw){
 }
 function reset(owner){
  RADAR.owner=owner;RADAR.ready=false;RADAR.items=[];RADAR.results=[];RADAR.scanning=false;
- RADAR.error='';RADAR.modal=null;RADAR.filter='all';RADAR.lastScanAt=null;
+ RADAR.error='';RADAR.modal=null;RADAR.dirty=false;RADAR.filter='all';RADAR.lastScanAt=null;
 }
 async function load(owner){
  if(!owner||owner!==host?.state?.()?.user?.id)return;
@@ -209,7 +209,7 @@ async function saveManual(form){
  const o={provider:'Manual',provider_id:'',role_title:title.slice(0,200),company_name:company.slice(0,200),
  location_label:place.slice(0,180),job_url:url,cluster:CLUSTERS.includes(raw.cluster)?raw.cluster:'investment',
  posted_at:null,relevance_score:rank?.score||0,score_reason:'User-submitted URL · source not independently verified · '+(rank?.reason||'Location eligibility not confirmed')};
- try{await persist(o,'saved');RADAR.modal=null;RADAR.view='saved';RADAR.error='';host.render();host.notify('Opportunity link saved')}
+ try{await persist(o,'saved');RADAR.modal=null;RADAR.dirty=false;RADAR.view='saved';RADAR.error='';host.render();host.notify('Opportunity link saved')}
  catch(error){RADAR.error='Could not save: '+error.message;const err=form.querySelector('.career-save-note');if(err)err.textContent=RADAR.error;host.notify(RADAR.error,true)}
 }
 async function convert(o){
@@ -238,7 +238,7 @@ async function convert(o){
    Object.assign(record,linked);
    // Stage remains Wishlist until user changes it. No external application submission.
    await host.reloadCareer?.();ensure();
-   RADAR.modal=null;RADAR.view='history';RADAR.error='';host.notify('Draft added to Applications');
+   RADAR.modal=null;RADAR.dirty=false;RADAR.view='history';RADAR.error='';host.notify('Draft added to Applications');
   }catch(error){RADAR.error='Application saved, but Radar status did not sync. The original job URL prevents duplicate imports when retried: '+error.message;host.render()}
  }catch(error){RADAR.error='Could not finish adding draft: '+error.message+'. Check Applications before retrying.';host.render()}
  finally{RADAR.busy=false;if(owner===RADAR.owner)host.render()}
@@ -250,8 +250,8 @@ async function action(event){
  const type=b.dataset.career3,url=b.dataset.url,id=b.dataset.id;
  if(type==='tab'){RADAR.view=b.dataset.tab;host.render()}
  else if(type==='scan')await scan();
- else if(type==='manual'){RADAR.modal={kind:'manual'};RADAR.error='';host.render()}
- else if(type==='close-modal'){RADAR.modal=null;host.render()}
+ else if(type==='manual'){RADAR.modal={kind:'manual'};RADAR.dirty=false;RADAR.error='';host.render()}
+ else if(type==='close-modal'){if(RADAR.dirty&&!confirm('Discard unsaved Radar details?'))return true;RADAR.modal=null;RADAR.dirty=false;host.render()}
  else if(type==='assist'||type==='convert'){const o=sourceOf(url);if(o){RADAR.modal={kind:type==='assist'?'assist':'convert',o};host.render()}}
  else if(type==='confirm-convert'){const o=sourceOf(url);if(o&&confirm('Add this role as a draft to your existing Applications?'))await convert(o)}
  else if(type==='save'||type==='dismiss'){
@@ -272,8 +272,17 @@ async function submit(event){
  event.preventDefault();event.stopPropagation();await saveManual(event.target);return true;
 }
 function keydown(event){
- if(RADAR.modal&&event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation?.();RADAR.modal=null;host.render();return true}
+ if(RADAR.modal&&event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation?.();if(RADAR.dirty&&!confirm('Discard unsaved Radar details?'))return true;RADAR.modal=null;RADAR.dirty=false;host.render();return true}
  return false;
+}
+function input(event){
+ if(event.target?.closest?.('#career3-form')){RADAR.dirty=true;return true}
+ return false;
+}
+function beforeNavigate(){
+ if(!RADAR.modal)return true;
+ if(RADAR.dirty&&!confirm('Discard unsaved Radar details?'))return false;
+ RADAR.modal=null;RADAR.dirty=false;return true;
 }
 function links(){
  if(!isOwned())return [];
@@ -282,5 +291,5 @@ function links(){
  }));
 }
 function init(args){host=args.host;core=args.career}
-window.SELFCareerPhase3={init,reset,load,render,action,submit,keydown,scan,scoreOpportunity,links,ui:RADAR};
+window.SELFCareerPhase3={init,reset,load,render,action,submit,keydown,scan,scoreOpportunity,links,input,beforeNavigate,ui:RADAR};
 })();
