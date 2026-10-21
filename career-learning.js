@@ -150,6 +150,16 @@ async function downloadStarter(id,kind){
  }
  throw Error('Jenis file belum didukung.');
 }
+function professionalBenchmark(day){
+ const p=day.professional_standard;if(!p)return '';
+ return '<section class="learning-recruiter-standard"><div class="learning-label">RECRUITER-GRADE CASE / NOT A CERTIFICATION</div><h3>'+h(p.deliverable_title)+'</h3>'+
+ '<p class="learning-director-prompt">'+h(p.employer_question)+'</p>'+
+ '<div class="learning-pro-divider"><div><h4>What the reviewer should be able to inspect</h4><p>'+h(p.recruiter_output)+'</p></div>'+
+ '<div><h4>Benchmark against real expert work</h4><p>'+h(p.source_status)+'</p>'+external('Original benchmark',p.source_url)+'</div></div>'+
+ '<details class="learning-quality-details"><summary>Quality gate — what makes this more than a student assignment</summary><ol>'+p.qualities.map(s=>'<li>'+h(s)+'</li>').join('')+'</ol></details>'+
+ '<details class="learning-quality-details"><summary>Investment Director / Partner / Client challenges</summary><ol>'+p.pushback.map(s=>'<li>'+h(s)+'</li>').join('')+'</ol></details>'+
+ '<p class="learning-standard-disclaimer">SELF provides educational assessment criteria. No private firm endorsement, executed deal, or hiring outcome is implied.</p></section>';
+}
 function sprint(){
  const days=ui.data.sprints;const day=days.find(d=>d.id===ui.day)||days[0];const task=existingTask(day.id);
  return '<div class="learning-sprint-intro"><span class="learning-label">LEARN BY BUILDING</span><h2>Tiga proyek. Bukti yang bisa lu tunjukkan.</h2><p>Belajar dari contoh asli, tonton bagian yang relevan, lalu langsung bikin. Target 6–8 jam per hari; boleh lanjut besok kalau butuh waktu.</p></div>'+
@@ -157,6 +167,7 @@ function sprint(){
  '<article class="learning-day-detail"><div class="learning-assignment-head"><div><span class="learning-label">ASSIGNMENT · HARI '+day.day+'</span><h2 id="learning-day-title" tabindex="-1">'+h(day.title)+'</h2><p>'+h(day.summary)+'</p></div><div>'+button(ui.busy?'Memeriksa tugas…':task?'Buka task di My Work':'Tambah proyek ke My Work','task','data-id="'+h(day.id)+'" '+(ui.busy?'disabled':''),true)+'<small class="learning-task-note">'+(task?'Task SELF yang sama; status mengikuti My Work.':'Task dibuat saat lu memilih tombol ini.')+'</small></div></div>'+
  (ui.taskError?'<p class="learning-task-error" role="alert">'+h(ui.taskError)+'</p>':'')+
  '<div class="learning-workflow"><section><h3>01 · SEE</h3><p>Pelajari cara expert menyusun keputusan.</p><div class="learning-related">'+day.panels.map(evidenceButton).join('')+'</div></section><section><h3>02 · WATCH</h3><p>Tonton berurutan. Setelah tiap video, kerjakan hasilnya.</p><div class="learning-related">'+day.videos.map(id=>videoButton(ui.data.videos.find(v=>v.id===id)?.video_id)).join('')+'</div></section></div>'+
+ professionalBenchmark(day)+
  '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief PDF','download','data-id="'+h(day.id)+'" data-kind="pdf"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+(day.id==='Consulting'?button('↓ Editable 6-slide PPTX','download','data-id="'+h(day.id)+'" data-kind="pptx"'):'')+button(ui.workspace===day.id?'Tutup private workspace':'Buka private workspace','workspace','data-id="'+h(day.id)+'"')+'</div>'+
  (ui.workspace===day.id?(window.SELFCareerPortfolio?.render?.(day.id)||''):'')+
  '<section class="learning-lesson"><h3>03 · DO → BUILD → REVIEW</h3><p class="learning-fixture-label">Data fiktif untuk latihan independen. Bukan transaksi atau proyek klien nyata.</p>'+markdown(day.lesson)+'</section></article>'+
