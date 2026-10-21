@@ -17,7 +17,7 @@ const months=Array.from({length:12},(_,i)=>{const t=9+i;return (2025+Math.floor(
 const cohort=rows('cohorts.csv'),traction=rows('monthly-traction.csv'),cac=rows('acquisition.csv'),cash=rows('cash-runway.csv');
 const financing=JSON.parse(read('financing.json'));
 const holdoutPath=path.join(root,'content/career-cases/vc/blind/holdout-cohorts.csv');
-const holdoutRaw=fs.readFileSync(holdoutPath,'utf8').trim().split(/\\r?\\n/);
+const holdoutRaw=fs.readFileSync(holdoutPath,'utf8').trim().split(/\r?\n/);
 const holdoutHeaders=holdoutRaw.shift().split(',');
 const holdout=holdoutRaw.map(line=>Object.fromEntries(line.split(',').map((value,i)=>[holdoutHeaders[i],value])));
 const cohortMonthIndex=r=>months.indexOf(r.cohort_month);
