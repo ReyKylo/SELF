@@ -35,7 +35,21 @@ function portTarget(id){return {dataset:{c3Port:id,side:'e'},closest(q){if(q==='
 async function tick(){await new Promise(resolve=>setTimeout(resolve,1))}
 async function main(){
  const initial=window.SELFBoards.renderEditor();
- assert.match(initial,/c3-minimap/,'minimap renders in canvas');
+ assert.match(initial,/c3-minimap-closed/,'minimap is opt-in by default');
+ assert.equal(window.SELFBoards.ui.inspectorOpen,false,'idle properties panel hidden');
+ assert.equal(window.SELFBoards.ui.mapCollapsed,true,'idle map collapsed');
+ assert.match(initial,/c3-panel-closed/,'canvas gets full width when nothing selected');
+ assert.match(initial,/c3-smart-strip" hidden/,'smart actions do not occupy canvas when idle');
+ await button('inspector-toggle');
+ assert.equal(window.SELFBoards.ui.inspectorOpen,true,'properties can be opened explicitly');
+ assert.match(window.SELFBoards.renderEditor(),/c3-panel-open/);
+ await button('inspector-toggle');
+ assert.equal(window.SELFBoards.ui.inspectorOpen,false,'properties can be closed explicitly');
+ await button('tools-more');
+ assert.equal(window.SELFBoards.ui.toolsExpanded,true,'advanced tools can expand');
+ assert.match(window.SELFBoards.renderEditor(),/c3-more-tools/);
+ await button('tools-more');
+ assert.equal(window.SELFBoards.ui.toolsExpanded,false,'advanced tools can collapse');
  // Double-click empty space opens a local add palette; no full-page overlay.
  handlers['doc:dblclick'][0](evt(background,460,480));
  assert.equal(window.SELFBoards.ui.quickAdd?.point?.x!==undefined,true);
@@ -85,6 +99,9 @@ async function main(){
  assert(base.y>=viewBounds.y-2&&base.y+base.h<=viewBounds.y+viewBounds.h+2,'fit selection visible vertically');
  window.SELFBoards.renderEditor();
  const panBefore={...selected.pan};
+ await button('minimap-toggle');
+ assert.equal(window.SELFBoards.ui.mapCollapsed,false,'minimap opens on demand');
+ window.SELFBoards.renderEditor();
  await button('minimap-jump',{});
  assert(Math.abs(panBefore.x-selected.pan.x)>2||Math.abs(panBefore.y-selected.pan.y)>2,'clicking minimap changes camera');
  await button('minimap-toggle');
