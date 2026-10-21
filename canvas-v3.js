@@ -931,7 +931,8 @@ function keydown(e){if(state().view!=='board-editor')return;
  const typing=e.target.closest('input,textarea,select,[contenteditable=true]');
  if(e.key===' '&&!typing){ui.spaceDown=true;e.preventDefault()}
  if(typing)return;
- if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){e.preventDefault();cloneSelection();return}
+ if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey&&dSelected()){e.preventDefault();dBeginEdit(dSelected().id);return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){e.preventDefault();cloneSelection();return}
  if(e.key.toLowerCase()==='f'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();fitSelection();return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();step(e.shiftKey?'redo':'undo');return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();step('redo');return}
