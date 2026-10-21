@@ -63,7 +63,7 @@ function originalEvidence(p){
  const v=p.visual,origin=external('Buka sumber asli',p.source_url);
  if(!v||!safeUrl(v.url))return '<div class="learning-document-mark" aria-hidden="true">'+(host.icon?.('book',34)||'↗')+'</div><span class="learning-label">SOURCE POINTER ONLY</span><p class="learning-pointer-note">Belum ada bukti visual yang dapat ditampilkan langsung. Buka sumber asli di bagian yang tertera — jangan anggap panel ini screenshot verified.</p>';
  const url=h(safeUrl(v.url));
- if(v.type==='image')return '<div class="learning-real-visual"><a href="'+h(p.source_url)+'" target="_blank" rel="noopener noreferrer" aria-label="Buka sumber asli '+h(p.publisher)+'"><img src="'+url+'" loading="lazy" alt="'+h(v.caption)+'"></a><p class="learning-visual-caption">'+h(v.caption)+'</p></div>';
+ if(v.type==='image')return '<div class="learning-real-visual"><a href="'+h(safeUrl(p.source_url)||'')+'" target="_blank" rel="noopener noreferrer" aria-label="Buka sumber asli '+h(p.publisher)+'"><img src="'+url+'" loading="lazy" alt="'+h(v.caption)+'"></a><p class="learning-visual-caption">'+h(v.caption)+'</p></div>';
  if(v.type==='pdf')return '<div class="learning-real-visual"><object data="'+url+'#page=1&view=FitH" type="application/pdf" aria-label="'+h(v.caption)+'"><p>Browser tidak dapat menampilkan PDF ini. '+origin+'</p></object><p class="learning-visual-caption">'+h(v.caption)+'</p></div>';
  return '';
 }
