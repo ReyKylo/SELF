@@ -1,0 +1,141 @@
+/* SELF Concept D v1.1 — toolbar-first writing. No full-screen backdrop, flashes or layout remounts.
+ * Selection and knowledge controls share one floating surface. */
+.c3-shell .c3-content{grid-template-columns:minmax(0,1fr)!important}
+.c3-shell .c3-content>.c3-inspector{display:none!important}
+.c3-shell #c3-inspector-toggle{display:none!important}
+.c3-shell .c3-object-face{padding:12px 17px}
+.c3-shell .c3-object .d-surface{
+  width:100%;height:100%;max-height:100%;overflow:auto;
+  display:block;outline:0;background:transparent;border:0;
+  text-align:inherit;white-space:normal;overflow-wrap:anywhere;
+  font:inherit;line-height:1.37;color:inherit;
+  padding:4px 3px;cursor:inherit;user-select:none;scrollbar-width:thin;
+}
+.c3-shell .c3-object .d-surface[contenteditable="true"]{
+  cursor:text;user-select:text;-webkit-user-select:text;
+  white-space:normal;outline:none!important;border:none!important;
+  box-shadow:none!important;caret-color:currentColor;
+}
+.c3-shell .c3-object:has(.d-is-editing){cursor:text}
+.c3-shell .c3-object .d-surface p{font-size:1em;line-height:1.42;opacity:1;margin:0 0 .5em;display:block;white-space:pre-wrap;overflow:visible}
+.c3-shell .c3-object .d-surface p:last-child{margin-bottom:0}
+.c3-shell .c3-object .d-surface h1,.c3-shell .c3-object .d-surface h2,.c3-shell .c3-object .d-surface h3{margin:.18em 0 .5em;line-height:1.22;font-weight:750}
+.c3-shell .c3-object .d-surface h1{font-size:1.3em}
+.c3-shell .c3-object .d-surface h2{font-size:1.16em}
+.c3-shell .c3-object .d-surface h3{font-size:1.05em}
+.c3-shell .c3-object .d-surface ul,.c3-shell .c3-object .d-surface ol{margin:.25em 0 .5em;padding-left:1.35em}
+.c3-shell .c3-object .d-surface li{margin:0 0 .28em}
+.c3-shell .c3-object .d-surface a{text-decoration:underline;text-underline-offset:3px;color:inherit}
+.c3-shell .c3-object .d-legacy-title{font-weight:730;line-height:1.3;margin-bottom:.5em}
+.c3-shell .c3-kind-sticky .d-surface,.c3-shell .c3-kind-knowledge .d-surface,
+.c3-shell .c3-kind-reference .d-surface{text-align:left}
+.c3-shell .c3-kind-text .d-surface{text-align:left}
+.c3-shell .c3-kind-frame .d-surface{text-align:left}
+.c3-shell .c3-kind-ellipse .d-surface{width:78%;height:78%;margin:auto}
+.c3-shell .c3-kind-diamond .d-surface{width:75%;height:70%;margin:auto;font-size:.87em}
+.c3-shell .c3-object-text.d-surface:empty{min-height:1px}
+.c3-shell .d-object-chips{position:absolute;bottom:7px;left:7px;right:7px;display:flex;gap:4px;justify-content:center;pointer-events:none}
+.c3-shell .d-chip{font-size:9px;white-space:nowrap;line-height:1.3;max-width:26%;overflow:hidden;text-overflow:ellipsis;border-radius:5px;padding:2px 5px;background:#101d3d44;color:inherit}
+.c3-shell .c3-selection-border{border:1.5px solid #a393ff;inset:-3px;border-radius:5px}
+.c3-shell .c3-handle{width:10px;height:10px;border:1.5px solid #5b63d8;background:#fff;border-radius:3px}
+.c3-shell .c3-anchor{opacity:0;width:14px;height:14px;pointer-events:none;border:2px solid white}
+.c3-shell .c3-object.selected .c3-anchor{opacity:0;pointer-events:none}
+.c3-shell .c3-object.selected:hover .c3-anchor,
+.c3-shell .c3-object:has(.c3-anchor:hover) .c3-anchor,
+.c3-shell .c3-object.c3-magnet .c3-anchor{opacity:1;pointer-events:auto}
+.c3-shell .c3-object:hover .c3-object-face{filter:none!important}
+.c3-shell #c3-floating-ui{position:relative;z-index:29}
+.c3-shell .d-toolbar{
+ position:absolute;top:12px;z-index:31;
+ max-width:calc(100% - 108px)!important;
+ min-height:49px;border:1px solid var(--c3-border);
+ border-radius:13px;box-shadow:0 8px 27px #02081338;
+ background:var(--c3-surface);color:var(--c3-text);
+ padding:5px 7px;display:flex;flex-direction:column;align-items:center;gap:0;
+ animation:none!important;
+}
+.c3-shell .d-toolbar-primary,.c3-shell .d-toolbar-secondary{
+ display:flex;gap:4px;align-items:center;justify-content:center;width:100%;
+ overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;white-space:nowrap;
+}
+.c3-shell .d-toolbar-secondary{border-top:1px solid var(--c3-border);margin-top:5px;padding-top:5px;justify-content:flex-start}
+.c3-shell .d-toolbar .d-bar-tool{
+ padding:7px 10px;min-height:36px;border:1px solid transparent;background:transparent;
+ color:var(--c3-text);border-radius:8px;cursor:pointer;font-size:.81em;font-weight:675;
+ flex:0 0 auto;transition:background-color .12s,border-color .12s,transform .1s;
+}
+.c3-shell .d-toolbar .d-bar-tool:hover,.c3-shell .d-toolbar .d-bar-tool.active{background:var(--c3-raise);border-color:var(--c3-border)}
+.c3-shell .d-toolbar .d-bar-tool:active{transform:scale(.96)}
+.c3-shell .d-toolbar .d-bold{min-width:34px;font-size:1.04em}
+.c3-shell .d-toolbar .d-bar-tool[data-format="italic"]{font-style:italic}
+.c3-shell .d-toolbar .d-bar-tool[data-format="underline"]{text-decoration:underline}
+.c3-shell .d-toolbar .d-bar-divider{width:1px;height:26px;background:var(--c3-border);margin:0 3px;flex:0 0 auto}
+.c3-shell .d-color,.c3-shell .d-font{
+ display:flex;align-items:center;justify-content:center;gap:6px;
+ padding:4px 8px;border-radius:8px;color:var(--c3-muted);
+ font-size:.78em;font-weight:650;min-height:36px;
+}
+.c3-shell .d-color input[type=color]{width:27px;height:27px;padding:2px;border:1px solid var(--c3-border);border-radius:7px;cursor:pointer;background:transparent}
+.c3-shell .d-font input[type=number]{width:42px;padding:5px 2px;border-radius:6px;border:1px solid var(--c3-border);background:var(--c3-inspector);color:var(--c3-text);font:inherit;text-align:center}
+.c3-shell .d-font input::-webkit-inner-spin-button{opacity:.5}
+.c3-shell .d-popover{
+ position:absolute;top:calc(100% + 7px);right:5px;
+ width:min(325px,calc(100vw - 140px));max-height:55dvh;overflow:auto;
+ background:var(--c3-surface);border:1px solid var(--c3-border);
+ border-radius:13px;box-shadow:0 12px 30px #0309185e;
+ padding:15px;display:flex;flex-direction:column;gap:10px;
+ white-space:normal;animation:none!important;
+}
+.c3-shell .d-popover strong{font-size:.91em}
+.c3-shell .d-popover p{color:var(--c3-muted);font-size:.8em;line-height:1.5;margin:0}
+.c3-shell .d-popover label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.8em;color:var(--c3-muted)}
+.c3-shell .d-pop-input{min-height:39px;border-radius:8px;border:1px solid var(--c3-border);color:var(--c3-text);background:var(--c3-inspector);padding:7px 9px;font:inherit}
+.c3-shell .d-pop-input:focus{outline:2px solid var(--c3-blue)}
+.c3-shell .d-pop-submit{min-height:39px;border-radius:8px;border:1px solid var(--c3-blue);background:var(--c3-blue);color:white;cursor:pointer;font-weight:700;padding:7px 12px}
+.c3-shell .d-more-action{width:100%;min-height:38px;border:1px solid var(--c3-border);background:transparent;color:var(--c3-text);text-align:left;border-radius:8px;padding:7px 10px;cursor:pointer}
+.c3-shell .d-more-action:hover{background:var(--c3-raise)}
+.c3-shell .d-focus-panel{
+ position:absolute;z-index:28;left:72px;right:18px;top:84px;bottom:68px;
+ background:var(--c3-inspector);color:var(--c3-text);
+ border:1px solid var(--c3-border);border-radius:18px;
+ box-shadow:0 18px 34px #0609123b;
+ display:flex;flex-direction:column;min-width:0;overflow:hidden;
+ animation:none!important;opacity:1!important;filter:none!important;
+}
+.c3-shell .d-focus-panel header{
+ min-height:61px;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--c3-border)
+}
+.c3-shell .d-focus-panel header strong{font-size:1.02em}
+.c3-shell .d-focus-panel header span{color:var(--c3-muted);font-size:.75em}
+.c3-shell .d-focus-panel header button{background:var(--c3-surface);color:var(--c3-text);border:1px solid var(--c3-border);padding:8px 12px;border-radius:9px;cursor:pointer}
+.c3-shell .d-focus-content{
+ flex:1;outline:0;padding:30px clamp(22px,7vw,90px);font:inherit;
+ font-size:calc(19px * var(--scale));line-height:1.65;overflow-y:auto;
+ max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere;
+ background:transparent;color:var(--c3-text);
+}
+.c3-shell .d-focus-content p{margin:0 0 .8em}
+.c3-shell .d-focus-content h1,.c3-shell .d-focus-content h2,.c3-shell .d-focus-content h3{margin:.4em 0}
+.c3-shell .d-focus-content a{color:var(--c3-blue)}
+.c3-shell .d-focus-content:focus{outline:0}
+@media(max-width:1000px){
+ .c3-shell .d-toolbar{left:calc(50% + 24px)!important;max-width:calc(100% - 100px)!important}
+ .c3-shell .d-toolbar .d-bar-tool{padding:7px 8px}
+ .c3-shell .d-toolbar .d-overflow{display:none}
+ .c3-shell .d-focus-panel{left:65px;right:10px;top:75px}
+}
+@media(max-width:650px){
+ .c3-shell .d-toolbar{top:6px!important;left:calc(50% + 23px)!important;max-width:calc(100% - 85px)!important;padding:4px}
+ .c3-shell .d-toolbar .d-bar-tool{font-size:.76em;padding:7px 8px}
+ .c3-shell .d-toolbar .d-bar-tool span{display:none}
+ .c3-shell .d-toolbar .d-color{font-size:0;gap:0;padding:4px}
+ .c3-shell .d-toolbar-primary,.c3-shell .d-toolbar-secondary{justify-content:flex-start}
+ .c3-shell .d-popover{right:0;max-width:calc(100vw - 85px)}
+ .c3-shell .d-focus-panel{left:9px;right:9px;top:116px;bottom:60px}
+ .c3-shell .d-focus-panel header{padding:8px 10px}
+ .c3-shell .d-focus-panel header span{display:none}
+ .c3-shell .d-focus-content{padding:18px 16px}
+}
+@media(prefers-reduced-motion:reduce){
+ .c3-shell .d-toolbar,.c3-shell .d-toolbar *,.c3-shell .d-popover,.c3-shell .d-focus-panel{animation:none!important;transition:none!important}
+}
