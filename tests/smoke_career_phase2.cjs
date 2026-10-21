@@ -1,6 +1,7 @@
 /* SELF Career Phase 2 smoke: real App records, Task links and rejected writes. */
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const zlib=require('node:zlib');
 const root=path.join(__dirname,'..');
 const phase2=fs.readFileSync(path.join(root,'career-phase2.js'),'utf8');
 const career=fs.readFileSync(path.join(root,'career.js'),'utf8');
@@ -17,7 +18,7 @@ assert(build.includes('career-phase2.js'),'Cloudflare ship Phase2');
 assert(app.includes('uploadCareerDocument')&&app.includes('signCareerDocument'),'CVs use private Storage');
 assert(app.includes("'[data-career],[data-career2],[data-career3]'"),'All Career actions must route through global SELF handler');
 const tables={career_companies:[],career_people:[],career_applications:[],career_touchpoints:[],career_cv_versions:[],
- career_interviews:[],career_templates:[],career_task_links:[],tasks:[]};
+ career_cv_embedded_files:[],career_interviews:[],career_templates:[],career_task_links:[],tasks:[]};
 let n=0,failPatch=false,failInsert=false,notifications=[],clicks=0;
 const owner={id:'owner-1'};
 const company={id:'co1',user_id:'owner-1',name:'Real Firm',industry:'Investment',notes:''};
@@ -26,9 +27,12 @@ const person={id:'p1',user_id:'owner-1',full_name:'Recruiter',role_title:'HR',co
 const application={id:'a1',user_id:'owner-1',role_title:'Analyst',company_id:'co1',hiring_stage:'wishlist'};
 tables.career_companies.push(company);tables.career_people.push(person);tables.career_applications.push(application);
 tables.tasks.push({id:'existing-task',user_id:'owner-1',title:'Existing reminder',status:'todo',due_date:'2026-11-01'});
+const downloads=[];
 const listeners={},doc={
  addEventListener(k,callback){(listeners[k]??=[]).push(callback)},
- querySelector(){return null},querySelectorAll(){return []}
+ querySelector(){return null},querySelectorAll(){return []},
+ createElement(){return {download:'',href:'',click(){downloads.push(this.download)},remove(){}}},
+ body:{appendChild(){}}
 };
 const FormDataMock=class{
  constructor(form){this.values=form.fields||{}}
@@ -37,7 +41,7 @@ const FormDataMock=class{
 };
 const clipboard=[];
 const ctx={window:{open(){return {location:{},close(){}}}},
- document:doc,FormData:FormDataMock,URL,Date,Promise,
+ document:doc,FormData:FormDataMock,URL,Date,Promise,Blob,Response,DecompressionStream,Uint8Array,TextDecoder,atob,
  confirm:()=>true,navigator:{clipboard:{async writeText(v){clipboard.push(v)}}},console,setTimeout,clearTimeout};
 vm.createContext(ctx);
 vm.runInContext(phase2,ctx);vm.runInContext(career,ctx);
@@ -110,6 +114,24 @@ async function main(){
  const selectNode={dataset:{career2Cv:'a1'},value:cvId};
  await p2.change({target:selectNode});
  assert.equal(application.cv_version_id,cvId,'application linked to CV version');
+ // Realistic private PDF backfill: owner-scoped bytea response, gzip TAR extraction, browser download.
+ const basename='resume.pdf';
+ const fakePdf=Buffer.from('%PDF-1.3\\n1 0 obj\\n<<>>\\nendobj\\n%%EOF','utf8');
+ const hdr=Buffer.alloc(512);
+ hdr.write(basename,0,'ascii');
+ hdr.write(fakePdf.length.toString(8).padStart(11,'0')+'\\0',124,'ascii');
+ hdr.write('ustar\\0',257,'ascii');
+ const padding=Buffer.alloc((512-fakePdf.length%512)%512);
+ const archive=zlib.gzipSync(Buffer.concat([hdr,fakePdf,padding,Buffer.alloc(1024)]));
+ tables.career_cv_versions[0].storage_path=null;
+ tables.career_cv_versions[0].file_name=basename;
+ tables.career_cv_embedded_files.push({cv_id:cvId,user_id:owner.id,file_name:basename,file_bytes:String.fromCharCode(92)+'x'+archive.toString('hex')});
+ await p2.load(owner.id);
+ assert.match(p2.renderCVs(),/Download PDF/,'imported private PDF offers download');
+ await click('open-file',{id:cvId});
+ assert.equal(downloads.at(-1),basename,'private PDF bytes unpack and download');
+ assert(notifications.some(x=>x.message.includes('Download started')),'successful download feedback');
+
  p2.ui.modal={type:'interview'};
  await submit(form('interview',{title:'First round',application_id:'a1',scheduled_at:'2026-11-01T09:00',
  format:'video',stage:'scheduled',prep_notes:'Review valuation',reflection:''}));
