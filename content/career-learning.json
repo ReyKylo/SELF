@@ -912,7 +912,8 @@
       ],
       "analisis_ai": "Teks memuat asumsi 100.000 penduduk × 1 cup/day tetapi rekomendasi menyebut 7 juta cups; annualisasi sederhana justru 36,5 juta. Denominator 7 juta belum terjelaskan. Jangan mengulang klaim pangsa ~3% tanpa rekonsiliasi.",
       "video_ids": [
-        "iPg7-NO97FU"
+        "iPg7-NO97FU",
+        "81_W0vzhJdw"
       ],
       "review": "Kontribusi £2/cup; (£245.610 + £163.740)/£2 = 204.675 cups untuk recovery dalam tahun pertama.",
       "visual_status": "source_pointer_only_rights_not_confirmed",
@@ -938,7 +939,8 @@
       ],
       "analisis_ai": "Fixed cost dibagi contribution menghasilkan volume, bukan market share. Definisikan periode dan konversi gallon ke bottle sebelum membagi pasar.",
       "video_ids": [
-        "iPg7-NO97FU"
+        "iPg7-NO97FU",
+        "ZXslsi3jK6Y"
       ],
       "review": "$2 − $1,90 = $0,10; $40m/$0,10 = 400m bottles = 50m gallons; verifikasi denominator dari exhibit.",
       "visual_status": "publisher_original_external_preview_not_rehosted",
@@ -970,7 +972,8 @@
       ],
       "analisis_ai": "Margin tinggi tidak membuktikan harga akuisisi menarik. Tanpa purchase price dan capital needs, rekomendasi investasi final harus bersyarat.",
       "video_ids": [
-        "iPg7-NO97FU"
+        "iPg7-NO97FU",
+        "81_W0vzhJdw"
       ],
       "review": "Dapatkah pembaca membedakan menarik sebagai bisnis dan menarik pada harga tertentu?",
       "visual_status": "source_pointer_only_rights_not_confirmed",
@@ -996,7 +999,8 @@
       ],
       "analisis_ai": "Contoh menerapkan (1+10%) pada spending lalu menyebutnya incremental. Jika hanya uplift 10% yang baru, 6.600 × $1.000 × 10% × 5% = $33.000/bulan, bukan $375.000. Baseline pelanggan belum cukup jelas untuk memastikan total benefit.",
       "video_ids": [
-        "iPg7-NO97FU"
+        "iPg7-NO97FU",
+        "ZXslsi3jK6Y"
       ],
       "review": "Jangan memakai payback dipercepat sebelum merekonsiliasi baseline, rounding dan biaya operasi tambahan.",
       "visual_status": "source_pointer_only_rights_not_confirmed",
@@ -1263,6 +1267,67 @@
       "screening": "Publisher context and player description/chapters; not full video viewing or frame-by-frame audit",
       "playback_limit": "Server returned playability OK; playback in every region/account not tested",
       "verified_on": "2026-10-22"
+    },
+    {
+      "id": "V10",
+      "video_id": "81_W0vzhJdw",
+      "url": "https://www.youtube.com/watch?v=81_W0vzhJdw",
+      "title": "How to Build Slides Like a Top Consultant (McKinsey, BCG, Bain)",
+      "channel": "Firm Learning",
+      "duration": "Durasi belum diverifikasi",
+      "duration_seconds": 0,
+      "track": "Consulting",
+      "category": "BUILD WITH ME",
+      "instructor_credentials": "Firm Learning consulting education channel; not official content from McKinsey, BCG or Bain. Individual presenter credentials not independently confirmed.",
+      "teaches": "Slide skeleton, message/action titles, structuring evidence, chart choices and polish for a professional consulting deck.",
+      "portfolio_task": "Consulting 6-slide editable executive deck, especially recommendation, profit bridge, and initiative economics slides.",
+      "prerequisites": "Finish consulting case mathematics and define one conclusion per slide.",
+      "selection_reason": "Directly addresses a gap in prior library: how to translate the profitability model into decision-focused slides.",
+      "chapters": [
+        "00:00 Introduction",
+        "00:55 Slide skeleton",
+        "03:15 Message/action titles",
+        "04:56 Structure",
+        "06:54 Visuals and charts",
+        "08:08 Supporting text",
+        "08:38 Polishing"
+      ],
+      "chapter_verification": "Indexed YouTube publisher description; full running time not independently verified",
+      "exercise": "Build the six slide skeletons first; convert each slide title into a defensible conclusion with 1 calculation or supporting exhibit.",
+      "verification": "URL, title, channel and indexed chapter headings matched; playback availability and full duration not confirmed.",
+      "screening": "Publisher video description and chapter index; not full video viewing or full content audit.",
+      "playback_limit": "Embedding, geographic availability and playback not tested in production.",
+      "verified_on": "2026-10-22"
+    },
+    {
+      "id": "V11",
+      "video_id": "ZXslsi3jK6Y",
+      "url": "https://www.youtube.com/watch?v=ZXslsi3jK6Y",
+      "title": "Consulting Slide Structure: How McKinsey, Bain, and BCG Create Slides",
+      "channel": "Analyst Academy",
+      "duration": "Durasi belum diverifikasi",
+      "duration_seconds": 0,
+      "track": "Consulting",
+      "category": "GO DEEPER",
+      "instructor_credentials": "Analyst Academy educational channel; demonstrations of consulting slide logic, not official McKinsey, Bain or BCG training.",
+      "teaches": "Pyramid Principle, conclusion-oriented titles and breakdown of example consulting slides.",
+      "portfolio_task": "Consulting storyline and quality check of 6-slide CEO recommendation.",
+      "prerequisites": "A draft six-slide consulting deck or clear issue tree.",
+      "selection_reason": "Shows how actual analytical argument structure becomes a concise executive story rather than generic presentation design.",
+      "chapters": [
+        "00:00 Introduction",
+        "01:03 Pyramid Principle",
+        "02:18 BCG example",
+        "03:52 McKinsey example",
+        "05:02 Bain example",
+        "07:24 Final thoughts"
+      ],
+      "chapter_verification": "Indexed YouTube publisher description; full running time not independently verified",
+      "exercise": "Check every slide: one takeaway headline, one logically relevant exhibit, one sentence about what it means for the CEO.",
+      "verification": "URL, title, channel and indexed chapters matched; playback and total duration not independently checked.",
+      "screening": "Indexed original video description, not a full frame-by-frame audit.",
+      "playback_limit": "Embedding, geographic availability and playback not tested in production.",
+      "verified_on": "2026-10-22"
     }
   ],
   "sprints": [
@@ -1315,7 +1380,9 @@
       "summary": "Temukan penyebab laba turun dan prioritaskan tindakan.",
       "output": "Profit bridge + executive deck 6 slide",
       "videos": [
-        "V09"
+        "V09",
+        "V10",
+        "V11"
       ],
       "panels": [
         "CO01",
@@ -1323,7 +1390,7 @@
         "CO03",
         "CO04"
       ],
-      "lesson": "**Assignment:** kedai fiktif SELF Coffee. Diagnosis penurunan laba dan usulkan dua inisiatif prioritas. Output target enam slide berisi cerita keputusan, bukan ringkasan teori. Hari ini kamu yang membuat deck; paket riset ini tidak membuat deck pengganti.\n\n**Data latihan (IDR):** tahun lalu volume 120.000 cups, harga rata-rata Rp30.000, variable cost Rp10.000/cup, fixed operating costs Rp1,5 miliar. Sekarang volume 100.000, harga Rp30.000, variable cost Rp12.000/cup, fixed costs tetap Rp1,5 miliar. Inisiatif A: pengadaan baru menurunkan variable cost Rp1.000/cup dengan one-off implementation Rp50 juta. B: kampanye menambah 10.000 cups/tahun dengan contribution Rp18.000/cup dan biaya kampanye tahunan Rp60 juta. Asumsikan kapasitas tersedia, tanpa cannibalization, tanpa capex baru, dan dampak ramp-up diabaikan untuk latihan; semua perlu divalidasi sebelum rekomendasi nyata.\n\n**Urutan belajar dan build:**\n\n1. 45 menit: baca CO01 dan CO02. Tulis objective, time horizon, constraints dan issue tree yang spesifik.\n2. 60 menit: V09 (30:59). Pause 00:47; kerjakan struktur sendiri. Lanjut ke reasoning 01:21, follow-up 16:20 dan kritik 24:54/27:23. Coaching video bukan template jawaban yang harus sama.\n3. 90 menit: hitung profit bridge menggunakan volume effect pada margin lama dan cost effect pada volume sekarang. Buat table driver → impact → evidence required.\n4. 60 menit: hitung initiative economics, recurring versus one-off benefit dan payback. Baca CO04 agar tidak menghitung baseline sebagai uplift.\n5. 90 menit: bangun enam slide: recommendation; problem/bridge; root-cause hypotheses; initiatives economics; 90-day plan/owners; risks and decision gates. Judul slide berupa kesimpulan yang didukung exhibit.\n6. 45 menit: baca CO03 dan berikan recommendation 60 detik: pilih tindakan → dua alasan kuantitatif → risiko → next step.\n\n**Answer checks:** laba tahun lalu Rp900 juta, kini Rp300 juta, turun Rp600 juta. Volume effect = −20.000 × Rp20.000 = −Rp400 juta; cost effect = 100.000 × (−Rp2.000) = −Rp200 juta. Total cocok. A recurring benefit Rp100 juta/tahun; year-one net benefit Rp50 juta; simple payback enam bulan jika saving merata. B annual net benefit Rp120 juta. Jika A juga berlaku pada 10.000 cups tambahan B, ada interaction +Rp10 juta/tahun: combined recurring benefit Rp230 juta; setelah one-off A, first-year uplift Rp180 juta. Tanpa interaction, hasil berbeda; jelaskan konvensi. Jangan jumlahkan dua estimasi tanpa mengecek overlap.\n\n**Official-case mini-checks:** Bain first-year recovery 204.675 cups benar dengan input yang ditampilkan, tetapi pangsa pasar memerlukan denominator yang konsisten. Electro-Light membutuhkan 400 juta botol untuk menutup fixed costs pada contribution $0,10; profit impact harga dan volume harus diuji bersamaan.\n\n**Submit minimum:** enam slide, workbook perhitungan, assumptions/source log dan script recommendation 60 detik. Bedakan fakta kasus, hipotesis akar masalah dan rekomendasi. Data volume/biaya saja belum membuktikan penyebab churn pelanggan atau supplier inflation.",
+      "lesson": "**Assignment:** kedai fiktif SELF Coffee. Diagnosis penurunan laba dan usulkan dua inisiatif prioritas. Output target enam slide berisi cerita keputusan, bukan ringkasan teori. Hari ini kamu yang membuat deck; paket riset ini tidak membuat deck pengganti.\n\n**Data latihan (IDR):** tahun lalu volume 120.000 cups, harga rata-rata Rp30.000, variable cost Rp10.000/cup, fixed operating costs Rp1,5 miliar. Sekarang volume 100.000, harga Rp30.000, variable cost Rp12.000/cup, fixed costs tetap Rp1,5 miliar. Inisiatif A: pengadaan baru menurunkan variable cost Rp1.000/cup dengan one-off implementation Rp50 juta. B: kampanye menambah 10.000 cups/tahun dengan contribution Rp18.000/cup dan biaya kampanye tahunan Rp60 juta. Asumsikan kapasitas tersedia, tanpa cannibalization, tanpa capex baru, dan dampak ramp-up diabaikan untuk latihan; semua perlu divalidasi sebelum rekomendasi nyata.\n\n**Urutan belajar dan build:**\n\n1. 45 menit: baca CO01 dan CO02. Tulis objective, time horizon, constraints dan issue tree yang spesifik.\n2. 60 menit: V09 (30:59). Pause 00:47; kerjakan struktur sendiri. Lanjut ke reasoning 01:21, follow-up 16:20 dan kritik 24:54/27:23. Coaching video bukan template jawaban yang harus sama.\n3. 90 menit: hitung profit bridge menggunakan volume effect pada margin lama dan cost effect pada volume sekarang. Buat table driver → impact → evidence required.\n4. 60 menit: hitung initiative economics, recurring versus one-off benefit dan payback. Baca CO04 agar tidak menghitung baseline sebagai uplift.\n5. 90 menit: tonton V10 (khususnya skeleton 00:55, titles 03:15, charts 06:54), lalu bangun enam slide: recommendation; problem/bridge; root-cause hypotheses; initiatives economics; 90-day plan/owners; risks and decision gates. Judul slide berupa kesimpulan yang didukung exhibit. Gunakan V11 sebagai review opsional: pastikan tiap slide punya satu pesan yang dibuktikan.\n6. 45 menit: baca CO03 dan berikan recommendation 60 detik: pilih tindakan → dua alasan kuantitatif → risiko → next step.\n\n**Answer checks:** laba tahun lalu Rp900 juta, kini Rp300 juta, turun Rp600 juta. Volume effect = −20.000 × Rp20.000 = −Rp400 juta; cost effect = 100.000 × (−Rp2.000) = −Rp200 juta. Total cocok. A recurring benefit Rp100 juta/tahun; year-one net benefit Rp50 juta; simple payback enam bulan jika saving merata. B annual net benefit Rp120 juta. Jika A juga berlaku pada 10.000 cups tambahan B, ada interaction +Rp10 juta/tahun: combined recurring benefit Rp230 juta; setelah one-off A, first-year uplift Rp180 juta. Tanpa interaction, hasil berbeda; jelaskan konvensi. Jangan jumlahkan dua estimasi tanpa mengecek overlap.\n\n**Official-case mini-checks:** Bain first-year recovery 204.675 cups benar dengan input yang ditampilkan, tetapi pangsa pasar memerlukan denominator yang konsisten. Electro-Light membutuhkan 400 juta botol untuk menutup fixed costs pada contribution $0,10; profit impact harga dan volume harus diuji bersamaan.\n\n**Submit minimum:** enam slide, workbook perhitungan, assumptions/source log dan script recommendation 60 detik. Bedakan fakta kasus, hipotesis akar masalah dan rekomendasi. Data volume/biaya saja belum membuktikan penyebab churn pelanggan atau supplier inflation.",
       "task_title": "[Portfolio] Consulting · Profitability",
       "task_description": "SELF Career Prep · Sprint hari 3\nProfit bridge + executive deck 6 slide\nLatihan independen dengan data fiktif; bukan transaksi atau proyek klien nyata.\nBuka SELF → Career → Career Prep → Sprint 3 hari untuk assignment dan answer checks."
     }
