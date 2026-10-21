@@ -235,7 +235,9 @@ async function dPersist(){
  clearTimeout(ui.dSaveTimer);ui.dSaveTimer=null;
  if(!ui.dEditing)return;
  const edit=ui.dEditing,item=itm(edit.id);if(!item)return;
- const payload={content_blocks:[{id:'main',type:'richtext',html:edit.draft??documentMarkup(card(item.card_id))}]};
+ const html=edit.draft??documentMarkup(card(item.card_id));
+ const first=textFromHtml(html).split(/\r?\n/).map(x=>x.trim()).find(Boolean)||'';
+ const payload={content_blocks:[{id:'main',type:'richtext',html}],title:first.slice(0,180)};
  const cardId=item.card_id;
  ui.dSaveQueue=ui.dSaveQueue.catch(()=>{}).then(async()=>{
    await api.patch('knowledge_cards',cardId,payload);
@@ -600,7 +602,13 @@ function fitBoard(){
  updateCam();saveCam();
 }
 function liveRefresh(){const layer=$('#c3-wires');if(layer)layer.innerHTML=renderWires();for(const i of items()){const n=document.querySelector('[data-c3-item="'+i.id+'"]');if(n){n.style.left=i.x+'px';n.style.top=i.y+'px';n.style.width=i.w+'px';n.style.height=i.h+'px';n.style.transform='rotate('+num(i.rotation)+'deg)'}}refreshNavigationUI()}
-function selection(ids){ui.selected=new Set(ids);ui.edge=null;ui.quickAdd=null;api.render()}
+function selection(ids){
+ const selected=new Set(ids);
+ if(ui.dEditing&&!selected.has(ui.dEditing.id)){
+  dCapture();void dPersist();ui.dEditing=null;ui.dFocus=false;ui.dPopover=null;ui.dKnowledge=false;
+ }
+ ui.selected=selected;ui.edge=null;ui.quickAdd=null;api.render();
+}
 function entries(){return [...ui.selected].map(itm).filter(Boolean)}
 function positions(ids){const d={};for(const id of ids){const i=itm(id);if(i)d[id]={x:i.x,y:i.y,w:i.w,h:i.h,z:i.z};}return d}
 async function persistPositions(before,after,msg){const ids=Object.keys(after);await transact(async()=>{for(const id of ids)await api.patchSimple('board_items',id,after[id])},msg);history(async()=>{for(const id of ids)await api.patchSimple('board_items',id,before[id])},async()=>{for(const id of ids)await api.patchSimple('board_items',id,after[id])})}
@@ -682,7 +690,12 @@ function formatPoint(i){return {x:i.x,y:i.y,w:i.w,h:i.h}}
 function startPan(e){rememberCamera(true);ui.quickAdd=null;refreshNavigationUI();ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};$('#c3-canvas')?.classList.add('is-panning');e.preventDefault()}
 function gestureCancel(){const gesture=ui.gesture;ui.gesture=null;$('#c3-canvas')?.classList.remove('is-panning');const box=$('#c3-marquee');if(box)box.hidden=true;if(gesture?.type==='pan'&&gesture.moved)saveCam()}
 function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
- const t=e.target;if(t.closest('.c3-quick-add,.c3-contextbar,.c3-minimap'))return;if(t.closest('input,textarea,select,[contenteditable]'))return;
+ const t=e.target;
+ if(t.closest('.c3-quick-add,.c3-contextbar,.c3-minimap,.d-toolbar,.d-focus-panel'))return;
+ if(t.closest('input,textarea,select,[contenteditable]'))return;
+ if(ui.dEditing&&t.closest('[data-c3-item]')?.dataset.c3Item!==ui.dEditing.id){
+  dCapture();void dPersist();ui.dEditing=null;ui.dFocus=false;ui.dPopover=null;
+ }
  if(e.button===1||ui.spaceDown||ui.tool==='hand'){startPan(e);return}
  const port=t.closest('[data-c3-port]'),res=t.closest('[data-c3-resize]'),node=t.closest('[data-c3-item]'),edge=t.closest('[data-c3-edge]');
  if(ui.connectFrom&&node){const target=node.dataset.c3Item,from=ui.connectFrom;ui.connectFrom=null;ui.tool='select';if(from!==target){const a=itm(from),b=itm(target);if(a&&b){const sides=choose(a,b);addEdge(from,target,sides.from,sides.to);}else say('Source is no longer available',true)}api.render();e.preventDefault();return}
@@ -833,6 +846,24 @@ async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-'))return;e.p
  if(a==='rename-board'){await transact(()=>api.patch('boards',ui.boardId,{title:o.title.trim()}),'Board renamed');return}
  if(a==='add-reference'){const u=url(o.url);if(!u)return say('Use a valid http(s) link',true);await create('reference',null,{url:u});return}
  if(a==='add-existing'){if(!o.card_id)return;await transact(()=>api.insert('board_items',{board_id:ui.boardId,card_id:o.card_id,visual_kind:'knowledge',...centerPosition(255,170),w:255,h:170}),'Shared card placed');return}}
+ if(f.id==='d-popover-form'){
+  const selection=dSelected();if(!selection)return;
+  const c=card(selection.card_id);if(!c)return;
+  const which=f.dataset.type;
+  if(which==='sources'){
+   const uri=url(o.url?.trim());if(!uri)return say('Enter a valid http(s) URL',true);
+   const title=(o.title?.trim()||new URL(uri).hostname).slice(0,160);
+   const markup=documentMarkup(c);
+   const normalized=markup.includes('href="'+h(uri)+'"')?markup:markup+'<p><a href="'+h(uri)+'" target="_blank" rel="noopener noreferrer">'+h(title)+'</a></p>';
+   const data={url:uri,content_blocks:[{id:'main',type:'richtext',html:normalized}]};
+   ui.dPopover=null;await transact(()=>api.patch('knowledge_cards',c.id,data),'Source linked to this shape');return
+  }
+  if(which==='task'||which==='board'){
+   const valid=which==='task'?state().tasks.some(t=>t.id===o.value):state().boards.some(b=>b.id===o.value&&b.id!==ui.boardId);
+   if(!valid)return say('Choose an existing '+which,true);
+   ui.dPopover=null;await transact(()=>api.patch('knowledge_cards',c.id,{[which==='task'?'task_id':'target_board_id']:o.value}),'Linked '+which);return
+  }
+ }
  if(f.id==='c3-edge-form'){
  const e=edges().find(v=>v.id===f.dataset.id);if(!e)return;
  await transact(()=>api.patchSimple('board_edges',e.id,{label:o.label||'',route_type:o.route_type,from_anchor:o.from_anchor,to_anchor:o.to_anchor}),'Connector updated');return;
