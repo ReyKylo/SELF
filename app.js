@@ -145,7 +145,8 @@ function allGeneralLinks(){
  const inputs=[
   ...state.links.map(l=>({...l,source:'Tasks'})),
   ...state.inbox.filter(x=>x.kind==='link').map(l=>({id:l.id,title:l.title,url:l.body,source:'Quick Capture'})),
-  ...(window.SELFBoards?.links?.()||[]).map(l=>({...l,source:'Whiteboards'}))
+  ...(window.SELFBoards?.links?.()||[]).map(l=>({...l,source:'Whiteboards'})),
+  ...(window.SELFCareer?.links?.()||[]).map(l=>({...l,source:'Career'}))
  ];
  const seen=new Map();
  for(const item of inputs){
@@ -160,7 +161,7 @@ function renderLinks(){
  const all=allGeneralLinks(),source=state.linkSource||'all',q=state.linkSearch.trim().toLowerCase();
  const rows=all.filter(l=>(source==='all'||l.sources.includes(source))&&
   (!q||[l.title,l.url,...l.sources].some(v=>String(v||'').toLowerCase().includes(q))));
- const filters=[['all','All'],['Tasks','Tasks'],['Whiteboards','Whiteboards'],['Quick Capture','Quick Capture']]
+ const filters=[['all','All'],['Tasks','Tasks'],['Whiteboards','Whiteboards'],['Quick Capture','Quick Capture'],['Career','Career']]
  .map(([id,name])=>'<button type="button" class="choice '+(source===id?'selected':'')+
  '" data-action="link-source" data-source="'+attr(id)+'">'+name+'</button>').join('');
  const tiles=rows.map(l=>{
@@ -223,7 +224,7 @@ else if(modal==='subpage')body=`<h2>Create a subpage</h2><p>Give this task room 
 return `<div class="modal-overlay" data-action="close-modal"><div class="modal" onclick="event.stopPropagation()"><div class="panel-top"><span class="small-sub">SELF / Quick create</span><button class="icon-btn" data-action="close-modal" title="Close">${ic('close')}</button></div>${body}</div></div>`}
 function renderAuth(){return `<div class="auth-shell"><div class="auth-visual"><div class="brand" style="color:#fff;padding-left:0"><span class="brand-square">${ic('sparkle')}</span> SELF</div><div><div class="eyebrow" style="color:#a8c4ff">Your space to think</div><h1>One place for<br/>all the things<br/>on your mind.</h1><p>Capture your ideas. Keep your work moving. Connect the pieces of what you're learning — all in a workspace that's yours.</p></div><div class="small-sub">✳ Made for a mind that never stops.</div></div><div class="auth-login"><div class="auth-box"><div class="brand" style="padding-left:0"><span class="brand-square">${ic('sparkle')}</span> SELF</div><h2>${state.loginMode==='signin'?'Welcome back.':'Create your space.'}</h2><p class="subtitle" style="margin-bottom:30px">${state.loginMode==='signin'?'Good to have you here. Let’s get something done.':'All you need is your email and a password.'}</p>${state.authMessage?`<p class="message ${state.authMessage.toLowerCase().includes('error')?'error':''}">${esc(state.authMessage)}</p>`:''}<form id="auth-form" class="form-stack"><label class="form-label">Email address<input class="field" type="email" name="email" autocomplete="email" required placeholder="you@example.com"/></label><label class="form-label">Password<input class="field" type="password" name="password" autocomplete="${state.loginMode==='signin'?'current-password':'new-password'}" required minlength="6" placeholder="At least 6 characters"/></label><button class="primary-btn" type="submit">${state.loginMode==='signin'?'Sign in':'Create account'} ${ic('chevron')}</button></form><div class="auth-bottom">${state.loginMode==='signin'?`New to SELF? <button data-action="auth-toggle">Create an account</button>`:`Already have an account? <button data-action="auth-toggle">Sign in</button>`}</div><p class="small-sub" style="margin-top:35px">Private workspace · Your tasks and notes are visible only to your account.</p></div></div></div>`}
 function render(){if(!state.user){$('#app').innerHTML=renderAuth();return}if(state.view==='board-editor'&&window.SELFBoards?.updateInPlace?.()){paintSave();return}const pages={home:['Home',renderHome],spaces:['Spaces',renderSpaces],space:['Space',renderSpace],boards:['Boards',renderBoards],'board-editor':['Whiteboard',()=>window.SELFBoards?.renderEditor?.()||empty('Board unavailable','Reload this page.')],work:['My Work',renderWork],career:['Career',()=>window.SELFCareer?.render?.()||empty('Career unavailable','Try reloading SELF.')],links:['My Links',renderLinks],inbox:['Inbox',renderInbox],search:['Search',renderSearch],settings:['Settings',renderSettings]};const [title,fn]=pages[state.view]||pages.home;$('#app').innerHTML=chrome(fn(),title);paintSave()}
-function go(view){state.view=view;state.taskId=null;state.pageId=null;state.modal=null;if(view==='career')window.SELFCareer?.enter?.();render();window.scrollTo({top:0,behavior:'instant'})}
+function go(view){state.view=view;state.taskId=null;state.pageId=null;state.modal=null;if(view==='career'||view==='links')window.SELFCareer?.enter?.();render();window.scrollTo({top:0,behavior:'instant'})}
 const urlRegex=/https?:\/\/[^\s<>"']+/gi;
 async function autoCaptureLinks(taskId,text){const urls=[...new Set((text.match(urlRegex)||[]).map(s=>s.replace(/[),.;!?]+$/,'')).filter(u=>normalUrl(u)))];const existing=state.links.filter(x=>x.task_id===taskId);for(const url of urls){if(!existing.some(x=>x.url===normalUrl(url))){await insert('task_links',{task_id:taskId,url:normalUrl(url),title:new URL(url).hostname})}}}
 function formData(form){return Object.fromEntries(new FormData(form).entries())}
@@ -346,6 +347,6 @@ async function signBoardImage(path){
  return SUPABASE_URL+(signed.startsWith('/storage/v1/')?'':'/storage/v1')+(signed.startsWith('/')?'':'/')+signed;
 }
 
-window.SELFCareer?.init?.({state:()=>state,render,navigate:go,request,insert,patch,del,notify:toast});
+window.SELFCareer?.init?.({state:()=>state,render,navigate:go,request,insert,patch,del,notify:toast,newTask:()=>{state.newTaskSpace='';state.modal='task';render()}});
 window.SELFBoards?.init?.({state:()=>state,render,navigate:go,uploadImage:uploadBoardImage,signImage:signBoardImage,openTask:(id)=>{window.SELFBoards.ui.selected?.clear?.();state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
 verifySession();
