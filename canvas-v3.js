@@ -879,7 +879,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='open-task'){api.openTask(id);return}
  if(a==='existing'){ui.modal={type:'existing'};api.render();return}
 }
-async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-'))return;e.preventDefault();e.stopPropagation();const o=Object.fromEntries(new FormData(f).entries());
+async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-')&&f.id!=='d-popover-form')return;e.preventDefault();e.stopPropagation();const o=Object.fromEntries(new FormData(f).entries());
  if(f.id==='c3-modal-form'){const a=f.dataset.action;ui.modal=null;
  if(a==='create-board'){if(!o.title?.trim())return say('Name your board',true);await newBoard(o.title,o.space_id);return}
  if(a==='rename-board'){await transact(()=>api.patch('boards',ui.boardId,{title:o.title.trim()}),'Board renamed');return}
