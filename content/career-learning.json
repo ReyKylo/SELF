@@ -1351,7 +1351,28 @@
       ],
       "lesson": "**Assignment:** SELF CoffeeCo, perusahaan hipotetis. Semua angka USD juta. Ini latihan buatan SELF, bukan jawaban JoeCo WSP. Buat acquisition model lima tahun lalu putuskan invest/pass pada hurdle 20% IRR, yang merupakan asumsi latihan.\n\n**Data latihan:** tahun 0 revenue 1.000, EBITDA 100. Entry EV 10× EBITDA. Debt baru 500; biaya transaksi 20 dibayar saat entry, tanpa financing fee. Sponsor equity 520. Tidak ada utang lama/kas tambahan; transaksi disederhanakan cash-free/debt-free. Revenue naik 5% setiap tahun; EBITDA margin 10%; D&A 2% revenue; capex 2%; kenaikan NWC 1%; pajak 25% atas EBIT setelah bunga, dibatasi minimum nol. Bunga 8% dari beginning debt. Seluruh FCF positif disapu untuk repayment, maksimum outstanding debt; tidak ada mandatory amortization terpisah, minimum cash, PIK, opsi manajemen, dividend, exit fee atau pajak exit. Exit akhir tahun 5 pada 10× EBITDA. Jika debt habis, akumulasi sisa kas dan tambahkan saat exit.\n\n**Urutan belajar dan build:**\n\n1. 30 menit: baca PE01 dan tulis sumber dana/kebutuhan. Tonton V01 (8:28), lalu bangun assumptions serta entry valuation.\n2. 60 menit: V02 (9:16), bangun Sources & Uses dan operating forecast. Jangan membuka finished template sebelum mencoba.\n3. 90 menit: PE02 + V03 (16:50). Buat cash tax, capex, ΔNWC, cash available, repayment dan debt roll-forward.\n4. 60 menit: V04 (6:59). Hitung exit EV → equity proceeds → MOIC/IRR.\n5. 60 menit: buat sensitivitas growth 0/5/10% dan exit multiple 8/10/12×. Tambahkan skenario bunga 10%; nyatakan cash shortfall bila terjadi, jangan menutupnya dengan debt negatif.\n6. 60 menit: tulis investment recommendation maksimal dua halaman: keputusan, harga, tiga driver return, downside, kondisi sebelum investasi.\n7. Sisa waktu: QA. V05 opsional sesudah model selesai, bukan prasyarat hari pertama. Gunakan bab 32:14 untuk debt dan 46:04 untuk return; baca koreksi penerbit dahulu.\n\n**Formula kunci:** FCF = EBITDA − cash interest − cash tax − capex − ΔNWC. Cash tax = max(0, EBITDA − D&A − interest) × tax rate. Debt repayment = min(beginning debt, max(0, FCF)). MOIC = total sponsor proceeds / entry sponsor equity. Dengan hanya entry/exit, IRR = MOIC^(1/5) − 1; bandingkan dengan IRR atas seri [-520, 0, 0, 0, 0, proceeds]. Gunakan XIRR jika tanggal aktual tidak berjarak sama.\n\n**Answer checks:** tahun 1 revenue 1.050; EBITDA 105; interest 40; tax 11; FCF 22,5; ending debt 477,5. Akhir tahun 5 EBITDA 127,628156; ending debt 343,906710; exit equity 932,374853; MOIC 1,793029×; IRR 12,387353%. Base case berada di bawah hurdle latihan 20%; contoh keputusan: pass pada harga/struktur ini atau negosiasikan harga lebih rendah. Keputusan ini tidak berlaku untuk perusahaan nyata.\n\n**Submit minimum:** workbook dengan assumptions, funding, operations, debt, returns, sensitivities dan checks; memo dua halaman; README sumber dan keterbatasan. Tidak wajib full three-statement, PPA atau DCF pada sprint ini. PE04 adalah cross-check lanjutan sesudah core selesai. Nama file dan halaman boleh sederhana; formula harus dapat diaudit.",
       "task_title": "[Portfolio] PE · Acquisition model",
-      "task_description": "SELF Career Prep · Sprint hari 1\nWorkbook LBO + investment recommendation\nLatihan independen dengan data fiktif; bukan transaksi atau proyek klien nyata.\nBuka SELF → Career → Career Prep → Sprint 3 hari untuk assignment dan answer checks."
+      "task_description": "SELF Career Prep · Sprint hari 1\nWorkbook LBO + investment recommendation\nLatihan independen dengan data fiktif; bukan transaksi atau proyek klien nyata.\nBuka SELF → Career → Career Prep → Sprint 3 hari untuk assignment dan answer checks.",
+      "professional_standard": {
+        "source_name": "Wall Street Prep — Basic / Standard LBO Modeling Tests",
+        "source_url": "https://www.wallstreetprep.com/knowledge/lbo-modeling-test-example-solutions/",
+        "source_status": "professional worked practice model, NOT an actual executed PE transaction",
+        "employer_question": "At what entry price does this deal meet a 20% equity IRR hurdle under defensible operating and downside assumptions?",
+        "deliverable_title": "Independent Investment Screening — Hypothetical Leveraged Acquisition",
+        "recruiter_output": "Audit-ready acquisition returns workbook; maximum bid and 8x/10x/12x exit sensitivity; 2-page IC screening recommendation; model check log; assumptions register.",
+        "qualities": [
+          "Sources & Uses reconcile exactly and cash never goes below a disclosed liquidity rule",
+          "Returns reconcile across sponsor equity, exit cash and debt; no negative debt balances",
+          "Upside, base and downside tested; valuation is not merely copied from training example",
+          "A specific invest/pass recommendation, maximum bid and reasons for rejecting the thesis",
+          "Can rebuild the key return calculation on a blank sheet and explain cash flow versus accounting profit"
+        ],
+        "pushback": [
+          "What if the exit multiple drops to 8x and the interest rate rises 200bps?",
+          "How much of the IRR comes from deleveraging, not EBITDA growth?",
+          "What is the maximum acquisition price at a 20% return hurdle?",
+          "Which due-diligence issue could stop the transaction?"
+        ]
+      }
     },
     {
       "id": "VC",
@@ -1371,7 +1392,28 @@
       ],
       "lesson": "**Assignment:** tulis IC memo dua halaman untuk perusahaan SaaS fiktif SELF OpsCloud. Lampirkan satu halaman KPI, cohort analysis dan simple cap table. Gunakan Shopify/Toast/Twilio/PagerDuty untuk metode; jangan mencampur angka perusahaan tersebut sebagai data OpsCloud.\n\n**Data latihan (fiktif, USD):** cohort A: 100 pelanggan saat akuisisi, ARPA awal $100 per bulan. Di bulan ke-6, 80 masih aktif dan masing-masing membayar $150. Cohort B: 120 awal × $100; bulan ke-6 84 aktif × $120. Cohort C: 150 awal × $100; baru berumur tiga bulan, 120 aktif × $110. Acquisition cost cohort A total $30.000; gross margin subscription 80%. Cash sekarang $1,2 juta, net cash burn stabil $200.000/bulan. Investment offer: invest $2 juta pada $8 juta pre-money; satu kelas ordinary-equivalent shares, tanpa option-pool top-up, preference atau transaction fees untuk latihan. Skenario berikutnya mendilusi investor lama 20%; tidak ada pro-rata. Hypothetical exit equity proceeds pool $100 juta.\n\n**Urutan belajar dan build:**\n\n1. 45 menit: baca VC01 dan VC02; catat claim → evidence → uncertainty dari memo historis, tanpa memakai hasil sukses masa kini sebagai bukti.\n2. 60 menit: V06 (23:47). Buat kamus ARR, gross margin, CAC, logo retention, NRR, burn dan runway. Setiap metrik punya periode/denominator.\n3. 90 menit: VC04 + V08 (29:23). Buat tabel cohort dan hitung retention; pisahkan expansion dari customer baru. Latihan spreadsheet berasal dari data SELF di atas, bukan dataset resmi YC.\n4. 60 menit: hitung simple cap table dan returns. Untuk priced round, post-money = pre-money + dana baru. Ownership masuk = investasi/post-money; setelah dilution = ownership masuk × (1 − dilution).\n5. 60 menit: VC03. Tulis staged diligence: apa yang harus terbukti sebelum cek berikutnya? Pisahkan fakta, asumsi dan pertanyaan terbuka. V07 opsional untuk membandingkan consumer versus B2B.\n6. 60–90 menit: memo: recommendation; product/buyer; market; traction/economics; competition; terms/returns; risks; tiga diligence gates. Presentasikan lisan dalam lima menit.\n\n**Answer checks:** cohort A logo retention 80%, NRR 120%; B logo retention 70%, NRR 84%. Jangan bandingkan C pada bulan 3 dengan A/B bulan 6 sebagai performa apples-to-apples. CAC A $300; simple initial-gross-profit CAC payback = $300/($100×80%) = 3,75 bulan, mengabaikan churn/expansion/timing dan bukan realized cohort payback. Runway snapshot enam bulan. Ownership investor 20%, lalu 16%; simple exit proceeds $16 juta → 8× gross MOIC. Exit valuation, timing, preference dan taxes belum diverifikasi; hasil tersebut hanya matematika skenario, bukan expected return. Tanpa waktu exit, jangan mengklaim IRR.\n\n**Market sizing exercise:** pilih 3 segmen calon pembeli; definisikan eligible accounts × annual spend. Isi dengan asumsi berlabel dan daftar sumber yang diperlukan; jangan menyebut hasilnya verified TAM. Bedakan TAM, reachable segment dan jumlah pelanggan realistis.\n\n**Submit minimum:** memo dua halaman, spreadsheet KPI/cohorts/cap table, source list, satu halaman diligence questions. Recommendation yang masuk akal boleh “wait for diligence”, karena data latihan belum cukup membuktikan market size, security, competition dan acquisition scalability. Jangan membuat angka tambahan agar memo tampak lengkap.",
       "task_title": "[Portfolio] VC · Investment memo",
-      "task_description": "SELF Career Prep · Sprint hari 2\nIC memo + KPI, cohort, dan cap table\nLatihan independen dengan data fiktif; bukan transaksi atau proyek klien nyata.\nBuka SELF → Career → Career Prep → Sprint 3 hari untuk assignment dan answer checks."
+      "task_description": "SELF Career Prep · Sprint hari 2\nIC memo + KPI, cohort, dan cap table\nLatihan independen dengan data fiktif; bukan transaksi atau proyek klien nyata.\nBuka SELF → Career → Career Prep → Sprint 3 hari untuk assignment dan answer checks.",
+      "professional_standard": {
+        "source_name": "Bessemer Venture Partners — Original Shopify (2010) and Toast (2015) Investment Memos",
+        "source_url": "https://www.bvp.com/memos/shopify",
+        "source_status": "original firm-authored investment memos; OpsCloud data is a separate fictional exercise",
+        "employer_question": "Do traction, customer economics and financing terms justify a seed investment now — or only after milestone-based diligence?",
+        "deliverable_title": "Early-Stage Investment Screening — SaaS Seed Round",
+        "recruiter_output": "Original 2-page investment memo; cohort analysis; unit-economics and cash runway model; cap-table ownership/exit math; priced-term sensitivity; evidence-to-thesis map.",
+        "qualities": [
+          "All retention metrics label their cohort age, numerator and denominator",
+          "New customer growth is separated from revenue expansion among existing customers",
+          "CAC payback is tied to gross profit, and burn/runway is explained as a simplifying assumption",
+          "Ownership is modelled with financing dilution rather than headline valuation alone",
+          "An investment decision with three measurable diligence gates, including what would change the verdict"
+        ],
+        "pushback": [
+          "Why is an expanding NRR not automatically evidence of product-market fit?",
+          "Which cohort deserves the most skeptical treatment and why?",
+          "What happens to the fund's return after a down round or 20% dilution?",
+          "What evidence would justify investing today rather than waiting?"
+        ]
+      }
     },
     {
       "id": "Consulting",
@@ -1392,7 +1434,28 @@
       ],
       "lesson": "**Assignment:** kedai fiktif SELF Coffee. Diagnosis penurunan laba dan usulkan dua inisiatif prioritas. Output target enam slide berisi cerita keputusan, bukan ringkasan teori. Hari ini kamu yang membuat deck; paket riset ini tidak membuat deck pengganti.\n\n**Data latihan (IDR):** tahun lalu volume 120.000 cups, harga rata-rata Rp30.000, variable cost Rp10.000/cup, fixed operating costs Rp1,5 miliar. Sekarang volume 100.000, harga Rp30.000, variable cost Rp12.000/cup, fixed costs tetap Rp1,5 miliar. Inisiatif A: pengadaan baru menurunkan variable cost Rp1.000/cup dengan one-off implementation Rp50 juta. B: kampanye menambah 10.000 cups/tahun dengan contribution Rp18.000/cup dan biaya kampanye tahunan Rp60 juta. Asumsikan kapasitas tersedia, tanpa cannibalization, tanpa capex baru, dan dampak ramp-up diabaikan untuk latihan; semua perlu divalidasi sebelum rekomendasi nyata.\n\n**Urutan belajar dan build:**\n\n1. 45 menit: baca CO01 dan CO02. Tulis objective, time horizon, constraints dan issue tree yang spesifik.\n2. 60 menit: V09 (30:59). Pause 00:47; kerjakan struktur sendiri. Lanjut ke reasoning 01:21, follow-up 16:20 dan kritik 24:54/27:23. Coaching video bukan template jawaban yang harus sama.\n3. 90 menit: hitung profit bridge menggunakan volume effect pada margin lama dan cost effect pada volume sekarang. Buat table driver → impact → evidence required.\n4. 60 menit: hitung initiative economics, recurring versus one-off benefit dan payback. Baca CO04 agar tidak menghitung baseline sebagai uplift.\n5. 90 menit: tonton V10 (khususnya skeleton 00:55, titles 03:15, charts 06:54), lalu bangun enam slide: recommendation; problem/bridge; root-cause hypotheses; initiatives economics; 90-day plan/owners; risks and decision gates. Judul slide berupa kesimpulan yang didukung exhibit. Gunakan V11 sebagai review opsional: pastikan tiap slide punya satu pesan yang dibuktikan.\n6. 45 menit: baca CO03 dan berikan recommendation 60 detik: pilih tindakan → dua alasan kuantitatif → risiko → next step.\n\n**Answer checks:** laba tahun lalu Rp900 juta, kini Rp300 juta, turun Rp600 juta. Volume effect = −20.000 × Rp20.000 = −Rp400 juta; cost effect = 100.000 × (−Rp2.000) = −Rp200 juta. Total cocok. A recurring benefit Rp100 juta/tahun; year-one net benefit Rp50 juta; simple payback enam bulan jika saving merata. B annual net benefit Rp120 juta. Jika A juga berlaku pada 10.000 cups tambahan B, ada interaction +Rp10 juta/tahun: combined recurring benefit Rp230 juta; setelah one-off A, first-year uplift Rp180 juta. Tanpa interaction, hasil berbeda; jelaskan konvensi. Jangan jumlahkan dua estimasi tanpa mengecek overlap.\n\n**Official-case mini-checks:** Bain first-year recovery 204.675 cups benar dengan input yang ditampilkan, tetapi pangsa pasar memerlukan denominator yang konsisten. Electro-Light membutuhkan 400 juta botol untuk menutup fixed costs pada contribution $0,10; profit impact harga dan volume harus diuji bersamaan.\n\n**Submit minimum:** enam slide, workbook perhitungan, assumptions/source log dan script recommendation 60 detik. Bedakan fakta kasus, hipotesis akar masalah dan rekomendasi. Data volume/biaya saja belum membuktikan penyebab churn pelanggan atau supplier inflation.",
       "task_title": "[Portfolio] Consulting · Profitability",
-      "task_description": "SELF Career Prep · Sprint hari 3\nProfit bridge + executive deck 6 slide\nLatihan independen dengan data fiktif; bukan transaksi atau proyek klien nyata.\nBuka SELF → Career → Career Prep → Sprint 3 hari untuk assignment dan answer checks."
+      "task_description": "SELF Career Prep · Sprint hari 3\nProfit bridge + executive deck 6 slide\nLatihan independen dengan data fiktif; bukan transaksi atau proyek klien nyata.\nBuka SELF → Career → Career Prep → Sprint 3 hari untuk assignment dan answer checks.",
+      "professional_standard": {
+        "source_name": "Bain — Coffee Case; McKinsey — Electro-Light Official Interview Cases",
+        "source_url": "https://www.bain.com/careers/hiring-process/interviewing/coffee-case-study/",
+        "source_status": "official practice cases, not confidential client deliverables",
+        "employer_question": "Why is profit falling despite flat price, and which actions should the CEO approve over the next 90 days?",
+        "deliverable_title": "CEO Decision Brief — Retail F&B Profitability Turnaround",
+        "recruiter_output": "6-slide, action-title executive deck; verified profit bridge; initiative economics and combined interaction; 90-day KPIs/owners; risks, constraints and an explicit management ask.",
+        "qualities": [
+          "Volume and unit cost profit effects reconcile exactly to the stated decline",
+          "Baseline and incremental effects are not double-counted",
+          "Every slide headline is a conclusion supported by a calculation or exhibit",
+          "Unverified root-cause hypotheses are separated from observed case facts",
+          "Recommendation has owners, testable milestones and a stop/scale decision gate"
+        ],
+        "pushback": [
+          "Do you know why cup volume fell, or have you only quantified the effect?",
+          "Can procurement savings damage quality and customer retention?",
+          "Are initiative A and B benefits independent or interacting?",
+          "What exactly must the CEO approve today and how would you measure it?"
+        ]
+      }
     }
   ]
 }
