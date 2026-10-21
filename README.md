@@ -1,5 +1,5 @@
 # SELF — Personal Thinking Workspace
-A personal workspace for work, learning, notes, tasks and links. **Phase 2.5 Concept C build** of the three-phase rebuild (Creative + Smart Diagramming).
+A personal workspace for work, learning, notes, tasks and links. **Core Phase 3 implementation** on the existing Phase 1/2 and Concept C/D foundation. Career remains a future modular extension.
 
 ## Run
 No build tooling or dependency installation needed. Serve the directory over HTTP:
@@ -28,7 +28,7 @@ Open http://localhost:8080. A Supabase email/password account is required. The c
 - Persistent board geometry and camera in Supabase, user-scoped RLS and FK integrity
 - Dedicated `boards.js` / `boards.css`; existing Phase 1 interaction and themes preserved
 
-## Phase 2.5 Concept C — current active editor
+## Phase 2.5 Concept C engine, upgraded by Concept D toolbar-first editing
 - Blank-first shapes (rectangle, ellipse, diamond, sticky, text, frame), rich knowledge cards and task/reference blocks. One click creates an object before asking for content.
 - Premium floating vector toolbar, spacious dotted canvas, sidebar and contextual four-tab inspector; preserved Phase 1 theme and font scaling.
 - Resize, move, marquee and multi-select; magnetic four-side ports, dynamic connectors recalculated during pointer moves/resizes, straight/curved/elbow routing and connector labels.
@@ -39,10 +39,17 @@ Open http://localhost:8080. A Supabase email/password account is required. The c
 - Legacy editor remains available with `?canvas=legacy` on the SELF URL. Both editors use the same underlying boards/cards and data; no data reset.
 - Back-end migration: `20261021030100_self_concept_c_canvas_scene_storage.sql` (additive).
 
+## Core Phase 3 delivered (2026-10-21)
+- Drag-and-drop task Kanban, native status dropdown for keyboard/mobile, and reliable Undo.
+- No false Saved signals; unsaved field indicators and retained draft/form content when requests fail.
+- Priority ordering across Spaces; generalized and searchable My Links with deduplicated display; global Search now includes boards and URLs.
+- No dark-flash overlay when editing Task Details. No new Supabase migrations or Career routes.
+- **Production browser QA remains open**. See [Core Phase 3 Release Gate](docs/CORE_PHASE3_RELEASE_GATE.md).
+
 ## Phases
 - **Phase 1**: Daily workspace, Spaces, My Work, Tasks, Quick Capture, dark/light theme.
 - **Phase 2.5**: Creative + Smart Diagramming whiteboard (implementation committed, smoke-tested; browser visual QA still open).
-- **Phase 3**: Richer block editor, consolidated link management, advanced global search and final polish.
+- **Core Phase 3**: Task reliability, Kanban and general links/search improvements implemented; release acceptance requires real-browser review. Concept D richer inline writing remains the current whiteboard editor.
 
 ## Checks
 ```sh
@@ -50,6 +57,8 @@ node tests/smoke_render.cjs
 node tests/smoke_api.cjs
 node tests/smoke_whiteboards.cjs
 node tests/smoke_concept_c.cjs
+node tests/smoke_concept_d.cjs
+node tests/smoke_core_phase3.cjs
 python3 tools/build_cloudflare.py
 ```
 A passing smoke test isn't a browser screenshot or live deployment verification. Visual and real-device checks remain required before signing off the visual contract.
@@ -65,7 +74,7 @@ No service-role keys in the browser. Users can select/change only their own reco
 SELF is a zero-dependency static application deployed as **Cloudflare Workers Static Assets**, not as a Cloudflare Pages project.
 
 The repository includes:
-- `tools/build_cloudflare.py`: creates `dist/` with seven static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`, `canvas-v3.css`, `canvas-v3.js`).
+- `tools/build_cloudflare.py`: creates `dist/` with eight static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`, `canvas-v3.css`, `canvas-v3.js`, `concept-d.css`).
 - `wrangler.jsonc`: preserves the existing Worker name `self` and points Wrangler to `dist/` as static assets.
 
 In **Cloudflare dashboard > Workers & Pages > self > Settings > Builds**, set:
