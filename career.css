@@ -169,3 +169,8 @@
 @media(prefers-reduced-motion:reduce){
  .career-workspace *, .career-drawer, .career-modal{animation:none!important;transition:none!important}
 }
+
+.career-capture-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:17px 0 18px}
+.career-capture-choices .career-btn{min-height:65px;text-align:left;font-size:.88em;padding:16px;background:var(--card)}
+.career-capture-choices .career-btn:not(:disabled):hover{border-color:var(--blue);background:var(--blueSoft)}
+@media(max-width:390px){.career-capture-choices{grid-template-columns:1fr}}
