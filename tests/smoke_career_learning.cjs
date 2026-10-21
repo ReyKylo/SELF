@@ -23,7 +23,7 @@ function setup(owner='owner-a'){
 async function main(){
  const f=setup();await f.learning.load();assert.equal(f.learning.ui.data.sources.length,41);assert.equal(f.learning.ui.data.panels.length,12);assert.equal(f.learning.ui.data.videos.length,9);
  let markup=f.learning.render();assert(markup.includes('Tiga proyek.'));assert(markup.includes('Data fiktif'));assert.equal(db.length,0,'reading does not seed tasks');
- await f.click('tab',{tab:'evidence'});markup=f.learning.render();assert(markup.includes('12 dari 12'));assert(markup.includes('INI APA')&&markup.includes('ANALISIS AI'));assert(markup.includes('screenshot belum tersedia'));assert(!markup.includes('<img'),'pointer-only assets do not fabricate images');
+ await f.click('tab',{tab:'evidence'});markup=f.learning.render();assert(markup.includes('12 dari 12'));assert(markup.includes('INI APA')&&markup.includes('ANALISIS AI'));assert(markup.includes('PREVIEW EKSTERNAL'));assert(markup.includes('media.wallstreetprep.com'),'original publisher image visible in evidence markup');assert(markup.includes('INI APA')&&markup.includes('CARA ACHIEVE'));
  f.learning.ui.track='VC';markup=f.learning.render();assert(markup.includes('4 dari 12'));assert(!markup.includes('Sources &amp; Uses: uang'));
  f.learning.ui.query='no-such-entry';assert(f.learning.render().includes('Tidak ada yang cocok.'));
  await f.click('clear');await f.click('panel',{id:'VC04'});f.learning.ui.query='PagerDuty';f.learning.ui.type='Original Investment Firm Memo';await f.click('video',{id:'VNxBZ7ka5J0'});assert.equal(f.learning.ui.backPanel,'VC04');assert(f.learning.render().includes('How To Keep Your Users'));assert(!f.learning.render().includes('<iframe'));
