@@ -132,11 +132,11 @@ async function downloadStarter(id,kind){
   return;
  }
  if(kind==='brief'){
-  const brief='# '+day.title+' — SELF Career Prep\\n\\n**Independent simulated case — NOT a real investment or client mandate.**\\n\\n'+day.lesson;
+  const brief='# '+day.title+' — SELF Career Prep\n\n**Independent simulated case — NOT a real investment or client mandate.**\n\n'+day.lesson;
   blobDownload(brief,'SELF_'+id+'_Case_Brief.md','text/markdown;charset=utf-8');return;
  }
  if(kind==='memo'){
-  const memo='# '+day.title+' — YOUR INDEPENDENT RECOMMENDATION\\n\\n**SIMULATED EXERCISE — MY OWN WORK**\\n\\n## Decision\\n[Invest, Pass, Diligence, or strategic recommendation]\\n\\n## Key evidence\\n[Link to workbook and verify every number]\\n\\n## Drivers and scenarios\\n[Base, downside, alternatives]\\n\\n## Risks and unanswered diligence\\n[State uncertainty]\\n\\n## Next steps\\n[Conditions and execution]\\n\\n## Sources and case limitations\\n[Expert examples studied and simulated-data disclosure]\\n';
+  const memo='# '+day.title+' — YOUR INDEPENDENT RECOMMENDATION\n\n**SIMULATED EXERCISE — MY OWN WORK**\n\n## Decision\n[Invest, Pass, Diligence, or strategic recommendation]\n\n## Key evidence\n[Link to workbook and verify every number]\n\n## Drivers and scenarios\n[Base, downside, alternatives]\n\n## Risks and unanswered diligence\n[State uncertainty]\n\n## Next steps\n[Conditions and execution]\n\n## Sources and case limitations\n[Expert examples studied and simulated-data disclosure]\n';
   blobDownload(memo,'SELF_'+id+'_Decision_Template.md','text/markdown;charset=utf-8');return;
  }
  throw Error('Jenis file belum didukung.');
