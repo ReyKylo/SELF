@@ -12,7 +12,7 @@ const STATUSES=[['todo','To Do','gray'],['planning','Planning','yellow'],['in_pr
 const PRIORITIES=[['low','Low','green'],['normal','Normal','blue'],['high','High','red']];
 const COLORS={blue:'#428cff',green:'#3dce9e',purple:'#ad92fa',yellow:'#f0b862',red:'#f68e94',cyan:'#3fc5d2'};
 const SPACE_ICONS=['briefcase','chart','graduation','person','brain','folder'];
-const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
+const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',linkSearch:'',linkSource:'all',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,savePending:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
 function setTheme(theme){state.preferences.theme=theme;document.body.dataset.theme=theme;localStorage.setItem('self.theme',theme)}
 function setScale(scale){state.preferences.text_scale=scale;document.documentElement.style.setProperty('--scale',String(scale/100));localStorage.setItem('self.scale',String(scale))}
 setTheme(state.preferences.theme);setScale(state.preferences.text_scale);
@@ -47,8 +47,29 @@ async function patch(table,id,record){return request(endpoint(table,`id=eq.${enc
 async function patchSimple(table,id,record){return request(endpoint(table,`id=eq.${encodeURIComponent(id)}&select=*`),{method:'PATCH',body:record,headers:{Prefer:'return=representation'}}).then(x=>x[0])}
 async function del(table,id){return request(endpoint(table,`id=eq.${encodeURIComponent(id)}`),{method:'DELETE'})}
 async function savePref(){const body={user_id:state.user.id,theme:state.preferences.theme,text_scale:state.preferences.text_scale,updated_at:new Date().toISOString()};await request(endpoint('preferences','on_conflict=user_id'),{method:'POST',body,headers:{Prefer:'resolution=merge-duplicates,return=minimal'}})}
-async function mutate(operation,success='Saved'){state.saving=true;paintSave();try{await operation();await loadAll();state.saving=false;render();if(success)toast(success)}catch(e){state.saving=false;paintSave();toast(e.message,true);console.error(e)}}
-function paintSave(){const e=$('#save-state');if(e)e.innerHTML=state.saving?`${ic('clock',14)} Saving...`:`${ic('check',14)} Saved`}
+async function mutate(operation,success='Saved',{rerender=true}={}){
+ state.saving=true;state.savePending=false;state.saveError=null;paintSave();
+ let wrote=false;
+ try{
+  await operation();wrote=true;
+  await loadAll();
+  state.saving=false;state.savePending=false;state.saveError=null;
+  if(rerender)render();else paintSave();if(success)toast(success);
+  return true;
+ }catch(err){
+  state.saving=false;
+  state.saveError=wrote?'Saved remotely, but refresh failed. Reload to verify.':'Not saved. '+(err?.message||String(err));
+  paintSave();toast(state.saveError,true);console.error(err);
+  return false;
+ }
+}
+function paintSave(){
+ const e=$('#save-state');if(!e)return;
+ e.setAttribute('role','status');e.setAttribute('aria-live','polite');
+ e.classList.toggle('save-failed',!!state.saveError);
+ e.innerHTML=state.saving?`${ic('clock',14)} Saving...`:state.saveError?`${ic('flag',14)} Not saved`:state.savePending?`${ic('clock',14)} Unsaved changes`:`${ic('check',14)} Saved`;
+ if(state.saveError)e.title=state.saveError;else e.removeAttribute('title');
+}
 function nav(icon,label,view){return `<button class="nav-btn ${(state.view===view||(view==='spaces'&&state.view==='space')||(view==='boards'&&state.view==='board-editor'))?'active':''}" data-action="nav" data-view="${view}" title="${label}" aria-label="${label}">${ic(icon)}<span>${label}</span></button>`}
 function chrome(content,heading='Home'){
  const name=(state.user?.email||'SELF user').split('@')[0];
@@ -57,20 +78,133 @@ function chrome(content,heading='Home'){
 function header(title,subtitle,right=''){return `<div class="hero"><div><div class="eyebrow">Your personal workspace</div><h1>${title}</h1><p class="subtitle">${subtitle}</p></div>${right}</div>`}
 function empty(title,subtitle,action=''){return `<div class="blank">${ic('sparkle',30)}<strong>${title}</strong><p>${subtitle}</p>${action}</div>`}
 function taskRow(t,withStatus=false){const s=spaceOf(t.space_id);return `<div class="priority-item" data-action="open-task" data-id="${t.id}"><input class="check" type="checkbox" aria-label="Mark task done" data-action="toggle-task" data-id="${t.id}" ${t.status==='done'?'checked':''}/><div class="item-core"><div class="item-title ${t.status==='done'?'done':''}">${esc(t.title)}</div><div class="item-sub">${esc(s?.name||'Unsorted')} · ${esc(statusOf(t.status)[1])}</div></div>${dueBadge(t.due_date)}</div>`}
-function renderHome(){const tasks=state.tasks.filter(t=>t.status!=='done').sort((a,b)=>(a.due_date||'9999').localeCompare(b.due_date||'9999')||new Date(b.updated_at)-new Date(a.updated_at));const recents=[...state.tasks].sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)).slice(0,3);
+function priorityRank(t){
+ const day=today();
+ if(t.due_date&&t.due_date<day)return 0;
+ if(t.due_date===day)return 1;
+ if(t.priority==='high')return 2;
+ if(t.due_date)return 3;
+ if(t.priority==='normal')return 4;
+ return 5;
+}
+function renderHome(){const tasks=state.tasks.filter(t=>t.status!=='done').sort((a,b)=>
+ priorityRank(a)-priorityRank(b)||
+ (a.due_date||'9999-99-99').localeCompare(b.due_date||'9999-99-99')||
+ new Date(b.updated_at)-new Date(a.updated_at));const recents=[...state.tasks].sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)).slice(0,3);
 return header('Your day, in focus. ✳',new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),`<button class="primary-btn" data-action="new-task">${ic('plus')} New Task</button>`)+`<section class="card quick"><div class="quick-head">${ic('sparkle')} Quick Capture <span class="small-sub">— get it out of your head</span></div><div class="capture-row"><input id="quick-text" class="capture-input" value="${attr(state.captureDraft)}" placeholder="Tulis ide, catatan, atau kerjaan baru..." maxlength="250" aria-label="Quick capture"/><button class="primary-btn" title="Save capture" data-action="quick-submit">${ic('send')}</button></div><div class="capture-bottom"><div class="capture-modes">${[['note','Note'],['task','Task'],['link','Link'],['board','Board']].map(([k,v])=>`<button class="choice ${state.captureMode===k?'selected':''}" data-action="capture-mode" data-mode="${k}">${ic(k==='task'?'check':k)} ${v}</button>`).join('')}</div><span class="small-sub">Press Enter to save</span></div></section><div class="two-col"><section class="card card-pad"><div class="section-head"><h2>My Priorities <span style="color:var(--faint)">(${tasks.length})</span></h2><button class="link-action" data-action="nav" data-view="work">See all ${ic('chevron',13)}</button></div><div class="priority-list">${tasks.slice(0,6).map(t=>taskRow(t)).join('')||`<div class="empty-mini">Nothing urgent. Add a task to get started ✨</div>`}</div></section><section class="card card-pad"><div class="section-head"><h2>Continue Where You Left Off</h2><button class="link-action" data-action="nav" data-view="work">See all ${ic('chevron',13)}</button></div><div class="continue-list">${recents.map(t=>`<button class="continue-item" data-action="open-task" data-id="${t.id}"><span class="mini-thumb">${ic('note',25)}</span><span><strong>${esc(t.title)}</strong><small>${esc(spaceOf(t.space_id)?.name||'Unsorted')} · ${esc(statusOf(t.status)[1])}</small></span></button>`).join('')||`<div class="empty-mini">Your recently updated tasks will appear here.</div>`}</div></section></div><div class="countbar"><div class="stat"><strong>${state.tasks.filter(t=>t.status!=='done').length}</strong><span>Active tasks</span></div><div class="stat"><strong>${state.spaces.length}</strong><span>Spaces</span></div><div class="stat"><strong>${state.inbox.length}</strong><span>Captured notes</span></div><div class="stat"><strong>${state.tasks.filter(t=>t.status==='done').length}</strong><span>Tasks completed</span></div></div>`}
 function renderSpaces(){return header('Your Spaces','Organize your work, learning, and everything in between.',`<button class="primary-btn" data-action="new-space">${ic('plus')} New Space</button>`)+`<div class="space-grid">${state.spaces.map(s=>{const n=state.tasks.filter(t=>t.space_id===s.id).length;return `<button class="space-tile" data-action="open-space" data-id="${s.id}" style="--accent:${COLORS[s.accent]||COLORS.blue}"><span class="space-symbol">${ic(s.icon,32)}</span><strong>${esc(s.name)}</strong><small>${n} ${n===1?'task':'tasks'}</small></button>`}).join('')}<button class="space-tile add" data-action="new-space"><span class="space-symbol">${ic('plus',32)}</span><strong>New Space</strong><small>Make room for something new</small></button></div>`}
 function renderSpace(){const s=spaceOf(state.spaceId);if(!s)return renderSpaces();const ts=state.tasks.filter(t=>t.space_id===s.id);const ins=state.inbox.filter(x=>x.space_id===s.id);const lk=state.links.filter(x=>ts.some(t=>t.id===x.task_id));let body='';if(state.spaceTab==='tasks')body=`<section class="card card-pad"><div class="section-head"><h2>Tasks in ${esc(s.name)}</h2><button class="ghost-btn" data-action="new-task" data-space="${s.id}">${ic('plus')} Add Task</button></div><div class="priority-list">${ts.map(t=>taskRow(t)).join('')||'<div class="empty-mini">No tasks in this Space yet.</div>'}</div></section>`;else if(state.spaceTab==='notes')body=`<section class="card card-pad"><div class="section-head"><h2>Captured notes</h2></div>${ins.map(x=>`<div class="inbox-item"><div><strong>${esc(x.title)}</strong><p>${esc(x.body)}</p></div></div>`).join('')||'<div class="empty-mini">Quick Capture notes assigned to this space will appear here.</div>'}</section>`;else if(state.spaceTab==='links')body=renderLinkGrid(lk,false);else body=window.SELFBoards?.renderLibrary?.(s.id)||empty('Boards unavailable','Try reloading the page.');
 return `<button class="link-action" data-action="nav" data-view="spaces" style="margin-bottom:18px">${ic('back',15)} All Spaces</button><div class="space-header"><span class="space-symbol">${ic(s.icon,28)}</span><div><h1 style="margin:0 0 6px;letter-spacing:-.045em">${esc(s.name)}</h1><p class="subtitle">Your connected workspace.</p></div><span style="flex:1"></span><button class="icon-btn" title="Edit Space" data-action="edit-space" data-id="${s.id}">${ic('settings')}</button></div><div class="tabs">${[['tasks','Tasks'],['boards','Boards'],['notes','Notes'],['links','Links']].map(([v,label])=>`<button class="tab ${state.spaceTab===v?'active':''}" data-action="space-tab" data-tab="${v}">${label}</button>`).join('')}</div>${body}`}
 function filteredTasks(){return state.tasks.filter(t=>(state.filterSpace==='all'||t.space_id===state.filterSpace)&&(state.filterStatus==='all'||t.status===state.filterStatus)&&(!state.workSearch||t.title.toLowerCase().includes(state.workSearch.toLowerCase()))).sort((a,b)=>(a.due_date||'9999-99-99').localeCompare(b.due_date||'9999-99-99'))}
 function renderWork(){const tasks=filteredTasks();const controls=`<div class="tabs">${[['list','List','list'],['board','Board','kanban'],['calendar','Calendar','calendar']].map(([v,t,i])=>`<button class="tab ${state.workView===v?'active':''}" data-action="work-view" data-mode="${v}">${ic(i,16)} ${t}</button>`).join('')}</div><div class="work-controls"><input class="field search-field" id="work-search" value="${attr(state.workSearch)}" placeholder="Search tasks..."/><select id="filter-space" class="select"><option value="all">All Spaces</option>${state.spaces.map(s=>`<option value="${s.id}" ${state.filterSpace===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select><select id="filter-status" class="select"><option value="all">All Statuses</option>${STATUSES.map(([k,v])=>`<option value="${k}" ${state.filterStatus===k?'selected':''}>${v}</option>`).join('')}</select></div>`;
-let body='';if(state.workView==='list'){body=`<div class="work-table"><div class="work-row header"><div>Task</div><div>Space</div><div>Status</div><div>Priority</div><div>Due date</div></div>${tasks.map(t=>`<div class="work-row data" data-action="open-task" data-id="${t.id}"><div class="task-cell"><input type="checkbox" class="check" data-action="toggle-task" data-id="${t.id}" ${t.status==='done'?'checked':''}/><span class="${t.status==='done'?'item-title done':''}">${esc(t.title)}</span></div><div>${esc(spaceOf(t.space_id)?.name||'Unsorted')}</div><div>${sbadge(t.status)}</div><div><span class="badge ${priorityOf(t.priority)[2]}">${esc(priorityOf(t.priority)[1])}</span></div><div class="small-sub">${esc(niceDate(t.due_date))}</div></div>`).join('')||`<div class="empty-mini">No tasks match these filters.</div>`}</div>`}else if(state.workView==='board'){body=`<div class="kanban">${STATUSES.map(([k,label])=>`<div class="kanban-col"><div class="kanban-head"><span>${label}</span><span>${tasks.filter(t=>t.status===k).length}</span></div>${tasks.filter(t=>t.status===k).map(t=>`<div class="kanban-task" data-action="open-task" data-id="${t.id}"><strong>${esc(t.title)}</strong><span class="item-sub">${esc(spaceOf(t.space_id)?.name||'Unsorted')} · ${esc(niceDate(t.due_date))}</span></div>`).join('')}</div>`).join('')}</div>`}else {body=`<div class="calendar-list">${tasks.filter(t=>t.due_date).map(t=>`<div class="calendar-row" data-action="open-task" data-id="${t.id}"><span class="date-square">${esc(niceDate(t.due_date))}</span><div><strong>${esc(t.title)}</strong><div class="item-sub">${esc(spaceOf(t.space_id)?.name||'Unsorted')}</div></div><span style="margin-left:auto">${sbadge(t.status)}</span></div>`).join('')||empty('No dates yet','Add a due date to any task and it will show up here.')}</div>`}
-return header('My Work','Everything you need to do, across all your Spaces.',`<button class="primary-btn" data-action="new-task">${ic('plus')} New Task</button>`)+controls+body}
+let body='';if(state.workView==='list'){body=`<div class="work-table"><div class="work-row header"><div>Task</div><div>Space</div><div>Status</div><div>Priority</div><div>Due date</div></div>${tasks.map(t=>`<div class="work-row data" data-action="open-task" data-id="${t.id}"><div class="task-cell"><input type="checkbox" class="check" data-action="toggle-task" data-id="${t.id}" ${t.status==='done'?'checked':''}/><span class="${t.status==='done'?'item-title done':''}">${esc(t.title)}</span></div><div>${esc(spaceOf(t.space_id)?.name||'Unsorted')}</div><div>${sbadge(t.status)}</div><div><span class="badge ${priorityOf(t.priority)[2]}">${esc(priorityOf(t.priority)[1])}</span></div><div class="small-sub">${esc(niceDate(t.due_date))}</div></div>`).join('')||`<div class="empty-mini">No tasks match these filters.</div>`}</div>`}else if(state.workView==='board'){body=`<div class="kanban" aria-label="Task status board">${STATUSES.map(([k,label])=>`<section class="kanban-col" data-drop-status="${k}" aria-label="${label} tasks"><div class="kanban-head"><span>${label}</span><span>${tasks.filter(t=>t.status===k).length}</span></div><div class="kanban-items">${tasks.filter(t=>t.status===k).map(t=>`<article class="kanban-task" draggable="true" data-task-drag="${t.id}" data-action="open-task" data-id="${t.id}" tabindex="0" role="group" aria-label="${attr(t.title)}"><div class="kanban-card-head"><strong>${esc(t.title)}</strong><span class="kanban-drag-grip" aria-hidden="true">⋮⋮</span></div><span class="item-sub">${esc(spaceOf(t.space_id)?.name||'Unsorted')} · ${esc(niceDate(t.due_date))}</span><label class="kanban-stage-label">Status <select class="kanban-stage-select" data-stage-task-id="${t.id}" aria-label="Move ${attr(t.title)} to status">${STATUSES.map(([v,name])=>`<option value="${v}" ${v===t.status?'selected':''}>${name}</option>`).join('')}</select></label></article>`).join('')||'<div class="kanban-empty">Drag a task here</div>'}</div></section>`).join('')}</div>`}else {body=`<div class="calendar-list">${tasks.filter(t=>t.due_date).map(t=>`<div class="calendar-row" data-action="open-task" data-id="${t.id}"><span class="date-square">${esc(niceDate(t.due_date))}</span><div><strong>${esc(t.title)}</strong><div class="item-sub">${esc(spaceOf(t.space_id)?.name||'Unsorted')}</div></div><span style="margin-left:auto">${sbadge(t.status)}</span></div>`).join('')||empty('No dates yet','Add a due date to any task and it will show up here.')}</div>`}
+return header('My Work','Everything you need to do, across all your Spaces.',`<button class="primary-btn" data-action="new-task">${ic('plus')} New Task</button>`)+controls+(state.workView==='board'?`<div class="kanban-help"><span>${ic('kanban',16)} Drag between stages, or use the status menu on each task.</span>${state.lastTaskMove?`<button type="button" class="soft-btn" data-action="undo-stage" aria-label="Undo last task move">${ic('back',15)} Undo last move</button>`:''}</div>`:'')+body}
+async function moveTaskStatus(id,target,{undo=false}={}){
+ const task=taskOf(id);
+ if(!task||!STATUSES.some(([s])=>s===target)||state.movingTaskId)return false;
+ if(task.status===target)return true;
+ const from=task.status;state.movingTaskId=id;
+ const card=document.querySelector('[data-task-drag="'+id+'"]');
+ if(card){card.classList.add('is-saving');card.setAttribute('aria-busy','true')}
+ const result=await mutate(async()=>patch('tasks',id,{status:target}),undo?'Move undone':'Task moved to '+statusOf(target)[1],{rerender:false});
+ state.movingTaskId=null;
+ if(result){state.lastTaskMove=undo?null:{id,from,to:target};render();return true}
+ if(card?.isConnected){card.classList.remove('is-saving');card.removeAttribute('aria-busy')}
+ return false;
+}
+function resetTaskDropHighlights(){
+ document.querySelectorAll?.('.kanban-col.is-drag-over,.kanban-task.is-dragging').forEach(node=>node.classList.remove('is-drag-over','is-dragging'));
+}
+function workDragStart(e){
+ if(state.view!=='work'||state.workView!=='board'||state.movingTaskId)return;
+ if(e.target.closest?.('select,input,button')){e.preventDefault?.();return}
+ const card=e.target.closest?.('[data-task-drag]');if(!card)return;
+ state.dragTaskId=card.dataset.taskDrag;
+ if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',state.dragTaskId)}
+ card.classList.add('is-dragging');
+}
+function workDragOver(e){
+ if(!state.dragTaskId)return;
+ const col=e.target.closest?.('[data-drop-status]');if(!col)return;
+ e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='move';
+ document.querySelectorAll?.('.kanban-col.is-drag-over').forEach(node=>{if(node!==col)node.classList.remove('is-drag-over')});
+ col.classList.add('is-drag-over');
+}
+async function workDrop(e){
+ const id=state.dragTaskId,target=e.target.closest?.('[data-drop-status]')?.dataset.dropStatus;
+ if(!id||!target)return;
+ e.preventDefault();state.dragTaskId=null;resetTaskDropHighlights();
+ await moveTaskStatus(id,target);
+}
+function workDragEnd(){state.dragTaskId=null;resetTaskDropHighlights()}
+
 function renderBoards(){return window.SELFBoards?.renderLibrary?.()||empty('Boards unavailable','Try reloading the page.')}
 function renderLinkGrid(links,global=true){const extra=state.inbox.filter(x=>x.kind==='link').map(x=>({id:x.id,title:x.title,url:x.body,fromInbox:true}));const all=global?[...links,...extra]:links;return all.length?`<div class="link-grid">${all.map(l=>`<a class="link-tile" href="${attr(normalUrl(l.url)||'#')}" target="_blank" rel="noopener noreferrer"><span class="link-logo">${ic(l.url.includes('docs.google.com/spreadsheets')?'grid':l.url.includes('drive.google.com')?'folder':'link',30)}</span><strong>${esc(l.title||new URL(normalUrl(l.url)||'https://example.org').hostname)}</strong><small>${esc(l.fromInbox?'Quick Capture':l.boardName||taskOf(l.task_id)?.title||'Task resource')}</small></a>`).join('')}</div>`:empty('No links yet','Add a link in a Task Detail, or capture a URL from Home. It will appear here automatically.')}
-function renderLinks(){const boardLinks=(window.SELFBoards?.links?.()||[]).filter(l=>!state.links.some(x=>x.url===l.url)&&!state.inbox.some(x=>x.kind==='link'&&x.body===l.url));return header('My Links','Useful resources from tasks, notes, and whiteboards.',`<button class="primary-btn" data-action="new-link">${ic('plus')} New Link</button>`)+renderLinkGrid([...state.links,...boardLinks])}
+function allGeneralLinks(){
+ // My Links is general-purpose. One URL can be used by several objects.
+ const inputs=[
+  ...state.links.map(l=>({...l,source:'Tasks'})),
+  ...state.inbox.filter(x=>x.kind==='link').map(l=>({id:l.id,title:l.title,url:l.body,source:'Quick Capture'})),
+  ...(window.SELFBoards?.links?.()||[]).map(l=>({...l,source:'Whiteboards'}))
+ ];
+ const seen=new Map();
+ for(const item of inputs){
+  const safe=normalUrl(item.url);if(!safe)continue;
+  const old=seen.get(safe);
+  if(old){old.count++;if(!old.sources.includes(item.source))old.sources.push(item.source)}
+  else seen.set(safe,{...item,url:safe,sources:[item.source],count:1});
+ }
+ return [...seen.values()];
+}
+function renderLinks(){
+ const all=allGeneralLinks(),source=state.linkSource||'all',q=state.linkSearch.trim().toLowerCase();
+ const rows=all.filter(l=>(source==='all'||l.sources.includes(source))&&
+  (!q||[l.title,l.url,...l.sources].some(v=>String(v||'').toLowerCase().includes(q))));
+ const filters=[['all','All'],['Tasks','Tasks'],['Whiteboards','Whiteboards'],['Quick Capture','Quick Capture']]
+ .map(([id,name])=>'<button type="button" class="choice '+(source===id?'selected':'')+
+ '" data-action="link-source" data-source="'+attr(id)+'">'+name+'</button>').join('');
+ const tiles=rows.map(l=>{
+  const host=new URL(l.url).hostname;
+  const icon=l.url.includes('docs.google.com/spreadsheets')?'grid':l.url.includes('drive.google.com')?'folder':'link';
+  return '<a class="link-tile" href="'+attr(l.url)+'" target="_blank" rel="noopener noreferrer">'+
+  '<span class="link-logo">'+ic(icon,27)+'</span><strong>'+esc(l.title||host)+'</strong><small>'+
+  esc(host)+'</small><span class="link-origin">'+esc(l.sources.join(' · '))+
+  (l.count>1?' · '+l.count+' references':'')+'</span></a>';
+ }).join('');
+ return header('My Links','Your general library of references, not tied to any one workspace.',
+ '<button class="primary-btn" data-action="new-link">'+ic('plus')+' New Link</button>')+
+ '<div class="links-tools"><label class="links-search-label" for="links-search">'+ic('search',18)+
+ '<input id="links-search" class="field" value="'+attr(state.linkSearch)+
+ '" placeholder="Search names or domains..." autocomplete="off"/></label><div class="links-filters">'+filters+'</div></div>'+
+ '<div class="links-summary">'+rows.length+' unique '+(rows.length===1?'link':'links')+'</div>'+
+ (rows.length?'<div class="link-grid">'+tiles+'</div>':
+ empty(q||source!=='all'?'No matching links':'No links yet',q||source!=='all'?
+ 'Try another search or filter.':'Capture a URL on Home or save one from a task.'));
+}
 function renderInbox(){return header('Quick Inbox','Capture first. Organize later. Your ideas are safe here.')+`<section class="card card-pad"><div class="section-head"><h2>Captured notes & links</h2><span class="small-sub">${state.inbox.length} items</span></div>${state.inbox.slice().reverse().map(x=>`<div class="inbox-item"><div><strong>${ic(x.kind==='link'?'link':'note',15)} ${esc(x.title)}</strong><p>${x.kind==='link'?`<a href="${attr(normalUrl(x.body)||'#')}" target="_blank" rel="noopener noreferrer">${esc(x.body)}</a>`:esc(x.body||'No extra details')}</p><span class="small-sub">${esc(spaceOf(x.space_id)?.name||'Unsorted')} · ${esc(new Date(x.created_at).toLocaleDateString('id-ID'))}</span></div><button class="icon-quiet" data-action="delete-inbox" data-id="${x.id}" title="Delete capture">${ic('trash')}</button></div>`).join('')||'<div class="empty-mini">Nothing in your inbox yet. Quick Capture on Home is ready for you.</div>'}</section>`}
-function renderSearch(){const q=state.search.trim().toLowerCase();const all=[...state.tasks.map(x=>({...x,type:'task'})),...state.spaces.map(x=>({...x,type:'space'})),...state.inbox.map(x=>({...x,type:'note'}))];const matches=q?all.filter(x=>(x.title||x.name||'').toLowerCase().includes(q)):[];return header('Search Everything','Find tasks, notes and Spaces in one place.')+`<input class="capture-input" style="width:100%" id="global-search" value="${attr(state.search)}" placeholder="Search your SELF workspace..." autofocus/><div class="card card-pad" style="margin-top:20px">${matches.map(x=>`<button class="continue-item" data-action="${x.type==='task'?'open-task':x.type==='space'?'open-space':'nav'}" ${x.type==='note'?'data-view="inbox"':`data-id="${x.id}"`}><span class="mini-thumb">${ic(x.type==='task'?'check':x.type==='space'?'folder':'note')}</span><span><strong>${esc(x.title||x.name)}</strong><small>${esc(x.type)}</small></span></button>`).join('')||`<div class="empty-mini">${q?'No matching items.':'Type to start searching.'}</div>`}</div>`}
+function renderSearch(){
+ const q=state.search.trim().toLowerCase();
+ const data=[
+  ...state.tasks.map(x=>({...x,type:'task',label:x.title,desc:spaceOf(x.space_id)?.name||'My Work'})),
+  ...state.spaces.map(x=>({...x,type:'space',label:x.name,desc:'Space'})),
+  ...state.boards.map(x=>({...x,type:'board',label:x.title,desc:'Whiteboard'})),
+  ...state.inbox.filter(x=>x.kind==='note').map(x=>({...x,type:'note',label:x.title,desc:'Inbox note'})),
+  ...allGeneralLinks().map(x=>({...x,type:'link',label:x.title||new URL(x.url).hostname,desc:new URL(x.url).hostname}))
+ ];
+ const matches=q?data.filter(x=>[x.label,x.desc,x.type,x.url].some(v=>String(v||'').toLowerCase().includes(q))).slice(0,50):[];
+ const glyph={task:'check',space:'folder',board:'board',note:'note',link:'link'};
+ const results=matches.map(x=>{
+  const inner='<span class="mini-thumb">'+ic(glyph[x.type])+'</span><span><strong>'+esc(x.label)+'</strong><small>'+esc(x.desc)+'</small></span>';
+  if(x.type==='link')return '<a class="continue-item" href="'+attr(x.url)+'" target="_blank" rel="noopener noreferrer">'+inner+ic('external',16)+'</a>';
+  const action=x.type==='task'?'open-task':x.type==='space'?'open-space':x.type==='board'?'open-board':'nav';
+  const fields=x.type==='note'?'data-view="inbox"':'data-id="'+attr(x.id)+'"';
+  return '<button class="continue-item" data-action="'+action+'" '+fields+'>'+inner+'</button>';
+ }).join('');
+ return header('Search Everything','Find tasks, boards, Spaces and links in one place.')+
+ '<input class="capture-input" style="width:100%" id="global-search" value="'+attr(state.search)+'" placeholder="Search SELF..." autofocus/>'+
+ '<div class="card card-pad" style="margin-top:20px">'+(results||'<div class="empty-mini">'+
+ (q?'No matching items.':'Type to search across your workspace.')+'</div>')+'</div>';
+}
 function renderSettings(){return header('Make SELF yours','Your workspace should feel exactly right for you.')+`<div class="settings-section"><div class="settings-row"><div><strong>Appearance</strong><small>Switch between two carefully designed themes.</small></div><div class="segmented"><button class="${state.preferences.theme==='dark'?'active':''}" data-action="set-theme" data-theme="dark">${ic('moon')} Dark</button><button class="${state.preferences.theme==='light'?'active':''}" data-action="set-theme" data-theme="light">${ic('sun')} Light</button></div></div><div class="settings-row"><div><strong>Text size</strong><small>Scale labels, content and controls to your comfort.</small></div><div style="display:flex;align-items:center;gap:14px"><input type="range" id="text-scale" class="slider" min="100" max="150" step="5" value="${state.preferences.text_scale}"/><strong id="scale-label">${state.preferences.text_scale}%</strong></div></div><div class="settings-row"><div><strong>Your account</strong><small>${esc(state.user.email)} · Your data is private to this account.</small></div><button class="ghost-btn" data-action="logout">${ic('logout')} Sign out</button></div></div>`}
 function renderPanel(){const t=taskOf(state.taskId);if(!t){state.taskId=null;return ''}const s=spaceOf(t.space_id);const checks=state.checklist.filter(c=>c.task_id===t.id).sort((a,b)=>a.position-b.position);const complete=checks.filter(c=>c.is_done).length;const links=state.links.filter(l=>l.task_id===t.id);const pages=state.pages.filter(p=>p.task_id===t.id);
 if(state.pageId){const pg=pages.find(p=>p.id===state.pageId);if(pg)return `<div class="overlay" data-action="close-panel"><aside class="panel" onclick="event.stopPropagation()"><div class="panel-top"><button class="ghost-btn" data-action="close-subpage">${ic('back')} Back to task</button><button class="icon-btn" data-action="close-panel" aria-label="Close">${ic('close')}</button></div><div class="eyebrow">${esc(t.title)} / Subpage</div><input class="panel-title-input" data-page-field="title" data-id="${pg.id}" value="${attr(pg.title)}" aria-label="Page title"/><div class="panel-section-title">Your page</div><textarea class="area long-area" data-page-field="content" data-id="${pg.id}" placeholder="Write anything. Your thoughts belong here.">${esc(pg.content)}</textarea><p class="small-sub">Changes are saved to your private SELF workspace.</p><div style="margin-top:28px"><button class="ghost-btn" data-action="delete-page" data-id="${pg.id}">${ic('trash')} Delete page</button></div></aside></div>`}
@@ -95,16 +229,16 @@ async function autoCaptureLinks(taskId,text){const urls=[...new Set((text.match(
 function formData(form){return Object.fromEntries(new FormData(form).entries())}
 async function handleSubmit(e){const form=e.target;if(!form.id)return;e.preventDefault();const v=formData(form);const id=form.dataset.id;
 if(form.id==='auth-form'){const btn=form.querySelector('button[type="submit"]');btn.disabled=true;state.authMessage='';try{await login(v.email,v.password,state.loginMode==='signup')}catch(e){state.authMessage='Error: '+e.message;render()}finally{if(btn.isConnected)btn.disabled=false}return}
-if(form.id==='create-task-form'){await mutate(async()=>{await insert('tasks',{title:v.title.trim(),space_id:v.space_id||null,status:v.status,due_date:v.due_date||null})},'Task created');state.modal=null;render();return}
-if(form.id==='create-space-form'){await mutate(async()=>{await insert('spaces',{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent})},'Space created');state.modal=null;render();return}
-if(form.id==='edit-space-form'){await mutate(async()=>patch('spaces',state.editSpaceId,{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent}),'Space updated');state.modal=null;render();return}
+if(form.id==='create-task-form'){if(await mutate(async()=>{await insert('tasks',{title:v.title.trim(),space_id:v.space_id||null,status:v.status,due_date:v.due_date||null})},'Task created')){state.modal=null;render()}return}
+if(form.id==='create-space-form'){if(await mutate(async()=>{await insert('spaces',{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent})},'Space created')){state.modal=null;render()}return}
+if(form.id==='edit-space-form'){if(await mutate(async()=>patch('spaces',state.editSpaceId,{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent}),'Space updated')){state.modal=null;render()}return}
 if(form.id==='add-check-form'){await mutate(async()=>{await insert('task_checklist',{task_id:id,text:v.text.trim(),position:state.checklist.filter(c=>c.task_id===id).length})},'Checklist updated');return}
 if(form.id==='add-link-form'){const url=normalUrl(v.url);if(!url){toast('Use an http or https URL',true);return}if(state.links.some(l=>l.task_id===id&&l.url===url)){toast('This link is already attached');return}await mutate(async()=>{await insert('task_links',{task_id:id,url,title:v.title.trim()||new URL(url).hostname})},'Link saved to My Links');return}
-if(form.id==='create-link-form'){const url=normalUrl(v.url);if(!url){toast('Use a valid URL',true);return}await mutate(async()=>insert('inbox',{title:v.title.trim(),body:url,kind:'link'}),'Link added to My Links');state.modal=null;render();return}
-if(form.id==='create-subpage-form'){let made;await mutate(async()=>{made=await insert('task_pages',{task_id:state.taskId,title:v.title.trim()})},'Subpage created');state.modal=null;state.pageId=made?.id||null;render();return}
+if(form.id==='create-link-form'){const url=normalUrl(v.url);if(!url){toast('Use a valid URL',true);return}if(await mutate(async()=>insert('inbox',{title:v.title.trim(),body:url,kind:'link'}),'Link added to My Links')){state.modal=null;render()}return}
+if(form.id==='create-subpage-form'){let made;if(await mutate(async()=>{made=await insert('task_pages',{task_id:state.taskId,title:v.title.trim()})},'Subpage created')){state.modal=null;state.pageId=made?.id||null;render()}return}
 }
-async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='board'){let made;await mutate(async()=>{made=await insert('boards',{title:text})},'Board created');state.captureDraft='';if(made)window.SELFBoards.open(made.id);return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured');state.captureDraft='';render()}
-async function handleAction(e){const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if((e.target.closest('a'))&&action==='open-task')return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
+async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='board'){let made;if(await mutate(async()=>{made=await insert('boards',{title:text})},'Board created')){state.captureDraft='';if(made)window.SELFBoards.open(made.id)}return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}if(await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured')){state.captureDraft='';render()}}
+async function handleAction(e){const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if((e.target.closest('a, select, input, button')&&action==='open-task'&&e.target!==b))return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
 if(action==='toggle-sidebar'){
  state.sidebarCollapsed=!state.sidebarCollapsed;
  localStorage.setItem('self.sidebarCollapsed',String(state.sidebarCollapsed));
@@ -121,19 +255,22 @@ if(action==='new-space'){state.spaceAccent='blue';state.spaceIcon='briefcase';st
 if(action==='edit-space'){state.editSpaceId=id;state.spaceAccent=spaceOf(id)?.accent||'blue';state.spaceIcon=spaceOf(id)?.icon||'briefcase';state.modal='edit-space';render();return}
 if(action==='space-accent'){state.spaceAccent=b.dataset.accent;document.querySelectorAll('.color-swatch').forEach(x=>x.classList.toggle('on',x.dataset.accent===state.spaceAccent));return}
 if(action==='open-space'){state.spaceId=id;state.spaceTab='tasks';go('space');return}
+if(action==='open-board'){window.SELFBoards?.open?.(id);return}
+if(action==='link-source'){state.linkSource=b.dataset.source;render();return}
 if(action==='open-task'){state.taskId=id;state.panelTab='overview';state.pageId=null;render();return}
 if(action==='close-panel'){state.taskId=null;state.pageId=null;render();return}
 if(action==='panel-tab'){state.panelTab=b.dataset.tab;state.pageId=null;render();return}
 if(action==='space-tab'){state.spaceTab=b.dataset.tab;render();return}
 if(action==='work-view'){state.workView=b.dataset.mode;render();return}
+if(action==='undo-stage'){const m=state.lastTaskMove;if(m)await moveTaskStatus(m.id,m.from,{undo:true});return}
 if(action==='toggle-task'){const t=taskOf(id);if(t)await mutate(async()=>patch('tasks',id,{status:t.status==='done'?'todo':'done'}),'Task updated');return}
 if(action==='toggle-check'){await mutate(async()=>patchSimple('task_checklist',id,{is_done:b.checked}),'Checklist updated');return}
 if(action==='delete-check'){await mutate(async()=>del('task_checklist',id),'Step removed');return}
 if(action==='delete-inbox'){if(!confirm('Delete this capture?'))return;await mutate(async()=>del('inbox',id),'Capture deleted');return}
 if(action==='delete-link'){await mutate(async()=>del('task_links',id),'Link removed');return}
-if(action==='delete-task'){if(!confirm('Delete this task and its linked pages and checklist?'))return;await mutate(async()=>del('tasks',id),'Task deleted');state.taskId=null;render();return}
-if(action==='delete-space'){if(!confirm('Delete this Space? Its tasks will be kept as Unsorted.'))return;await mutate(async()=>del('spaces',id),'Space removed');state.modal=null;state.spaceId=null;go('spaces');return}
-if(action==='delete-page'){if(!confirm('Delete this subpage?'))return;await mutate(async()=>del('task_pages',id),'Subpage removed');state.pageId=null;render();return}
+if(action==='delete-task'){if(!confirm('Delete this task and its linked pages and checklist?'))return;if(await mutate(async()=>del('tasks',id),'Task deleted')){state.taskId=null;render()}return}
+if(action==='delete-space'){if(!confirm('Delete this Space? Its tasks will be kept as Unsorted.'))return;if(await mutate(async()=>del('spaces',id),'Space removed')){state.modal=null;state.spaceId=null;go('spaces')}return}
+if(action==='delete-page'){if(!confirm('Delete this subpage?'))return;if(await mutate(async()=>del('task_pages',id),'Subpage removed')){state.pageId=null;render()}return}
 if(action==='open-subpage'){state.pageId=id;render();return}
 if(action==='close-subpage'){state.pageId=null;render();return}
 if(action==='new-subpage'){state.modal='subpage';render();return}
@@ -146,22 +283,44 @@ if(action==='logout'){await logout();return}
 if(action==='format-note'){const el=$('#task-notes');if(!el)return;const start=el.selectionStart,end=el.selectionEnd,selected=el.value.slice(start,end);let added='';if(b.dataset.format==='bold')added=`**${selected||'bold text'}**`;else if(b.dataset.format==='heading')added=`\n# ${selected||'Heading'}`;else if(b.dataset.format==='bullet')added=`\n- ${selected||'Key point'}`;else added=`[${selected||'Link title'}](https://)`;el.setRangeText(added,start,end,'end');el.focus();return}
 }
 async function handleChange(e){const el=e.target;
+if(el.dataset.stageTaskId){await moveTaskStatus(el.dataset.stageTaskId,el.value);return}
 if(el.id==='filter-status'){state.filterStatus=el.value;render();return}
 if(el.id==='filter-space'){state.filterSpace=el.value;render();return}
-if(el.dataset.taskField){const field=el.dataset.taskField;let value=el.value;if(field==='title'&&!value.trim()){toast('Task title cannot be blank',true);render();return}if(field==='space_id'||field==='due_date')value=value||null;const id=el.dataset.id;await mutate(async()=>{await patch('tasks',id,{[field]:value});if(field==='notes'||field==='description')await autoCaptureLinks(id,value)},'Saved');return}
+if(el.dataset.taskField){
+ const field=el.dataset.taskField;
+ let value=el.value;
+ if(field==='title'&&!value.trim()){toast('Task title cannot be blank',true);render();return}
+ if(field==='space_id'||field==='due_date')value=value||null;
+ const id=el.dataset.id;let linkIndexError=null;
+ const saved=await mutate(async()=>{
+  await patch('tasks',id,{[field]:value});
+  if(field==='notes'||field==='description'){
+   try{await autoCaptureLinks(id,value)}
+   catch(err){linkIndexError=err}
+  }
+ },'Saved');
+ if(saved&&linkIndexError)toast('Writing saved, but link indexing failed. Add the URL via Links when needed.',true);
+ return
+}
 if(el.dataset.checkField){if(!el.value.trim()){toast('Checklist text cannot be blank',true);render();return}await mutate(async()=>patchSimple('task_checklist',el.dataset.id,{text:el.value.trim()}),'Step saved');return}
 if(el.dataset.pageField){await mutate(async()=>patch('task_pages',el.dataset.id,{[el.dataset.pageField]:el.value}),'Page saved');return}
 }
 let searchTimer;
-function handleInput(e){const el=e.target;if(el.id==='quick-text'){state.captureDraft=el.value;return}
-if(el.id==='work-search'||el.id==='global-search'){const id=el.id,pos=el.selectionStart;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{if(id==='work-search')state.workSearch=el.value;else state.search=el.value;render();const restored=document.getElementById(id);if(restored){restored.focus();restored.setSelectionRange(pos,pos)}},160);return}
+function handleInput(e){const el=e.target;
+if(el.dataset?.taskField||el.dataset?.pageField||el.dataset?.checkField){state.savePending=true;paintSave();return}
+if(el.id==='quick-text'){state.captureDraft=el.value;return}
+if(el.id==='work-search'||el.id==='global-search'||el.id==='links-search'){const id=el.id,pos=el.selectionStart;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{if(id==='work-search')state.workSearch=el.value;else if(id==='links-search')state.linkSearch=el.value;else state.search=el.value;render();const restored=document.getElementById(id);if(restored){restored.focus();restored.setSelectionRange(pos,pos)}},160);return}
 if(el.id==='text-scale'){setScale(Number(el.value));const label=$('#scale-label');if(label)label.textContent=el.value+'%';clearTimeout(searchTimer);searchTimer=setTimeout(()=>mutate(async()=>savePref(),null),300)}
 }
 document.addEventListener('click',e=>{handleAction(e).catch(error=>toast(error.message,true))});
 document.addEventListener('submit',e=>{handleSubmit(e).catch(error=>toast(error.message,true))});
 document.addEventListener('change',e=>{handleChange(e).catch(error=>toast(error.message,true))});
 document.addEventListener('input',handleInput);
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(state.user)go('search')}if(e.key==='Escape'){if(state.modal)state.modal=null;else if(state.pageId)state.pageId=null;else state.taskId=null;render()}if(e.key==='Enter'&&e.target?.id==='quick-text'){e.preventDefault();quickCapture().catch(err=>toast(err.message,true))}});
+document.addEventListener('dragstart',workDragStart);
+document.addEventListener('dragover',workDragOver);
+document.addEventListener('drop',e=>{workDrop(e).catch(error=>toast(error.message,true))});
+document.addEventListener('dragend',workDragEnd);
+document.addEventListener('keydown',e=>{if(state.view==='work'&&state.workView==='board'&&e.target?.matches?.('[data-task-drag]')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();state.taskId=e.target.dataset.taskDrag;state.panelTab='overview';render();return}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(state.user)go('search')}if(e.key==='Escape'){if(state.modal)state.modal=null;else if(state.pageId)state.pageId=null;else state.taskId=null;render()}if(e.key==='Enter'&&e.target?.id==='quick-text'){e.preventDefault();quickCapture().catch(err=>toast(err.message,true))}});
 
 /* Private image assets for the authenticated Concept C whiteboard. */
 async function uploadBoardImage(file){

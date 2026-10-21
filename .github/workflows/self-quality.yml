@@ -25,6 +25,8 @@ jobs:
         run: node tests/smoke_render.cjs
       - name: Phase 1 API smoke
         run: node tests/smoke_api.cjs
+      - name: Core Phase 3 task and data integrity
+        run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
         run: node tests/smoke_whiteboards.cjs
       - name: Concept C canvas smoke
