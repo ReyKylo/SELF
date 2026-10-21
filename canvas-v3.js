@@ -552,7 +552,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='new-board'){ui.modal={type:'board',space:el.dataset.space|| (state().view==='space'?state().spaceId:null)};api.render();return}
  if(a==='close-modal'){ui.modal=null;api.render();return}
  if(a==='rename'){ui.modal={type:'rename'};api.render();return}
- if(a==='tool'){let k=el.dataset.kind;ui.tool=k;if(k==='image'){$('#c3-upload')?.click();return}if(k==='knowledge'||k==='sticky'||k==='text'||k==='rectangle'||k==='ellipse'||k==='diamond'||k==='frame'){await create(k);ui.tool='select'}else api.render();return}
+ if(a==='tool'){let k=el.dataset.kind;ui.tool=k;if(k==='image'){ui.tool='select';$('#c3-upload')?.click();api.render();return}if(k==='knowledge'||k==='sticky'||k==='text'||k==='rectangle'||k==='ellipse'||k==='diamond'||k==='frame'){await create(k);ui.tool='select';api.render()}else api.render();return}
  if(a==='starter'){await makeStarter();return}
  if(a==='add'){await create(el.dataset.kind||'rectangle');return}
  if(a==='tab'){ui.tab=el.dataset.tab;api.render();return}
