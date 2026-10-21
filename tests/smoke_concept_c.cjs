@@ -39,6 +39,25 @@ function evt(target,x=380,y=260){return {target,button:0,clientX:x,clientY:y,pre
 function act(a,props={}){const el={dataset:{c3:a,...props},classList:{contains:()=>false},closest(q){return q==='[data-c3]'?this:null}};return handlers.click[0](evt(el))}
 async function main(){
  assert.match(window.SELFBoards.renderEditor(),/c3-toolbar/);
+ // Mouse wheel MUST zoom toward the cursor, never scroll the board as a camera pan.
+ const wheelTarget={closest:q=>q==='#c3-canvas'?viewport:null};
+ const firstZoom=window.SELFBoards.ui.zoom;
+ const firstPan={...window.SELFBoards.ui.pan};
+ const cx=530,cy=320,r=viewport.getBoundingClientRect();
+ const worldAtCursor={x:(cx-r.left-firstPan.x)/firstZoom,y:(cy-r.top-firstPan.y)/firstZoom};
+ let prevented=false;
+ handlers.wheel[0]({target:wheelTarget,clientX:cx,clientY:cy,deltaX:0,deltaY:-120,deltaMode:0,ctrlKey:false,metaKey:false,preventDefault(){prevented=true}});
+ assert(prevented,'wheel inside canvas prevents normal page scroll');
+ assert(window.SELFBoards.ui.zoom>firstZoom,'wheel up zooms in WITHOUT modifier');
+ const zoomed=window.SELFBoards.ui;
+ assert(Math.abs((cx-r.left-zoomed.pan.x)/zoomed.zoom-worldAtCursor.x)<.001,'zoom anchored at cursor x');
+ assert(Math.abs((cy-r.top-zoomed.pan.y)/zoomed.zoom-worldAtCursor.y)<.001,'zoom anchored at cursor y');
+ handlers.wheel[0]({target:wheelTarget,clientX:cx,clientY:cy,deltaX:0,deltaY:120,deltaMode:0,ctrlKey:false,metaKey:false,preventDefault(){}});
+ assert(Math.abs(window.SELFBoards.ui.zoom-firstZoom)<.001,'wheel down zooms back out');
+ assert(Math.abs(window.SELFBoards.ui.pan.y-firstPan.y)<.001,'zooming in and back out does not pan');
+ const lineZoom=window.SELFBoards.ui.zoom;
+ handlers.wheel[0]({target:wheelTarget,clientX:cx,clientY:cy,deltaX:0,deltaY:-3,deltaMode:1,ctrlKey:false,metaKey:false,preventDefault(){}});
+ assert(window.SELFBoards.ui.zoom>lineZoom,'line-mode mouse wheel also zooms');
  // Dragging the background must move the board without any tool/keyboard modifier.
  const blankTarget={closest:q=>q==='#c3-canvas'?viewport:null};
  const p0={...window.SELFBoards.ui.pan};
@@ -96,6 +115,6 @@ async function main(){
  assert(window.SELFBoards.links().some(x=>x.url.includes('idx.co.id')),'note URLs reach Important Links');
  data.knowledgeCards.find(c=>c.id===first.card_id).title='<img src=x onerror=alert(1)>';
  assert(!window.SELFBoards.renderEditor().includes('<img src=x onerror=alert(1)>'),'HTML text escaped');
- console.log('Concept C PASS: blank-first, drag-to-pan, Shift marquee, fit contents, 4 anchors, resize/move rebind, edge persistence, smart tidy, undo, notes, links, XSS escaping.');
+ console.log('Concept C PASS: blank-first, wheel-to-zoom, drag-to-pan, Shift marquee, fit contents, 4 anchors, resize/move rebind, edge persistence, smart tidy, undo, notes, links, XSS escaping.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
