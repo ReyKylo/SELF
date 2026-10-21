@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.join(__dirname,'..');
 const assets=[
- {id:'PE',name:'PE_LBO_Starter.xlsx.b64',sheets:['INPUTS','OPERATIONS','RETURNS'],tokens:['Sponsors','Sponsor equity','Free cash flow','MOIC']},
+ {id:'PE',name:'PE_LBO_Starter.xlsx.b64',sheets:['INPUTS','OPERATIONS','RETURNS'],tokens:['Sponsor equity','Free cash flow','MOIC']},
  {id:'VC',name:'VC_Investment_Starter.xlsx.b64',sheets:['COHORTS','METRICS','FINANCING'],tokens:['Logo retention','Investor ownership entry','Runway months']},
  {id:'Consulting',name:'Consulting_Profitability_Starter.xlsx.b64',sheets:['INPUTS','PROFIT BRIDGE','DECK GUIDE'],tokens:['Volume effect','Unit cost effect','Combined year-one net']}
 ];
