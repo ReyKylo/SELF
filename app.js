@@ -286,7 +286,22 @@ async function handleChange(e){const el=e.target;
 if(el.dataset.stageTaskId){await moveTaskStatus(el.dataset.stageTaskId,el.value);return}
 if(el.id==='filter-status'){state.filterStatus=el.value;render();return}
 if(el.id==='filter-space'){state.filterSpace=el.value;render();return}
-if(el.dataset.taskField){const field=el.dataset.taskField;let value=el.value;if(field==='title'&&!value.trim()){toast('Task title cannot be blank',true);render();return}if(field==='space_id'||field==='due_date')value=value||null;const id=el.dataset.id;await mutate(async()=>{await patch('tasks',id,{[field]:value});if(field==='notes'||field==='description')await autoCaptureLinks(id,value)},'Saved');return}
+if(el.dataset.taskField){
+ const field=el.dataset.taskField;
+ let value=el.value;
+ if(field==='title'&&!value.trim()){toast('Task title cannot be blank',true);render();return}
+ if(field==='space_id'||field==='due_date')value=value||null;
+ const id=el.dataset.id;let linkIndexError=null;
+ const saved=await mutate(async()=>{
+  await patch('tasks',id,{[field]:value});
+  if(field==='notes'||field==='description'){
+   try{await autoCaptureLinks(id,value)}
+   catch(err){linkIndexError=err}
+  }
+ },'Saved');
+ if(saved&&linkIndexError)toast('Writing saved, but link indexing failed. Add the URL via Links when needed.',true);
+ return
+}
 if(el.dataset.checkField){if(!el.value.trim()){toast('Checklist text cannot be blank',true);render();return}await mutate(async()=>patchSimple('task_checklist',el.dataset.id,{text:el.value.trim()}),'Step saved');return}
 if(el.dataset.pageField){await mutate(async()=>patch('task_pages',el.dataset.id,{[el.dataset.pageField]:el.value}),'Page saved');return}
 }
