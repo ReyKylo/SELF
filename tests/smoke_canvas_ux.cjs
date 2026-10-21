@@ -60,7 +60,7 @@ async function main(){
  assert.equal(window.SELFBoards.ui.quickAdd,null,'palette closes after creation');
  const base=records.boardItems[0];
  window.SELFBoards.ui.selected=new Set([base.id]);
- assert.match(window.SELFBoards.renderEditor(),/c3-contextbar/,'selection has quick actions');
+ assert.match(window.SELFBoards.renderEditor(),/d-toolbar/,'selection has unified knowledge toolbar');
  await button('quick-duplicate');
  assert.equal(records.boardItems.length,2,'duplicate inserts another object');
  const duplicate=records.boardItems[1];
