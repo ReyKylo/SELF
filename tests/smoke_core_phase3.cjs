@@ -165,8 +165,30 @@ async function main(){
  await evaluate('handleAction(boardEvent)');
  assert.equal(ctx.openedBoard,'board1');
 
+
+ // Overdue work and urgent items should be visible before low-priority undated tasks.
+ const rankFixtures=[
+  {id:'z1',title:'Low later',status:'todo',priority:'low',due_date:null,space_id:'space1'},
+  {id:'z2',title:'Overdue now',status:'todo',priority:'low',due_date:'2025-01-01',space_id:'space1'},
+  {id:'z3',title:'High priority',status:'todo',priority:'high',due_date:null,space_id:null}
+ ];
+ ctx.extraTasks=rankFixtures;
+ await evaluate('state.tasks=extraTasks');
+ const home=await evaluate('renderHome()');
+ assert(home.indexOf('Overdue now')<home.indexOf('High priority'),'overdue ranks first');
+ assert(home.indexOf('High priority')<home.indexOf('Low later'),'high priority ranks before low');
+ // Optional URL indexing can fail after the note itself saved; don't mislabel writing as lost.
+ await evaluate('state.tasks=fixture.tasks;state.links=fixture.task_links');
+ failPost=true;
+ ctx.noteEvent={target:{dataset:{taskField:'notes',id:'task1'},value:'Memo https://unique-source.example/' }};
+ await evaluate('handleChange(noteEvent)');
+ assert.equal(store.tasks[0].notes,'Memo https://unique-source.example/','notes saved despite link indexing error');
+ assert.equal(await evaluate('state.saveError'),null,'base writing is confirmed saved');
+ assert.match(saveState.html,/Saved/,'save state remains accurate when optional indexing fails');
+ failPost=false;
+
  // No accidental transfer to a Career-specific table.
  assert.equal(Object.keys(store).some(k=>k.startsWith('career_')),false);
- console.log('PASS Core Phase 3: drag/drop, stage select, retryable Undo, failed saves, unsaved edits and safe Quick Capture, general My Links, and global board search.');
+ console.log('PASS Core Phase 3: drag/drop, stage select, retryable Undo, failed saves, unsaved edits and safe Quick Capture, general My Links, cross-space priority, safe link indexing and global board search.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
