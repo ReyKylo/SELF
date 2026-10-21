@@ -217,11 +217,15 @@ function textFromHtml(html){return String(html||'').replace(/<br\s*\/?>/gi,'\n')
 function dBody(i,c,s){
  const editing=ui.dEditing?.id===i.id&&!ui.dFocus;
  const html=documentMarkup(c);
- return '<div class="c3-object-text d-surface'+(editing?' d-is-editing':'')+'" '+(editing?'contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-d-editor="'+h(i.id)+'"':'')+'>'+ (html|| (editing?'':'<span class="d-empty-shape"></span>'))+'</div>'+
- ((c?.url||c?.task_id||c?.target_board_id||c?.asset_path)?'<div class="d-object-chips">'+
- (c.url?'<span class="d-chip" title="'+h(c.url)+'">↗ Source</span>':'')+
- (c.task_id?'<span class="d-chip">☑ Task</span>':'')+
- (c.target_board_id?'<span class="d-chip">▣ Board</span>':'')+
+ const asset=c?.asset_path?ui.assetUrls.get(c.asset_path):null;
+ const source=url(c?.url);
+ return '<div class="c3-object-text d-surface'+(editing?' d-is-editing':'')+'" '+(editing?'contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-d-editor="'+h(i.id)+'"':'')+'>'+
+ (html||(editing?'':'<span class="d-empty-shape"></span>'))+'</div>'+
+ (asset?'<img class="d-asset-thumb" src="'+h(asset)+'" alt="Attached private image"/>':'')+
+ ((source||c?.task_id||c?.target_board_id||c?.asset_path)?'<div class="d-object-chips">'+
+ (source?'<a class="d-chip" href="'+h(source)+'" target="_blank" rel="noopener noreferrer" title="'+h(source)+'">↗ Source</a>':'')+
+ (c.task_id?'<button class="d-chip" data-c3="open-task" data-id="'+h(c.task_id)+'">☑ Task</button>':'')+
+ (c.target_board_id?'<button class="d-chip" data-c3="open-board" data-id="'+h(c.target_board_id)+'">▣ Board</button>':'')+
  (c.asset_path?'<span class="d-chip">▧ File</span>':'')+'</div>':'');
 }
 function dSelected(){return entries().length===1?entries()[0]:null}
@@ -294,8 +298,8 @@ function dPopoverMarkup(){
  const p=ui.dPopover;
  const c=card(dSelected()?.card_id);
  if(p==='sources')return '<form class="d-popover" id="d-popover-form" data-type="sources"><strong>Add a source</strong><label>Link title<input class="d-pop-input" name="title" placeholder="Annual report / study" value="'+h(c?.title||'')+'"/></label><label>URL<input class="d-pop-input" type="url" name="url" placeholder="https://..." value="'+h(c?.url||'')+'" required/></label><button type="submit" class="d-pop-submit">Attach source</button></form>';
- if(p==='task'||p==='board'){
-  const objects=p==='task'?state().tasks:state().boards.filter(b=>b.id!==ui.boardId);
+ if(p==='task'||p==='board'||p==='reuse'){
+  const objects=p==='task'?state().tasks:p==='board'?state().boards.filter(b=>b.id!==ui.boardId):state().knowledgeCards.filter(c=>!items().some(i=>i.card_id===c.id));
   return '<form class="d-popover" id="d-popover-form" data-type="'+p+'"><strong>Link '+p+'</strong><label>Choose '+p+'<select name="value" class="d-pop-input" required><option value="">Choose…</option>'+
   objects.map(x=>'<option value="'+h(x.id)+'">'+h(x.title||x.name||'Untitled')+'</option>').join('')+'</select></label><button type="submit" class="d-pop-submit">Link '+p+'</button></form>';
  }
@@ -303,7 +307,7 @@ function dPopoverMarkup(){
   [['Paragraph','p','formatBlock'],['Heading 1','h1','formatBlock'],['Heading 2','h2','formatBlock'],['Quote','blockquote','formatBlock'],['Bullet list','insertUnorderedList','command'],['Numbered list','insertOrderedList','command'],['Align left','justifyLeft','command'],['Center','justifyCenter','command'],['Align right','justifyRight','command']].map(([name,value,type])=>
   '<button class="d-more-action" data-c3="d-format-option" data-format="'+value+'" data-type="'+type+'">'+name+'</button>').join('')+'</div>';
  if(p==='more')return '<div class="d-popover" role="menu"><strong>More knowledge tools</strong>'+
- ['d-pop-sources','existing','quick-duplicate','quick-connect'].map((a,i)=>'<button class="d-more-action" data-c3="'+a+'">'+['Add reference','Reuse existing knowledge','Duplicate card','Connect card'][i]+'</button>').join('')+'</div>';
+ ['d-pop-sources','d-pop-reuse','quick-duplicate','quick-connect'].map((a,i)=>'<button class="d-more-action" data-c3="'+a+'">'+['Add reference','Reuse existing knowledge','Duplicate card','Connect card'][i]+'</button>').join('')+'</div>';
  if(p==='files')return '<div class="d-popover"><strong>Files & images</strong><p>Private uploads are attached to this card.</p><button class="d-pop-submit" data-c3="d-upload">Choose image</button></div>';
  return '';
 }
@@ -704,7 +708,7 @@ function dPreserveSelection(e){
 function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
  const t=e.target;
  if(t.closest('.c3-quick-add,.c3-contextbar,.c3-minimap,.d-toolbar,.d-focus-panel'))return;
- if(t.closest('input,textarea,select,[contenteditable]'))return;
+ if(t.closest('input,textarea,select,[contenteditable],a[href],button'))return;
  if(ui.dEditing&&t.closest('[data-c3-item]')?.dataset.c3Item!==ui.dEditing.id){
   dCapture();void dPersist();ui.dEditing=null;ui.dFocus=false;ui.dPopover=null;
  }
@@ -813,7 +817,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='help-toggle'){ui.helpOpen=!ui.helpOpen;api.render();return}
  if(a==='quick-notes'){ui.dKnowledge=true;api.render();return}
  if(a==='d-knowledge'){ui.dKnowledge=!ui.dKnowledge;ui.dPopover=null;api.render();return}
- if(a==='d-pop-sources'||a==='d-pop-task'||a==='d-pop-board'||a==='d-pop-files'||a==='d-pop-more'||a==='d-pop-format'){
+ if(a==='d-pop-sources'||a==='d-pop-task'||a==='d-pop-board'||a==='d-pop-files'||a==='d-pop-more'||a==='d-pop-format'||a==='d-pop-reuse'){
   const which=a.slice(6);ui.dKnowledge=true;ui.dPopover=ui.dPopover===which?null:which;api.render();return
  }
  if(a==='d-pop-close'){ui.dPopover=null;api.render();return}
@@ -888,10 +892,19 @@ async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-'))return;e.p
   if(which==='sources'){
    const uri=url(o.url?.trim());if(!uri)return say('Enter a valid http(s) URL',true);
    const title=(o.title?.trim()||new URL(uri).hostname).slice(0,160);
+   if(ui.dEditing){await dPersist();}
    const markup=documentMarkup(c);
    const normalized=markup.includes('href="'+h(uri)+'"')?markup:markup+'<p><a href="'+h(uri)+'" target="_blank" rel="noopener noreferrer">'+h(title)+'</a></p>';
    const data={url:uri,content_blocks:[{id:'main',type:'richtext',html:normalized}]};
-   ui.dPopover=null;await transact(()=>api.patch('knowledge_cards',c.id,data),'Source linked to this shape');return
+   if(ui.dEditing){const editor=dEditor();if(editor&&normalized!==markup){editor.insertAdjacentHTML('beforeend','<p><a href="'+h(uri)+'" target="_blank" rel="noopener noreferrer">'+h(title)+'</a></p>');dCapture();await dPersist()}}ui.dPopover=null;await transact(()=>api.patch('knowledge_cards',c.id,data),'Source linked to this shape');return
+  }
+  if(which==='reuse'){
+   const c=state().knowledgeCards.find(v=>v.id===o.value);
+   if(!c)return say('Choose knowledge to reuse',true);
+   const point=centerPosition(260,160);
+   ui.dPopover=null;
+   await transact(()=>api.insert('board_items',{board_id:ui.boardId,card_id:c.id,visual_kind:'knowledge',...point,w:260,h:160,z:items().length+1}),'Existing knowledge reused on this board');
+   return;
   }
   if(which==='task'||which==='board'){
    const valid=which==='task'?state().tasks.some(t=>t.id===o.value):state().boards.some(b=>b.id===o.value&&b.id!==ui.boardId);
