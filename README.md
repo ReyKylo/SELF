@@ -105,7 +105,7 @@ No service-role keys in the browser. Users can select/change only their own reco
 SELF is a zero-dependency static application deployed as **Cloudflare Workers Static Assets**, not as a Cloudflare Pages project.
 
 The repository includes:
-- `tools/build_cloudflare.py`: creates `dist/` with fourteen static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`, `canvas-v3.css`, `canvas-v3.js`, `concept-d.css`, `career.js`, `career.css`, `career-phase2.js`, `career-phase2.css`, `career-phase3.js`, `career-phase3.css`).
+- `tools/build_cloudflare.py`: creates `dist/` with eighteen static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`, `canvas-v3.css`, `canvas-v3.js`, `concept-d.css`, `career.js`, `career.css`, `career-phase2.js`, `career-phase2.css`, `career-phase3.js`, `career-phase3.css`, `career-learning.js`, `career-learning.css`, `content/career-learning.json`, `content/portfolio-sprint.md`).
 - `wrangler.jsonc`: preserves the existing Worker name `self` and points Wrangler to `dist/` as static assets.
 
 In **Cloudflare dashboard > Workers & Pages > self > Settings > Builds**, set:
@@ -144,3 +144,16 @@ Required reading before writing whiteboard code:
 
 No destructive migrations, new Cloudflare Worker or whole-app replacement were performed. The original editor is preserved behind `?canvas=legacy`; compare actual browser screenshots to the approved image and obtain acceptance before Phase 3.
 
+
+
+## Career Prep — expert evidence and portfolio sprint
+
+Open **Career → Career Prep** for the three-day PE / VC / Consulting portfolio sprint, 12 evidence panels, 9 connected YouTube lessons and the 41-source audit. The V4 reader keeps explanations beside an honest source pointer; original screenshots are not fabricated or redistributed. Search by topic/publisher, inspect verification/access labels, and return from a video without losing the selected evidence and filters.
+
+**Add project to My Work** explicitly creates or opens one canonical SELF Task per user/sprint. A deterministic UUID uses the existing task primary key to reconcile repeated clicks, concurrent tabs and lost acknowledgements; no new task table or schema migration is needed. No project is inserted just by reading.
+
+The lesson/catalog files are nonpersonal static content in `content/`. YouTube loads only after Play or chapter selection. CV Library, Interview Prep, Radar, Tasks and Whiteboard retain their original data and views. The Task drawer's delegated Close/tab clicks are repaired so a portfolio Task can be used normally.
+
+Checks: `node tests/smoke_career_learning.cjs` and the existing regression suite. Optional real-browser synthetic QA: `node tests/browser_career_learning.cjs` requires Playwright plus a local Chromium executable; set `SELF_QA_CHROMIUM` if necessary. The fixture starts an isolated static server and intercepts Supabase requests; it never writes to the production account.
+
+See `docs/LEARNING_RELEASE_GATE.md` and `docs/learning-review/` for scoped independent runtime evidence and remaining live-deployment checks.

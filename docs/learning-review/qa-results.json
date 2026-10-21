@@ -1,0 +1,76 @@
+{
+  "build": "35e693664ef991bee8a9a15ead94c1d378da21f1cc274e4c1c964e8d3750bcf2",
+  "environment": "Chromium headless 145; local synthetic Supabase fixture; not production RLS or real user persistence",
+  "checks": [
+    {
+      "name": "No automatic Task creation",
+      "result": "PASS",
+      "details": "Opening Career Prep did not write records."
+    },
+    {
+      "name": "Repeated Task action under delay",
+      "result": "PASS",
+      "details": "Two click events resulted in one POST, one row and the actual Task detail."
+    },
+    {
+      "name": "Reload and reopen same canonical Task",
+      "result": "PASS",
+      "details": "Reloaded page retrieved original Task ID; no second POST."
+    },
+    {
+      "name": "Lost POST acknowledgement recovery",
+      "result": "PASS",
+      "details": "POST committed then route aborted; follow-up GET found stable ID and opened same Task."
+    },
+    {
+      "name": "Failed Task lookup is explicit and retryable",
+      "result": "PASS",
+      "details": "Error displayed, no phantom row or POST, action re-enabled."
+    },
+    {
+      "name": "Task retry after restored service",
+      "result": "PASS",
+      "details": "Exactly one Consulting Task created and opened."
+    },
+    {
+      "name": "Counts, clear, evidence→video→back and focus",
+      "result": "PASS",
+      "details": "4/12 and 0/12 reconciled; reset restores 12/12; selected VC04 and focused title returned."
+    },
+    {
+      "name": "Source-screening provenance",
+      "result": "PASS",
+      "details": "41 actual source rows, screened-title and index-only statuses displayed; not a universal deep-review badge."
+    },
+    {
+      "name": "No browser page errors",
+      "result": "PASS",
+      "details": "Fault responses were intentional fixture network errors, not uncaught JavaScript errors."
+    },
+    {
+      "name": "Account switch during pending POST",
+      "result": "PASS",
+      "details": "Actual synthetic sign out/sign in with a held old-account response did not open or inject the old Task into the new account."
+    },
+    {
+      "name": "Learning independent of unrelated Career failure",
+      "result": "PASS",
+      "details": "All Career tables returned 503; static Career Prep still loaded."
+    },
+    {
+      "name": "Content failure and Retry",
+      "result": "PASS",
+      "details": "Static JSON 503 produces explicit error and Retry restores real content."
+    },
+    {
+      "name": "Layout/type/keyboard 390",
+      "result": "PASS",
+      "details": "All four tabs at 150% type have no document overflow; search retains focus; live theme switch exercised."
+    },
+    {
+      "name": "Layout/type/keyboard 1366",
+      "result": "PASS",
+      "details": "All four tabs at 150% type have no document overflow; search retains focus; live theme switch exercised."
+    }
+  ]
+}

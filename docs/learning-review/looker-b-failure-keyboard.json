@@ -1,0 +1,38 @@
+[
+  {
+    "label": "content failure",
+    "text": "Materi belum terbuka.\n\nMateri belum bisa dimuat. HTTP 503\n\nCoba lagi"
+  },
+  {
+    "label": "task failure",
+    "text": "Proyek belum terbuka: Synthetic Task service unavailable",
+    "posts": 0,
+    "records": 0
+  },
+  {
+    "label": "task retry",
+    "posts": 1,
+    "records": 1
+  },
+  {
+    "label": "keyboard video tab",
+    "list": 9,
+    "focus": "videos"
+  },
+  {
+    "label": "keyboard video selection",
+    "focus": "learning-video-title",
+    "title": "LBO Model Tutorial: Case Study Introduction and Purchase Price Assumptions"
+  },
+  {
+    "label": "video embed",
+    "count": 1,
+    "src": "https://www.youtube-nocookie.com/embed/_EtDe4y3Cro?start=0",
+    "focus": "stop"
+  },
+  {
+    "label": "stop embed",
+    "count": 0,
+    "focus": "play"
+  }
+]

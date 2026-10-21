@@ -24,6 +24,7 @@ jobs:
           node --check career.js
           node --check career-phase2.js
           node --check career-phase3.js
+          node --check career-learning.js
       - name: Phase 1 render smoke
         run: node tests/smoke_render.cjs
       - name: Phase 1 API smoke
@@ -34,6 +35,8 @@ jobs:
         run: node tests/smoke_career_phase2.cjs
       - name: Career Phase 3 sourced Radar regression
         run: node tests/smoke_career_phase3.cjs
+      - name: Career Prep content and canonical Task regression
+        run: node tests/smoke_career_learning.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
@@ -65,3 +68,4 @@ jobs:
           test -s dist/career-phase2.css
           test -s dist/career-phase3.js
           test -s dist/career-phase3.css
+

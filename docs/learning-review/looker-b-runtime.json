@@ -1,0 +1,99 @@
+[
+  {
+    "label": "mobile sprint 100%",
+    "scroll": 390,
+    "width": 390,
+    "body": 390,
+    "focus": ""
+  },
+  {
+    "label": "panel heading focus",
+    "focus": "learning-evidence-title"
+  },
+  {
+    "label": "mobile original source",
+    "scroll": 390,
+    "width": 390,
+    "body": 390,
+    "focus": "learning-evidence-title"
+  },
+  {
+    "label": "pointer explicit",
+    "text": "Tautan sumber asli · screenshot belum tersedia. Buka bagian di atas untuk melihat exhibit dari penerbit."
+  },
+  {
+    "label": "expanded source URL",
+    "scroll": 390,
+    "width": 390,
+    "body": 390,
+    "focus": ""
+  },
+  {
+    "label": "video destination",
+    "title": "B2B Startup Metrics | Startup School",
+    "back": 1
+  },
+  {
+    "label": "return to evidence",
+    "title": "Shopify: nilai kualitas pertumbuhan",
+    "track": "VC"
+  },
+  {
+    "label": "no match",
+    "text": "Tidak ada yang cocok.\n\nCoba kata lain atau tampilkan semua bidang dan jenis.\n\nReset filter"
+  },
+  {
+    "label": "reset",
+    "count": "12 dari 12 evidence · Semua bidang"
+  },
+  {
+    "label": "mobile evidence 150%",
+    "scroll": 390,
+    "width": 390,
+    "body": 390,
+    "focus": "learning-search"
+  },
+  {
+    "label": "mobile sources 150%",
+    "scroll": 390,
+    "width": 390,
+    "body": 390,
+    "focus": ""
+  },
+  {
+    "label": "mobile source disclosure 150%",
+    "scroll": 390,
+    "width": 390,
+    "body": 390,
+    "focus": ""
+  },
+  {
+    "label": "task created",
+    "posts": 1,
+    "tasks": 1,
+    "title": "[Portfolio] PE · Acquisition model"
+  },
+  {
+    "label": "reopen same task",
+    "posts": 1,
+    "tasks": 1
+  },
+  {
+    "label": "laptop evidence 100%",
+    "scroll": 1366,
+    "width": 1366,
+    "body": 1366,
+    "focus": "learning-track"
+  },
+  {
+    "label": "laptop evidence 150 light",
+    "scroll": 1366,
+    "width": 1366,
+    "body": 1366,
+    "focus": "learning-track"
+  },
+  {
+    "label": "pageerrors",
+    "errors": []
+  }
+]

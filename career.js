@@ -5,7 +5,7 @@ const PAGES=[
  ['overview','Overview','home'],['applications','Applications','briefcase'],
  ['people','People','person'],['companies','Companies','grid'],
  ['radar','Opportunity Radar','search'],['cvs','CV Library','note'],
- ['interviews','Interview Prep','calendar'],['templates','Templates','book'],
+ ['learning','Career Prep','graduation'],['interviews','Interview Prep','calendar'],['templates','Templates','book'],
  ['reminders','Reminders','clock']
 ];
 const HIRING=[['wishlist','Wishlist'],['applied','Applied'],['interviewing','Interviewing'],['offer','Offer'],['closed','Closed']];
@@ -201,7 +201,8 @@ function render(){
  '<span class="career-nav-symbol">'+(host.icon?host.icon(icon,19):'•')+'</span><span class="career-nav-text">'+label+'</span></button>').join('')+
  '<div class="career-rail-footer">One Career workspace. SELF Tasks, Links and Boards stay connected.</div></nav>';
  let main='';
- if(ui.loading&&!ui.ready)main=empty('Opening Career…','Loading your private records.');
+ if(selected==='learning')main=window.SELFCareerLearning?.render?.()||empty('Career Prep unavailable','Try reloading SELF.');
+ else if(ui.loading&&!ui.ready)main=empty('Opening Career…','Loading your private records.');
  else if(ui.error&&!ui.ready)main=empty('Career could not load',ui.error,primary('Retry loading','retry'));
  else if(selected==='overview')main=careerOverview();
  else if(selected==='applications')main=window.SELFCareerPhase2?.renderApplications?.()||careerApplications();
@@ -253,6 +254,7 @@ function enter(){
   ui.drawer=null;ui.modal=null;ui.dirty=false;ui.generation++;
   window.SELFCareerPhase2?.reset?.(owner);
   window.SELFCareerPhase3?.reset?.(owner);
+  window.SELFCareerLearning?.reset?.(owner);
  }
  if(!ui.ready&&!ui.loading)void load();
 }
@@ -324,6 +326,7 @@ async function erase(kind,id){
  }finally{ui.busy=false}
 }
 async function action(e){
+ if(await window.SELFCareerLearning?.action?.(e))return true;
  if(await window.SELFCareerPhase3?.action?.(e))return true;
  if(await window.SELFCareerPhase2?.action?.(e))return true;
  const b=e.target.closest?.('[data-career]');
@@ -358,6 +361,7 @@ async function submit(e){
  await save(e.target);return true;
 }
 function input(e){
+ if(window.SELFCareerLearning?.input?.(e))return true;
  if(window.SELFCareerPhase3?.input?.(e))return true;
  if(window.SELFCareerPhase2?.input?.(e))return true;
  if(!e.target?.closest?.('.career-record-form'))return false;
@@ -381,5 +385,6 @@ function links(){
   ...(window.SELFCareerPhase3?.links?.()||[])
  ];
 }
-window.SELFCareer={init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
+window.SELFCareer={init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
 })();
+
