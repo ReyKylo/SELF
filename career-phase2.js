@@ -325,8 +325,12 @@ async function action(ev){
   catch{notice('Clipboard unavailable. Open template and select its text.',true);C.modal={type:'template',id};host.render()}}
  }else if(a==='open-file'){
   const cv=C.cvs.find(x=>x.id===id);
-  if(cv?.storage_path){try{const uri=await host.signDocument(cv.storage_path);if(uri)window.open(uri,'_blank','noopener,noreferrer')}
-  catch(error){notice('Could not open document: '+error.message,true)}}
+  if(cv?.storage_path){
+   const tab=window.open('about:blank','_blank');
+   if(!tab){notice('Allow pop-ups to open your private document.',true);return true}
+   try{const uri=await host.signDocument(cv.storage_path);if(uri)tab.location.href=uri;else tab.close()}
+   catch(error){tab.close();notice('Could not open document: '+error.message,true)}
+  }
  }else if(a==='delete-record'){
   const map=type==='cv'?C.cvs:type==='touchpoint'?C.touchpoints:type==='interview'?C.interviews:C.templates;
   const obj=map.find(x=>x.id===id);
