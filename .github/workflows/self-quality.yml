@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed to diff specialist PR files against base for ownership gate
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -43,6 +45,12 @@ jobs:
         run: node tests/smoke_career_portfolio.cjs
       - name: Career Prep Phase 1 teaching quality blueprint and competency contract
         run: node tests/smoke_career_prep_blueprint.cjs
+      - name: GptChatMaximize parallel workstream safety contract
+        run: node tests/smoke_gpt_chat_maximize.cjs
+      - name: GptChatMaximize worker PR path isolation
+        run: |
+          node tools/check_worker_scope.cjs --self-test
+          node tools/check_worker_scope.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
