@@ -13,7 +13,7 @@ const RELATIONSHIPS=[['new','New'],['reached_out','Reached Out'],['in_conversati
 const TYPES={company:'career_companies',person:'career_people',application:'career_applications'};
 const names={company:'Company',person:'Person',application:'Application'};
 const ui={page:'overview',railCollapsed:false,ready:false,loading:false,error:'',
- companies:[],people:[],applications:[],drawer:null,modal:null,dirty:false,busy:false,saveError:'',generation:0};
+ companies:[],people:[],applications:[],drawer:null,modal:null,dirty:false,busy:false,saveError:'',generation:0,owner:null};
 let host=null;
 const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','"':'&quot;',"'":'&#39;'}[c]));
 const a=h;
@@ -236,7 +236,16 @@ async function load(){
  }catch(e){if(gen!==ui.generation)return;ui.error=e?.message||String(e)}
  finally{if(gen===ui.generation){ui.loading=false;host.render()}}
 }
-function enter(){if(!ui.ready&&!ui.loading)void load();}
+function enter(){
+ const owner=host?.state?.()?.user?.id;
+ if(!owner)return;
+ if(ui.owner!==owner){
+  ui.owner=owner;ui.ready=false;ui.loading=false;ui.error='';
+  ui.companies=[];ui.people=[];ui.applications=[];
+  ui.drawer=null;ui.modal=null;ui.dirty=false;ui.generation++;
+ }
+ if(!ui.ready&&!ui.loading)void load();
+}
 function setPage(id){
  if(!PAGES.some(x=>x[0]===id))return;
  if(ui.dirty&&!confirm('Discard unsaved edits?'))return;
@@ -271,7 +280,7 @@ async function save(form){
  try{
   if(isEdit)await host.patch(table,id,payload);
   else await host.insert(table,payload);
-  ui.dirty=false;ui.modal=null;ui.drawer=null;
+  ui.dirty=false;ui.modal=null;ui.drawer=isEdit?{kind,id}:null;
   await load();
   host.notify(names[kind]+(isEdit?' updated':' created'));
  }catch(e){
@@ -318,7 +327,7 @@ async function action(e){
   if(b.dataset.kind==='application'&&!ui.companies.length){ui.modal='company';ui.saveError='';ui.drawer=null;host.render();return true}
   ui.modal=b.dataset.kind;ui.drawer=null;ui.saveError='';ui.dirty=false;host.render();
  }
- if(x==='open'){ui.drawer={kind:b.dataset.kind,id:b.dataset.id};ui.modal=null;ui.saveError='';ui.dirty=false;host.render()}
+ if(x==='open'){if(ui.dirty&&!confirm('Discard unsaved edits?'))return true;ui.drawer={kind:b.dataset.kind,id:b.dataset.id};ui.modal=null;ui.saveError='';ui.dirty=false;host.render()}
  if(x==='close-modal')clearPanel();
  if(x==='close-drawer')clearPanel();
  if(x==='delete')await erase(b.dataset.kind,b.dataset.id);
@@ -343,6 +352,7 @@ function keydown(e){
  e.stopImmediatePropagation?.();e.preventDefault();clearPanel();return true;
 }
 function links(){
+ if(!host?.state?.()?.user?.id||host.state().user.id!==ui.owner)return [];
  return [
   ...ui.companies.filter(x=>safeUrl(x.website)).map(x=>({id:x.id,title:x.name+' — website',url:safeUrl(x.website),boardName:'Career · Company'})),
   ...ui.people.filter(x=>safeUrl(x.profile_url)).map(x=>({id:x.id,title:x.full_name+' — profile',url:safeUrl(x.profile_url),boardName:'Career · Person'})),
