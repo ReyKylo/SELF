@@ -681,9 +681,15 @@
         "uujQsjqAL4s"
       ],
       "review": "Total sources − uses = 0; undrawn revolver bukan dana tunai yang diterima.",
-      "visual_status": "source_pointer_only_rights_not_confirmed",
-      "rights_note": "Public access is not a republication licence. No local screenshot or publisher image included; open the exact source section. Permission / permitted embedding must be resolved before production hosting.",
-      "verified_on": "2026-10-22"
+      "visual_status": "publisher_original_external_preview_not_rehosted",
+      "rights_note": "Source-linked visual from publisher, not rehosted. Image/embedded PDF may be blocked by source browser policies; original link available.",
+      "verified_on": "2026-10-22",
+      "visual": {
+        "type": "image",
+        "url": "https://media.wallstreetprep.com/uploads/2022/03/30202013/LBO-Model-scaled.jpg",
+        "caption": "Wall Street Prep original short-form LBO mini-model; use Sources & Uses section.",
+        "pointer": "Sources & Uses block (upper left)"
+      }
     },
     {
       "id": "PE02",
@@ -708,9 +714,15 @@
         "QQUISWzKvVU"
       ],
       "review": "Ending debt tidak negatif; cash bridge cocok; IRR memakai sponsor cash flows, bukan enterprise value.",
-      "visual_status": "source_pointer_only_rights_not_confirmed",
-      "rights_note": "Public access is not a republication licence. No local screenshot or publisher image included; open the exact source section. Permission / permitted embedding must be resolved before production hosting.",
-      "verified_on": "2026-10-22"
+      "visual_status": "publisher_original_external_preview_not_rehosted",
+      "rights_note": "Source-linked visual from publisher, not rehosted. Image/embedded PDF may be blocked by source browser policies; original link available.",
+      "verified_on": "2026-10-22",
+      "visual": {
+        "type": "image",
+        "url": "https://media.wallstreetprep.com/uploads/2022/03/30202013/LBO-Model-scaled.jpg",
+        "caption": "Wall Street Prep original LBO mini-model; focus on Cash Flow, Debt and credit metrics on the right.",
+        "pointer": "Projected cash flow / credit metrics (right)"
+      }
     },
     {
       "id": "PE03",
@@ -734,9 +746,15 @@
         "AX7qJg9k6CM"
       ],
       "review": "Kas akhir harus menghitung mandatory dan optional repayment; uji sponsor waterfall dengan contoh angka kecil.",
-      "visual_status": "source_pointer_only_rights_not_confirmed",
-      "rights_note": "Public access is not a republication licence. No local screenshot or publisher image included; open the exact source section. Permission / permitted embedding must be resolved before production hosting.",
-      "verified_on": "2026-10-22"
+      "visual_status": "publisher_original_external_preview_not_rehosted",
+      "rights_note": "Source-linked visual from publisher, not rehosted. Image/embedded PDF may be blocked by source browser policies; original link available.",
+      "verified_on": "2026-10-22",
+      "visual": {
+        "type": "pdf",
+        "url": "https://youtube-breakingintowallstreet-com.s3.amazonaws.com/109-19-LBO-Modeling-Test.pdf",
+        "caption": "Original publicly accessible 2-page BIWS/M&I modeling test prompt, not a completed model.",
+        "pointer": "Page 1: financial and deal assumptions; page 2: decision questions"
+      }
     },
     {
       "id": "PE04",
@@ -787,9 +805,15 @@
         "VNxBZ7ka5J0"
       ],
       "review": "Bedakan logo retention, revenue retention, GMV dan pendapatan Shopify; daftar data yang tidak tersedia.",
-      "visual_status": "source_pointer_only_rights_not_confirmed",
-      "rights_note": "Public access is not a republication licence. No local screenshot or publisher image included; open the exact source section. Permission / permitted embedding must be resolved before production hosting.",
-      "verified_on": "2026-10-22"
+      "visual_status": "publisher_original_external_preview_not_rehosted",
+      "rights_note": "Source-linked visual from publisher, not rehosted. Image/embedded PDF may be blocked by source browser policies; original link available.",
+      "verified_on": "2026-10-22",
+      "visual": {
+        "type": "image",
+        "url": "https://www.bvp.com/assets/uploads/2022/12/memos-shopify-1-paying-customers-graph.png.jpeg",
+        "caption": "Original Bessemer Shopify memo exhibit: paying customers, Jan 2009 to Sep 2010.",
+        "pointer": "Customers & Pricing — paying customers graph"
+      }
     },
     {
       "id": "VC02",
@@ -917,9 +941,15 @@
         "iPg7-NO97FU"
       ],
       "review": "$2 − $1,90 = $0,10; $40m/$0,10 = 400m bottles = 50m gallons; verifikasi denominator dari exhibit.",
-      "visual_status": "source_pointer_only_rights_not_confirmed",
-      "rights_note": "Public access is not a republication licence. No local screenshot or publisher image included; open the exact source section. Permission / permitted embedding must be resolved before production hosting.",
-      "verified_on": "2026-10-22"
+      "visual_status": "publisher_original_external_preview_not_rehosted",
+      "rights_note": "Source-linked visual from publisher, not rehosted. Image/embedded PDF may be blocked by source browser policies; original link available.",
+      "verified_on": "2026-10-22",
+      "visual": {
+        "type": "image",
+        "url": "https://www.mckinsey.com/~/media/mckinsey/careers%20redesign/interviewing/electrolight/careers_practicecases_ex1_png_img.png",
+        "caption": "McKinsey official Electro-Light market sizing exhibit; entire market vs electrolyte segment.",
+        "pointer": "Question 2 — sports drink market share exhibit"
+      }
     },
     {
       "id": "CO03",
