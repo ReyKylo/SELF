@@ -326,9 +326,7 @@ function dFocusMarkup(){
 
 function objectMarkup(i){const k=kind(i),s=style(i),c=card(i.card_id),isSel=ui.selected.has(i.id),name=c?.title||'',summary=c?.summary||'';
  const fill=s.fill==='transparent'?'transparent':validColour(s.fill),stroke=s.stroke==='transparent'?'transparent':validColour(s.stroke),image=c?.asset_path?ui.assetUrls.get(c.asset_path):url(c?.url);
- const body=k==='image'?((image?'<img src="'+h(image)+'" alt="'+h(name||'Reference image')+'" draggable="false"/>':'<span class="c3-placeholder">▧<small>Add a reference image</small></span>')) :
- (k==='frame'?'<div class="c3-frame-title">'+h(name||'Untitled section')+'</div>':
- '<div class="c3-object-text">'+(name?'<div>'+h(name)+'</div>':(k==='knowledge'||k==='task'?'<span class="c3-object-icon">'+(k==='task'?'☑':'✧')+'</span>':''))+(summary&&['knowledge','task','reference'].includes(k)?'<p>'+h(summary)+'</p>':'')+'</div>');
+ const body=k==='image'?((image?'<img src="'+h(image)+'" alt="'+h(name||'Reference image')+'" draggable="false"/>':'<span class="c3-placeholder">▧<small>Add a reference image</small></span>')):dBody(i,c,s);
  let label=h(name||'Blank '+k);
  const variant=SHAPE_IDS.has(s.shape)?s.shape:k;
  return '<div class="c3-object c3-kind-'+k+' c3-variant-'+variant+(isSel?' selected':'')+'" data-c3-item="'+h(i.id)+'" tabindex="0" role="button" aria-label="'+label+'" style="left:'+i.x+'px;top:'+i.y+'px;width:'+i.w+'px;height:'+i.h+'px;transform:rotate('+num(i.rotation)+'deg);--fill:'+fill+';--stroke:'+stroke+';--ink:'+validColour(s.color)+';--corner:'+num(s.radius,12)+'px;--font-size:'+num(s.fontSize,20)+'px;opacity:'+clamp(num(s.opacity,1),.3,1)+';z-index:'+num(i.z)+'">'+
@@ -379,17 +377,7 @@ function floatingUI(){
   return '<div class="c3-quick-add" id="c3-quick-add" role="menu" aria-label="Create an object" style="left:'+q.x+'px;top:'+q.y+'px"><div class="c3-quick-title">CREATE SOMETHING</div><div class="c3-quick-grid">'+QUICK_TYPES.map(([type,label])=>'<button data-c3="quick-create" data-kind="'+type+'" role="menuitem">'+label+'</button>').join('')+'</div><div class="c3-quick-hint">Create first. Write when ready.</div></div>';
  }
  if(selected.length!==1||ui.gesture?.type==='move'||ui.gesture?.type==='resize')return '';
- const item=selected[0],s=style(item),map=$('#c3-canvas');
- const vw=map?.clientWidth||950,vh=map?.clientHeight||700;
- const top=clamp(item.y*ui.zoom+ui.pan.y-58,12,vh-72);
- const left=clamp((item.x+item.w/2)*ui.zoom+ui.pan.x-171,12,Math.max(12,vw-360));
- return '<div class="c3-contextbar" id="c3-contextbar" style="left:'+left+'px;top:'+top+'px" role="toolbar" aria-label="Selected object quick actions">'+
- '<button data-c3="quick-edit" title="Edit text" aria-label="Edit text">✎</button><button data-c3="quick-notes" title="Detailed notes" aria-label="Open detailed notes">▤</button>'+
- '<button data-c3="quick-duplicate" title="Duplicate object (Ctrl+D)" aria-label="Duplicate object">⧉</button>'+
- '<button data-c3="quick-connect" title="Connect to another object" aria-label="Connect to another object">⤳</button>'+
- '<span class="c3-context-sep"></span>'+
- ['blue','green','yellow','purple'].map(key=>'<button data-c3="swatch" data-value="'+palette[key]+'" class="c3-context-color" aria-label="Set fill '+key+'" title="'+key+'" style="--swatch:'+palette[key]+'"></button>').join('')+
- '<span class="c3-context-sep"></span><button data-c3="quick-delete" title="Remove from board" aria-label="Remove from board">⌫</button></div>';
+ return dToolbar();
 }
 function minimapMarkup(){
  if(ui.mapCollapsed)return '<div class="c3-minimap c3-minimap-closed" id="c3-minimap"><button data-c3="minimap-toggle" aria-label="Show minimap">▧ Map</button></div>';
@@ -455,7 +443,7 @@ function canvas(){
  (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
  '<div class="c3-smart-strip"'+(ui.selected.size<2?' hidden':'')+'>'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
  '<div class="c3-bottom-tools">'+button('zoom-out','−','aria-label="Zoom out"')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋','aria-label="Zoom in"')+'<span class="c3-divider"></span>'+button('fit','⛶','aria-label="Fit all objects" title="Fit all objects"')+button('view-back','↶','id="c3-view-back" title="Previous view" aria-label="Previous view"')+button('help-toggle','?','aria-label="Show canvas shortcuts"')+'</div>'+
- '<div id="c3-floating-ui">'+floatingUI()+'</div>'+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F to fit</div>'+
+ '<div id="c3-floating-ui">'+floatingUI()+'</div>'+dFocusMarkup()+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F to fit</div>'+
  '<div id="c3-marquee" hidden></div><input id="c3-upload" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"/></section>'+
  inspector()+'</div>'+modal()+'</div>';
 }
@@ -467,6 +455,9 @@ function updateInPlace(){
  const content=$('.c3-content');if(content){content.classList.toggle('c3-panel-open',ui.inspectorOpen);content.classList.toggle('c3-panel-closed',!ui.inspectorOpen);}
  if(!shell||!world||!scene||shell.dataset.boardId!==ui.boardId)return false;
  const next=items(),wanted=new Set(next.map(i=>i.id));
+ const focusPanel=scene.querySelector('#d-focus-panel');
+ if(ui.dFocus&&ui.dEditing&&!focusPanel)scene.insertAdjacentHTML('beforeend',dFocusMarkup());
+ if(!ui.dFocus&&focusPanel)focusPanel.remove();
  for(const node of [...world.querySelectorAll('.c3-object[data-c3-item]')]){
    if(!wanted.has(node.dataset.c3Item)){node.remove();ui.domSnapshots.delete(node.dataset.c3Item)}
  }
@@ -474,6 +465,7 @@ function updateInPlace(){
    const markup=objectMarkup(i);
    if(ui.domSnapshots.get(i.id)===markup)continue;
    const existing=world.querySelector('[data-c3-item="'+i.id+'"]');
+   if(ui.dEditing?.id===i.id&&existing?.querySelector?.('[data-d-editor]')){ui.domSnapshots.set(i.id,markup);continue}
    if(existing)existing.outerHTML=markup;
    else world.insertAdjacentHTML('beforeend',markup);
    ui.domSnapshots.set(i.id,markup);
@@ -679,6 +671,10 @@ async function commitStyle(){
 }
 async function applyStyle(field,value){updateStylePreview(field,value,null);await commitStyle()}
 async function addEdge(from,to,fromSide='auto',toSide='auto'){if(from===to||!itm(from)||!itm(to))return;let e;await transact(async()=>{e=await api.insert('board_edges',{board_id:ui.boardId,source_item_id:from,target_item_id:to,from_anchor:fromSide,to_anchor:toSide,route_type:'curved'})},'Connected');if(e)history(async()=>api.del('board_edges',e.id),async()=>api.insert('board_edges',{...e}))}
+async function dUploadAsset(file){
+ try{const path=await api.uploadImage(file);ui.assetUrls.set(path,await api.signImage(path));const item=dSelected();if(!item)return;await transact(()=>api.patch('knowledge_cards',item.card_id,{asset_path:path}),'File attached to original object');}
+ catch(e){say('File upload failed: '+e.message,true)}
+}
 async function upload(file){if(!file)return;const allowed=['image/jpeg','image/png','image/webp','image/gif'];if(!allowed.includes(file.type)||file.size>10485760)return say('Use a PNG, JPG, WebP or GIF under 10 MB',true);
  setBusy(true);try{const path=await api.uploadImage(file);const signed=await api.signImage(path);ui.assetUrls.set(path,signed);await create('image',null,{asset_path:path,title:''})}catch(e){setBusy(false);say('Upload failed: '+e.message,true)}}
 async function imageResolve(){for(const c of state().knowledgeCards){if(!c.asset_path||ui.assetUrls.has(c.asset_path)||ui.loadingImages.has(c.asset_path))continue;ui.loadingImages.add(c.asset_path);api.signImage(c.asset_path).then(link=>{ui.assetUrls.set(c.asset_path,link);if(state().view==='board-editor')api.render()}).catch(()=>{}).finally(()=>ui.loadingImages.delete(c.asset_path))}}
@@ -764,11 +760,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='close-modal'&&el.classList.contains('c3-modal-overlay')&&e.target.closest('.c3-modal'))return;
  e.preventDefault();e.stopPropagation();const id=el.dataset.id;
  if(a==='quick-create'){const point=ui.quickAdd?.point;ui.quickAdd=null;await create(el.dataset.kind||'rectangle',point?{x:snap(point.x),y:snap(point.y)}:null);return}
- if(a==='quick-edit'){
-  const selected=entries()[0],node=selected?document.querySelector('[data-c3-item="'+selected.id+'"]'):null;
-  if(node)dbl({target:node,preventDefault(){},stopPropagation(){}});
-  return
- }
+ if(a==='quick-edit'){const selected=dSelected();if(selected)dBeginEdit(selected.id);return}
  if(a==='quick-duplicate'){await cloneSelection();return}
  if(a==='quick-delete'){await removeSelection();return}
  if(a==='quick-connect'){
@@ -794,7 +786,20 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='shapes-toggle'){ui.shapesOpen=!ui.shapesOpen;ui.toolsExpanded=false;api.render();return}
  if(a==='shape-create'){await createShape(el.dataset.shape);return}
  if(a==='help-toggle'){ui.helpOpen=!ui.helpOpen;api.render();return}
- if(a==='quick-notes'){if(entries().length!==1)return;ui.tab='notes';ui.inspectorOpen=true;api.render();return}
+ if(a==='quick-notes'){ui.dKnowledge=true;api.render();return}
+ if(a==='d-knowledge'){ui.dKnowledge=!ui.dKnowledge;ui.dPopover=null;api.render();return}
+ if(a==='d-pop-sources'||a==='d-pop-task'||a==='d-pop-board'||a==='d-pop-files'||a==='d-pop-more'){
+  const which=a.slice(6);ui.dKnowledge=true;ui.dPopover=ui.dPopover===which?null:which;api.render();return
+ }
+ if(a==='d-pop-close'){ui.dPopover=null;api.render();return}
+ if(a==='d-points'){dInsertHtml('<h3>Key points</h3><ul><li>Key insight</li></ul>');return}
+ if(a==='d-checklist'){dInsertHtml('<h3>Checklist</h3><ul><li>☐ First task</li></ul>');return}
+ if(a==='d-format'){dRichCommand(el.dataset.format);return}
+ if(a==='d-focus'){const selected=dSelected();if(!selected)return;dBeginEdit(selected.id,{focus:true});return}
+ if(a==='d-focus-close'){dEndEdit();return}
+ if(a==='d-upload'){
+  ui.dPopover=null;const input=$('#c3-upload');if(input){input.dataset.dAttach='true';input.click();}return
+ }
  if(a==='open-board'){open(id);return}
  if(a==='back'){ui.boardId=null;api.navigate('boards');return}
  if(a==='new-board'){ui.modal={type:'board',space:el.dataset.space|| (state().view==='space'?state().spaceId:null)};api.render();return}
@@ -834,32 +839,40 @@ async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-'))return;e.p
  }
  if(f.id==='c3-note-form'){const one=itm(f.dataset.id);if(!one)return;const u=o.url?.trim();if(u&&!url(u))return say('Invalid URL',true);
  await transact(()=>api.patch('knowledge_cards',one.card_id,{title:o.title||'',body:o.body||'',key_points:o.key_points||'',url:u||null,task_id:o.task_id||null,target_board_id:o.target_board_id||null}),'Notes saved to your knowledge library');return}}
-function input(e){const field=e.target?.dataset?.c3Style;if(field)updateStylePreview(field,e.target.value,e.target)}
+function input(e){if(e.target?.matches?.('[data-d-editor],#d-focus-editor')){dCapture();return}const field=e.target?.dataset?.c3Style;if(field)updateStylePreview(field,e.target.value,e.target)}
 function change(e){const field=e.target.dataset.c3Style;if(field){updateStylePreview(field,e.target.value,e.target);void commitStyle();return}
  if(e.target.matches('[data-c3-grid]'))ui.grid=e.target.checked;
- if(e.target.id==='c3-upload'){upload(e.target.files?.[0]);e.target.value=''}}
-function keydown(e){if(state().view!=='board-editor')return;const typing=e.target.closest('input,textarea,select,[contenteditable=true]');
+ if(e.target.id==='c3-upload'){const file=e.target.files?.[0];if(e.target.dataset.dAttach&&file){delete e.target.dataset.dAttach;void dUploadAsset(file)}else upload(file);e.target.value=''}}
+function keydown(e){if(state().view!=='board-editor')return;
+ if(ui.dEditing&&(e.target?.matches?.('[data-d-editor],#d-focus-editor')||e.target?.closest?.('[contenteditable=true]'))){
+   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();e.stopPropagation();dEndEdit();return}
+   if(e.key==='Escape'){e.preventDefault();e.stopPropagation();dEndEdit();return}
+   return;
+ }
+ const typing=e.target.closest('input,textarea,select,[contenteditable=true]');
  if(e.key===' '&&!typing){ui.spaceDown=true;e.preventDefault()}
  if(typing)return;
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){e.preventDefault();cloneSelection();return}
  if(e.key.toLowerCase()==='f'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();fitSelection();return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();step(e.shiftKey?'redo':'undo');return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();step('redo');return}
- if(e.key==='Escape'){ui.modal=null;ui.quickAdd=null;ui.connectFrom=null;ui.tool='select';gestureCancel();selection([]);return}
+ if(e.key==='Escape'){if(ui.dPopover){ui.dPopover=null;api.render();return}ui.dKnowledge=false;ui.modal=null;ui.quickAdd=null;ui.connectFrom=null;ui.tool='select';gestureCancel();selection([]);return}
  if(e.key==='Delete'||e.key==='Backspace'){if(ui.selected.size){e.preventDefault();let records=entries().map(i=>({...i})),ids=records.map(i=>i.id);ui.selected.clear();transact(async()=>{for(const id of ids)await api.del('board_items',id)},'Objects removed');history(async()=>{for(const i of records)await api.insert('board_items',i)},async()=>{for(const i of records)await api.del('board_items',i.id)})}return}
  if(e.key.toLowerCase()==='r'){e.preventDefault();create('rectangle')}
  if(e.key.toLowerCase()==='n'){e.preventDefault();create('sticky')}
  if(e.key.toLowerCase()==='v'){e.preventDefault();ui.tool='select';api.render()}
 }
-function dbl(e){if(state().view!=='board-editor')return;const node=e.target.closest('[data-c3-item]');if(!node){if(!e.target.closest('#c3-canvas')||e.target.closest('button,input,textarea,select,.c3-minimap,.c3-bottom-tools,.c3-smart-strip,.c3-contextbar,.c3-quick-add'))return;e.preventDefault();e.stopPropagation();openQuickAdd(e.clientX,e.clientY);return}const i=itm(node.dataset.c3Item),c=card(i?.card_id);if(!i||!c)return;e.preventDefault();e.stopPropagation();ui.selected=new Set([i.id]);
- if(kind(i)==='image'){ui.tab='notes';api.render();return}
- const text=node.querySelector('.c3-object-text')||node.querySelector('.c3-frame-title');if(!text)return;
- const existing=text.querySelector('div')?.textContent||c.title||'';text.innerHTML='<textarea class="c3-inline" maxlength="200" rows="3" aria-label="Type your note">'+h(existing)+'</textarea>';
- const area=text.querySelector('textarea');if(!area)return;area.focus();area.select();
- let committed=false;
- const complete=async(save)=>{if(committed)return;committed=true;const v=area.value; if(save){await transact(()=>api.patch('knowledge_cards',c.id,{title:v}),'Text saved')}else api.render()};
- area.addEventListener('keydown',ev=>{if(ev.key==='Escape'){ev.stopPropagation();complete(false)}else if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();ev.stopPropagation();complete(true)}});
- area.addEventListener('blur',()=>complete(true));}
+function dbl(e){
+ if(state().view!=='board-editor')return;
+ const node=e.target.closest?.('[data-c3-item]');
+ if(!node){
+  if(!e.target.closest?.('#c3-canvas')||e.target.closest?.('button,input,textarea,select,.c3-minimap,.c3-bottom-tools,.c3-smart-strip,.d-toolbar,.c3-quick-add'))return;
+  e.preventDefault();e.stopPropagation();openQuickAdd(e.clientX,e.clientY);return;
+ }
+ const item=itm(node.dataset.c3Item);if(!item)return;
+ e.preventDefault();e.stopPropagation();dBeginEdit(item.id);
+}
+
 function links(){const found=new Map();for(const c of state().knowledgeCards){const hits=[c.url,...(String(c.body||'')+' '+String(c.key_points||'')+' '+String(c.summary||'')).match(/https?:\/\/[^\s<>"']+/gi)||[]];for(let raw of hits){let u=url(String(raw||'').replace(/[),.;!?]+$/,''));if(u&&!found.has(u)){const i=state().boardItems.find(i=>i.card_id===c.id);const b=state().boards.find(b=>b.id===i?.board_id);found.set(u,{id:c.id,title:c.title||new URL(u).hostname,url:u,boardName:b?.title||'Knowledge'})}}}return [...found.values()]}
 
 function dropOver(e){if(state().view!=='board-editor'||!e.target.closest('#c3-canvas'))return;e.preventDefault()}
