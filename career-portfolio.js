@@ -49,10 +49,14 @@ async function upload(file){
  const o=st.owner,t=st.track;if(!current(o,t)||st.busy||!file)return;
  const ext=file.name.split('.').pop().toLowerCase();if(!['pdf','docx','xlsx','pptx'].includes(ext)||!file.size||file.size>15728640){st.error='Pilih PDF/DOCX/XLSX/PPTX hingga 15 MB';redraw();return}
  st.busy=true;st.error='';redraw();let obj;
- try{obj=await host.uploadPortfolioFile(file,t);if(!current(o,t))return;
+ try{
+ if(st.record?.status!=='draft'){
+  await host.request(url('career_portfolio_cases',o,t),{method:'PATCH',headers:{Prefer:'return=minimal'},body:{status:'draft',updated_at:new Date().toISOString()}});
+  if(!current(o,t))return;st.record.status='draft';
+ }
+ obj=await host.uploadPortfolioFile(file,t);if(!current(o,t))return;
  const res=await host.request('/rest/v1/career_portfolio_files',{method:'POST',headers:{Prefer:'return=representation'},body:{user_id:o,track:t,object_path:obj.path,filename:file.name,mime_type:obj.mime,bytes:obj.bytes}});
  if(!current(o,t))return;if(!res?.[0]?.id)throw Error('Metadata file belum tersimpan');st.files.unshift(res[0]);
- if(st.record){st.record.status='draft';await host.request(url('career_portfolio_cases',o,t),{method:'PATCH',headers:{Prefer:'return=minimal'},body:{status:'draft',updated_at:new Date().toISOString()}})}
  host.notify('File tersimpan di portfolio')}
  catch(e){if(obj?.path)try{await host.removePortfolioFile(obj.path)}catch{}if(current(o,t))st.error='Upload belum terkonfirmasi: '+e.message}
  finally{if(current(o,t)){st.busy=false;redraw()}}
@@ -65,8 +69,14 @@ async function view(id){
 async function remove(id){
  const f=st.files.find(f=>f.id===id),o=st.owner,t=st.track;if(!f||st.busy||!window.confirm('Hapus '+f.filename+'?'))return;
  st.busy=true;redraw();
- try{await host.removePortfolioFile(f.object_path);await host.request('/rest/v1/career_portfolio_files?id=eq.'+encodeURIComponent(id),{method:'DELETE'});if(current(o,t)){st.files=st.files.filter(x=>x.id!==id);host.notify('File dihapus')}}
- catch(e){if(current(o,t))st.error='Hapus tidak terkonfirmasi: '+e.message}
+ try{
+  await host.request('/rest/v1/career_portfolio_files?id=eq.'+encodeURIComponent(id),{method:'DELETE'});
+  if(!current(o,t))return;st.files=st.files.filter(x=>x.id!==id);
+  if(st.record?.status!=='draft'){await host.request(url('career_portfolio_cases',o,t),{method:'PATCH',headers:{Prefer:'return=minimal'},body:{status:'draft',updated_at:new Date().toISOString()}});if(current(o,t))st.record.status='draft';}
+  try{await host.removePortfolioFile(f.object_path);host.notify('File dihapus');}
+  catch(e){st.error='File dihapus dari daftar, tapi cleanup storage gagal: '+e.message}
+ }
+ catch(e){if(current(o,t))st.error='Hapus belum selesai: '+e.message}
  finally{if(current(o,t)){st.busy=false;redraw()}}
 }
 function action(e){const b=e.target.closest?.('[data-portfolio]');if(!b)return false;e.preventDefault();e.stopPropagation();
