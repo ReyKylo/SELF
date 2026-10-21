@@ -174,3 +174,16 @@
 .career-capture-choices .career-btn{min-height:65px;text-align:left;font-size:.88em;padding:16px;background:var(--card)}
 .career-capture-choices .career-btn:not(:disabled):hover{border-color:var(--blue);background:var(--blueSoft)}
 @media(max-width:390px){.career-capture-choices{grid-template-columns:1fr}}
+
+
+/* Final readability pass: core record text scales with SELF's 100–150% setting. */
+.career-stage{font-size:1.02em}
+.career-subnav{font-size:.88em}
+.career-list-item strong{font-size:.91em}
+.career-list-item small,.career-section-head p,.career-company small{font-size:.82em}
+.career-focus-message p,.career-upcoming p,.career-empty p{font-size:.94em}
+.career-drawer-scroll,.career-modal{font-size:1em}
+.career-form-label{font-size:.87em}
+.career-btn{font-size:.84em}
+.career-drawer-header .career-btn{min-width:40px;min-height:40px}
+.career-form-actions .career-primary{min-width:140px}
