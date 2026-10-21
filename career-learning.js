@@ -59,6 +59,14 @@ function noMatch(){return '<div class="learning-empty" role="status"><h3>Tidak a
 function videoButton(videoId){const v=ui.data.videos.find(v=>v.video_id===videoId);return v?button(v.title+' · '+v.duration,'video','data-id="'+h(v.video_id)+'"'):''}
 function evidenceButton(id){const p=ui.data.panels.find(p=>p.id===id);return p?button(p.title,'panel','data-id="'+h(id)+'"'):''}
 function block(title,body){return '<section class="learning-explainer"><h3>'+h(title)+'</h3>'+body+'</section>'}
+function originalEvidence(p){
+ const v=p.visual,origin=external('Buka sumber asli',p.source_url);
+ if(!v||!safeUrl(v.url))return '<div class="learning-document-mark" aria-hidden="true">'+(host.icon?.('book',34)||'↗')+'</div><span class="learning-label">SOURCE POINTER ONLY</span><p class="learning-pointer-note">Belum ada bukti visual yang dapat ditampilkan langsung. Buka sumber asli di bagian yang tertera — jangan anggap panel ini screenshot verified.</p>';
+ const url=h(safeUrl(v.url));
+ if(v.type==='image')return '<div class="learning-real-visual"><a href="'+h(safeUrl(p.source_url)||'')+'" target="_blank" rel="noopener noreferrer" aria-label="Buka sumber asli '+h(p.publisher)+'"><img src="'+url+'" loading="lazy" alt="'+h(v.caption)+'"></a><p class="learning-visual-caption">'+h(v.caption)+'</p></div>';
+ if(v.type==='pdf')return '<div class="learning-real-visual"><object data="'+url+'#page=1&view=FitH" type="application/pdf" aria-label="'+h(v.caption)+'"><p>Browser tidak dapat menampilkan PDF ini. '+origin+'</p></object><p class="learning-visual-caption">'+h(v.caption)+'</p></div>';
+ return '';
+}
 function evidence(){
  const rows=filtered('panels');const p=rows.find(p=>p.id===ui.panel)||rows[0];if(p)ui.panel=p.id;
  return filters('panels')+'<p class="learning-count" role="status">'+rows.length+' dari '+ui.data.panels.length+' evidence · '+h(trackName(ui.track))+'</p>'+
@@ -68,10 +76,11 @@ function evidence(){
  '<div class="learning-v4"><div class="learning-explainers">'+block('INI APA','<p>'+h(p.ini_apa)+'</p>')+block('INI KENAPA','<p>'+h(p.ini_kenapa)+'</p>')+
  block('CARA ACHIEVE','<ol>'+p.cara_achieve.map(step=>'<li>'+h(step)+'</li>').join('')+'</ol>')+
  block('ANALISIS AI','<p>'+h(p.analisis_ai)+'</p>')+'</div>'+
- '<aside class="learning-original" aria-label="Sumber asli"><div class="learning-document-mark" aria-hidden="true">'+(host.icon?.('book',34)||'↗')+'</div>'+
- '<span class="learning-label">EVIDENCE ASLI</span><h3>'+h(p.source_title)+'</h3><p>'+h(p.publisher)+'</p><div class="learning-source-location"><strong>Bagian yang perlu dibuka</strong><p>'+h(p.source_pointer)+'</p></div>'+
- '<p class="learning-pointer-note">Tautan sumber asli · screenshot belum tersedia. Buka bagian di atas untuk melihat exhibit dari penerbit.</p>'+external('Buka sumber asli',p.source_url)+
- '<details class="learning-disclosure"><summary>URL, verifikasi & akses</summary><p class="learning-url">'+h(p.source_url)+'</p><p>Diperiksa '+h(p.verified_on)+'. Klasifikasi: '+h(p.classification)+'. Izin reproduksi gambar belum dikonfirmasi; tidak ada screenshot buatan.</p></details></aside></div>'+
+ '<aside class="learning-original" aria-label="Sumber asli">'+originalEvidence(p)+
+ '<span class="learning-label">EVIDENCE / '+(p.visual?'PREVIEW EKSTERNAL':'SOURCE LINK')+'</span><h3>'+h(p.source_title)+'</h3><p>'+h(p.publisher)+'</p><div class="learning-source-location"><strong>Bagian untuk dipelajari</strong><p>'+h(p.visual?.pointer||p.source_pointer)+'</p></div>'+
+ (!p.visual?'<p class="learning-pointer-note">Screenshot belum tersedia untuk panel ini.</p>':'<p class="learning-pointer-note">Preview dari penerbit; mungkin diblokir browser. Gambar tidak di-host ulang di SELF.</p>')+
+ external('Buka sumber asli',p.source_url)+
+ '<details class="learning-disclosure"><summary>URL, verifikasi & akses</summary><p class="learning-url">'+h(p.source_url)+'</p><p>Diperiksa '+h(p.verified_on)+'. Klasifikasi: '+h(p.classification)+'. '+h(p.rights_note)+'</p></details></aside></div>'+
  '<div class="learning-next">'+block('WATCH · Pelajaran terkait','<div class="learning-related">'+p.video_ids.map(videoButton).join('')+'</div>')+
  block('REVIEW · Cek pemahaman','<p>'+h(p.review)+'</p>')+'</div></article></div>');
 }
@@ -101,6 +110,37 @@ function sources(){const rows=filtered('sources');return filters('sources')+
  (rows.length?'<div class="learning-source-list">'+rows.map(x=>'<article class="learning-source-row"><div><small>'+h(x.track)+' · '+h(x.publisher)+' · '+h(x.classification)+'</small><h3>'+h(x.title)+'</h3><p>'+h(x.useful_exhibit)+'</p><span class="learning-source-status">'+h(sourceStatus(x))+'</span><details class="learning-disclosure"><summary>Detail akses</summary><p>'+h(x.access_note)+'</p><p>Diperiksa '+h(x.verified_on)+'</p><p class="learning-url">'+h(x.url)+'</p></details></div>'+external('Buka',x.url,'aria-label="Buka '+h(x.title)+'"')+'</article>').join('')+'</div>':noMatch());}
 function marker(id){return '[SELF learning sprint:v1:'+id+']'}
 function existingTask(id){const owner=ensureOwner();return (host.state()?.tasks||[]).find(t=>t.user_id===owner&&String(t.notes||'').includes(marker(id)))}
+const STARTER_ASSETS={
+ PE:{filename:'Day1_PE_LBO_Starter.xlsx',url:'./content/career-kits/PE_LBO_Starter.xlsx.b64'},
+ VC:{filename:'Day2_VC_Investment_Starter.xlsx',url:'./content/career-kits/VC_Investment_Starter.xlsx.b64'},
+ Consulting:{filename:'Day3_Consulting_Profitability_Starter.xlsx',url:'./content/career-kits/Consulting_Profitability_Starter.xlsx.b64'}
+};
+function blobDownload(data,name,type){
+ const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');
+ a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
+async function downloadStarter(id,kind){
+ const day=ui.data?.sprints.find(d=>d.id===id);
+ if(!day)throw Error('Case tidak ditemukan.');
+ if(kind==='xlsx'){
+  const asset=STARTER_ASSETS[id];if(!asset)throw Error('Workbook belum tersedia.');
+  const r=await fetch(asset.url,{cache:'no-cache'});if(!r.ok)throw Error('File belum tersedia ('+r.status+').');
+  const txt=(await r.text()).trim();if(!/^[A-Za-z0-9+/=]+$/.test(txt))throw Error('Konten file tidak valid.');
+  const bin=atob(txt);if(bin.length<2500||bin.charCodeAt(0)!==0x50||bin.charCodeAt(1)!==0x4b)throw Error('Bukan workbook XLSX yang valid.');
+  const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+  blobDownload(bytes,asset.filename,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  return;
+ }
+ if(kind==='brief'){
+  const brief='# '+day.title+' — SELF Career Prep\n\n**Independent simulated case — NOT a real investment or client mandate.**\n\n'+day.lesson;
+  blobDownload(brief,'SELF_'+id+'_Case_Brief.md','text/markdown;charset=utf-8');return;
+ }
+ if(kind==='memo'){
+  const memo='# '+day.title+' — YOUR INDEPENDENT RECOMMENDATION\n\n**SIMULATED EXERCISE — MY OWN WORK**\n\n## Decision\n[Invest, Pass, Diligence, or strategic recommendation]\n\n## Key evidence\n[Link to workbook and verify every number]\n\n## Drivers and scenarios\n[Base, downside, alternatives]\n\n## Risks and unanswered diligence\n[State uncertainty]\n\n## Next steps\n[Conditions and execution]\n\n## Sources and case limitations\n[Expert examples studied and simulated-data disclosure]\n';
+  blobDownload(memo,'SELF_'+id+'_Decision_Template.md','text/markdown;charset=utf-8');return;
+ }
+ throw Error('Jenis file belum didukung.');
+}
 function sprint(){
  const days=ui.data.sprints;const day=days.find(d=>d.id===ui.day)||days[0];const task=existingTask(day.id);
  return '<div class="learning-sprint-intro"><span class="learning-label">LEARN BY BUILDING</span><h2>Tiga proyek. Bukti yang bisa lu tunjukkan.</h2><p>Belajar dari contoh asli, tonton bagian yang relevan, lalu langsung bikin. Target 6–8 jam per hari; boleh lanjut besok kalau butuh waktu.</p></div>'+
@@ -108,6 +148,7 @@ function sprint(){
  '<article class="learning-day-detail"><div class="learning-assignment-head"><div><span class="learning-label">ASSIGNMENT · HARI '+day.day+'</span><h2 id="learning-day-title" tabindex="-1">'+h(day.title)+'</h2><p>'+h(day.summary)+'</p></div><div>'+button(ui.busy?'Memeriksa tugas…':task?'Buka task di My Work':'Tambah proyek ke My Work','task','data-id="'+h(day.id)+'" '+(ui.busy?'disabled':''),true)+'<small class="learning-task-note">'+(task?'Task SELF yang sama; status mengikuti My Work.':'Task dibuat saat lu memilih tombol ini.')+'</small></div></div>'+
  (ui.taskError?'<p class="learning-task-error" role="alert">'+h(ui.taskError)+'</p>':'')+
  '<div class="learning-workflow"><section><h3>01 · SEE</h3><p>Pelajari cara expert menyusun keputusan.</p><div class="learning-related">'+day.panels.map(evidenceButton).join('')+'</div></section><section><h3>02 · WATCH</h3><p>Tonton berurutan. Setelah tiap video, kerjakan hasilnya.</p><div class="learning-related">'+day.videos.map(id=>videoButton(ui.data.videos.find(v=>v.id===id)?.video_id)).join('')+'</div></section></div>'+
+ '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief','download','data-id="'+h(day.id)+'" data-kind="brief"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+'</div>'+
  '<section class="learning-lesson"><h3>03 · DO → BUILD → REVIEW</h3><p class="learning-fixture-label">Data fiktif untuk latihan independen. Bukan transaksi atau proyek klien nyata.</p>'+markdown(day.lesson)+'</section></article>'+
  '<div class="learning-download"><a class="career-btn learning-link" href="./content/portfolio-sprint.md" download="SELF_Portfolio_Sprint.md">Download playbook lengkap ↓</a><p>Workbook, memo, dan deck dibuat sendiri dari latihan. Materi tidak menandakan pengalaman deal nyata.</p></div>';
 }
@@ -150,6 +191,7 @@ function switchTab(tab){clearTimeout(searchTimer);ui.tab=tab;ui.query='';ui.type
 async function action(event){
  const b=event.target.closest?.('[data-learning]');if(!b)return false;
  event.preventDefault();event.stopPropagation();ensureOwner();const action=b.dataset.learning;
+ if(action==='download'){downloadStarter(b.dataset.id,b.dataset.kind).then(()=>host?.notify?.('File berhasil disiapkan untuk download')).catch(err=>host?.notify?.('Download gagal: '+(err?.message||String(err)),true));return true}
  if(action==='retry'){void load();return true}
  if(action==='task'){await projectTask(b.dataset.id);return true}
  if(action==='tab'){ui.backPanel=null;ui.backContext=null;switchTab(b.dataset.tab);redraw('[data-learning="tab"][data-tab="'+ui.tab+'"]');return true}

@@ -37,6 +37,8 @@ jobs:
         run: node tests/smoke_career_phase3.cjs
       - name: Career Prep content and canonical Task regression
         run: node tests/smoke_career_learning.cjs
+      - name: Career Prep real XLSX asset verification
+        run: node tests/smoke_career_starter_assets.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke

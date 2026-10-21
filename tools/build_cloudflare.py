@@ -6,7 +6,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "dist"
-ASSETS = ("index.html", "styles.css", "app.js", "boards.css", "boards.js", "canvas-v3.css", "canvas-v3.js", "concept-d.css", "career.js", "career.css", "career-phase2.js", "career-phase2.css", "career-phase3.js", "career-phase3.css", "career-learning.js", "career-learning.css", "content/career-learning.json", "content/portfolio-sprint.md")
+ASSETS = ("index.html", "styles.css", "app.js", "boards.css", "boards.js", "canvas-v3.css", "canvas-v3.js", "concept-d.css", "career.js", "career.css", "career-phase2.js", "career-phase2.css", "career-phase3.js", "career-phase3.css", "career-learning.js", "career-learning.css", "content/career-learning.json", "content/portfolio-sprint.md", "content/career-kits/PE_LBO_Starter.xlsx.b64", "content/career-kits/VC_Investment_Starter.xlsx.b64", "content/career-kits/Consulting_Profitability_Starter.xlsx.b64")
 
 
 def main() -> int:
