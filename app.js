@@ -376,7 +376,48 @@ async function signCareerDocument(path){
  return SUPABASE_URL+(signed.startsWith('/storage/v1/')?'':'/storage/v1')+(signed.startsWith('/')?'':'/')+signed;
 }
 
-window.SELFCareer?.init?.({state:()=>state,render,navigate:go,request,insert,patch,del,notify:toast,icon:ic,newTask:()=>{state.newTaskSpace='';state.modal='task';render()},openTask:id=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},reloadCore:loadAll,uploadDocument:uploadCareerDocument,signDocument:signCareerDocument,validateDocument:validateCareerDocument,reloadCareer:()=>window.SELFCareer?.reload?.()});
+
+// Career Prep portfolio artifacts live in a separate private bucket (never CV storage).
+const PORTFOLIO_TYPES={
+ pdf:'application/pdf',
+ xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+ pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+ docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+};
+function portfolioMime(file){
+ const ext=String(file?.name||'').split('.').pop().toLowerCase();
+ if(!Object.prototype.hasOwnProperty.call(PORTFOLIO_TYPES,ext))throw Error('Use PDF, XLSX, PPTX or DOCX.');
+ if(!file.size||file.size>15*1024*1024)throw Error('File must be between 1 byte and 15 MB.');
+ const mime=PORTFOLIO_TYPES[ext];
+ if(file.type&&file.type!=='application/octet-stream'&&file.type!==mime)throw Error('File extension and type disagree.');
+ return {ext,mime};
+}
+async function uploadPortfolioFile(file,track){
+ if(!state.user?.id||!state.session?.access_token)throw Error('Login diperlukan sebelum upload.');
+ if(!['PE','VC','Consulting'].includes(track))throw Error('Case track tidak valid.');
+ const {ext,mime}=portfolioMime(file);
+ const path=state.user.id+'/'+track+'/'+crypto.randomUUID()+'.'+ext;
+ const url=SUPABASE_URL+'/storage/v1/object/self-career-portfolio/'+path.split('/').map(encodeURIComponent).join('/');
+ const perform=token=>fetch(url,{method:'POST',headers:{apikey:PUBLIC_KEY,Authorization:'Bearer '+token,'Content-Type':mime,'x-upsert':'false'},body:file});
+ let res=await perform(state.session.access_token);
+ if(res.status===401&&await refresh())res=await perform(state.session.access_token);
+ if(!res.ok){const err=await res.json().catch(()=>({message:res.statusText}));throw Error(err.message||err.error||'Portfolio upload failed');}
+ return {path,mime,bytes:file.size};
+}
+async function signPortfolioFile(path){
+ if(!state.user?.id||!path?.startsWith(state.user.id+'/'))throw Error('File bukan milik akun ini.');
+ const result=await request('/storage/v1/object/sign/self-career-portfolio/'+path.split('/').map(encodeURIComponent).join('/'),{method:'POST',body:{expiresIn:300}});
+ const url=result?.signedURL||result?.signedUrl;
+ if(!url)throw Error('Signed URL tidak tersedia.');
+ if(url.startsWith('https://'))return url;
+ return SUPABASE_URL+(url.startsWith('/storage/v1/')?'':'/storage/v1')+(url.startsWith('/')?'':'/')+url;
+}
+async function removePortfolioFile(path){
+ if(!state.user?.id||!path?.startsWith(state.user.id+'/'))throw Error('File bukan milik akun ini.');
+ return request('/storage/v1/object/self-career-portfolio/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE'});
+}
+
+window.SELFCareer?.init?.({state:()=>state,render,navigate:go,request,insert,patch,del,notify:toast,icon:ic,newTask:()=>{state.newTaskSpace='';state.modal='task';render()},openTask:id=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},reloadCore:loadAll,uploadDocument:uploadCareerDocument,signDocument:signCareerDocument,validateDocument:validateCareerDocument,uploadPortfolioFile,signPortfolioFile,removePortfolioFile,reloadCareer:()=>window.SELFCareer?.reload?.()});
 window.SELFBoards?.init?.({state:()=>state,render,navigate:go,uploadImage:uploadBoardImage,signImage:signBoardImage,openTask:(id)=>{window.SELFBoards.ui.selected?.clear?.();state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
 verifySession();
 
