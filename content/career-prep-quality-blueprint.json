@@ -1,0 +1,818 @@
+{
+  "version": "1.0.0-phase1",
+  "created_on": "2026-10-22",
+  "project": "ReyKylo/SELF",
+  "phase": "1 - Quality Blueprint",
+  "status": "SPECIFICATION_ONLY_NOT_A_CERTIFICATION",
+  "external_benchmark_notice": "References describe real programs/evidence; SELF thresholds and rubric are independently designed internal criteria, never named firm approval.",
+  "teach_contract": {
+    "required_sequence": [
+      "RELATABLE_HOOK",
+      "ANALOGY",
+      "EXPLICIT_FORMAL_TERM",
+      "PRECISE_DEFINITION",
+      "SOURCE_VISUAL_OR_TRANSPARENT_SUBSTITUTE",
+      "WORKED_EXAMPLE",
+      "INDEPENDENT_ATTEMPT",
+      "CHECK_AND_REMEDIATION",
+      "SPACED_RECALL"
+    ],
+    "naming_rule": "Immediately after every analogy include a sentence like 'Yes, ini namanya [English technical term] ([Indonesian term])'. Distinguish neighboring and commonly confused terms, do not force a false synonym.",
+    "audience_language": "Bahasa Indonesia ringan + accepted English technical terms. Define abbreviations on first use and retain them for interviews.",
+    "analogy_quality": "Concrete, numerically accurate when numbers appear; identify where analogy stops matching professional use. Never substitute analogy for rigorous definition.",
+    "visual_rule": "Prefer authentic licensed/attributed exhibit. Every original evidence page requires source URL, publisher, page/section, access status, and an evidence-to-claim check. Missing images must not be replaced with fake screenshots.",
+    "video_rule": "Each assigned video must have verified creator/URL/objective, and a named action to perform immediately afterward. Chapters only when source verified.",
+    "examples_rule": "A worked example is explicitly separate from independent answer keys; answers must not leak into blank modeling assessment.",
+    "competency_rule": "No 'Watched = Mastered'. End with a new question or numeric exercise with identifiable expected outcome.",
+    "assistance_rule": "Three levels: concept reminder; methodology/formula guidance; reference solution only after student tries. Track hints used when interpreting independent performance.",
+    "feedback_rule": "Feedback cites failing cell, calculation, reason, evidence or assumption. Encourage revision and repeated independent attempt instead of generic praise.",
+    "memory_rule": "Review core technical terms again in a separate session / later case; include retrieval practice and spaced practice."
+  },
+  "glossary": [
+    {
+      "id": "G01",
+      "track": "PE",
+      "analogy": "Harga toko keseluruhan berbeda dari uang bersih pemilik setelah utangnya dibereskan.",
+      "term": "Enterprise Value (EV) vs Equity Value",
+      "definition": "EV adalah nilai operasi perusahaan bagi semua penyandang dana; Equity Value adalah nilai yang menjadi hak pemegang saham setelah penyesuaian utang/kas dan klaim lain yang relevan.",
+      "numbers": "EV Rp120M, net debt Rp40M -> equity value Rp80M.",
+      "check": "Apakah menambah Rp10M kas mengubah enterprise value, equity value, atau kedua-duanya, jika faktor lain tetap?"
+    },
+    {
+      "id": "G02",
+      "track": "PE",
+      "analogy": "Modal sendiri seperti uang DP rumah; sisanya pinjam bank.",
+      "term": "Capital Structure / Debt Financing / Equity Contribution",
+      "definition": "Capital structure menjelaskan komposisi pendanaan melalui utang dan modal pemegang saham.",
+      "numbers": "Harga Rp100M, debt Rp60M -> equity kontribusi Rp40M sebelum biaya.",
+      "check": "Apa risiko investor jika arus kas perusahaan turun?"
+    },
+    {
+      "id": "G03",
+      "track": "PE",
+      "analogy": "Membeli bisnis dengan sebagian dana pinjaman untuk menghasilkan pengembalian kepada pemegang saham.",
+      "term": "Leveraged Buyout (LBO)",
+      "definition": "Akuisisi dengan porsi pembiayaan utang yang material, ditopang cash flow bisnis target.",
+      "numbers": "EV Rp100M, debt Rp60M, equity Rp40M (simplified, no fees).",
+      "check": "Mengapa leverage tidak selalu meningkatkan IRR?"
+    },
+    {
+      "id": "G04",
+      "track": "PE",
+      "analogy": "Dua sisi nota belanja harus cocok: asal uang sama dengan dipakainya.",
+      "term": "Sources & Uses of Funds",
+      "definition": "Tabel transaksi yang merekonsiliasi seluruh sumber dana dengan seluruh penggunaan dana.",
+      "numbers": "Uses Rp120M+fee Rp4M, debt Rp60M -> equity Rp64M.",
+      "check": "Berapa funding gap ketika sources baru Rp121M?"
+    },
+    {
+      "id": "G05",
+      "track": "PE",
+      "analogy": "Laba di atas kertas belum sama dengan uang yang bisa dipakai membayar tagihan.",
+      "term": "Working Capital / Cash Conversion",
+      "definition": "Working capital operasional mencerminkan dana yang terikat dalam persediaan/piutang dikurangi kewajiban operasional terkait; kenaikan modal kerja biasanya menggunakan kas.",
+      "numbers": "Piutang naik Rp7M dengan faktor lain tetap -> CFO turun Rp7M.",
+      "check": "Mengapa pertumbuhan penjualan bisa memperburuk arus kas?"
+    },
+    {
+      "id": "G06",
+      "track": "PE",
+      "analogy": "Laba operasi sebelum beberapa biaya tertentu, bukan uang tunai.",
+      "term": "EBITDA",
+      "definition": "Earnings Before Interest, Taxes, Depreciation and Amortization; ukuran kinerja operasi yang mengabaikan biaya tertentu, bukan pengganti free cash flow.",
+      "numbers": "EBITDA Rp20M, capex Rp8M tidak berarti investor punya Rp20M kas.",
+      "check": "Apa dua pengeluaran yang tidak tercermin langsung dalam EBITDA?"
+    },
+    {
+      "id": "G07",
+      "track": "PE",
+      "analogy": "Setiap tahun sisa pinjaman harus diperbarui seperti cicilan kredit.",
+      "term": "Debt Schedule / Debt Roll-forward",
+      "definition": "Perhitungan saldo utang awal, pencairan, bunga, pembayaran pokok dan saldo utang akhir.",
+      "numbers": "Utang awal Rp60M, pelunasan pokok Rp8M -> akhir Rp52M.",
+      "check": "Apakah biaya bunga otomatis mengurangi pokok utang?"
+    },
+    {
+      "id": "G08",
+      "track": "PE",
+      "analogy": "Tabel 'kalau harga jual turun, untungku jadi berapa?'",
+      "term": "Sensitivity Analysis / Downside Scenario",
+      "definition": "Pengujian dampak perubahan asumsi pada valuation, cash, return atau kelayakan keputusan.",
+      "numbers": "Exit multiple 8x, 10x, 12x menghasilkan exit EV berbeda.",
+      "check": "Asumsi exit multiple naik terus tanpa bukti termasuk risiko apa?"
+    },
+    {
+      "id": "G09",
+      "track": "PE",
+      "analogy": "Uang Rp1 menjadi Rp2 berarti hasil dua kali lipat, tetapi belum jelas berapa cepat.",
+      "term": "MOIC (Multiple on Invested Capital)",
+      "definition": "Gross proceeds divided by invested equity capital, sebelum definisi fee/expense khusus yang relevan.",
+      "numbers": "Equity out Rp50M, exit equity Rp125M -> MOIC 2.5x.",
+      "check": "MOIC 2.5x dalam 3 tahun sama menariknya dengan 10 tahun?"
+    },
+    {
+      "id": "G10",
+      "track": "PE",
+      "analogy": "Mengukur kecepatan pertumbuhan modal dengan mempertimbangkan waktu.",
+      "term": "Internal Rate of Return (IRR)",
+      "definition": "Discount rate yang membuat NPV seluruh arus kas investasi menjadi nol.",
+      "numbers": "Invest 100, receive 121 after 2 years -> IRR 10% pa.",
+      "check": "Mengapa MOIC dan IRR perlu dibaca bersama?"
+    },
+    {
+      "id": "G11",
+      "track": "PE",
+      "analogy": "Berapa harga tertinggi yang masih membuat bisnis layak dibeli.",
+      "term": "Maximum Bid / Return Hurdle",
+      "definition": "Harga akuisisi maksimum yang konsisten dengan persyaratan return investor di bawah asumsi tertentu.",
+      "numbers": "Hurdle 20% IRR -> cari entry price yang menghasilkan tepat sekitar 20%.",
+      "check": "Apa yang terjadi pada maksimum harga masuk ketika proyeksi EBITDA turun?"
+    },
+    {
+      "id": "G12",
+      "track": "VC",
+      "analogy": "Seperti kolam: semua orang Indonesia bukan otomatis calon pembeli produk khusus mahasiswa.",
+      "term": "TAM / SAM / SOM",
+      "definition": "Total addressable market, serviceable available market, serviceable obtainable market; ukur ruang pasar berjenjang.",
+      "numbers": "TAM Rp10T tidak berarti startup bisa memperoleh Rp10T.",
+      "check": "Bagaimana menunjukkan reachable share tanpa asal mengalikan pangsa pasar?"
+    },
+    {
+      "id": "G13",
+      "track": "VC",
+      "analogy": "Pendapatan langganan seperti iuran bulanan, bukan seluruh uang transfer yang masuk.",
+      "term": "MRR / ARR",
+      "definition": "Monthly / Annual Recurring Revenue, diukur dari kontrak/langganan berulang dengan penyesuaian relevan.",
+      "numbers": "MRR Rp100jt -> ARR run-rate Rp1,2Miliar, belum tentu revenue tahun aktual.",
+      "check": "Apa beda annualized run rate dan actual revenue?"
+    },
+    {
+      "id": "G14",
+      "track": "VC",
+      "analogy": "Anak kelas yang daftar bersamaan diamati bulan demi bulan.",
+      "term": "Cohort Analysis",
+      "definition": "Mengelompokkan pelanggan berdasarkan waktu masuk untuk mempelajari perilaku, retention dan monetization pada usia pelanggan yang sebanding.",
+      "numbers": "100 signup Januari, 80 aktif pada bulan 6 -> logo retention 80%.",
+      "check": "Bolehkah langsung membandingkan cohort umur 3 bulan dan 6 bulan?"
+    },
+    {
+      "id": "G15",
+      "track": "VC",
+      "analogy": "Dari 10 pelanggan berbayar, dua pergi: berapa yang bertahan?",
+      "term": "Logo Retention / Logo Churn",
+      "definition": "Perbandingan jumlah pelanggan yang bertahan/hilang dari awal periode.",
+      "numbers": "100 awal, 80 bertahan -> retention 80%, churn 20%.",
+      "check": "Apa bedanya churn pelanggan dan churn revenue?"
+    },
+    {
+      "id": "G16",
+      "track": "VC",
+      "analogy": "Pelanggan lama mungkin pergi, tetapi yang bertahan belanja makin besar.",
+      "term": "Net Revenue Retention (NRR)",
+      "definition": "Recurring revenue dari pelanggan yang sama setelah churn, contraction dan expansion; tidak memasukkan revenue pelanggan baru.",
+      "numbers": "MRR awal 100, expansion 20, contraction 5, churn 10 -> NRR 105%.",
+      "check": "Mengapa NRR >100% belum membuktikan startup profitable?"
+    },
+    {
+      "id": "G17",
+      "track": "VC",
+      "analogy": "Biaya iklan dan sales untuk dapat pembeli, dibanding laba kotor yang dia sumbangkan.",
+      "term": "CAC / CAC Payback",
+      "definition": "Customer Acquisition Cost dan bulan yang dibutuhkan gross profit pelanggan untuk memulihkan biaya akuisisi.",
+      "numbers": "CAC Rp1,2jt, MRR Rp200rb, GM 75% -> payback 8 bulan.",
+      "check": "Apa akibatnya kalau menghitung payback dari revenue bukan gross profit?"
+    },
+    {
+      "id": "G18",
+      "track": "VC",
+      "analogy": "Berapa bulan perusahaan masih bisa hidup dengan uang di kas.",
+      "term": "Net Burn / Runway",
+      "definition": "Net cash burn per bulan dan estimasi bulan ketahanan kas, dengan asumsi dinyatakan jelas.",
+      "numbers": "Kas Rp1,2M, burn Rp200jt/bln -> runway 6 bulan.",
+      "check": "Kenapa runway tidak pasti jika penjualan berubah tiap bulan?"
+    },
+    {
+      "id": "G19",
+      "track": "VC",
+      "analogy": "Harga rumah sebelum dan sesudah pemilik baru menyetor uang.",
+      "term": "Pre-money / Post-money Valuation",
+      "definition": "Nilai perusahaan sebelum dan sesudah investasi primer dalam suatu financing.",
+      "numbers": "Pre $8M, invest $2M -> post $10M.",
+      "check": "Berapa ownership baru sebelum option-pool effects?"
+    },
+    {
+      "id": "G20",
+      "track": "VC",
+      "analogy": "Kue perusahaan terbagi lebih banyak potongan setelah investor baru masuk.",
+      "term": "Cap Table / Dilution",
+      "definition": "Catatan hak kepemilikan menurut kelas dan putaran; dilution terjadi ketika basis saham membesar.",
+      "numbers": "Own 20%, lalu dilution pro-rata 20% -> stake turun menjadi 16% (simplified).",
+      "check": "Mengapa 20% ownership tidak sama dengan 20% seluruh exit proceeds?"
+    },
+    {
+      "id": "G21",
+      "track": "VC",
+      "analogy": "Sebelum ngasih uang, investor mengecek dokumen, pelanggan, produk dan risiko.",
+      "term": "Due Diligence (DD)",
+      "definition": "Proses penyelidikan bukti bisnis, legal, keuangan, teknologi dan tim sebelum keputusan investasi.",
+      "numbers": "Tiga diligence gates: cohort retention, data integrity, runway.",
+      "check": "Apa satu temuan yang membuat keputusan 'pass'?"
+    },
+    {
+      "id": "G22",
+      "track": "VC",
+      "analogy": "Surat ke komite berisi 'masuk atau enggak' beserta alasannya.",
+      "term": "Investment Committee (IC) Memo",
+      "definition": "Dokumen berstruktur berisi tesis, evidence, valuation, risiko, terms dan keputusan yang diusulkan.",
+      "numbers": "Two-page memo memuat Invest/Pass/Further Diligence.",
+      "check": "Mengapa ringkasan fitur produk saja bukan memo investasi?"
+    },
+    {
+      "id": "G23",
+      "track": "Consulting",
+      "analogy": "Seperti dokter: diagnosis dahulu sebelum meresepkan obat.",
+      "term": "Problem Framing / Hypothesis-driven Problem Solving",
+      "definition": "Merumuskan keputusan, kriteria, masalah dan hipotesis teruji sebelum menganalisis.",
+      "numbers": "Goal: recover Rp600M profit loss in 90 days.",
+      "check": "Apa risiko bila langsung merekomendasikan diskon?"
+    },
+    {
+      "id": "G24",
+      "track": "Consulting",
+      "analogy": "Memecah penyebab bocor ember jadi lubang di sisi yang berbeda.",
+      "term": "Issue Tree / MECE",
+      "definition": "Issue tree memecah pertanyaan utama menjadi driver relevan, sebisa mungkin saling terpisah dan mencakup masalah.",
+      "numbers": "Profit=Volume×Price−Volume×UnitCost−FixedCost.",
+      "check": "Apa cabang yang perlu ditambahkan jika pricing berubah?"
+    },
+    {
+      "id": "G25",
+      "track": "Consulting",
+      "analogy": "Laba turun seperti saldo tabungan: apa kontribusi volume, harga dan biaya?",
+      "term": "Profitability Bridge / Profit Bridge",
+      "definition": "Rekonsiliasi perubahan laba menurut driver operasi dan keuangan.",
+      "numbers": "Prior Rp900jt; volume -Rp400jt; unit cost -Rp200jt -> Rp300jt.",
+      "check": "Jika bridge tidak sampai current profit, apa yang harus diperiksa?"
+    },
+    {
+      "id": "G26",
+      "track": "Consulting",
+      "analogy": "Diskon 10 ribu belum berarti laba naik; ada dampak balik dan biaya pelaksanaannya.",
+      "term": "Incremental Contribution / Incremental Economics",
+      "definition": "Pendapatan dan biaya tambahan dari satu opsi dibanding baseline, net of incremental implementation costs.",
+      "numbers": "10rb cups×Rp18rb contribution−Rp60jt spend -> Rp120jt net.",
+      "check": "Apa yang harus dicek sebelum mengasumsikan semua transaksi incremental?"
+    },
+    {
+      "id": "G27",
+      "track": "Consulting",
+      "analogy": "Dua cara menghemat listrik jangan dihitung dua kali untuk lampu yang sama.",
+      "term": "Overlap / Double Counting / Interaction Effect",
+      "definition": "Interaksi inisiatif membuat manfaat gabungan berbeda dari jumlah manfaat yang dihitung terpisah.",
+      "numbers": "Penghematan Rp1rb per cup berlaku juga ke 10rb cup tambahan -> interaksi Rp10jt.",
+      "check": "Kapan pengaruh silang ini justru negatif?"
+    },
+    {
+      "id": "G28",
+      "track": "Consulting",
+      "analogy": "Judul slide adalah keputusan yang mau diambil, bukan label 'Analisis Pendapatan'.",
+      "term": "Action Title / Executive Storyline",
+      "definition": "Judul slide mengomunikasikan kesimpulan yang ditopang exhibit teruji.",
+      "numbers": "'Falling volume explains two-thirds of profit decline' lebih informatif dari 'Volume'.",
+      "check": "Apakah bukti di slide benar-benar membuktikan headline?"
+    },
+    {
+      "id": "G29",
+      "track": "Consulting",
+      "analogy": "Ide bagus belum berguna kalau tak ada PIC, tenggat dan ukuran keberhasilannya.",
+      "term": "Implementation Roadmap / KPI / Decision Gate",
+      "definition": "Rencana tindakan, pemilik, indikator, tanggal dan kriteria lanjut/hentikan.",
+      "numbers": "Pilot 30 hari, KPI gross profit/customer experience, stop if quality falls.",
+      "check": "Apa risiko dari KPI yang mudah dimanipulasi?"
+    },
+    {
+      "id": "G30",
+      "track": "all",
+      "analogy": "Belajar naik sepeda: nonton orang jago tidak sama dengan bisa mengayuh sendiri.",
+      "term": "Worked Example / Deliberate Practice / Retrieval Practice",
+      "definition": "Contoh pakar diikuti latihan mandiri, pengambilan ulang dari ingatan dan koreksi spesifik.",
+      "numbers": "Lihat contoh, tutup contoh, bangun versi sendiri, lalu tes blind case.",
+      "check": "Apakah lu bisa menjelaskan rumus sehari setelah menontonnya?"
+    }
+  ],
+  "tracks": [
+    {
+      "id": "PE",
+      "title": "Private Equity & Buyout Investing",
+      "decision": "Would we acquire the company, at what maximum price, and under what conditions?",
+      "benchmark": {
+        "name": "CFA Institute Private Equity Certificate",
+        "url": "https://www.cfainstitute.org/programs/private-equity-certificate",
+        "role": "practitioner-informed learning outcomes, not SELF certification"
+      },
+      "stages": [
+        "Training: synthetic LBO with answer key",
+        "Independent: company filing based underwriting with hypothetical financing",
+        "Defense: downside repricing and IC presentation"
+      ],
+      "skills": [
+        {
+          "id": "PE-01",
+          "skill": "Read IS, BS and CF and reconcile cash generation",
+          "proof": "Historical financial bridge with unit labels",
+          "check": "EBITDA -> CFO -> cash available for debt; balance sheet matches",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-02",
+          "skill": "Distinguish EV and equity value",
+          "proof": "Bridge EV to equity with net debt and adjustments",
+          "check": "Proceeds and enterprise value never conflated",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-03",
+          "skill": "Normalize earnings responsibly",
+          "proof": "EBITDA adjustment schedule with cited rationale",
+          "check": "No unsupported add-backs or double counting",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-04",
+          "skill": "Design Sources & Uses",
+          "proof": "Funding schedule that balances",
+          "check": "Total Sources minus Total Uses exactly zero",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-05",
+          "skill": "Build operating forecast and working capital",
+          "proof": "Linked cash flow schedules",
+          "check": "Cash conversion, capex and working capital move with drivers",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-06",
+          "skill": "Model debt amortization, cash sweep and interest",
+          "proof": "Beginning debt, interest and ending debt each year",
+          "check": "Debt roll-forward accurate; ending debt not negative",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-07",
+          "skill": "Compute sponsor MOIC and IRR",
+          "proof": "Equity cash flow and return schedule",
+          "check": "Independent recalculation matches within chosen tolerance",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-08",
+          "skill": "Explain downside and multiple risk",
+          "proof": "2D sensitivity / downside table",
+          "check": "Entry and exit assumptions both auditable",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-09",
+          "skill": "Evaluate price versus return hurdle",
+          "proof": "Maximum bid calculation",
+          "check": "Boundary price actually reproduces hurdle target",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-10",
+          "skill": "Assess credit and liquidity risk",
+          "proof": "Coverage, covenant and minimum cash considerations",
+          "check": "No debt capacity recommendation ignoring downside liquidity",
+          "level": "advanced"
+        },
+        {
+          "id": "PE-11",
+          "skill": "Write concise investment committee recommendation",
+          "proof": "Two-page IC memo with invest/pass/pricing/diligence",
+          "check": "Model inputs cited and memo conclusion matches model",
+          "level": "foundation"
+        },
+        {
+          "id": "PE-12",
+          "skill": "Defend live investment assumptions",
+          "proof": "Recorded or written rebuttal to challenge questions",
+          "check": "Can explain 3 material sensitivities without solution aid",
+          "level": "independent"
+        }
+      ]
+    },
+    {
+      "id": "VC",
+      "title": "Venture Capital & Startup Underwriting",
+      "decision": "Invest, pass, or request diligence — at what terms and why?",
+      "benchmark": {
+        "name": "Bessemer public investment memos",
+        "url": "https://www.bvp.com/memos/shopify",
+        "role": "original historical investor-authored evidence, not a standard all VCs adopt"
+      },
+      "stages": [
+        "Training: synthetic seed SaaS data",
+        "Independent: blind historical memo underwriting or sourced public case",
+        "Defense: VC partner follow-up with milestone conditions"
+      ],
+      "skills": [
+        {
+          "id": "VC-01",
+          "skill": "Distinguish problem, target customer and market",
+          "proof": "Customer/problem evidence map",
+          "check": "TAM top-down does not masquerade as achievable revenue",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-02",
+          "skill": "Judge founder-market fit without invented claims",
+          "proof": "Evidence/unknown table and founder questions",
+          "check": "No unsupported biographical assertions",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-03",
+          "skill": "Compute consistent SaaS revenue measures",
+          "proof": "MRR/ARR bridge by month",
+          "check": "Recurring and non-recurring cash receipts separate",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-04",
+          "skill": "Analyze same-age cohorts",
+          "proof": "Cohort retention sheet",
+          "check": "Month-3 and month-6 cohorts not directly treated as same-age",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-05",
+          "skill": "Calculate gross/net retention",
+          "proof": "Logo retention, GRR, NRR calculations",
+          "check": "Denominator, expansion and churn treatment explicit",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-06",
+          "skill": "Calculate CAC and gross-profit payback",
+          "proof": "CAC schedule with acquisition spend",
+          "check": "Payback uses gross profit not raw revenue",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-07",
+          "skill": "Understand burn and runway",
+          "proof": "Net burn and liquidity schedule",
+          "check": "Cash balance divided by disclosed net burn; scenario tested",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-08",
+          "skill": "Model pre/post money, cap table and dilution",
+          "proof": "Round closing and subsequent dilution schedule",
+          "check": "Ownership sums to 100%, entries reconcile",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-09",
+          "skill": "Translate stake to fund returns",
+          "proof": "Investor proceeds and scenario MOIC",
+          "check": "No confusion between startup valuation and fund IRR",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-10",
+          "skill": "Challenge market, competitive and execution assumptions",
+          "proof": "Risks with falsifiable diligence requests",
+          "check": "3 measurable investment gates",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-11",
+          "skill": "Write concise VC partner memo",
+          "proof": "Two-page invest/pass/further diligence memo",
+          "check": "Decision supported by metric provenance",
+          "level": "foundation"
+        },
+        {
+          "id": "VC-12",
+          "skill": "Defend investment under uncertainty and historical context",
+          "proof": "Blind decision + later outcome comparison",
+          "check": "No hindsight leakage in original underwriting",
+          "level": "independent"
+        }
+      ]
+    },
+    {
+      "id": "Consulting",
+      "title": "Strategy Consulting & Executive Problem Solving",
+      "decision": "What should management do, why, at what impact, and with which tradeoffs?",
+      "benchmark": {
+        "name": "McKinsey official case interview practice",
+        "url": "https://www.mckinsey.com/careers/interviewing",
+        "role": "recruitment practice case, not proof of real client project"
+      },
+      "stages": [
+        "Training: synthetic business profitability bridge",
+        "Independent: official practice case cold solve",
+        "Defense: 6-slide CEO decision and short oral Q&A"
+      ],
+      "skills": [
+        {
+          "id": "CO-01",
+          "skill": "Clarify client objective and decision criterion",
+          "proof": "One-sentence decision statement",
+          "check": "Clear objective, timeframe and constraints",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-02",
+          "skill": "Structure a custom issue tree",
+          "proof": "MECE-enough, hypothesis-driven issue tree",
+          "check": "Branches relevant to case, no generic framework dumping",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-03",
+          "skill": "Calculate driver based market sizing",
+          "proof": "Market size with unit conversions",
+          "check": "Denominator and reachable share separated",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-04",
+          "skill": "Build profitability bridge",
+          "proof": "Revenue-volume-price-cost driver sheet",
+          "check": "Bridge reconciles to reported profit movement",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-05",
+          "skill": "Separate observed effects from causal hypotheses",
+          "proof": "Evidence vs hypothesis log",
+          "check": "No root cause asserted from arithmetic alone",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-06",
+          "skill": "Quantify incremental initiatives",
+          "proof": "Initiative impact, cost and payback",
+          "check": "Baseline/incremental calculations consistent",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-07",
+          "skill": "Account for overlapping benefits",
+          "proof": "Combined initiative reconciliation",
+          "check": "No double counting shared impact",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-08",
+          "skill": "Evaluate tradeoffs and execution risks",
+          "proof": "Alternatives ranking with constraints",
+          "check": "Not merely pick highest gross benefit",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-09",
+          "skill": "Turn analysis into CEO storyline",
+          "proof": "Six-slide action-title deck",
+          "check": "Every title is a conclusion supported by exhibit",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-10",
+          "skill": "Set actionable 90-day roadmap",
+          "proof": "Milestone/owner/KPI plan",
+          "check": "Metrics have owner, timing and stop/scale gate",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-11",
+          "skill": "Make explicit recommendation and decision ask",
+          "proof": "Executive summary with quantified impact",
+          "check": "Client can see exactly what must be approved",
+          "level": "foundation"
+        },
+        {
+          "id": "CO-12",
+          "skill": "Defend conclusion with case-specific reasoning",
+          "proof": "Cold case + follow-up challenge",
+          "check": "Responds to objections without canned frameworks",
+          "level": "independent"
+        }
+      ]
+    }
+  ],
+  "rubric": {
+    "source": "SELF INTERNAL PROPOSAL; NOT CFA, BVP, McKINSEY OR ANY EMPLOYER'S OFFICIAL SCORING",
+    "dimensions": [
+      {
+        "id": "technical",
+        "weight": 30,
+        "desc": "Model / numeric integrity, checks and formula logic"
+      },
+      {
+        "id": "judgment",
+        "weight": 25,
+        "desc": "Defensible business decision, alternatives and tradeoffs"
+      },
+      {
+        "id": "evidence",
+        "weight": 20,
+        "desc": "Data provenance, disclosure and assumptions"
+      },
+      {
+        "id": "risk",
+        "weight": 15,
+        "desc": "Downside, sensitivities and falsifiable risks"
+      },
+      {
+        "id": "communication",
+        "weight": 10,
+        "desc": "Executive clarity, traceability, concise action-oriented output"
+      }
+    ],
+    "draft_minimum": 0,
+    "technical_check_threshold": 24,
+    "portfolio_candidate_proposal": {
+      "total_min": 80,
+      "technical_min": 24,
+      "evidence_min": 14,
+      "all_critical_checks": true,
+      "independent_case": true,
+      "live_defense_or_recorded_defense": true,
+      "manual_validation_required": true
+    },
+    "objective_checks": [
+      "Formulas and unit conversions",
+      "Sources and uses / ownership / profit bridge invariant",
+      "Sensitivity outputs recalculate",
+      "Source-to-claim exact matching",
+      "Correct file types and version retention"
+    ],
+    "narrative_checks": [
+      "Investment/strategy logic",
+      "Why assumptions credible",
+      "Explicit negative-case handling",
+      "Communication and ability to defend"
+    ],
+    "assessor_labels": [
+      "DETERMINISTIC_VERIFIED",
+      "AI_COACHING_OPINION",
+      "SELF_ATTESTED",
+      "HUMAN_REVIEWED"
+    ],
+    "never_claim": [
+      "expert approved without actual human reviewer",
+      "portfolio-ready solely from AI score",
+      "actual deal execution based on a synthetic case",
+      "firm affiliation or hiring likelihood"
+    ]
+  },
+  "case_requirements": {
+    "training": [
+      "Decision question with business tension",
+      "Consistent synthetic source pack and source ledger",
+      "At least 4 distinct case exhibits",
+      "Input data and units",
+      "Guided workbook separate from blank workbook",
+      "Locked answer key not accessible in blind attempt",
+      "Verifiable calculations and intentional error traps",
+      "Downside scenario",
+      "Short recommendation and 3 partner challenges"
+    ],
+    "independent": [
+      "Primary public source with precise publication date and page references",
+      "Explicit historical information cutoff",
+      "True vs hypothetical assumptions ledger",
+      "Genuinely new data to prevent answer memorization",
+      "No worked solution visibility until submission",
+      "Independent model/brief and source log",
+      "Sensitivity and defensible recommendation",
+      "Review/revision trail",
+      "Portfolio provenance disclosure"
+    ],
+    "evidence_types": [
+      "ORIGINAL_FIRM_DOCUMENT",
+      "OFFICIAL_PRACTICE_CASE",
+      "PROFESSIONAL_WORKED_MODEL",
+      "ACADEMIC_WORK",
+      "PRACTITIONER_COMMENTARY"
+    ],
+    "failure_red_lines": [
+      "Unsupported 'expert-approved' claim",
+      "Fabricated screenshot/exhibit",
+      "Unverified or inconsistent financial inputs",
+      "Data from future of historical decision used in blind case",
+      "Broken download/upload or user isolation",
+      "AI claiming numeric calculation done when never parsed original workbook",
+      "Missing sources or copyrighted work rehosted without permission"
+    ],
+    "versioning": "Case ID + version + dataset checksum + source date and access notes; submit immutable snapshots or version references."
+  },
+  "gates": [
+    {
+      "id": "G1_CONTENT",
+      "name": "Case consistency and provenance",
+      "proof": "Case spec + source ledger + arithmetic golden sheet + independently checked expected outputs",
+      "pass": "No unlabelled unsupported figures and no unresolved arithmetic invariant"
+    },
+    {
+      "id": "G2_TEACH",
+      "name": "Analogy + term + transfer",
+      "proof": "3 sample lessons per track reviewed manually + new test questions",
+      "pass": "All teaching steps occur in order; naming rule always clear; analogies do not distort definitions"
+    },
+    {
+      "id": "G3_EVIDENCE",
+      "name": "Source to exhibit mapping",
+      "proof": "Exhibit screenshot/source pointer and exact page/section with rights status",
+      "pass": "All used claims grounded; missing preview honestly marked"
+    },
+    {
+      "id": "G4_TECH",
+      "name": "Deterministic formula QA",
+      "proof": "Unit tests incl intentionally broken workbook and expected failure",
+      "pass": "Deliberately altered formula flagged; no assertion of checking unparsed XLSX"
+    },
+    {
+      "id": "G5_DECISION",
+      "name": "Blind independent assessment",
+      "proof": "New case + hidden answer key + defense questions and revision log",
+      "pass": "Assessment is not coached, answer leakage or unsupported automatic pass"
+    },
+    {
+      "id": "G6_PORTFOLIO",
+      "name": "Recruiter-facing artifact review",
+      "proof": "Model + 2-page memo or 6 slide deck + assumption/source ledger",
+      "pass": "No fake credentials, defensible scope, files open and explainable"
+    },
+    {
+      "id": "G7_PRODUCTION",
+      "name": "Security/runtime/UX",
+      "proof": "GitHub CI + authenticated production browser test + two-owner RLS + real downloads",
+      "pass": "No unrelated regressions and no unverified live claims"
+    }
+  ],
+  "audit": {
+    "repo_at": "2026-10-22",
+    "baseline": {
+      "sources": 41,
+      "evidence_panels": 12,
+      "external_preview_refs": 7,
+      "videos": 11,
+      "training_cases": 3
+    },
+    "current_verified_capabilities": [
+      "Career Prep nav, curated source/video lists",
+      "3 sprint case content and downloadable practice assets",
+      "Private portfolio storage and self-attested checklist",
+      "GitHub CI for syntax/static workbook structure"
+    ],
+    "present_weaknesses": [
+      "7 external preview references are not proof images render in production; 5/12 evidence still pointer-only",
+      "Most sources were title-level verified; deep page-level and rights audit incomplete",
+      "11 videos across 3 tracks; lesson-level post-watch exercises not consistently connected",
+      "Starter workbook formulas exist, but blind build and locked solution integrity not implemented",
+      "Uploads are stored privately; no real uploaded XLSX cell-by-cell automated QA",
+      "Self-reviewed label is not an expert/Director certification; no validated competency inference",
+      "CI confirms build but not production login, file lifecycle or learning efficacy",
+      "3-day synthetic cases are foundations, not automatically valid professional recruiting portfolio"
+    ],
+    "protected_features": [
+      "CV Library",
+      "Applications",
+      "People",
+      "Opportunity Radar",
+      "Interview Prep",
+      "My Work",
+      "Whiteboard",
+      "Bintang Trader/Panjul separate repositories"
+    ]
+  },
+  "validated_references": [
+    {
+      "name": "CFA Private Equity Certificate",
+      "url": "https://www.cfainstitute.org/programs/private-equity-certificate",
+      "supports": "3-statement modeling, LBO, deal/risk and value creation training"
+    },
+    {
+      "name": "Bessemer original Shopify Investment Memo",
+      "url": "https://www.bvp.com/memos/shopify",
+      "supports": "Original public investor-author memo; a historical example rather than universal standard"
+    },
+    {
+      "name": "McKinsey official interviewing overview",
+      "url": "https://www.mckinsey.com/careers/interviewing",
+      "supports": "Problem-solving, sample cases and articulation of recommendations"
+    },
+    {
+      "name": "Dunlosky et al. 2013 evidence review",
+      "url": "https://doi.org/10.1177/1529100612453266",
+      "supports": "Practice testing and distributed practice high-utility learning techniques"
+    }
+  ],
+  "planned_release": "Phase 1 only defines product contract and tests; Phase 2 builds source-backed cases; Phase 3 creates lesson implementations; Phase 4 full model lab; Phase 5 deterministic and judgement review; Phase 6 independent work samples; Phase 7 full QA/release."
+}
