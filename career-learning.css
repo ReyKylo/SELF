@@ -39,3 +39,15 @@
 @container(max-width:42em){.learning-original{border-left:0;border-top:1px solid var(--line)}.learning-source-row{flex-wrap:wrap}.learning-source-row>div{flex-basis:100%}.learning-video-row{padding:16px 13px;gap:10px}.learning-play-icon{display:none}}
 @media(max-width:600px){.learning-tabs{gap:3px}.learning-tabs button{padding:9px 12px;font-size:.8em}.learning-panel-top,.learning-assignment-head,.learning-workflow,.learning-explainers,.learning-original,.learning-next,.learning-lesson{padding:20px}.learning-source-row{padding:18px}.learning-day-tabs{gap:10px}.learning-day{padding:17px}.learning-filterbar label{flex-basis:100%}.learning-workspace h2{font-size:1.35em}.learning-task-error{margin:14px 18px!important}.learning-video-body{padding:8px 20px 20px}}
 @media(prefers-reduced-motion:reduce){.learning-workspace *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Real evidence is always a publisher-origin asset or a transparently labelled source pointer. */
+.learning-real-visual{width:100%;min-width:0;margin:0 0 18px;border:1px solid var(--line);background:var(--card2);border-radius:9px;overflow:hidden}
+.learning-real-visual a{display:block;max-width:100%;max-height:540px;overflow:auto;background:#f2f2f1}
+.learning-real-visual img{display:block;max-width:100%;height:auto;min-width:0;margin:0 auto;object-fit:contain;background:#f8f8f8}
+.learning-real-visual object{display:block;width:100%;height:465px;min-height:330px;border:0;background:#f6f6f6}
+.learning-real-visual object p{padding:20px;color:var(--text)}
+.learning-visual-caption{border-top:1px solid var(--line);color:var(--muted);font-size:.76em;line-height:1.6;padding:11px 12px;margin:0!important}
+.learning-kit-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:17px 26px;border-bottom:1px solid var(--line);background:var(--card2)}
+.learning-kit-row .career-btn{min-height:44px;white-space:normal;text-align:left}
+@container (max-width:700px){.learning-real-visual object{height:390px}.learning-kit-row{padding:15px}}
+@container (max-width:440px){.learning-real-visual object{height:320px}.learning-real-visual a{max-height:370px}}
