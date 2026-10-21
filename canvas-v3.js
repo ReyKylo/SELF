@@ -708,7 +708,7 @@ function dPreserveSelection(e){
 function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
  const t=e.target;
  if(t.closest('.c3-quick-add,.c3-contextbar,.c3-minimap,.d-toolbar,.d-focus-panel'))return;
- if(t.closest('input,textarea,select,[contenteditable],a[href],button'))return;
+ if(t.closest('input,textarea,select,[contenteditable],.d-object-chips button,.d-object-chips a'))return;
  if(ui.dEditing&&t.closest('[data-c3-item]')?.dataset.c3Item!==ui.dEditing.id){
   dCapture();void dPersist();ui.dEditing=null;ui.dFocus=false;ui.dPopover=null;
  }
