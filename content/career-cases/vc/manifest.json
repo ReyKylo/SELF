@@ -41,5 +41,9 @@
     "3-minute partner defense"
   ],
   "review_status": "worker-self-tested-not-independent-expert-reviewed",
-  "simulated_data_notice": "Every ArusOps fact, person, market estimate, competitor archetype, currency, pricing, contract and financing figure is SIMULATED. Published Bessemer historical memos are separate external references."
+  "simulated_data_notice": "Every ArusOps fact, person, market estimate, competitor archetype, currency, pricing, contract and financing figure is SIMULATED. Published Bessemer historical memos are separate external references.",
+  "blind_holdout": [
+    "blind/holdout-brief.md",
+    "blind/holdout-cohorts.csv"
+  ]
 }

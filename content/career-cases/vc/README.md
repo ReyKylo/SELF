@@ -30,3 +30,5 @@
 `node tests/cases/vc/check-case.cjs` from SELF repository root. This reads fixtures, verifies cohort/ARR/gross retention, CAC payback, cash runway and full financing roll-forwards, and includes mutation guards. Numerical correctness ≠ evidence quality or endorsement. Instructor solutions are withheld during the blind test; a human must separately review the thesis and owner economics.
 
 **Status:** worker-built educational case, pending independent Integrator QA, UI integration, rights/access review and actual blind-assessment delivery. **Not recruiter certified.**
+
+**Independent transfer check:** `blind/holdout-brief.md` and `blind/holdout-cohorts.csv` are a distinct, never-worked pilot. The cold assessment requires fresh cohort, CAC, runway, cap-table and return calculations from these files; keys remain in the non-browser test folder.

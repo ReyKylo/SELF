@@ -1,0 +1,17 @@
+# ArusOps transfer audit — independent cold holdout (SIMULATED)
+
+**SIMULATED — SEPARATE evidence universe, not a continuation of original customer totals.** Do not combine these figures with the main ArusOps exhibits. This standalone counterfactual is an investment committee **re-underwriting drill** about a separate regional pilot, with evidence cutoff **2026-09-30**. No tutor walkthrough, solved outputs or key in `content/`.
+
+The pilot has 5 May–Sep 2026 acquisition cohorts in two segments (SMB monthly list price US$200 and MID US$1,100). Subscriptions are live at acquisition; later MRR can rise or fall due to survivors' net contracted spending. Age0 is acquisition month; any cell after cutoff stays blank. Prior history is **assumed zero** for this independent isolated pilot. Core SaaS historical revenue excludes contract pipeline.
+
+Cash Sept: opening unrestricted cash **US$420,000**; paid customer cash receipts **US$38,000**; fully-loaded sales & marketing SMB **US$42,000** and MID **US$32,000**; non-sales personnel **US$60,000**; infrastructure cash costs **US$18,000**; G&A cash **US$22,000**. Historical Sept burn is not an accrual gross margin. Founder proposes forward burn US$170,000/month without signed capital commitments.
+
+September segment paid acquisitions: **36 SMB** and **7 MID** customers (see cohort age0); gross margin assumptions **75% SMB / 72% MID** for recurring revenue, excluding one-time setup. Distinguish margin-adjusted CAC payback from marketing dollar payback.
+
+**New financing — independent terms:** current FD shares founders **6.4m**, seed common **1.6m**, existing unallocated option pool **1.0m**. Proposed Series A **US$12m pre, US$3m raise**, lead fund **US$2m**, others **US$1m**. Company requests **12% unallocated options immediately post-money, topped up pre-money**. Hypothetical later round **US$5m on US$20m pre**, with an additional **4% post-later-round new option grant**, and no lead pro-rata. Preferred: A 1x nonparticipating, B 1x senior to A; existing seed remains common. Five-year exits: distress equity US$6m, base US$110m, upside US$350m, with no exit debt, fees or carry. Assume any eventual exit prefers economically optimal conversion over taking the stated preference, and explain liquidation waterfall for distress.
+
+**Market assumptions (NOT researched market facts):** 30,000 regional target firms × US$4k annual spend for TAM; 8,000 qualified reachable × US$4k for SAM; 1,000 capturable firms × US$4k for five-year SOM. Management projects US$20m year-five ARR under the base exit; clearly identify what market-expansion assumptions are required.
+
+**Blind questions (submit in a separate tab named `Holdout`):** (a) September live MRR, ARR, logo count and prior-customer GRR/NRR from `holdout-cohorts.csv`; (b) month-3 logo and revenue retention only for eligible cohorts; (c) both segment CAC and GP payback; (d) September net cash burn, ending cash, forward-burn runway; (e) option pool top-up, lead fully diluted stake after both rounds and 4% grant, base MOIC and distressed preference payout; (f) TAM/SAM/SOM and one price-sensitive reason to PASS.
+
+**Independence rule:** Do not use the tutor-guide worked ArusOps figures as if they apply here. No exact holdout calculation appears in the public learner assets; reviewer checks in `tests/cases/vc/` must remain restricted.

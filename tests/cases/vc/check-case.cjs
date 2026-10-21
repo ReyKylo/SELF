@@ -16,6 +16,10 @@ let count=0;const gate=(label,fn)=>{fn();count++;console.log('PASS',label);};
 const months=Array.from({length:12},(_,i)=>{const t=9+i;return (2025+Math.floor(t/12))+'-'+String(t%12+1).padStart(2,'0');});
 const cohort=rows('cohorts.csv'),traction=rows('monthly-traction.csv'),cac=rows('acquisition.csv'),cash=rows('cash-runway.csv');
 const financing=JSON.parse(read('financing.json'));
+const holdoutPath=path.join(root,'content/career-cases/vc/blind/holdout-cohorts.csv');
+const holdoutRaw=fs.readFileSync(holdoutPath,'utf8').trim().split(/\\r?\\n/);
+const holdoutHeaders=holdoutRaw.shift().split(',');
+const holdout=holdoutRaw.map(line=>Object.fromEntries(line.split(',').map((value,i)=>[holdoutHeaders[i],value])));
 const cohortMonthIndex=r=>months.indexOf(r.cohort_month);
 function verifyCohort(rowsToCheck){
  assert.equal(rowsToCheck.length,24);for(const r of rowsToCheck){
@@ -126,4 +130,18 @@ gate('equity proceeds, preferences, gross MOIC and 5-year IRR',()=>{
  }
 });
 gate('market exhibit archetypes are explicitly nonverified',()=>{const m=rows('market-competition.csv');assert.equal(m.length,4);assert.ok(m.every(r=>r.validation_needed&&r.substitute_not_verified_live_competitor));});
+gate('blind transfer: new age-consistent pilot, no baked answers',()=>{
+ assert.equal(holdout.length,10);
+ const ms=['2026-05','2026-06','2026-07','2026-08','2026-09'];
+ for(const r of holdout){
+  const i=ms.indexOf(r.cohort_month);assert.ok(i>=0);
+  near(num(r,'age0_logos'),num(r,'age0_logos'));near(num(r,'age0_mrr_usd'),num(r,'age0_mrr_usd'));
+  for(let age=0;age<5;age++){
+   const l=r['age'+age+'_logos'],v=r['age'+age+'_mrr_usd'];
+   if(i+age>=5){assert.equal(l,'');assert.equal(v,'');}
+   else{assert.ok(num(r,'age'+age+'_logos')>0);assert.ok(num(r,'age'+age+'_mrr_usd')>0);}
+  }
+ }
+ assert.equal(holdout.filter(r=>ms.indexOf(r.cohort_month)<=1).length,4);
+});
 console.log('VC CASE QA:',count,'gates passed; deterministic CSV/JSON invariants + two negative mutation guards. This does NOT grade investment judgment.');

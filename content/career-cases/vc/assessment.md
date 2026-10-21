@@ -21,3 +21,9 @@
 - A scenario table with at least one ownership and one cash stress sensitivity; 3 counterarguments, each answered with falsifiable evidence.
 
 **No hints:** numerical checks are evaluated only after submission by an authorized reviewer using a non-browser asset; no instant green score for prettier formatting. Define unknowns separately from simulated facts.
+
+## Mandatory unseen transfer (30 minutes, distinct figures)
+
+After submitting your main IC recommendation, independently underwrite the **separate** pilot in `blind/holdout-brief.md` using `blind/holdout-cohorts.csv`. Do not import the coached ArusOps numbers into this pilot. Complete all six blind questions under a clearly labeled `Holdout` model tab. Its answers are not supplied in the learner content.
+
+**Assessment integrity:** This unseen pilot, not the repeated guided numerical examples, provides the independent transfer check. The initial company analysis remains essential for full investment judgment; a model that copies the tutor answers without rebuilding formulas fails technical review.
