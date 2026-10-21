@@ -12,7 +12,7 @@ const STATUSES=[['todo','To Do','gray'],['planning','Planning','yellow'],['in_pr
 const PRIORITIES=[['low','Low','green'],['normal','Normal','blue'],['high','High','red']];
 const COLORS={blue:'#428cff',green:'#3dce9e',purple:'#ad92fa',yellow:'#f0b862',red:'#f68e94',cyan:'#3fc5d2'};
 const SPACE_ICONS=['briefcase','chart','graduation','person','brain','folder'];
-const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,savePending:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
+const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',linkSearch:'',linkSource:'all',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,savePending:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
 function setTheme(theme){state.preferences.theme=theme;document.body.dataset.theme=theme;localStorage.setItem('self.theme',theme)}
 function setScale(scale){state.preferences.text_scale=scale;document.documentElement.style.setProperty('--scale',String(scale/100));localStorage.setItem('self.scale',String(scale))}
 setTheme(state.preferences.theme);setScale(state.preferences.text_scale);
@@ -128,9 +128,71 @@ function workDragEnd(){state.dragTaskId=null;resetTaskDropHighlights()}
 
 function renderBoards(){return window.SELFBoards?.renderLibrary?.()||empty('Boards unavailable','Try reloading the page.')}
 function renderLinkGrid(links,global=true){const extra=state.inbox.filter(x=>x.kind==='link').map(x=>({id:x.id,title:x.title,url:x.body,fromInbox:true}));const all=global?[...links,...extra]:links;return all.length?`<div class="link-grid">${all.map(l=>`<a class="link-tile" href="${attr(normalUrl(l.url)||'#')}" target="_blank" rel="noopener noreferrer"><span class="link-logo">${ic(l.url.includes('docs.google.com/spreadsheets')?'grid':l.url.includes('drive.google.com')?'folder':'link',30)}</span><strong>${esc(l.title||new URL(normalUrl(l.url)||'https://example.org').hostname)}</strong><small>${esc(l.fromInbox?'Quick Capture':l.boardName||taskOf(l.task_id)?.title||'Task resource')}</small></a>`).join('')}</div>`:empty('No links yet','Add a link in a Task Detail, or capture a URL from Home. It will appear here automatically.')}
-function renderLinks(){const boardLinks=(window.SELFBoards?.links?.()||[]).filter(l=>!state.links.some(x=>x.url===l.url)&&!state.inbox.some(x=>x.kind==='link'&&x.body===l.url));return header('My Links','Useful resources from tasks, notes, and whiteboards.',`<button class="primary-btn" data-action="new-link">${ic('plus')} New Link</button>`)+renderLinkGrid([...state.links,...boardLinks])}
+function allGeneralLinks(){
+ // My Links is general-purpose. One URL can be used by several objects.
+ const inputs=[
+  ...state.links.map(l=>({...l,source:'Tasks'})),
+  ...state.inbox.filter(x=>x.kind==='link').map(l=>({id:l.id,title:l.title,url:l.body,source:'Quick Capture'})),
+  ...(window.SELFBoards?.links?.()||[]).map(l=>({...l,source:'Whiteboards'}))
+ ];
+ const seen=new Map();
+ for(const item of inputs){
+  const safe=normalUrl(item.url);if(!safe)continue;
+  const old=seen.get(safe);
+  if(old){old.count++;if(!old.sources.includes(item.source))old.sources.push(item.source)}
+  else seen.set(safe,{...item,url:safe,sources:[item.source],count:1});
+ }
+ return [...seen.values()];
+}
+function renderLinks(){
+ const all=allGeneralLinks(),source=state.linkSource||'all',q=state.linkSearch.trim().toLowerCase();
+ const rows=all.filter(l=>(source==='all'||l.sources.includes(source))&&
+  (!q||[l.title,l.url,...l.sources].some(v=>String(v||'').toLowerCase().includes(q))));
+ const filters=[['all','All'],['Tasks','Tasks'],['Whiteboards','Whiteboards'],['Quick Capture','Quick Capture']]
+ .map(([id,name])=>'<button type="button" class="choice '+(source===id?'selected':'')+
+ '" data-action="link-source" data-source="'+attr(id)+'">'+name+'</button>').join('');
+ const tiles=rows.map(l=>{
+  const host=new URL(l.url).hostname;
+  const icon=l.url.includes('docs.google.com/spreadsheets')?'grid':l.url.includes('drive.google.com')?'folder':'link';
+  return '<a class="link-tile" href="'+attr(l.url)+'" target="_blank" rel="noopener noreferrer">'+
+  '<span class="link-logo">'+ic(icon,27)+'</span><strong>'+esc(l.title||host)+'</strong><small>'+
+  esc(host)+'</small><span class="link-origin">'+esc(l.sources.join(' · '))+
+  (l.count>1?' · '+l.count+' references':'')+'</span></a>';
+ }).join('');
+ return header('My Links','Your general library of references, not tied to any one workspace.',
+ '<button class="primary-btn" data-action="new-link">'+ic('plus')+' New Link</button>')+
+ '<div class="links-tools"><label class="links-search-label" for="links-search">'+ic('search',18)+
+ '<input id="links-search" class="field" value="'+attr(state.linkSearch)+
+ '" placeholder="Search names or domains..." autocomplete="off"/></label><div class="links-filters">'+filters+'</div></div>'+
+ '<div class="links-summary">'+rows.length+' unique '+(rows.length===1?'link':'links')+'</div>'+
+ (rows.length?'<div class="link-grid">'+tiles+'</div>':
+ empty(q||source!=='all'?'No matching links':'No links yet',q||source!=='all'?
+ 'Try another search or filter.':'Capture a URL on Home or save one from a task.'));
+}
 function renderInbox(){return header('Quick Inbox','Capture first. Organize later. Your ideas are safe here.')+`<section class="card card-pad"><div class="section-head"><h2>Captured notes & links</h2><span class="small-sub">${state.inbox.length} items</span></div>${state.inbox.slice().reverse().map(x=>`<div class="inbox-item"><div><strong>${ic(x.kind==='link'?'link':'note',15)} ${esc(x.title)}</strong><p>${x.kind==='link'?`<a href="${attr(normalUrl(x.body)||'#')}" target="_blank" rel="noopener noreferrer">${esc(x.body)}</a>`:esc(x.body||'No extra details')}</p><span class="small-sub">${esc(spaceOf(x.space_id)?.name||'Unsorted')} · ${esc(new Date(x.created_at).toLocaleDateString('id-ID'))}</span></div><button class="icon-quiet" data-action="delete-inbox" data-id="${x.id}" title="Delete capture">${ic('trash')}</button></div>`).join('')||'<div class="empty-mini">Nothing in your inbox yet. Quick Capture on Home is ready for you.</div>'}</section>`}
-function renderSearch(){const q=state.search.trim().toLowerCase();const all=[...state.tasks.map(x=>({...x,type:'task'})),...state.spaces.map(x=>({...x,type:'space'})),...state.inbox.map(x=>({...x,type:'note'}))];const matches=q?all.filter(x=>(x.title||x.name||'').toLowerCase().includes(q)):[];return header('Search Everything','Find tasks, notes and Spaces in one place.')+`<input class="capture-input" style="width:100%" id="global-search" value="${attr(state.search)}" placeholder="Search your SELF workspace..." autofocus/><div class="card card-pad" style="margin-top:20px">${matches.map(x=>`<button class="continue-item" data-action="${x.type==='task'?'open-task':x.type==='space'?'open-space':'nav'}" ${x.type==='note'?'data-view="inbox"':`data-id="${x.id}"`}><span class="mini-thumb">${ic(x.type==='task'?'check':x.type==='space'?'folder':'note')}</span><span><strong>${esc(x.title||x.name)}</strong><small>${esc(x.type)}</small></span></button>`).join('')||`<div class="empty-mini">${q?'No matching items.':'Type to start searching.'}</div>`}</div>`}
+function renderSearch(){
+ const q=state.search.trim().toLowerCase();
+ const data=[
+  ...state.tasks.map(x=>({...x,type:'task',label:x.title,desc:spaceOf(x.space_id)?.name||'My Work'})),
+  ...state.spaces.map(x=>({...x,type:'space',label:x.name,desc:'Space'})),
+  ...state.boards.map(x=>({...x,type:'board',label:x.title,desc:'Whiteboard'})),
+  ...state.inbox.filter(x=>x.kind==='note').map(x=>({...x,type:'note',label:x.title,desc:'Inbox note'})),
+  ...allGeneralLinks().map(x=>({...x,type:'link',label:x.title||new URL(x.url).hostname,desc:new URL(x.url).hostname}))
+ ];
+ const matches=q?data.filter(x=>[x.label,x.desc,x.type,x.url].some(v=>String(v||'').toLowerCase().includes(q))).slice(0,50):[];
+ const glyph={task:'check',space:'folder',board:'board',note:'note',link:'link'};
+ const results=matches.map(x=>{
+  const inner='<span class="mini-thumb">'+ic(glyph[x.type])+'</span><span><strong>'+esc(x.label)+'</strong><small>'+esc(x.desc)+'</small></span>';
+  if(x.type==='link')return '<a class="continue-item" href="'+attr(x.url)+'" target="_blank" rel="noopener noreferrer">'+inner+ic('external',16)+'</a>';
+  const action=x.type==='task'?'open-task':x.type==='space'?'open-space':x.type==='board'?'open-board':'nav';
+  const fields=x.type==='note'?'data-view="inbox"':'data-id="'+attr(x.id)+'"';
+  return '<button class="continue-item" data-action="'+action+'" '+fields+'>'+inner+'</button>';
+ }).join('');
+ return header('Search Everything','Find tasks, boards, Spaces and links in one place.')+
+ '<input class="capture-input" style="width:100%" id="global-search" value="'+attr(state.search)+'" placeholder="Search SELF..." autofocus/>'+
+ '<div class="card card-pad" style="margin-top:20px">'+(results||'<div class="empty-mini">'+
+ (q?'No matching items.':'Type to search across your workspace.')+'</div>')+'</div>';
+}
 function renderSettings(){return header('Make SELF yours','Your workspace should feel exactly right for you.')+`<div class="settings-section"><div class="settings-row"><div><strong>Appearance</strong><small>Switch between two carefully designed themes.</small></div><div class="segmented"><button class="${state.preferences.theme==='dark'?'active':''}" data-action="set-theme" data-theme="dark">${ic('moon')} Dark</button><button class="${state.preferences.theme==='light'?'active':''}" data-action="set-theme" data-theme="light">${ic('sun')} Light</button></div></div><div class="settings-row"><div><strong>Text size</strong><small>Scale labels, content and controls to your comfort.</small></div><div style="display:flex;align-items:center;gap:14px"><input type="range" id="text-scale" class="slider" min="100" max="150" step="5" value="${state.preferences.text_scale}"/><strong id="scale-label">${state.preferences.text_scale}%</strong></div></div><div class="settings-row"><div><strong>Your account</strong><small>${esc(state.user.email)} · Your data is private to this account.</small></div><button class="ghost-btn" data-action="logout">${ic('logout')} Sign out</button></div></div>`}
 function renderPanel(){const t=taskOf(state.taskId);if(!t){state.taskId=null;return ''}const s=spaceOf(t.space_id);const checks=state.checklist.filter(c=>c.task_id===t.id).sort((a,b)=>a.position-b.position);const complete=checks.filter(c=>c.is_done).length;const links=state.links.filter(l=>l.task_id===t.id);const pages=state.pages.filter(p=>p.task_id===t.id);
 if(state.pageId){const pg=pages.find(p=>p.id===state.pageId);if(pg)return `<div class="overlay" data-action="close-panel"><aside class="panel" onclick="event.stopPropagation()"><div class="panel-top"><button class="ghost-btn" data-action="close-subpage">${ic('back')} Back to task</button><button class="icon-btn" data-action="close-panel" aria-label="Close">${ic('close')}</button></div><div class="eyebrow">${esc(t.title)} / Subpage</div><input class="panel-title-input" data-page-field="title" data-id="${pg.id}" value="${attr(pg.title)}" aria-label="Page title"/><div class="panel-section-title">Your page</div><textarea class="area long-area" data-page-field="content" data-id="${pg.id}" placeholder="Write anything. Your thoughts belong here.">${esc(pg.content)}</textarea><p class="small-sub">Changes are saved to your private SELF workspace.</p><div style="margin-top:28px"><button class="ghost-btn" data-action="delete-page" data-id="${pg.id}">${ic('trash')} Delete page</button></div></aside></div>`}
@@ -181,6 +243,8 @@ if(action==='new-space'){state.spaceAccent='blue';state.spaceIcon='briefcase';st
 if(action==='edit-space'){state.editSpaceId=id;state.spaceAccent=spaceOf(id)?.accent||'blue';state.spaceIcon=spaceOf(id)?.icon||'briefcase';state.modal='edit-space';render();return}
 if(action==='space-accent'){state.spaceAccent=b.dataset.accent;document.querySelectorAll('.color-swatch').forEach(x=>x.classList.toggle('on',x.dataset.accent===state.spaceAccent));return}
 if(action==='open-space'){state.spaceId=id;state.spaceTab='tasks';go('space');return}
+if(action==='open-board'){window.SELFBoards?.open?.(id);return}
+if(action==='link-source'){state.linkSource=b.dataset.source;render();return}
 if(action==='open-task'){state.taskId=id;state.panelTab='overview';state.pageId=null;render();return}
 if(action==='close-panel'){state.taskId=null;state.pageId=null;render();return}
 if(action==='panel-tab'){state.panelTab=b.dataset.tab;state.pageId=null;render();return}
@@ -218,7 +282,7 @@ let searchTimer;
 function handleInput(e){const el=e.target;
 if(el.dataset?.taskField||el.dataset?.pageField||el.dataset?.checkField){state.savePending=true;paintSave();return}
 if(el.id==='quick-text'){state.captureDraft=el.value;return}
-if(el.id==='work-search'||el.id==='global-search'){const id=el.id,pos=el.selectionStart;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{if(id==='work-search')state.workSearch=el.value;else state.search=el.value;render();const restored=document.getElementById(id);if(restored){restored.focus();restored.setSelectionRange(pos,pos)}},160);return}
+if(el.id==='work-search'||el.id==='global-search'||el.id==='links-search'){const id=el.id,pos=el.selectionStart;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{if(id==='work-search')state.workSearch=el.value;else if(id==='links-search')state.linkSearch=el.value;else state.search=el.value;render();const restored=document.getElementById(id);if(restored){restored.focus();restored.setSelectionRange(pos,pos)}},160);return}
 if(el.id==='text-scale'){setScale(Number(el.value));const label=$('#scale-label');if(label)label.textContent=el.value+'%';clearTimeout(searchTimer);searchTimer=setTimeout(()=>mutate(async()=>savePref(),null),300)}
 }
 document.addEventListener('click',e=>{handleAction(e).catch(error=>toast(error.message,true))});
