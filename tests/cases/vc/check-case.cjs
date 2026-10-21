@@ -8,7 +8,9 @@ const read=(f)=>fs.readFileSync(path.join(base,f),'utf8');
 function rows(file){
  const lines=read(file).trimEnd().split(/\r?\n/);
  const columns=lines.shift().split(',');
- return lines.map(l=>Object.fromEntries(l.split(',').map((v,i)=>[columns[i],v])));
+ const out=lines.map(l=>Object.fromEntries(l.split(',').map((v,i)=>[columns[i],v])));
+ if(out.some(r=>r.data_status!=='SIMULATED'))throw Error('Unlabeled simulated CSV '+file);
+ return out;
 }
 const num=(r,k)=>{assert.notEqual(r[k],undefined,'missing '+k);assert.notEqual(r[k],'','missing numeric '+k);const n=Number(r[k]);assert.ok(Number.isFinite(n),'nonfinite '+k);return n;};
 const near=(a,b,tol=1e-6,msg='')=>assert.ok(Math.abs(a-b)<=tol,`${msg}: actual ${a} expected ${b}`);
@@ -16,10 +18,12 @@ let count=0;const gate=(label,fn)=>{fn();count++;console.log('PASS',label);};
 const months=Array.from({length:12},(_,i)=>{const t=9+i;return (2025+Math.floor(t/12))+'-'+String(t%12+1).padStart(2,'0');});
 const cohort=rows('cohorts.csv'),traction=rows('monthly-traction.csv'),cac=rows('acquisition.csv'),cash=rows('cash-runway.csv');
 const financing=JSON.parse(read('financing.json'));
+if(!/^SIMULATED/.test(financing.disclosure))throw Error('financing provenance not marked SIMULATED');
 const holdoutPath=path.join(root,'content/career-cases/vc/blind/holdout-cohorts.csv');
 const holdoutRaw=fs.readFileSync(holdoutPath,'utf8').trim().split(/\r?\n/);
 const holdoutHeaders=holdoutRaw.shift().split(',');
 const holdout=holdoutRaw.map(line=>Object.fromEntries(line.split(',').map((value,i)=>[holdoutHeaders[i],value])));
+if(holdout.some(r=>r.data_status!=='SIMULATED'))throw Error('Blind holdout provenance missing');
 const cohortMonthIndex=r=>months.indexOf(r.cohort_month);
 function verifyCohort(rowsToCheck){
  assert.equal(rowsToCheck.length,24);for(const r of rowsToCheck){
