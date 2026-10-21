@@ -188,7 +188,7 @@ function documentMarkup(c){
  if(c.key_points)parts.push('<h3>Key points</h3><ul>'+String(c.key_points).split(/\r?\n/).filter(Boolean).map(line=>'<li>'+h(line.replace(/^\s*[-•]\s*/,''))+'</li>').join('')+'</ul>');
  return parts.join('');
 }
-const RICH_TAGS=new Set(['B','STRONG','I','EM','U','S','BR','DIV','P','SPAN','H1','H2','H3','BLOCKQUOTE','UL','OL','LI','A']);
+const RICH_TAGS=new Set(['B','STRONG','I','EM','U','S','BR','DIV','P','SPAN','H1','H2','H3','BLOCKQUOTE','UL','OL','LI','A','BUTTON']);
 function safeRich(html){
  // Allowlist nodes and URLs. Never interpolate persisted HTML unescaped.
  if(typeof document.createElement!=='function')return h(String(html).replace(/<[^>]*>/g,''));
@@ -200,6 +200,11 @@ function safeRich(html){
   if(tag==='SCRIPT'||tag==='STYLE'||tag==='IFRAME'||tag==='SVG'||tag==='FORM')return '';
   const inner=Array.from(node.childNodes).map(clean).join('');
   if(!RICH_TAGS.has(tag))return inner;
+  if(tag==='BUTTON'){
+    if(!node.hasAttribute('data-d-check'))return inner;
+    const checked=node.getAttribute('data-d-check')==='true';
+    return '<button type="button" class="d-check" data-c3="d-check-toggle" data-d-check="'+checked+'">'+(checked?'☑':'☐')+'</button>';
+  }
   if(tag==='A'){
     const link=url(node.getAttribute('href')||'');
     return link?'<a href="'+h(link)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>':inner;
@@ -278,7 +283,7 @@ function dRichCommand(command){
 function dInsertHtml(html){
  if(!ui.dEditing){const item=dSelected();if(!item)return;dBeginEdit(item.id)}
  const editor=dEditor();if(!editor)return;
- dPlaceCaret(editor);
+ if(!window.getSelection?.()?.anchorNode||!editor.contains(window.getSelection().anchorNode))dPlaceCaret(editor);
  const clean=safeRich(html);
  if(document.execCommand)document.execCommand('insertHTML',false,clean);
  else editor.insertAdjacentHTML('beforeend',clean);
@@ -294,8 +299,11 @@ function dPopoverMarkup(){
   return '<form class="d-popover" id="d-popover-form" data-type="'+p+'"><strong>Link '+p+'</strong><label>Choose '+p+'<select name="value" class="d-pop-input" required><option value="">Choose…</option>'+
   objects.map(x=>'<option value="'+h(x.id)+'">'+h(x.title||x.name||'Untitled')+'</option>').join('')+'</select></label><button type="submit" class="d-pop-submit">Link '+p+'</button></form>';
  }
+ if(p==='format')return '<div class="d-popover d-format-menu" role="menu"><strong>Writing formats</strong>'+
+  [['Paragraph','p','formatBlock'],['Heading 1','h1','formatBlock'],['Heading 2','h2','formatBlock'],['Quote','blockquote','formatBlock'],['Bullet list','insertUnorderedList','command'],['Numbered list','insertOrderedList','command'],['Align left','justifyLeft','command'],['Center','justifyCenter','command'],['Align right','justifyRight','command']].map(([name,value,type])=>
+  '<button class="d-more-action" data-c3="d-format-option" data-format="'+value+'" data-type="'+type+'">'+name+'</button>').join('')+'</div>';
  if(p==='more')return '<div class="d-popover" role="menu"><strong>More knowledge tools</strong>'+
- ['reference','existing','quick-duplicate','quick-connect'].map((a,i)=>'<button class="d-more-action" data-c3="'+a+'">'+['Add reference','Reuse existing knowledge','Duplicate card','Connect card'][i]+'</button>').join('')+'</div>';
+ ['d-pop-sources','existing','quick-duplicate','quick-connect'].map((a,i)=>'<button class="d-more-action" data-c3="'+a+'">'+['Add reference','Reuse existing knowledge','Duplicate card','Connect card'][i]+'</button>').join('')+'</div>';
  if(p==='files')return '<div class="d-popover"><strong>Files & images</strong><p>Private uploads are attached to this card.</p><button class="d-pop-submit" data-c3="d-upload">Choose image</button></div>';
  return '';
 }
@@ -308,7 +316,7 @@ function dToolbar(){
  '<label class="d-color" title="Fill color">Fill <input type="color" data-c3-style="fill" aria-label="Fill" value="'+validColour(s.fill)+'"/></label>'+
  '<label class="d-color" title="Stroke color">Border <input type="color" data-c3-style="stroke" aria-label="Border" value="'+validColour(s.stroke)+'"/></label>'+
  '<label class="d-font" title="Font size">Aa <input type="number" min="12" max="72" step="1" data-c3-style="fontSize" aria-label="Font size" value="'+size+'"/>px</label>'+
- '<span class="d-bar-divider"></span>'+
+ '<button class="d-bar-tool" data-c3="d-pop-format" title="Paragraphs, headings and alignment">Format ▾</button><span class="d-bar-divider"></span>'+
  ['bold','italic','underline'].map((command,i)=>'<button class="d-bar-tool d-bold" data-c3="d-format" data-format="'+command+'" title="'+command+'">'+['B','I','U'][i]+'</button>').join('')+
  '<button class="d-bar-tool d-knowledge'+(ui.dKnowledge?' active':'')+'" data-c3="d-knowledge" aria-expanded="'+ui.dKnowledge+'">✦ Knowledge <span>⌄</span></button>'+
  '<button class="d-bar-tool" data-c3="d-focus" title="Expand writing without resizing object">⛶ Focus</button>'+
@@ -689,6 +697,10 @@ async function imageResolve(){for(const c of state().knowledgeCards){if(!c.asset
 function formatPoint(i){return {x:i.x,y:i.y,w:i.w,h:i.h}}
 function startPan(e){rememberCamera(true);ui.quickAdd=null;refreshNavigationUI();ui.gesture={type:'pan',from:{x:e.clientX,y:e.clientY},orig:{...ui.pan},moved:false};$('#c3-canvas')?.classList.add('is-panning');e.preventDefault()}
 function gestureCancel(){const gesture=ui.gesture;ui.gesture=null;$('#c3-canvas')?.classList.remove('is-panning');const box=$('#c3-marquee');if(box)box.hidden=true;if(gesture?.type==='pan'&&gesture.moved)saveCam()}
+function dPreserveSelection(e){
+ const button=e.target.closest?.('[data-c3="d-format"],[data-c3="d-points"],[data-c3="d-checklist"],[data-c3="d-format-option"]');
+ if(button&&ui.dEditing)e.preventDefault();
+}
 function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
  const t=e.target;
  if(t.closest('.c3-quick-add,.c3-contextbar,.c3-minimap,.d-toolbar,.d-focus-panel'))return;
@@ -801,12 +813,35 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='help-toggle'){ui.helpOpen=!ui.helpOpen;api.render();return}
  if(a==='quick-notes'){ui.dKnowledge=true;api.render();return}
  if(a==='d-knowledge'){ui.dKnowledge=!ui.dKnowledge;ui.dPopover=null;api.render();return}
- if(a==='d-pop-sources'||a==='d-pop-task'||a==='d-pop-board'||a==='d-pop-files'||a==='d-pop-more'){
+ if(a==='d-pop-sources'||a==='d-pop-task'||a==='d-pop-board'||a==='d-pop-files'||a==='d-pop-more'||a==='d-pop-format'){
   const which=a.slice(6);ui.dKnowledge=true;ui.dPopover=ui.dPopover===which?null:which;api.render();return
  }
  if(a==='d-pop-close'){ui.dPopover=null;api.render();return}
  if(a==='d-points'){dInsertHtml('<h3>Key points</h3><ul><li>Key insight</li></ul>');return}
- if(a==='d-checklist'){dInsertHtml('<h3>Checklist</h3><ul><li>☐ First task</li></ul>');return}
+ if(a==='d-checklist'){dInsertHtml('<h3>Checklist</h3><ul><li><button data-d-check="false">☐</button> First task</li></ul>');return}
+ if(a==='d-format-option'){
+  const editor=dEditor()||document.querySelector('[data-d-editor]');
+  if(!ui.dEditing){const item=dSelected();if(item)dBeginEdit(item.id)}
+  const value=el.dataset.format;
+  const current=dEditor();if(current){
+    if(!window.getSelection?.()?.anchorNode||!current.contains(window.getSelection().anchorNode))dPlaceCaret(current);
+    if(document.execCommand)document.execCommand(el.dataset.type==='formatBlock'?'formatBlock':value,false,el.dataset.type==='formatBlock'?value:null);
+    dCapture();
+  }
+  ui.dPopover=null;api.render();return;
+ }
+ if(a==='d-check-toggle'){
+  const button=el,checked=button.dataset.dCheck==='true';
+  button.dataset.dCheck=String(!checked);button.textContent=checked?'☐':'☑';
+  if(ui.dEditing){dCapture();return}
+  const item=itm(button.closest('[data-c3-item]')?.dataset.c3Item);
+  if(!item)return;
+  const c=card(item.card_id),surface=button.closest('.d-surface');
+  if(!c||!surface)return;
+  const html=safeRich(surface.innerHTML);
+  c.content_blocks=[{id:'main',type:'richtext',html}];
+  await transact(()=>api.patch('knowledge_cards',c.id,{content_blocks:c.content_blocks}),'Checklist updated');return;
+ }
  if(a==='d-format'){dRichCommand(el.dataset.format);return}
  if(a==='d-focus'){const selected=dSelected();if(!selected)return;dBeginEdit(selected.id,{focus:true});return}
  if(a==='d-focus-close'){dEndEdit();return}
@@ -920,6 +955,6 @@ function pasteOn(e){if(state().view!=='board-editor'||e.target.closest('input,te
  if(url(raw.trim())){e.preventDefault();create('reference',null,{url:raw.trim(),title:new URL(raw.trim()).hostname})}
 }
 
-function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('input',input,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);window.addEventListener('pointercancel',gestureCancel);window.addEventListener('blur',gestureCancel);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
+function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('input',input,true);document.addEventListener('pointerdown',dPreserveSelection,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);window.addEventListener('pointercancel',gestureCancel);window.addEventListener('blur',gestureCancel);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
 window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{restorePending();queueMicrotask(imageResolve);return canvas()},updateInPlace,links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
 })();
