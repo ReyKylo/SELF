@@ -6,7 +6,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "dist"
-ASSETS = ("index.html", "styles.css", "app.js", "boards.css", "boards.js", "canvas-v3.css", "canvas-v3.js", "concept-d.css", "career.js", "career.css", "career-phase2.js", "career-phase2.css", "career-phase3.js", "career-phase3.css", "career-learning.js", "career-learning.css", "content/career-learning.json", "content/portfolio-sprint.md", "content/career-kits/PE_LBO_Starter.xlsx.b64", "content/career-kits/VC_Investment_Starter.xlsx.b64", "content/career-kits/Consulting_Profitability_Starter.xlsx.b64")
+ASSETS = ("index.html", "styles.css", "app.js", "boards.css", "boards.js", "canvas-v3.css", "canvas-v3.js", "concept-d.css", "career.js", "career.css", "career-phase2.js", "career-phase2.css", "career-phase3.js", "career-phase3.css", "career-learning.js", "career-portfolio.js", "career-kits.js", "career-learning.css", "content/career-learning.json", "content/portfolio-sprint.md", "content/career-kits/PE_LBO_Starter.xlsx.b64", "content/career-kits/VC_Investment_Starter.xlsx.b64", "content/career-kits/Consulting_Profitability_Starter.xlsx.b64")
 
 
 def main() -> int:
@@ -26,7 +26,7 @@ def main() -> int:
         print(f"  copied {asset} -> dist/{asset}")
 
     html = (OUTPUT / "index.html").read_text(encoding="utf-8")
-    required = ('href="./styles.css"', 'href="./boards.css"', 'src="./canvas-v3.js"', 'href="./canvas-v3.css"', 'href="./concept-d.css"', 'href="./career.css"', 'src="./career.js"', 'src="./career-phase2.js"', 'href="./career-phase2.css"', 'src="./career-phase3.js"', 'href="./career-phase3.css"', 'src="./app.js"', 'src="./career-learning.js"', 'href="./career-learning.css"')
+    required = ('href="./styles.css"', 'href="./boards.css"', 'src="./canvas-v3.js"', 'href="./canvas-v3.css"', 'href="./concept-d.css"', 'href="./career.css"', 'src="./career.js"', 'src="./career-phase2.js"', 'href="./career-phase2.css"', 'src="./career-phase3.js"', 'href="./career-phase3.css"', 'src="./app.js"', 'src="./career-learning.js"', 'src="./career-portfolio.js"', 'src="./career-kits.js"', 'href="./career-learning.css"')
     if not all(reference in html for reference in required):
         print("SELF build failed: index.html asset references changed.", file=sys.stderr)
         return 1
