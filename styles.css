@@ -30,3 +30,38 @@
 @media(prefers-reduced-motion:reduce){
  .shell .sidebar,.shell .main,.shell .brand .sidebar-toggle{transition:none!important}
 }
+
+
+/* Phase 3 Core — direct manipulation, visible save outcomes, calm focus. */
+.save-state.save-failed{color:var(--red,#f68e94);font-weight:720}
+.save-state.save-failed svg{color:currentColor}
+.kanban-help{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:.8em;color:var(--muted);margin:2px 0 17px;flex-wrap:wrap}
+.kanban-help>span{display:inline-flex;align-items:center;gap:8px}
+.kanban-help .soft-btn{min-height:35px}
+.kanban-col{display:flex;flex-direction:column;transition:border-color .12s,background-color .12s}
+.kanban-items{flex:1;min-height:110px}
+.kanban-col.is-drag-over{border-color:var(--blue)!important;
+  background:color-mix(in srgb,var(--blue) 11%,var(--card2))}
+.kanban-task{user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.kanban-card-head{display:flex;align-items:flex-start;gap:8px;justify-content:space-between}
+.kanban-drag-grip{color:var(--faint);font-size:1.2em;line-height:.8;font-weight:600;letter-spacing:.04em}
+.kanban-task.is-dragging{border-style:dashed;border-color:var(--blue);opacity:.65}
+.kanban-task.is-saving{border-color:var(--blue);cursor:progress}
+.kanban-task:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.kanban-empty{font-size:.73em;text-align:center;padding:25px 12px;color:var(--muted);
+  border:1px dashed var(--line);border-radius:10px}
+.kanban-stage-label{display:flex;justify-content:space-between;align-items:center;gap:6px;
+  padding-top:12px;margin-top:10px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:.73em;font-weight:700}
+.kanban-stage-select{min-width:0;max-width:124px;background:var(--card2);color:var(--text);
+  border:1px solid var(--line);border-radius:8px;padding:6px 5px;
+  font:inherit;font-weight:700;cursor:pointer}
+.kanban-stage-select:focus-visible{outline:2px solid var(--blue)}
+/* Full-screen darkening and backdrop blur used to flash again on every save.
+   Keep the detail panel solid, without dimming the entire workspace. */
+.overlay{background:transparent!important;backdrop-filter:none!important;animation:none!important}
+.overlay .panel{animation:none!important;box-shadow:-18px 0 45px #0002}
+@media(prefers-reduced-motion:reduce){
+ .kanban-col,.kanban-task,.kanban-stage-select{animation:none!important;transition:none!important}
+}
