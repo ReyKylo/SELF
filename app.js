@@ -12,7 +12,7 @@ const STATUSES=[['todo','To Do','gray'],['planning','Planning','yellow'],['in_pr
 const PRIORITIES=[['low','Low','green'],['normal','Normal','blue'],['high','High','red']];
 const COLORS={blue:'#428cff',green:'#3dce9e',purple:'#ad92fa',yellow:'#f0b862',red:'#f68e94',cyan:'#3fc5d2'};
 const SPACE_ICONS=['briefcase','chart','graduation','person','brain','folder'];
-const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
+const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
 function setTheme(theme){state.preferences.theme=theme;document.body.dataset.theme=theme;localStorage.setItem('self.theme',theme)}
 function setScale(scale){state.preferences.text_scale=scale;document.documentElement.style.setProperty('--scale',String(scale/100));localStorage.setItem('self.scale',String(scale))}
 setTheme(state.preferences.theme);setScale(state.preferences.text_scale);
@@ -47,8 +47,29 @@ async function patch(table,id,record){return request(endpoint(table,`id=eq.${enc
 async function patchSimple(table,id,record){return request(endpoint(table,`id=eq.${encodeURIComponent(id)}&select=*`),{method:'PATCH',body:record,headers:{Prefer:'return=representation'}}).then(x=>x[0])}
 async function del(table,id){return request(endpoint(table,`id=eq.${encodeURIComponent(id)}`),{method:'DELETE'})}
 async function savePref(){const body={user_id:state.user.id,theme:state.preferences.theme,text_scale:state.preferences.text_scale,updated_at:new Date().toISOString()};await request(endpoint('preferences','on_conflict=user_id'),{method:'POST',body,headers:{Prefer:'resolution=merge-duplicates,return=minimal'}})}
-async function mutate(operation,success='Saved'){state.saving=true;paintSave();try{await operation();await loadAll();state.saving=false;render();if(success)toast(success)}catch(e){state.saving=false;paintSave();toast(e.message,true);console.error(e)}}
-function paintSave(){const e=$('#save-state');if(e)e.innerHTML=state.saving?`${ic('clock',14)} Saving...`:`${ic('check',14)} Saved`}
+async function mutate(operation,success='Saved'){
+ state.saving=true;state.saveError=null;paintSave();
+ let wrote=false;
+ try{
+  await operation();wrote=true;
+  await loadAll();
+  state.saving=false;state.saveError=null;
+  render();if(success)toast(success);
+  return true;
+ }catch(err){
+  state.saving=false;
+  state.saveError=wrote?'Saved remotely, but refresh failed. Reload to verify.':'Not saved. '+(err?.message||String(err));
+  paintSave();toast(state.saveError,true);console.error(err);
+  return false;
+ }
+}
+function paintSave(){
+ const e=$('#save-state');if(!e)return;
+ e.setAttribute('role','status');e.setAttribute('aria-live','polite');
+ e.classList.toggle('save-failed',!!state.saveError);
+ e.innerHTML=state.saving?`${ic('clock',14)} Saving...`:state.saveError?`${ic('alert',14)} Not saved`:`${ic('check',14)} Saved`;
+ if(state.saveError)e.title=state.saveError;else e.removeAttribute('title');
+}
 function nav(icon,label,view){return `<button class="nav-btn ${(state.view===view||(view==='spaces'&&state.view==='space')||(view==='boards'&&state.view==='board-editor'))?'active':''}" data-action="nav" data-view="${view}" title="${label}" aria-label="${label}">${ic(icon)}<span>${label}</span></button>`}
 function chrome(content,heading='Home'){
  const name=(state.user?.email||'SELF user').split('@')[0];
@@ -95,15 +116,15 @@ async function autoCaptureLinks(taskId,text){const urls=[...new Set((text.match(
 function formData(form){return Object.fromEntries(new FormData(form).entries())}
 async function handleSubmit(e){const form=e.target;if(!form.id)return;e.preventDefault();const v=formData(form);const id=form.dataset.id;
 if(form.id==='auth-form'){const btn=form.querySelector('button[type="submit"]');btn.disabled=true;state.authMessage='';try{await login(v.email,v.password,state.loginMode==='signup')}catch(e){state.authMessage='Error: '+e.message;render()}finally{if(btn.isConnected)btn.disabled=false}return}
-if(form.id==='create-task-form'){await mutate(async()=>{await insert('tasks',{title:v.title.trim(),space_id:v.space_id||null,status:v.status,due_date:v.due_date||null})},'Task created');state.modal=null;render();return}
-if(form.id==='create-space-form'){await mutate(async()=>{await insert('spaces',{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent})},'Space created');state.modal=null;render();return}
-if(form.id==='edit-space-form'){await mutate(async()=>patch('spaces',state.editSpaceId,{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent}),'Space updated');state.modal=null;render();return}
+if(form.id==='create-task-form'){if(await mutate(async()=>{await insert('tasks',{title:v.title.trim(),space_id:v.space_id||null,status:v.status,due_date:v.due_date||null})},'Task created')){state.modal=null;render()}return}
+if(form.id==='create-space-form'){if(await mutate(async()=>{await insert('spaces',{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent})},'Space created')){state.modal=null;render()}return}
+if(form.id==='edit-space-form'){if(await mutate(async()=>patch('spaces',state.editSpaceId,{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent}),'Space updated')){state.modal=null;render()}return}
 if(form.id==='add-check-form'){await mutate(async()=>{await insert('task_checklist',{task_id:id,text:v.text.trim(),position:state.checklist.filter(c=>c.task_id===id).length})},'Checklist updated');return}
 if(form.id==='add-link-form'){const url=normalUrl(v.url);if(!url){toast('Use an http or https URL',true);return}if(state.links.some(l=>l.task_id===id&&l.url===url)){toast('This link is already attached');return}await mutate(async()=>{await insert('task_links',{task_id:id,url,title:v.title.trim()||new URL(url).hostname})},'Link saved to My Links');return}
-if(form.id==='create-link-form'){const url=normalUrl(v.url);if(!url){toast('Use a valid URL',true);return}await mutate(async()=>insert('inbox',{title:v.title.trim(),body:url,kind:'link'}),'Link added to My Links');state.modal=null;render();return}
-if(form.id==='create-subpage-form'){let made;await mutate(async()=>{made=await insert('task_pages',{task_id:state.taskId,title:v.title.trim()})},'Subpage created');state.modal=null;state.pageId=made?.id||null;render();return}
+if(form.id==='create-link-form'){const url=normalUrl(v.url);if(!url){toast('Use a valid URL',true);return}if(await mutate(async()=>insert('inbox',{title:v.title.trim(),body:url,kind:'link'}),'Link added to My Links')){state.modal=null;render()}return}
+if(form.id==='create-subpage-form'){let made;if(await mutate(async()=>{made=await insert('task_pages',{task_id:state.taskId,title:v.title.trim()})},'Subpage created')){state.modal=null;state.pageId=made?.id||null;render()}return}
 }
-async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='board'){let made;await mutate(async()=>{made=await insert('boards',{title:text})},'Board created');state.captureDraft='';if(made)window.SELFBoards.open(made.id);return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured');state.captureDraft='';render()}
+async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='board'){let made;if(await mutate(async()=>{made=await insert('boards',{title:text})},'Board created')){state.captureDraft='';if(made)window.SELFBoards.open(made.id)}return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}if(await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured')){state.captureDraft='';render()}}
 async function handleAction(e){const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if((e.target.closest('a'))&&action==='open-task')return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
 if(action==='toggle-sidebar'){
  state.sidebarCollapsed=!state.sidebarCollapsed;
@@ -131,9 +152,9 @@ if(action==='toggle-check'){await mutate(async()=>patchSimple('task_checklist',i
 if(action==='delete-check'){await mutate(async()=>del('task_checklist',id),'Step removed');return}
 if(action==='delete-inbox'){if(!confirm('Delete this capture?'))return;await mutate(async()=>del('inbox',id),'Capture deleted');return}
 if(action==='delete-link'){await mutate(async()=>del('task_links',id),'Link removed');return}
-if(action==='delete-task'){if(!confirm('Delete this task and its linked pages and checklist?'))return;await mutate(async()=>del('tasks',id),'Task deleted');state.taskId=null;render();return}
-if(action==='delete-space'){if(!confirm('Delete this Space? Its tasks will be kept as Unsorted.'))return;await mutate(async()=>del('spaces',id),'Space removed');state.modal=null;state.spaceId=null;go('spaces');return}
-if(action==='delete-page'){if(!confirm('Delete this subpage?'))return;await mutate(async()=>del('task_pages',id),'Subpage removed');state.pageId=null;render();return}
+if(action==='delete-task'){if(!confirm('Delete this task and its linked pages and checklist?'))return;if(await mutate(async()=>del('tasks',id),'Task deleted')){state.taskId=null;render()}return}
+if(action==='delete-space'){if(!confirm('Delete this Space? Its tasks will be kept as Unsorted.'))return;if(await mutate(async()=>del('spaces',id),'Space removed')){state.modal=null;state.spaceId=null;go('spaces')}return}
+if(action==='delete-page'){if(!confirm('Delete this subpage?'))return;if(await mutate(async()=>del('task_pages',id),'Subpage removed')){state.pageId=null;render()}return}
 if(action==='open-subpage'){state.pageId=id;render();return}
 if(action==='close-subpage'){state.pageId=null;render();return}
 if(action==='new-subpage'){state.modal='subpage';render();return}
