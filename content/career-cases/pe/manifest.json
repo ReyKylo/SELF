@@ -46,5 +46,13 @@
   "rights": "Original simulated company, data and exercises; external sources are linked, not reproduced",
   "teaching_language": "Bahasa Indonesia with immediate English professional terminology",
   "private_answer_key_present": false,
-  "integration_status": "not integrated into shared Career UI"
+  "integration_status": "not integrated into shared Career UI",
+  "exhibit_git_blob_sha1": {
+    "exhibits/exhibit-01-historical.csv": "c3ee594e135bb1a16e7c4c6621fe651a80a8cff9",
+    "exhibits/exhibit-02-aging.csv": "f5b8b323f3e86bfcfdb8dca8dc37a45d4c4b5da6",
+    "exhibits/exhibit-03-deal-terms.csv": "07c8d1f7984ccc88105b348ed428ebe04f3a27d8",
+    "exhibits/exhibit-04-forecast-drivers.csv": "fa77745f1c5747dfabafbb81b01496b5dce91a2d",
+    "exhibits/exhibit-05-covenants.csv": "d7f1742d8afd4c585f8bb4c16e5529eb7407b313",
+    "exhibits/exhibit-06-exit-sensitivity.csv": "6fb1edc87309cc8bac5b3c15678302d70d43e4a3"
+  }
 }
