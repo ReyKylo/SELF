@@ -125,7 +125,7 @@ async function main(){
  const archive=zlib.gzipSync(Buffer.concat([hdr,fakePdf,padding,Buffer.alloc(1024)]));
  tables.career_cv_versions[0].storage_path=null;
  tables.career_cv_versions[0].file_name=basename;
- tables.career_cv_embedded_files.push({cv_id:cvId,user_id:owner.id,file_name:basename,file_bytes:'\\\\x'+archive.toString('hex')});
+ tables.career_cv_embedded_files.push({cv_id:cvId,user_id:owner.id,file_name:basename,file_bytes:String.fromCharCode(92)+'x'+archive.toString('hex')});
  await p2.load(owner.id);
  assert.match(p2.renderCVs(),/Download PDF/,'imported private PDF offers download');
  await click('open-file',{id:cvId});
