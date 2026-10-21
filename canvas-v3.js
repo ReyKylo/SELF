@@ -127,7 +127,7 @@ function inspector(){
  '<label>Border <input type="color" data-c3-style="stroke" value="'+validColour(s.stroke==='transparent'?'#222b38':s.stroke)+'"/></label>'+
  '<label>Text color <input type="color" data-c3-style="color" value="'+validColour(s.color)+'"/></label>'+
  '<label>Font size <input type="range" min="12" max="72" step="1" data-c3-style="fontSize" value="'+num(s.fontSize,20)+'"/><output>'+num(s.fontSize,20)+'px</output></label>'+
- '<label>Corner radius <input type="range" min="0" max="45" data-c3-style="radius" value="'+Math.min(45,num(s.radius,12))+'"/><output>'+num(s.radius,12)+'px</output></label>'+
+ '<label>Corner radius <input type="range" min="0" max="120" data-c3-style="radius" value="'+num(s.radius,12)+'"/><output>'+num(s.radius,12)+'px</output></label>'+
  '<label>Opacity <input type="range" min="30" max="100" data-c3-style="opacity" value="'+Math.round(num(s.opacity,1)*100)+'"/><output>'+Math.round(num(s.opacity,1)*100)+'%</output></label></div>'+
  '<div class="c3-section-title">Quick palettes</div><div class="c3-swatches">'+Object.entries(palette).map(([key,val])=>'<button title="'+key+'" data-c3="swatch" data-value="'+val+'" style="background:'+val+'"></button>').join('')+'</div>';
  else if(ui.tab==='arrange')body='<div class="c3-section-title">Align selected</div><div class="c3-action-grid">'+['left','center','right','top','middle','bottom'].map(x=>button('align','↔ '+x,'data-align="'+x+'"')).join('')+'</div>'+
@@ -481,7 +481,7 @@ async function distribute(axis){const arr=entries().sort((a,b)=>axis==='horizont
 function styleValue(field,raw){
  if(field==='opacity')return clamp(num(raw,100)/100,.3,1);
  if(field==='fontSize')return clamp(num(raw,20),12,72);
- if(field==='radius')return clamp(num(raw,12),0,90);
+ if(field==='radius')return clamp(num(raw,12),0,120);
  return validColour(raw);
 }
 function updateStylePreview(field,raw,source){
