@@ -159,10 +159,10 @@ function modalMarkup(){
  '<div class="career-drawer-header"><span>SELF / Career / Quick Capture</span>'+button('✕','close-modal','aria-label="Close Quick Capture"')+'</div>'+
  '<h2>What are you capturing?</h2><p>Choose the record to create. Only essential details are required.</p>'+
  '<div class="career-capture-choices">'+
- button('▦  Application','choose-kind','data-kind="application" '+(ui.companies.length?'':'disabled title="Create a company first"'))+
- button('♧  Person','choose-kind','data-kind="person"')+
- button('◫  Company','choose-kind','data-kind="company"')+
- button('☑  SELF Task','choose-kind','data-kind="task"')+
+ button((host.icon?host.icon('briefcase',17):'')+'  Application','choose-kind','data-kind="application" '+(ui.companies.length?'':'disabled title="Create a company first"'))+
+ button((host.icon?host.icon('person',17):'')+'  Person','choose-kind','data-kind="person"')+
+ button((host.icon?host.icon('grid',17):'')+'  Company','choose-kind','data-kind="company"')+
+ button((host.icon?host.icon('check',17):'')+'  SELF Task','choose-kind','data-kind="task"')+
  '</div>'+(ui.companies.length?'':'<p class="career-form-hint">Create a Company before adding its Application.</p>')+
  '</section></div>';
  return '<div class="career-modal-layer" role="presentation"><section class="career-modal" role="dialog" aria-modal="true" aria-label="Create '+names[ui.modal]+'">'+
@@ -197,7 +197,7 @@ function render(){
  button(ui.railCollapsed?'›':'‹','toggle-rail','aria-label="Toggle Career navigation"')+'</div>'+
  PAGES.map(([id,label,icon],index)=> (index===5?'<div class="career-rail-category">RESOURCES</div>':'')+
  '<button type="button" class="career-subnav '+(selected===id?'active':'')+'" data-career="page" data-page="'+id+'" title="'+label+'" aria-current="'+(selected===id?'page':'false')+'">'+
- '<span class="career-nav-symbol">'+['⌂','▣','♧','◫','◎','▤','▦','≡','♧'][index]+'</span><span class="career-nav-text">'+label+'</span></button>').join('')+
+ '<span class="career-nav-symbol">'+(host.icon?host.icon(icon,19):'•')+'</span><span class="career-nav-text">'+label+'</span></button>').join('')+
  '<div class="career-rail-footer">One Career workspace. SELF Tasks, Links and Boards stay connected.</div></nav>';
  let main='';
  if(ui.loading&&!ui.ready)main=empty('Opening Career…','Loading your private records.');
@@ -256,6 +256,7 @@ async function save(form){
  const kind=form.dataset.kind,table=TYPES[kind],isEdit=form.id==='career-edit',id=form.dataset.id;
  if(!table)return;
  const vals=Object.fromEntries(new FormData(form).entries());
+ const inlineError=message=>{ui.saveError=message;const node=form.querySelector('.career-save-note');if(node)node.textContent=message};
  const clean=v=>String(v||'').trim();
  const payload={};
  const keys=kind==='company'?['name','industry','location','website','notes']:
@@ -266,14 +267,14 @@ async function save(form){
   if(key in payload&&!payload[key])payload[key]=null;
  }
  for(const key of ['website','profile_url','source_url']){
-  if(payload[key]&&!safeUrl(payload[key])){ui.saveError='Use an http(s) URL.';host.render();return}
+  if(payload[key]&&!safeUrl(payload[key])){inlineError('Use an http(s) URL.');return}
   if(payload[key])payload[key]=safeUrl(payload[key]);
  }
  if(kind==='company'&&!payload.name||kind==='person'&&!payload.full_name||
   kind==='application'&&(!payload.role_title||!payload.company_id)){
-  ui.saveError='Complete the required fields.';host.render();return;
+  inlineError('Complete the required fields.');return;
  }
- if(kind==='person'&&!validEmail(payload.email)){ui.saveError='Check the email address.';host.render();return}
+ if(kind==='person'&&!validEmail(payload.email)){inlineError('Check the email address.');return}
  ui.busy=true;ui.saveError='';
  const submit=form.querySelector('button[type="submit"]');
  if(submit){submit.disabled=true;submit.textContent='Saving…'}
