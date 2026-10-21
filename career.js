@@ -375,7 +375,8 @@ function links(){
  return [
   ...ui.companies.filter(x=>safeUrl(x.website)).map(x=>({id:x.id,title:x.name+' — website',url:safeUrl(x.website),boardName:'Career · Company'})),
   ...ui.people.filter(x=>safeUrl(x.profile_url)).map(x=>({id:x.id,title:x.full_name+' — profile',url:safeUrl(x.profile_url),boardName:'Career · Person'})),
-  ...ui.applications.filter(x=>safeUrl(x.source_url)).map(x=>({id:x.id,title:x.role_title+' — posting',url:safeUrl(x.source_url),boardName:'Career · Application'}))
+  ...ui.applications.filter(x=>safeUrl(x.source_url)).map(x=>({id:x.id,title:x.role_title+' — posting',url:safeUrl(x.source_url),boardName:'Career · Application'})),
+  ...(window.SELFCareerPhase3?.links?.()||[])
  ];
 }
 window.SELFCareer={init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
