@@ -315,7 +315,11 @@ function dToolbar(){
  const i=dSelected();if(!i)return '';
  const s=style(i),size=clamp(num(s.fontSize,20),12,72),vp=$('#c3-canvas'),w=vp?.clientWidth||1000;
  const mode=ui.dKnowledge?' expanded':'';
- return '<div class="d-toolbar'+mode+'" id="d-toolbar" role="toolbar" aria-label="Shape formatting and knowledge" style="left:50%;transform:translateX(-50%);max-width:calc(100% - 90px)">'+
+ const barH=ui.dKnowledge?108:52,screenY=i.y*ui.zoom+ui.pan.y,screenBottom=(i.y+i.h)*ui.zoom+ui.pan.y;
+ const vh=vp?.clientHeight||700;
+ let offsetTop=12;
+ if(screenY<barH+20&&screenBottom>0&&screenBottom+barH+28<vh-24)offsetTop=Math.round(screenBottom+15);
+ return '<div class="d-toolbar'+mode+'" id="d-toolbar" role="toolbar" aria-label="Shape formatting and knowledge" style="top:'+offsetTop+'px;left:50%;transform:translateX(-50%);max-width:calc(100% - 90px)">'+
  '<div class="d-toolbar-primary"><button class="d-bar-tool" data-c3="quick-edit" title="Write directly in shape">✎ <span>Write</span></button>'+
  '<label class="d-color" title="Fill color">Fill <input type="color" data-c3-style="fill" aria-label="Fill" value="'+validColour(s.fill)+'"/></label>'+
  '<label class="d-color" title="Stroke color">Border <input type="color" data-c3-style="stroke" aria-label="Border" value="'+validColour(s.stroke)+'"/></label>'+
