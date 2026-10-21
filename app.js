@@ -12,7 +12,7 @@ const STATUSES=[['todo','To Do','gray'],['planning','Planning','yellow'],['in_pr
 const PRIORITIES=[['low','Low','green'],['normal','Normal','blue'],['high','High','red']];
 const COLORS={blue:'#428cff',green:'#3dce9e',purple:'#ad92fa',yellow:'#f0b862',red:'#f68e94',cyan:'#3fc5d2'};
 const SPACE_ICONS=['briefcase','chart','graduation','person','brain','folder'];
-const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
+const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,savePending:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
 function setTheme(theme){state.preferences.theme=theme;document.body.dataset.theme=theme;localStorage.setItem('self.theme',theme)}
 function setScale(scale){state.preferences.text_scale=scale;document.documentElement.style.setProperty('--scale',String(scale/100));localStorage.setItem('self.scale',String(scale))}
 setTheme(state.preferences.theme);setScale(state.preferences.text_scale);
@@ -47,14 +47,14 @@ async function patch(table,id,record){return request(endpoint(table,`id=eq.${enc
 async function patchSimple(table,id,record){return request(endpoint(table,`id=eq.${encodeURIComponent(id)}&select=*`),{method:'PATCH',body:record,headers:{Prefer:'return=representation'}}).then(x=>x[0])}
 async function del(table,id){return request(endpoint(table,`id=eq.${encodeURIComponent(id)}`),{method:'DELETE'})}
 async function savePref(){const body={user_id:state.user.id,theme:state.preferences.theme,text_scale:state.preferences.text_scale,updated_at:new Date().toISOString()};await request(endpoint('preferences','on_conflict=user_id'),{method:'POST',body,headers:{Prefer:'resolution=merge-duplicates,return=minimal'}})}
-async function mutate(operation,success='Saved'){
- state.saving=true;state.saveError=null;paintSave();
+async function mutate(operation,success='Saved',{rerender=true}={}){
+ state.saving=true;state.savePending=false;state.saveError=null;paintSave();
  let wrote=false;
  try{
   await operation();wrote=true;
   await loadAll();
-  state.saving=false;state.saveError=null;
-  render();if(success)toast(success);
+  state.saving=false;state.savePending=false;state.saveError=null;
+  if(rerender)render();else paintSave();if(success)toast(success);
   return true;
  }catch(err){
   state.saving=false;
@@ -67,7 +67,7 @@ function paintSave(){
  const e=$('#save-state');if(!e)return;
  e.setAttribute('role','status');e.setAttribute('aria-live','polite');
  e.classList.toggle('save-failed',!!state.saveError);
- e.innerHTML=state.saving?`${ic('clock',14)} Saving...`:state.saveError?`${ic('alert',14)} Not saved`:`${ic('check',14)} Saved`;
+ e.innerHTML=state.saving?`${ic('clock',14)} Saving...`:state.saveError?`${ic('flag',14)} Not saved`:state.savePending?`${ic('clock',14)} Unsaved changes`:`${ic('check',14)} Saved`;
  if(state.saveError)e.title=state.saveError;else e.removeAttribute('title');
 }
 function nav(icon,label,view){return `<button class="nav-btn ${(state.view===view||(view==='spaces'&&state.view==='space')||(view==='boards'&&state.view==='board-editor'))?'active':''}" data-action="nav" data-view="${view}" title="${label}" aria-label="${label}">${ic(icon)}<span>${label}</span></button>`}
@@ -94,7 +94,7 @@ async function moveTaskStatus(id,target,{undo=false}={}){
  const from=task.status;state.movingTaskId=id;
  const card=document.querySelector('[data-task-drag="'+id+'"]');
  if(card){card.classList.add('is-saving');card.setAttribute('aria-busy','true')}
- const result=await mutate(async()=>patch('tasks',id,{status:target}),undo?'Move undone':'Task moved to '+statusOf(target)[1]);
+ const result=await mutate(async()=>patch('tasks',id,{status:target}),undo?'Move undone':'Task moved to '+statusOf(target)[1],{rerender:false});
  state.movingTaskId=null;
  if(result){state.lastTaskMove=undo?null:{id,from,to:target};render();return true}
  if(card?.isConnected){card.classList.remove('is-saving');card.removeAttribute('aria-busy')}
@@ -186,7 +186,7 @@ if(action==='close-panel'){state.taskId=null;state.pageId=null;render();return}
 if(action==='panel-tab'){state.panelTab=b.dataset.tab;state.pageId=null;render();return}
 if(action==='space-tab'){state.spaceTab=b.dataset.tab;render();return}
 if(action==='work-view'){state.workView=b.dataset.mode;render();return}
-if(action==='undo-stage'){const m=state.lastTaskMove;if(m){state.lastTaskMove=null;await moveTaskStatus(m.id,m.from,{undo:true})}return}
+if(action==='undo-stage'){const m=state.lastTaskMove;if(m)await moveTaskStatus(m.id,m.from,{undo:true});return}
 if(action==='toggle-task'){const t=taskOf(id);if(t)await mutate(async()=>patch('tasks',id,{status:t.status==='done'?'todo':'done'}),'Task updated');return}
 if(action==='toggle-check'){await mutate(async()=>patchSimple('task_checklist',id,{is_done:b.checked}),'Checklist updated');return}
 if(action==='delete-check'){await mutate(async()=>del('task_checklist',id),'Step removed');return}
@@ -215,7 +215,9 @@ if(el.dataset.checkField){if(!el.value.trim()){toast('Checklist text cannot be b
 if(el.dataset.pageField){await mutate(async()=>patch('task_pages',el.dataset.id,{[el.dataset.pageField]:el.value}),'Page saved');return}
 }
 let searchTimer;
-function handleInput(e){const el=e.target;if(el.id==='quick-text'){state.captureDraft=el.value;return}
+function handleInput(e){const el=e.target;
+if(el.dataset?.taskField||el.dataset?.pageField||el.dataset?.checkField){state.savePending=true;paintSave();return}
+if(el.id==='quick-text'){state.captureDraft=el.value;return}
 if(el.id==='work-search'||el.id==='global-search'){const id=el.id,pos=el.selectionStart;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{if(id==='work-search')state.workSearch=el.value;else state.search=el.value;render();const restored=document.getElementById(id);if(restored){restored.focus();restored.setSelectionRange(pos,pos)}},160);return}
 if(el.id==='text-scale'){setScale(Number(el.value));const label=$('#scale-label');if(label)label.textContent=el.value+'%';clearTimeout(searchTimer);searchTimer=setTimeout(()=>mutate(async()=>savePref(),null),300)}
 }
@@ -227,7 +229,7 @@ document.addEventListener('dragstart',workDragStart);
 document.addEventListener('dragover',workDragOver);
 document.addEventListener('drop',e=>{workDrop(e).catch(error=>toast(error.message,true))});
 document.addEventListener('dragend',workDragEnd);
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(state.user)go('search')}if(e.key==='Escape'){if(state.modal)state.modal=null;else if(state.pageId)state.pageId=null;else state.taskId=null;render()}if(e.key==='Enter'&&e.target?.id==='quick-text'){e.preventDefault();quickCapture().catch(err=>toast(err.message,true))}});
+document.addEventListener('keydown',e=>{if(state.view==='work'&&state.workView==='board'&&e.target?.matches?.('[data-task-drag]')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();state.taskId=e.target.dataset.taskDrag;state.panelTab='overview';render();return}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(state.user)go('search')}if(e.key==='Escape'){if(state.modal)state.modal=null;else if(state.pageId)state.pageId=null;else state.taskId=null;render()}if(e.key==='Enter'&&e.target?.id==='quick-text'){e.preventDefault();quickCapture().catch(err=>toast(err.message,true))}});
 
 /* Private image assets for the authenticated Concept C whiteboard. */
 async function uploadBoardImage(file){
