@@ -15,7 +15,7 @@ assert(sql.includes('ENABLE ROW LEVEL SECURITY')&&sql.includes('career_task_link
 assert(html.includes('src="./career-phase2.js"')&&html.includes('career-phase2.css'),'Phase2 browser assets included');
 assert(build.includes('career-phase2.js'),'Cloudflare ship Phase2');
 assert(app.includes('uploadCareerDocument')&&app.includes('signCareerDocument'),'CVs use private Storage');
-assert(app.includes("'[data-career],[data-career2]'"),'Phase2 actions must route through global SELF handler');
+assert(app.includes("'[data-career],[data-career2],[data-career3]'"),'All Career actions must route through global SELF handler');
 const tables={career_companies:[],career_people:[],career_applications:[],career_touchpoints:[],career_cv_versions:[],
  career_interviews:[],career_templates:[],career_task_links:[],tasks:[]};
 let n=0,failPatch=false,failInsert=false,notifications=[],clicks=0;

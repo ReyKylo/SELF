@@ -66,6 +66,14 @@ Open http://localhost:8080. A Supabase email/password account is required. The c
 - Opportunity Radar remains inactive until explicitly approved in Career Phase 3.
 - Review `docs/CAREER_PHASE2_RELEASE_GATE.md` for production UI and account-security acceptance gates.
 
+## Career Phase 3 — source-backed Opportunity Radar
+- Within the same Career shell, a real **on-demand** public Remotive job feed displays source URL and role/company metadata.
+- Transparent rule-based estimated relevance, explicit Jakarta/Indonesia or worldwide eligibility, four clusters, 75% threshold and max 15 results.
+- Privately Save/Dismiss results, keep general My Links as the one cross-SELF link library, opt in before adding a draft to existing Applications.
+- Editable research prompt Assist (copy-only; not a connected LLM), with no automatic company outreach or fabricated personal experience.
+- 06:00 WIB schedule remains a **design specification only**, not a running automation. See `docs/CAREER_PHASE3_RELEASE_GATE.md` for scope and limits.
+- Schema: `supabase/migrations/20261021170000_self_career_phase3_opportunities.sql` (additive owner-scoped).
+
 ## Phases
 - **Phase 1**: Daily workspace, Spaces, My Work, Tasks, Quick Capture, dark/light theme.
 - **Phase 2.5**: Creative + Smart Diagramming whiteboard (implementation committed, smoke-tested; browser visual QA still open).
@@ -81,6 +89,7 @@ node tests/smoke_concept_d.cjs
 node tests/smoke_core_phase3.cjs
 node tests/smoke_career_phase1.cjs
 node tests/smoke_career_phase2.cjs
+node tests/smoke_career_phase3.cjs
 python3 tools/build_cloudflare.py
 ```
 A passing smoke test isn't a browser screenshot or live deployment verification. Visual and real-device checks remain required before signing off the visual contract.
@@ -96,7 +105,7 @@ No service-role keys in the browser. Users can select/change only their own reco
 SELF is a zero-dependency static application deployed as **Cloudflare Workers Static Assets**, not as a Cloudflare Pages project.
 
 The repository includes:
-- `tools/build_cloudflare.py`: creates `dist/` with twelve static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`, `canvas-v3.css`, `canvas-v3.js`, `concept-d.css`, `career.js`, `career.css`, `career-phase2.js`, `career-phase2.css`).
+- `tools/build_cloudflare.py`: creates `dist/` with fourteen static app assets (`index.html`, `styles.css`, `app.js`, `boards.css`, `boards.js`, `canvas-v3.css`, `canvas-v3.js`, `concept-d.css`, `career.js`, `career.css`, `career-phase2.js`, `career-phase2.css`, `career-phase3.js`, `career-phase3.css`).
 - `wrangler.jsonc`: preserves the existing Worker name `self` and points Wrangler to `dist/` as static assets.
 
 In **Cloudflare dashboard > Workers & Pages > self > Settings > Builds**, set:

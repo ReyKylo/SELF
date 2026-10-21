@@ -207,7 +207,7 @@ function render(){
  else if(selected==='applications')main=window.SELFCareerPhase2?.renderApplications?.()||careerApplications();
  else if(selected==='people')main=window.SELFCareerPhase2?.renderPeople?.()||careerPeople();
  else if(selected==='companies')main=careerCompanies();
- else if(selected==='radar')main=careerRadar();
+ else if(selected==='radar')main=window.SELFCareerPhase3?.render?.()||careerRadar();
  else if(selected==='cvs')main=window.SELFCareerPhase2?.renderCVs?.()||future('CV Library','Version management and private attachments.','Phase 2');
  else if(selected==='interviews')main=window.SELFCareerPhase2?.renderInterviews?.()||future('Interview Prep','Linked sessions and preparation workflows.','Phase 2');
  else if(selected==='templates')main=window.SELFCareerPhase2?.renderTemplates?.()||future('Templates','Reusable messages and cover letter drafts.','Phase 2');
@@ -238,6 +238,8 @@ async function load(){
   [ui.companies,ui.people,ui.applications]=tables.map(x=>Array.isArray(x)?x:[]);
   await window.SELFCareerPhase2?.load?.(ui.owner);
   if(gen!==ui.generation)return;
+  await window.SELFCareerPhase3?.load?.(ui.owner);
+  if(gen!==ui.generation)return;
   ui.ready=true;ui.error='';
  }catch(e){if(gen!==ui.generation)return;ui.error=e?.message||String(e)}
  finally{if(gen===ui.generation){ui.loading=false;host.render()}}
@@ -250,12 +252,14 @@ function enter(){
   ui.companies=[];ui.people=[];ui.applications=[];
   ui.drawer=null;ui.modal=null;ui.dirty=false;ui.generation++;
   window.SELFCareerPhase2?.reset?.(owner);
+  window.SELFCareerPhase3?.reset?.(owner);
  }
  if(!ui.ready&&!ui.loading)void load();
 }
 function setPage(id){
  if(!PAGES.some(x=>x[0]===id))return;
  if(ui.dirty&&!confirm('Discard unsaved edits?'))return;
+ if(window.SELFCareerPhase3?.beforeNavigate?.()===false)return;
  if(window.SELFCareerPhase2?.beforeNavigate?.()===false)return;
  ui.page=id;ui.drawer=null;ui.modal=null;ui.dirty=false;ui.saveError='';host.render();
 }
@@ -320,6 +324,7 @@ async function erase(kind,id){
  }finally{ui.busy=false}
 }
 async function action(e){
+ if(await window.SELFCareerPhase3?.action?.(e))return true;
  if(await window.SELFCareerPhase2?.action?.(e))return true;
  const b=e.target.closest?.('[data-career]');
  if(!b)return false;
@@ -346,12 +351,14 @@ async function action(e){
  return true;
 }
 async function submit(e){
+ if(await window.SELFCareerPhase3?.submit?.(e))return true;
  if(await window.SELFCareerPhase2?.submit?.(e))return true;
  if(!/^career-(create|edit)$/.test(e.target?.id||''))return false;
  e.preventDefault();e.stopPropagation();
  await save(e.target);return true;
 }
 function input(e){
+ if(window.SELFCareerPhase3?.input?.(e))return true;
  if(window.SELFCareerPhase2?.input?.(e))return true;
  if(!e.target?.closest?.('.career-record-form'))return false;
  ui.dirty=true;ui.saveError='';
@@ -360,6 +367,7 @@ function input(e){
  return true;
 }
 function keydown(e){
+ if(window.SELFCareerPhase3?.keydown?.(e))return true;
  if(window.SELFCareerPhase2?.keydown?.(e))return true;
  if(e.key!=='Escape'||(!ui.modal&&!ui.drawer))return false;
  e.stopImmediatePropagation?.();e.preventDefault();clearPanel();return true;
@@ -369,8 +377,9 @@ function links(){
  return [
   ...ui.companies.filter(x=>safeUrl(x.website)).map(x=>({id:x.id,title:x.name+' — website',url:safeUrl(x.website),boardName:'Career · Company'})),
   ...ui.people.filter(x=>safeUrl(x.profile_url)).map(x=>({id:x.id,title:x.full_name+' — profile',url:safeUrl(x.profile_url),boardName:'Career · Person'})),
-  ...ui.applications.filter(x=>safeUrl(x.source_url)).map(x=>({id:x.id,title:x.role_title+' — posting',url:safeUrl(x.source_url),boardName:'Career · Application'}))
+  ...ui.applications.filter(x=>safeUrl(x.source_url)).map(x=>({id:x.id,title:x.role_title+' — posting',url:safeUrl(x.source_url),boardName:'Career · Application'})),
+  ...(window.SELFCareerPhase3?.links?.()||[])
  ];
 }
-window.SELFCareer={init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,ui};
+window.SELFCareer={init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
 })();
