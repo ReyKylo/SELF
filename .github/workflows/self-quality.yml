@@ -33,6 +33,8 @@ jobs:
         run: node tests/smoke_canvas_ux.cjs
       - name: Sidebar, Shapes, and live typography controls
         run: node tests/smoke_canvas_controls.cjs
+      - name: Concept D unified toolbar regression
+        run: node tests/smoke_concept_d.cjs
       - name: No-flash canvas stability regression
         run: node tests/smoke_canvas_stability.cjs
       - name: Cloudflare static build
@@ -45,3 +47,4 @@ jobs:
           test -s dist/boards.css
           test -s dist/canvas-v3.js
           test -s dist/canvas-v3.css
+          test -s dist/concept-d.css
