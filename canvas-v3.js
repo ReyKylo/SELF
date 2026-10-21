@@ -5,7 +5,7 @@
 (()=>{'use strict';
 if(window.location?.search&&new URLSearchParams(window.location.search).get('canvas')==='legacy')return;
 let api;
-const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',quickAdd:null,connectFrom:null,mapCollapsed:true,mapGeometry:null,inspectorOpen:false,toolsExpanded:false,helpOpen:false,previousCameras:[],lastCameraAt:0};
+const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',quickAdd:null,connectFrom:null,mapCollapsed:true,mapGeometry:null,inspectorOpen:false,toolsExpanded:false,toolsCollapsed:false,shapesOpen:false,helpOpen:false,styleSession:null,previousCameras:[],lastCameraAt:0};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const esc=h, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), num=(x,d=0)=>Number.isFinite(Number(x))?Number(x):d;
@@ -59,7 +59,7 @@ async function transact(operation,message){setBusy(true);try{await operation();a
 function history(undo,redo){ui.history.push({undo,redo});if(ui.history.length>70)ui.history.shift();ui.redo.length=0}
 async function step(direction){const src=direction==='undo'?ui.history:ui.redo,dst=direction==='undo'?ui.redo:ui.history;const op=src.pop();if(!op){say('Nothing to '+direction);return}setBusy(true);try{await op[direction]();dst.push(op);await sync(direction==='undo'?'Undone':'Redone')}catch(e){src.push(op);setBusy(false);say(e.message,true)}}
 const camera=(b)=>({x:num(b.pan_x,100),y:num(b.pan_y,90),z:clamp(num(b.zoom,1),.25,2.5)});
-function open(id){const b=state().boards.find(b=>b.id===id);if(!b)return say('Board not found',true);ui.boardId=id;ui.selected.clear();ui.edge=null;ui.tool='select';ui.modal=null;ui.tab='style';ui.inspectorOpen=false;ui.toolsExpanded=false;ui.helpOpen=false;ui.quickAdd=null;ui.connectFrom=null;ui.previousCameras=[];let p=camera(b);ui.pan={x:p.x,y:p.y};ui.zoom=p.z;api.navigate('board-editor')}
+function open(id){const b=state().boards.find(b=>b.id===id);if(!b)return say('Board not found',true);ui.boardId=id;ui.selected.clear();ui.edge=null;ui.tool='select';ui.modal=null;ui.tab='style';ui.inspectorOpen=false;ui.toolsExpanded=false;ui.shapesOpen=false;ui.helpOpen=false;ui.quickAdd=null;ui.connectFrom=null;ui.previousCameras=[];let p=camera(b);ui.pan={x:p.x,y:p.y};ui.zoom=p.z;api.navigate('board-editor')}
 function library(spaceId=null){
  const list=state().boards.filter(b=>!spaceId||b.space_id===spaceId);
  const head=spaceId?'<div class="c3-lib-head"><div><h2>Whiteboards</h2><p>Think visually, connect ideas and work in one space.</p></div><button class="c3-primary" data-c3="new-board" data-space="'+h(spaceId)+'">＋ New board</button></div>':
@@ -70,6 +70,43 @@ function library(spaceId=null){
 }
 function button(action,text,extra=''){return '<button type="button" class="c3-btn" data-c3="'+action+'" '+extra+'>'+text+'</button>'}
 function tool(name,label){const active=ui.tool===name;return '<button type="button" class="c3-tool'+(active?' active':'')+'" data-c3="tool" data-kind="'+name+'" title="'+label+'" aria-label="'+label+'" aria-pressed="'+active+'"><span>'+glyph(name)+'</span></button>'}
+
+const SHAPE_LIBRARY=[
+ {id:'rectangle',name:'Rectangle',kind:'rectangle'},
+ {id:'rounded',name:'Rounded',kind:'rectangle',radius:26},
+ {id:'pill',name:'Pill',kind:'rectangle',radius:90},
+ {id:'ellipse',name:'Circle',kind:'ellipse'},
+ {id:'diamond',name:'Diamond',kind:'diamond'},
+ {id:'triangle',name:'Triangle',kind:'rectangle'},
+ {id:'hexagon',name:'Hexagon',kind:'rectangle'},
+ {id:'parallelogram',name:'Parallelogram',kind:'rectangle'},
+ {id:'trapezoid',name:'Trapezoid',kind:'rectangle'},
+ {id:'chevron',name:'Chevron',kind:'rectangle'},
+ {id:'star',name:'Star',kind:'rectangle'},
+ {id:'speech',name:'Speech Bubble',kind:'rectangle',radius:24}
+];
+const SHAPE_IDS=new Set(SHAPE_LIBRARY.map(x=>x.id));
+function shapeGallery(){
+ return '<div class="c3-shape-gallery" role="group" aria-label="Shape library"><div class="c3-shape-gallery-head"><strong>SHAPES</strong><span>Pick a shape to create</span></div><div class="c3-shape-grid">'+SHAPE_LIBRARY.map(x=>'<button type="button" class="c3-shape-choice" data-c3="shape-create" data-shape="'+x.id+'" title="'+x.name+'" aria-label="Create '+x.name+'"><span class="c3-shape-preview c3-variant-'+x.id+'"></span><small>'+x.name+'</small></button>').join('')+'</div></div>';
+}
+function dockInner(){
+ if(ui.toolsCollapsed)return button('tools-collapse','›','aria-label="Expand canvas tools" title="Expand canvas tools" aria-expanded="false"');
+ return button('tools-collapse','‹','aria-label="Collapse canvas tools" title="Collapse canvas tools" aria-expanded="true"')+
+ tool('select','Select objects')+
+ '<button type="button" class="c3-tool c3-shape-trigger'+(ui.shapesOpen?' active':'')+'" data-c3="shapes-toggle" title="Shapes — 12 options" aria-label="Open shape library" aria-expanded="'+ui.shapesOpen+'"><span>'+glyph('rectangle')+'</span></button>'+
+ tool('connect','Connect')+tool('text','Text')+tool('sticky','Sticky note')+tool('knowledge','Knowledge card')+
+ '<span class="c3-tool-divider"></span>'+button('tools-more',ui.toolsExpanded?'−':'＋','aria-label="'+(ui.toolsExpanded?'Show fewer tools':'Show more tools')+'" aria-expanded="'+ui.toolsExpanded+'"')+
+ (ui.toolsExpanded?'<div class="c3-more-tools">'+['image','frame'].map(n=>tool(n,({image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>':'')+
+ (ui.shapesOpen?shapeGallery():'');
+}
+async function createShape(id,position=null){
+ const choice=SHAPE_LIBRARY.find(x=>x.id===id);if(!choice)return;
+ ui.shapesOpen=false;
+ const variant={shape:id};if(choice.radius!==undefined)variant.radius=choice.radius;
+ await create(choice.kind,position,{style:variant});
+ ui.tool='select';api.render();
+}
+
 function inspector(){
  const sel=[...ui.selected].map(itm).filter(Boolean),first=sel[0],s=first?style(first):presets.knowledge,c=first?card(first.card_id):null;
  const tabs=['style','arrange','smart','notes'];
@@ -143,7 +180,8 @@ function objectMarkup(i){const k=kind(i),s=style(i),c=card(i.card_id),isSel=ui.s
  (k==='frame'?'<div class="c3-frame-title">'+h(name||'Untitled section')+'</div>':
  '<div class="c3-object-text">'+(name?'<div>'+h(name)+'</div>':(k==='knowledge'||k==='task'?'<span class="c3-object-icon">'+(k==='task'?'☑':'✧')+'</span>':''))+(summary&&['knowledge','task','reference'].includes(k)?'<p>'+h(summary)+'</p>':'')+'</div>');
  let label=h(name||'Blank '+k);
- return '<div class="c3-object c3-kind-'+k+(isSel?' selected':'')+'" data-c3-item="'+h(i.id)+'" tabindex="0" role="button" aria-label="'+label+'" style="left:'+i.x+'px;top:'+i.y+'px;width:'+i.w+'px;height:'+i.h+'px;transform:rotate('+num(i.rotation)+'deg);--fill:'+fill+';--stroke:'+stroke+';--ink:'+validColour(s.color)+';--corner:'+num(s.radius,12)+'px;--font-size:'+num(s.fontSize,20)+'px;opacity:'+clamp(num(s.opacity,1),.3,1)+';z-index:'+num(i.z)+'">'+
+ const variant=SHAPE_IDS.has(s.shape)?s.shape:k;
+ return '<div class="c3-object c3-kind-'+k+' c3-variant-'+variant+(isSel?' selected':'')+'" data-c3-item="'+h(i.id)+'" tabindex="0" role="button" aria-label="'+label+'" style="left:'+i.x+'px;top:'+i.y+'px;width:'+i.w+'px;height:'+i.h+'px;transform:rotate('+num(i.rotation)+'deg);--fill:'+fill+';--stroke:'+stroke+';--ink:'+validColour(s.color)+';--corner:'+num(s.radius,12)+'px;--font-size:'+num(s.fontSize,20)+'px;opacity:'+clamp(num(s.opacity,1),.3,1)+';z-index:'+num(i.z)+'">'+
  '<div class="c3-object-face">'+body+'</div>'+
  (isSel?'<div class="c3-selection-border"></div>':'')+
  (['n','e','s','w'].map(a=>'<button type="button" class="c3-anchor anchor-'+a+'" data-c3-port="'+h(i.id)+'" data-side="'+a+'" aria-label="Connect '+label+' '+a+'"></button>').join(''))+
@@ -258,7 +296,7 @@ function canvas(){
  const objects=[...items()].sort((a,b)=>num(a.z)-num(b.z));
  ui.domSnapshots=new Map(objects.map(i=>[i.id,objectMarkup(i)]));
  return '<div class="self-board-editor c3-shell" data-board-id="'+h(b.id)+'"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
- '<div class="c3-toolbar" data-expanded="'+ui.toolsExpanded+'" role="toolbar" aria-label="Create and edit on the board">'+['select','rectangle','connect','text','sticky','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note'}[n]||n))).join('')+'<span class="c3-tool-divider"></span>'+button('tools-more',ui.toolsExpanded?'−':'＋','aria-label="'+(ui.toolsExpanded?'Show fewer tools':'Show more tools')+'" aria-expanded="'+ui.toolsExpanded+'"')+(ui.toolsExpanded?'<div class="c3-more-tools">'+['ellipse','diamond','image','frame'].map(n=>tool(n,({ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>':'')+'</div>'+
+ '<div class="c3-toolbar'+(ui.toolsCollapsed?' c3-toolbar-closed':'')+'" data-expanded="'+ui.toolsExpanded+'" data-collapsed="'+ui.toolsCollapsed+'" data-shapes="'+ui.shapesOpen+'" role="toolbar" aria-label="Create and edit on the board">'+dockInner()+'</div>'+ 
  '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo (Ctrl+Z)" aria-label="Undo"')+button('redo','↷','title="Redo (Ctrl+Shift+Z)" aria-label="Redo"')+button('inspector-toggle','⚙ Properties','id="c3-inspector-toggle" aria-label="'+(ui.inspectorOpen?'Close properties':'Open properties')+'" aria-expanded="'+ui.inspectorOpen+'"')+'</div></div>'+
  '<div class="c3-content '+(ui.inspectorOpen?'c3-panel-open':'c3-panel-closed')+'"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
  '<div class="c3-world" id="c3-world" style="transform:translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')">'+
@@ -309,8 +347,12 @@ function updateInPlace(){
    }
  }
  const panelToggle=$('#c3-inspector-toggle');if(panelToggle){panelToggle.setAttribute('aria-expanded',String(ui.inspectorOpen));panelToggle.setAttribute('aria-label',ui.inspectorOpen?'Close properties':'Open properties');panelToggle.classList.toggle('is-active',ui.inspectorOpen)}
- const dock=document.querySelector('.c3-toolbar');if(dock){const wantedTools=['select','rectangle','connect','text','sticky','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note'}[n]||n))).join('')+'<span class="c3-tool-divider"></span>'+button('tools-more',ui.toolsExpanded?'−':'＋','aria-label="'+(ui.toolsExpanded?'Show fewer tools':'Show more tools')+'" aria-expanded="'+ui.toolsExpanded+'"')+(ui.toolsExpanded?'<div class="c3-more-tools">'+['ellipse','diamond','image','frame'].map(n=>tool(n,({ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>':'');if(dock.dataset.expanded!==String(ui.toolsExpanded)){dock.innerHTML=wantedTools;dock.dataset.expanded=String(ui.toolsExpanded)}}
- const strip=document.querySelector('.c3-smart-strip');if(strip)strip.hidden=ui.selected.size<2;
+ const dock=document.querySelector('.c3-toolbar');if(dock){
+  const different=dock.dataset.expanded!==String(ui.toolsExpanded)||dock.dataset.collapsed!==String(ui.toolsCollapsed)||dock.dataset.shapes!==String(ui.shapesOpen);
+  if(different){dock.innerHTML=dockInner();dock.dataset.expanded=String(ui.toolsExpanded);dock.dataset.collapsed=String(ui.toolsCollapsed);dock.dataset.shapes=String(ui.shapesOpen)}
+  dock.classList.toggle('c3-toolbar-closed',ui.toolsCollapsed);
+ }
+  const strip=document.querySelector('.c3-smart-strip');if(strip)strip.hidden=ui.selected.size<2;
  const help=document.querySelector('.c3-canvas-help');if(help)help.hidden=!ui.helpOpen;
  for(const btn of document.querySelectorAll('.c3-tool')){
    const enabled=btn.dataset.kind===ui.tool;btn.classList.toggle('active',enabled);btn.setAttribute('aria-pressed',String(enabled));
@@ -349,7 +391,7 @@ async function create(k,position=null,extra={}){
  const data={title:extra.title||'',kind:k==='task'?'task':k==='reference'?'link':'note',summary:extra.summary||'',url:extra.url||null,asset_path:extra.asset_path||null};
  let c,i;
  const fakeCardId='pending-card-'+crypto.randomUUID(),fakeItemId='pending-item-'+crypto.randomUUID();
- const record={board_id:ui.boardId,card_id:fakeCardId,visual_kind:k,x:Math.round(positionFinal.x),y:Math.round(positionFinal.y),w,h:hg,z:items().length+1,style:{...presets[k]}};
+ const record={board_id:ui.boardId,card_id:fakeCardId,visual_kind:k,x:Math.round(positionFinal.x),y:Math.round(positionFinal.y),w,h:hg,z:items().length+1,style:{...presets[k],...(extra.style||{})}};
 const pendingCard={id:fakeCardId,...data},pendingItem={id:fakeItemId,...record};
  ui.pending.set(fakeItemId,{c:pendingCard,i:pendingItem});
  state().knowledgeCards.push(pendingCard);state().boardItems.push(pendingItem);
@@ -553,7 +595,10 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
   updateCam();saveCam();return
  }
  if(a==='inspector-toggle'){ui.inspectorOpen=!ui.inspectorOpen;api.render();return}
- if(a==='tools-more'){ui.toolsExpanded=!ui.toolsExpanded;api.render();return}
+ if(a==='tools-more'){ui.toolsExpanded=!ui.toolsExpanded;ui.shapesOpen=false;api.render();return}
+ if(a==='tools-collapse'){ui.toolsCollapsed=!ui.toolsCollapsed;ui.shapesOpen=false;ui.toolsExpanded=false;api.render();return}
+ if(a==='shapes-toggle'){ui.shapesOpen=!ui.shapesOpen;ui.toolsExpanded=false;api.render();return}
+ if(a==='shape-create'){await createShape(el.dataset.shape);return}
  if(a==='help-toggle'){ui.helpOpen=!ui.helpOpen;api.render();return}
  if(a==='quick-notes'){if(entries().length!==1)return;ui.tab='notes';ui.inspectorOpen=true;api.render();return}
  if(a==='open-board'){open(id);return}
@@ -561,7 +606,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='new-board'){ui.modal={type:'board',space:el.dataset.space|| (state().view==='space'?state().spaceId:null)};api.render();return}
  if(a==='close-modal'){ui.modal=null;api.render();return}
  if(a==='rename'){ui.modal={type:'rename'};api.render();return}
- if(a==='tool'){let k=el.dataset.kind;ui.tool=k;if(k==='image'){ui.tool='select';$('#c3-upload')?.click();api.render();return}if(k==='knowledge'||k==='sticky'||k==='text'||k==='rectangle'||k==='ellipse'||k==='diamond'||k==='frame'){await create(k);ui.tool='select';api.render()}else api.render();return}
+ if(a==='tool'){let k=el.dataset.kind;ui.shapesOpen=false;ui.tool=k;if(k==='image'){ui.tool='select';$('#c3-upload')?.click();api.render();return}if(k==='knowledge'||k==='sticky'||k==='text'||k==='rectangle'||k==='ellipse'||k==='diamond'||k==='frame'){await create(k);ui.tool='select';api.render()}else api.render();return}
  if(a==='starter'){await makeStarter();return}
  if(a==='add'){await create(el.dataset.kind||'rectangle');return}
  if(a==='tab'){ui.tab=el.dataset.tab;api.render();return}
