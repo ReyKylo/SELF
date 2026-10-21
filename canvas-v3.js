@@ -5,7 +5,7 @@
 (()=>{'use strict';
 if(window.location?.search&&new URLSearchParams(window.location.search).get('canvas')==='legacy')return;
 let api;
-const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',quickAdd:null,connectFrom:null,mapCollapsed:true,mapGeometry:null,inspectorOpen:false,toolsExpanded:false,toolsCollapsed:false,shapesOpen:false,helpOpen:false,styleSession:null,previousCameras:[],lastCameraAt:0};
+const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',dKnowledge:false,dPopover:null,dFocus:false,dEditing:null,dSaveTimer:null,dSaveQueue:Promise.resolve(),dCachedSelection:null,quickAdd:null,connectFrom:null,mapCollapsed:true,mapGeometry:null,inspectorOpen:false,toolsExpanded:false,toolsCollapsed:false,shapesOpen:false,helpOpen:false,styleSession:null,previousCameras:[],lastCameraAt:0};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const esc=h, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), num=(x,d=0)=>Number.isFinite(Number(x))?Number(x):d;
@@ -59,7 +59,7 @@ async function transact(operation,message){setBusy(true);try{await operation();a
 function history(undo,redo){ui.history.push({undo,redo});if(ui.history.length>70)ui.history.shift();ui.redo.length=0}
 async function step(direction){const src=direction==='undo'?ui.history:ui.redo,dst=direction==='undo'?ui.redo:ui.history;const op=src.pop();if(!op){say('Nothing to '+direction);return}setBusy(true);try{await op[direction]();dst.push(op);await sync(direction==='undo'?'Undone':'Redone')}catch(e){src.push(op);setBusy(false);say(e.message,true)}}
 const camera=(b)=>({x:num(b.pan_x,100),y:num(b.pan_y,90),z:clamp(num(b.zoom,1),.25,2.5)});
-function open(id){const b=state().boards.find(b=>b.id===id);if(!b)return say('Board not found',true);ui.boardId=id;ui.selected.clear();ui.edge=null;ui.tool='select';ui.modal=null;ui.tab='style';ui.inspectorOpen=false;ui.toolsExpanded=false;ui.shapesOpen=false;ui.helpOpen=false;ui.quickAdd=null;ui.connectFrom=null;ui.previousCameras=[];let p=camera(b);ui.pan={x:p.x,y:p.y};ui.zoom=p.z;api.navigate('board-editor')}
+function open(id){const b=state().boards.find(b=>b.id===id);if(!b)return say('Board not found',true);ui.boardId=id;ui.selected.clear();ui.edge=null;ui.tool='select';ui.modal=null;ui.dKnowledge=false;ui.dPopover=null;ui.dFocus=false;ui.dEditing=null;ui.tab='style';ui.inspectorOpen=false;ui.toolsExpanded=false;ui.shapesOpen=false;ui.helpOpen=false;ui.quickAdd=null;ui.connectFrom=null;ui.previousCameras=[];let p=camera(b);ui.pan={x:p.x,y:p.y};ui.zoom=p.z;api.navigate('board-editor')}
 function library(spaceId=null){
  const list=state().boards.filter(b=>!spaceId||b.space_id===spaceId);
  const head=spaceId?'<div class="c3-lib-head"><div><h2>Whiteboards</h2><p>Think visually, connect ideas and work in one space.</p></div><button class="c3-primary" data-c3="new-board" data-space="'+h(spaceId)+'">＋ New board</button></div>':
@@ -174,6 +174,156 @@ function renderWires(){let out='<defs><marker id="c3-arrow" markerWidth="10" mar
  if(ui.gesture?.type==='connect'&&ui.gesture.toWorld){const from=anchor(itm(ui.gesture.id),ui.gesture.side||'e'),to=ui.gesture.toWorld;out+='<path d="M'+from.x+' '+from.y+' L'+to.x+' '+to.y+'" fill="none" stroke="#8b5cf6" stroke-dasharray="7 5" stroke-width="3"/>'}
  return out;
 }
+
+/* Concept D toolbar-first knowledge: legacy notes stay intact until first edit. */
+function documentMarkup(c){
+ if(!c)return '';
+ if(Array.isArray(c.content_blocks)&&c.content_blocks.length)return c.content_blocks.map(b=>{
+   if(b.type==='richtext')return safeRich(b.html||'');
+   return '<p>'+h(b.text||'')+'</p>';
+ }).join('');
+ const parts=[];
+ if(c.title)parts.push('<div class="d-legacy-title">'+h(c.title)+'</div>');
+ if(c.body)parts.push(...String(c.body).split(/\r?\n/).map(line=>'<p>'+h(line)+'</p>'));
+ if(c.key_points)parts.push('<h3>Key points</h3><ul>'+String(c.key_points).split(/\r?\n/).filter(Boolean).map(line=>'<li>'+h(line.replace(/^\s*[-•]\s*/,''))+'</li>').join('')+'</ul>');
+ return parts.join('');
+}
+const RICH_TAGS=new Set(['B','STRONG','I','EM','U','S','BR','DIV','P','SPAN','H1','H2','H3','BLOCKQUOTE','UL','OL','LI','A']);
+function safeRich(html){
+ // Allowlist nodes and URLs. Never interpolate persisted HTML unescaped.
+ if(typeof document.createElement!=='function')return h(String(html).replace(/<[^>]*>/g,''));
+ const root=document.createElement('template');root.innerHTML=String(html||'');
+ function clean(node){
+  if(node.nodeType===3)return h(node.textContent);
+  if(node.nodeType!==1)return '';
+  const tag=node.tagName;
+  if(tag==='SCRIPT'||tag==='STYLE'||tag==='IFRAME'||tag==='SVG'||tag==='FORM')return '';
+  const inner=Array.from(node.childNodes).map(clean).join('');
+  if(!RICH_TAGS.has(tag))return inner;
+  if(tag==='A'){
+    const link=url(node.getAttribute('href')||'');
+    return link?'<a href="'+h(link)+'" target="_blank" rel="noopener noreferrer">'+inner+'</a>':inner;
+  }
+  return '<'+tag.toLowerCase()+'>'+inner+'</'+tag.toLowerCase()+'>';
+ }
+ return Array.from(root.content.childNodes).map(clean).join('');
+}
+function textFromHtml(html){return String(html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(?:p|div|li|h[1-3])>/gi,'\n').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
+function dBody(i,c,s){
+ const editing=ui.dEditing?.id===i.id&&!ui.dFocus;
+ const html=documentMarkup(c);
+ return '<div class="c3-object-text d-surface'+(editing?' d-is-editing':'')+'" '+(editing?'contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-d-editor="'+h(i.id)+'"':'')+'>'+ (html|| (editing?'':'<span class="d-empty-shape"></span>'))+'</div>'+
+ ((c?.url||c?.task_id||c?.target_board_id||c?.asset_path)?'<div class="d-object-chips">'+
+ (c.url?'<span class="d-chip" title="'+h(c.url)+'">↗ Source</span>':'')+
+ (c.task_id?'<span class="d-chip">☑ Task</span>':'')+
+ (c.target_board_id?'<span class="d-chip">▣ Board</span>':'')+
+ (c.asset_path?'<span class="d-chip">▧ File</span>':'')+'</div>':'');
+}
+function dSelected(){return entries().length===1?entries()[0]:null}
+function dEditor(){return ui.dFocus?$('#d-focus-editor'):ui.dEditing?document.querySelector('[data-d-editor="'+ui.dEditing.id+'"]'):null}
+function dCapture(){
+ const editor=dEditor();if(!editor||!ui.dEditing)return;
+ const html=safeRich(editor.innerHTML);
+ const item=itm(ui.dEditing.id),c=item&&card(item.card_id);
+ if(c)c.content_blocks=[{id:'main',type:'richtext',html}];
+ ui.dEditing.draft=html;
+ setBusy(true);
+ clearTimeout(ui.dSaveTimer);
+ ui.dSaveTimer=setTimeout(()=>{void dPersist()},600);
+}
+async function dPersist(){
+ clearTimeout(ui.dSaveTimer);ui.dSaveTimer=null;
+ if(!ui.dEditing)return;
+ const edit=ui.dEditing,item=itm(edit.id);if(!item)return;
+ const payload={content_blocks:[{id:'main',type:'richtext',html:edit.draft??documentMarkup(card(item.card_id))}]};
+ const cardId=item.card_id;
+ ui.dSaveQueue=ui.dSaveQueue.catch(()=>{}).then(async()=>{
+   await api.patch('knowledge_cards',cardId,payload);
+ });
+ try{await ui.dSaveQueue;if(ui.dEditing===edit)setBusy(false)}
+ catch(err){say('Could not save writing — edit retained: '+err.message,true);setBusy(false)}
+}
+function dPlaceCaret(element,atEnd=true){
+ if(!element?.focus)return;
+ element.focus();
+ if(!atEnd||!document.createRange||!window.getSelection)return;
+ const range=document.createRange();range.selectNodeContents(element);range.collapse(false);
+ const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+}
+function dBeginEdit(id,{focus=false}={}){
+ const item=itm(id);if(!item)return;
+ if(ui.dEditing&&ui.dEditing.id!==id)void dPersist();
+ ui.selected=new Set([id]);ui.dEditing={id,draft:documentMarkup(card(item.card_id))};
+ ui.dFocus=!!focus;ui.dPopover=null;
+ api.render();
+ queueMicrotask(()=>{const el=dEditor();if(el){if(ui.dEditing?.draft&&!el.innerHTML.trim())el.innerHTML=safeRich(ui.dEditing.draft);dPlaceCaret(el)}});
+}
+function dEndEdit(){
+ if(!ui.dEditing)return;
+ dCapture();void dPersist();
+ ui.dEditing=null;ui.dFocus=false;ui.dPopover=null;
+ api.render();
+}
+function dRichCommand(command){
+ if(!ui.dEditing){const i=dSelected();if(i)dBeginEdit(i.id);return}
+ const editor=dEditor();if(!editor)return;
+ editor.focus();
+ try{
+  if(document.execCommand)document.execCommand(command,false,null);
+ }catch{}
+ dCapture();
+}
+function dInsertHtml(html){
+ if(!ui.dEditing){const item=dSelected();if(!item)return;dBeginEdit(item.id)}
+ const editor=dEditor();if(!editor)return;
+ dPlaceCaret(editor);
+ const clean=safeRich(html);
+ if(document.execCommand)document.execCommand('insertHTML',false,clean);
+ else editor.insertAdjacentHTML('beforeend',clean);
+ dCapture();
+}
+function dPopoverMarkup(){
+ if(!ui.dPopover)return '';
+ const p=ui.dPopover;
+ const c=card(dSelected()?.card_id);
+ if(p==='sources')return '<form class="d-popover" id="d-popover-form" data-type="sources"><strong>Add a source</strong><label>Link title<input class="d-pop-input" name="title" placeholder="Annual report / study" value="'+h(c?.title||'')+'"/></label><label>URL<input class="d-pop-input" type="url" name="url" placeholder="https://..." value="'+h(c?.url||'')+'" required/></label><button type="submit" class="d-pop-submit">Attach source</button></form>';
+ if(p==='task'||p==='board'){
+  const objects=p==='task'?state().tasks:state().boards.filter(b=>b.id!==ui.boardId);
+  return '<form class="d-popover" id="d-popover-form" data-type="'+p+'"><strong>Link '+p+'</strong><label>Choose '+p+'<select name="value" class="d-pop-input" required><option value="">Choose…</option>'+
+  objects.map(x=>'<option value="'+h(x.id)+'">'+h(x.title||x.name||'Untitled')+'</option>').join('')+'</select></label><button type="submit" class="d-pop-submit">Link '+p+'</button></form>';
+ }
+ if(p==='more')return '<div class="d-popover" role="menu"><strong>More knowledge tools</strong>'+
+ ['reference','existing','quick-duplicate','quick-connect'].map((a,i)=>'<button class="d-more-action" data-c3="'+a+'">'+['Add reference','Reuse existing knowledge','Duplicate card','Connect card'][i]+'</button>').join('')+'</div>';
+ if(p==='files')return '<div class="d-popover"><strong>Files & images</strong><p>Private uploads are attached to this card.</p><button class="d-pop-submit" data-c3="d-upload">Choose image</button></div>';
+ return '';
+}
+function dToolbar(){
+ const i=dSelected();if(!i)return '';
+ const s=style(i),size=clamp(num(s.fontSize,20),12,72),vp=$('#c3-canvas'),w=vp?.clientWidth||1000;
+ const mode=ui.dKnowledge?' expanded':'';
+ return '<div class="d-toolbar'+mode+'" id="d-toolbar" role="toolbar" aria-label="Shape formatting and knowledge" style="left:50%;transform:translateX(-50%);max-width:calc(100% - 90px)">'+
+ '<div class="d-toolbar-primary"><button class="d-bar-tool" data-c3="quick-edit" title="Write directly in shape">✎ <span>Write</span></button>'+
+ '<label class="d-color" title="Fill color">Fill <input type="color" data-c3-style="fill" aria-label="Fill" value="'+validColour(s.fill)+'"/></label>'+
+ '<label class="d-color" title="Stroke color">Border <input type="color" data-c3-style="stroke" aria-label="Border" value="'+validColour(s.stroke)+'"/></label>'+
+ '<label class="d-font" title="Font size">Aa <input type="number" min="12" max="72" step="1" data-c3-style="fontSize" aria-label="Font size" value="'+size+'"/>px</label>'+
+ '<span class="d-bar-divider"></span>'+
+ ['bold','italic','underline'].map((command,i)=>'<button class="d-bar-tool d-bold" data-c3="d-format" data-format="'+command+'" title="'+command+'">'+['B','I','U'][i]+'</button>').join('')+
+ '<button class="d-bar-tool d-knowledge'+(ui.dKnowledge?' active':'')+'" data-c3="d-knowledge" aria-expanded="'+ui.dKnowledge+'">✦ Knowledge <span>⌄</span></button>'+
+ '<button class="d-bar-tool" data-c3="d-focus" title="Expand writing without resizing object">⛶ Focus</button>'+
+ '<button class="d-bar-tool d-overflow" data-c3="quick-duplicate" title="Duplicate">⧉</button>'+
+ '<button class="d-bar-tool d-overflow" data-c3="quick-delete" title="Remove object">⌫</button></div>'+
+ (ui.dKnowledge?'<div class="d-toolbar-secondary">'+
+ [['Write','quick-edit'],['Key points','d-points'],['Checklist','d-checklist'],['Sources','d-pop-sources'],['Task','d-pop-task'],['Board','d-pop-board'],['Files','d-pop-files'],['More','d-pop-more']]
+ .map(([label,action])=>'<button class="d-bar-tool'+(ui.dPopover===action.slice(6)?' active':'')+'" data-c3="'+action+'">'+label+'</button>').join('')+'</div>':'')+
+ dPopoverMarkup()+'</div>';
+}
+function dFocusMarkup(){
+ if(!ui.dFocus||!ui.dEditing)return '';
+ const i=itm(ui.dEditing.id),c=i&&card(i.card_id);if(!i)return '';
+ return '<section class="d-focus-panel" id="d-focus-panel" aria-label="Focus Writing within canvas"><header><strong>Focus Writing</strong><span>Same object · no size changes</span><button data-c3="d-focus-close" aria-label="Return to whiteboard">↙ Return to board</button></header>'+
+ '<div class="d-focus-content" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Write in original object" id="d-focus-editor" spellcheck="true">'+documentMarkup(c)+'</div></section>';
+}
+
 function objectMarkup(i){const k=kind(i),s=style(i),c=card(i.card_id),isSel=ui.selected.has(i.id),name=c?.title||'',summary=c?.summary||'';
  const fill=s.fill==='transparent'?'transparent':validColour(s.fill),stroke=s.stroke==='transparent'?'transparent':validColour(s.stroke),image=c?.asset_path?ui.assetUrls.get(c.asset_path):url(c?.url);
  const body=k==='image'?((image?'<img src="'+h(image)+'" alt="'+h(name||'Reference image')+'" draggable="false"/>':'<span class="c3-placeholder">▧<small>Add a reference image</small></span>')) :
