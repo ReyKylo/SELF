@@ -837,9 +837,15 @@
         "_mKeVGSqQac"
       ],
       "review": "SaaS ARR dan pembayaran processing jangan dibandingkan dengan perusahaan lain tanpa menyamakan definisi dan gross margin.",
-      "visual_status": "source_pointer_only_rights_not_confirmed",
-      "rights_note": "Public access is not a republication licence. No local screenshot or publisher image included; open the exact source section. Permission / permitted embedding must be resolved before production hosting.",
-      "verified_on": "2026-10-22"
+      "visual_status": "original_bvp_legacy_image_publisher_source",
+      "rights_note": "Historical original investor table reproduced via BVP legacy image/CDN in page results; source URL retained. Not an independently verified investment outcome.",
+      "verified_on": "2026-10-22",
+      "visual": {
+        "type": "image",
+        "url": "https://d33wubrfki0l68.cloudfront.net/5c70a3f8f8d26626440dc69336d43dfa31b1e2cd/17167/assets/uploads/legacy-site/t/toast-memo-graphic3.jpg",
+        "caption": "Bessemer Toast 2015 memo — original investor outcome analysis table (BVP historical graphic via legacy CDN).",
+        "pointer": "Investment returns scenarios with dilution, exit outcomes, probabilities and IRR (original Toast memo)"
+      }
     },
     {
       "id": "VC03",
@@ -889,9 +895,15 @@
         "VNxBZ7ka5J0"
       ],
       "review": "Exclude new customers dari NRR; gunakan interval bulanan atau tahunan yang konsisten.",
-      "visual_status": "source_pointer_only_rights_not_confirmed",
-      "rights_note": "Public access is not a republication licence. No local screenshot or publisher image included; open the exact source section. Permission / permitted embedding must be resolved before production hosting.",
-      "verified_on": "2026-10-22"
+      "visual_status": "publisher_original_growth_exhibit_not_cohort_heatmap",
+      "rights_note": "Publisher-hosted original chart; this visual shows company growth, not the separate cohort heatmap discussed in the memo.",
+      "verified_on": "2026-10-22",
+      "visual": {
+        "type": "image",
+        "url": "https://www.bvp.com/assets/uploads/2022/12/memos-pagerduty-monthly-recurring-revenue.png",
+        "caption": "Original Bessemer PagerDuty 2014 growth exhibit: MRR, number of customers and users. This is NOT the cohort heatmap.",
+        "pointer": "Monthly recurring revenue and customer/user growth; cohort expansion evidence is in Appendix: MRR Expansion by Cohorts."
+      }
     },
     {
       "id": "CO01",
