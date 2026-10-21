@@ -43,6 +43,8 @@ jobs:
         run: node tests/smoke_career_portfolio.cjs
       - name: Career Prep Phase 1 teaching quality blueprint and competency contract
         run: node tests/smoke_career_prep_blueprint.cjs
+      - name: GptChatMaximize parallel workstream safety contract
+        run: node tests/smoke_gpt_chat_maximize.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
