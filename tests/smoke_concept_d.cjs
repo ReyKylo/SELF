@@ -81,10 +81,23 @@ async function main(){
  assert.equal(ui.dFocus,false);
  assert.equal(JSON.stringify(state.boardItems[0]),geom,'focus leaves saved object geometry unchanged');
  assert.equal(state.knowledgeCards.length,1,'no separate note objects created');
+ // Explicit save failures must be visible and retryable, not silently displayed as Saved.
+ const originalPatch=api.patch;
+ api.patch=async()=>{throw new Error('Temporary network outage')};
+ await click('d-focus');
+ await click('d-focus-close');
+ await new Promise(resolve=>setTimeout(resolve,30));
+ assert(ui.dFailedSave,'failed save payload retained for retry');
+ assert.match(window.SELFBoards.renderEditor(),/Not saved/,'user sees failed-save status');
+ assert.match(window.SELFBoards.renderEditor(),/data-c3="d-retry"/,'retry control is actionable');
+ api.patch=originalPatch;
+ await click('d-retry');
+ assert.equal(ui.dFailedSave,null,'successful retry clears error');
+
  c.content_blocks=[{id:'main',type:'richtext',html:'<img src=x onerror=alert(1)><script>alert(1)</script>Safe'}];
  view=window.SELFBoards.renderEditor();
  assert.doesNotMatch(view,/<img src=x|<script>/,'untrusted rich HTML never injected as executable DOM');
  assert(css.includes('animation:none!important')&&css.includes('opacity:1!important'),'no flash or full-screen dim');
- console.log('PASS Concept D: one toolbar, legacy data, knowledge actions, source links, task/board associations, focus geometry, sanitized rendering.');
+ console.log('PASS Concept D: one toolbar, legacy data, knowledge actions, source links, task/board associations, focus geometry, sanitized rendering and save retry.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
