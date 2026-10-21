@@ -66,7 +66,7 @@ function pdfBrief(track){
  const objects=[null,'<< /Type /Catalog /Pages 2 0 R >>',null,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>'];
  const ids=[];for(const p of pages){const pId=objects.length,cId=pId+1;ids.push(pId);let content='BT\n';
  p.forEach((line,i)=>{const head=i===0||['CASE FACTS','YOUR ASSIGNMENT','PROVENANCE / ETHICS'].includes(line);
- content+='/F'+(head?'2':'1')+' '+(i===0?16:head?12:10)+' Tf 52 '+(785-i*19)+' Td ('+safe(line)+') Tj\n';if(i<p.length-1)content+='0 0 Td\n';});content+='ET';
+ content+='/F'+(head?'2':'1')+' '+(i===0?16:head?12:10)+' Tf 1 0 0 1 52 '+(785-i*19)+' Tm ('+safe(line)+') Tj\n';});content+='ET';
  objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents '+cId+' 0 R >>','<< /Length '+enc(content).length+' >>\nstream\n'+content+'\nendstream');
  }
  objects[2]='<< /Type /Pages /Kids ['+ids.map(i=>i+' 0 R').join(' ')+'] /Count '+ids.length+' >>';
