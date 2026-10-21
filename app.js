@@ -86,7 +86,46 @@ return `<button class="link-action" data-action="nav" data-view="spaces" style="
 function filteredTasks(){return state.tasks.filter(t=>(state.filterSpace==='all'||t.space_id===state.filterSpace)&&(state.filterStatus==='all'||t.status===state.filterStatus)&&(!state.workSearch||t.title.toLowerCase().includes(state.workSearch.toLowerCase()))).sort((a,b)=>(a.due_date||'9999-99-99').localeCompare(b.due_date||'9999-99-99'))}
 function renderWork(){const tasks=filteredTasks();const controls=`<div class="tabs">${[['list','List','list'],['board','Board','kanban'],['calendar','Calendar','calendar']].map(([v,t,i])=>`<button class="tab ${state.workView===v?'active':''}" data-action="work-view" data-mode="${v}">${ic(i,16)} ${t}</button>`).join('')}</div><div class="work-controls"><input class="field search-field" id="work-search" value="${attr(state.workSearch)}" placeholder="Search tasks..."/><select id="filter-space" class="select"><option value="all">All Spaces</option>${state.spaces.map(s=>`<option value="${s.id}" ${state.filterSpace===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}</select><select id="filter-status" class="select"><option value="all">All Statuses</option>${STATUSES.map(([k,v])=>`<option value="${k}" ${state.filterStatus===k?'selected':''}>${v}</option>`).join('')}</select></div>`;
 let body='';if(state.workView==='list'){body=`<div class="work-table"><div class="work-row header"><div>Task</div><div>Space</div><div>Status</div><div>Priority</div><div>Due date</div></div>${tasks.map(t=>`<div class="work-row data" data-action="open-task" data-id="${t.id}"><div class="task-cell"><input type="checkbox" class="check" data-action="toggle-task" data-id="${t.id}" ${t.status==='done'?'checked':''}/><span class="${t.status==='done'?'item-title done':''}">${esc(t.title)}</span></div><div>${esc(spaceOf(t.space_id)?.name||'Unsorted')}</div><div>${sbadge(t.status)}</div><div><span class="badge ${priorityOf(t.priority)[2]}">${esc(priorityOf(t.priority)[1])}</span></div><div class="small-sub">${esc(niceDate(t.due_date))}</div></div>`).join('')||`<div class="empty-mini">No tasks match these filters.</div>`}</div>`}else if(state.workView==='board'){body=`<div class="kanban" aria-label="Task status board">${STATUSES.map(([k,label])=>`<section class="kanban-col" data-drop-status="${k}" aria-label="${label} tasks"><div class="kanban-head"><span>${label}</span><span>${tasks.filter(t=>t.status===k).length}</span></div><div class="kanban-items">${tasks.filter(t=>t.status===k).map(t=>`<article class="kanban-task" draggable="true" data-task-drag="${t.id}" data-action="open-task" data-id="${t.id}" tabindex="0" role="group" aria-label="${attr(t.title)}"><div class="kanban-card-head"><strong>${esc(t.title)}</strong><span class="kanban-drag-grip" aria-hidden="true">⋮⋮</span></div><span class="item-sub">${esc(spaceOf(t.space_id)?.name||'Unsorted')} · ${esc(niceDate(t.due_date))}</span><label class="kanban-stage-label">Status <select class="kanban-stage-select" data-stage-task-id="${t.id}" aria-label="Move ${attr(t.title)} to status">${STATUSES.map(([v,name])=>`<option value="${v}" ${v===t.status?'selected':''}>${name}</option>`).join('')}</select></label></article>`).join('')||'<div class="kanban-empty">Drag a task here</div>'}</div></section>`).join('')}</div>`}else {body=`<div class="calendar-list">${tasks.filter(t=>t.due_date).map(t=>`<div class="calendar-row" data-action="open-task" data-id="${t.id}"><span class="date-square">${esc(niceDate(t.due_date))}</span><div><strong>${esc(t.title)}</strong><div class="item-sub">${esc(spaceOf(t.space_id)?.name||'Unsorted')}</div></div><span style="margin-left:auto">${sbadge(t.status)}</span></div>`).join('')||empty('No dates yet','Add a due date to any task and it will show up here.')}</div>`}
-return header('My Work','Everything you need to do, across all your Spaces.',`<button class="primary-btn" data-action="new-task">${ic('plus')} New Task</button>`)+controls+body}
+return header('My Work','Everything you need to do, across all your Spaces.',`<button class="primary-btn" data-action="new-task">${ic('plus')} New Task</button>`)+controls+(state.workView==='board'?`<div class="kanban-help"><span>${ic('kanban',16)} Drag between stages, or use the status menu on each task.</span>${state.lastTaskMove?`<button type="button" class="soft-btn" data-action="undo-stage" aria-label="Undo last task move">${ic('back',15)} Undo last move</button>`:''}</div>`:'')+body}
+async function moveTaskStatus(id,target,{undo=false}={}){
+ const task=taskOf(id);
+ if(!task||!STATUSES.some(([s])=>s===target)||state.movingTaskId)return false;
+ if(task.status===target)return true;
+ const from=task.status;state.movingTaskId=id;
+ const card=document.querySelector('[data-task-drag="'+id+'"]');
+ if(card){card.classList.add('is-saving');card.setAttribute('aria-busy','true')}
+ const result=await mutate(async()=>patch('tasks',id,{status:target}),undo?'Move undone':'Task moved to '+statusOf(target)[1]);
+ state.movingTaskId=null;
+ if(result){state.lastTaskMove=undo?null:{id,from,to:target};render();return true}
+ if(card?.isConnected){card.classList.remove('is-saving');card.removeAttribute('aria-busy')}
+ return false;
+}
+function resetTaskDropHighlights(){
+ document.querySelectorAll?.('.kanban-col.is-drag-over,.kanban-task.is-dragging').forEach(node=>node.classList.remove('is-drag-over','is-dragging'));
+}
+function workDragStart(e){
+ if(state.view!=='work'||state.workView!=='board'||state.movingTaskId)return;
+ if(e.target.closest?.('select,input,button')){e.preventDefault?.();return}
+ const card=e.target.closest?.('[data-task-drag]');if(!card)return;
+ state.dragTaskId=card.dataset.taskDrag;
+ if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',state.dragTaskId)}
+ card.classList.add('is-dragging');
+}
+function workDragOver(e){
+ if(!state.dragTaskId)return;
+ const col=e.target.closest?.('[data-drop-status]');if(!col)return;
+ e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='move';
+ document.querySelectorAll?.('.kanban-col.is-drag-over').forEach(node=>{if(node!==col)node.classList.remove('is-drag-over')});
+ col.classList.add('is-drag-over');
+}
+async function workDrop(e){
+ const id=state.dragTaskId,target=e.target.closest?.('[data-drop-status]')?.dataset.dropStatus;
+ if(!id||!target)return;
+ e.preventDefault();state.dragTaskId=null;resetTaskDropHighlights();
+ await moveTaskStatus(id,target);
+}
+function workDragEnd(){state.dragTaskId=null;resetTaskDropHighlights()}
+
 function renderBoards(){return window.SELFBoards?.renderLibrary?.()||empty('Boards unavailable','Try reloading the page.')}
 function renderLinkGrid(links,global=true){const extra=state.inbox.filter(x=>x.kind==='link').map(x=>({id:x.id,title:x.title,url:x.body,fromInbox:true}));const all=global?[...links,...extra]:links;return all.length?`<div class="link-grid">${all.map(l=>`<a class="link-tile" href="${attr(normalUrl(l.url)||'#')}" target="_blank" rel="noopener noreferrer"><span class="link-logo">${ic(l.url.includes('docs.google.com/spreadsheets')?'grid':l.url.includes('drive.google.com')?'folder':'link',30)}</span><strong>${esc(l.title||new URL(normalUrl(l.url)||'https://example.org').hostname)}</strong><small>${esc(l.fromInbox?'Quick Capture':l.boardName||taskOf(l.task_id)?.title||'Task resource')}</small></a>`).join('')}</div>`:empty('No links yet','Add a link in a Task Detail, or capture a URL from Home. It will appear here automatically.')}
 function renderLinks(){const boardLinks=(window.SELFBoards?.links?.()||[]).filter(l=>!state.links.some(x=>x.url===l.url)&&!state.inbox.some(x=>x.kind==='link'&&x.body===l.url));return header('My Links','Useful resources from tasks, notes, and whiteboards.',`<button class="primary-btn" data-action="new-link">${ic('plus')} New Link</button>`)+renderLinkGrid([...state.links,...boardLinks])}
@@ -125,7 +164,7 @@ if(form.id==='create-link-form'){const url=normalUrl(v.url);if(!url){toast('Use 
 if(form.id==='create-subpage-form'){let made;if(await mutate(async()=>{made=await insert('task_pages',{task_id:state.taskId,title:v.title.trim()})},'Subpage created')){state.modal=null;state.pageId=made?.id||null;render()}return}
 }
 async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='board'){let made;if(await mutate(async()=>{made=await insert('boards',{title:text})},'Board created')){state.captureDraft='';if(made)window.SELFBoards.open(made.id)}return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}if(await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured')){state.captureDraft='';render()}}
-async function handleAction(e){const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if((e.target.closest('a'))&&action==='open-task')return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
+async function handleAction(e){const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if((e.target.closest('a, select, input, button')&&action==='open-task'&&e.target!==b))return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
 if(action==='toggle-sidebar'){
  state.sidebarCollapsed=!state.sidebarCollapsed;
  localStorage.setItem('self.sidebarCollapsed',String(state.sidebarCollapsed));
@@ -147,6 +186,7 @@ if(action==='close-panel'){state.taskId=null;state.pageId=null;render();return}
 if(action==='panel-tab'){state.panelTab=b.dataset.tab;state.pageId=null;render();return}
 if(action==='space-tab'){state.spaceTab=b.dataset.tab;render();return}
 if(action==='work-view'){state.workView=b.dataset.mode;render();return}
+if(action==='undo-stage'){const m=state.lastTaskMove;if(m){state.lastTaskMove=null;await moveTaskStatus(m.id,m.from,{undo:true})}return}
 if(action==='toggle-task'){const t=taskOf(id);if(t)await mutate(async()=>patch('tasks',id,{status:t.status==='done'?'todo':'done'}),'Task updated');return}
 if(action==='toggle-check'){await mutate(async()=>patchSimple('task_checklist',id,{is_done:b.checked}),'Checklist updated');return}
 if(action==='delete-check'){await mutate(async()=>del('task_checklist',id),'Step removed');return}
@@ -167,6 +207,7 @@ if(action==='logout'){await logout();return}
 if(action==='format-note'){const el=$('#task-notes');if(!el)return;const start=el.selectionStart,end=el.selectionEnd,selected=el.value.slice(start,end);let added='';if(b.dataset.format==='bold')added=`**${selected||'bold text'}**`;else if(b.dataset.format==='heading')added=`\n# ${selected||'Heading'}`;else if(b.dataset.format==='bullet')added=`\n- ${selected||'Key point'}`;else added=`[${selected||'Link title'}](https://)`;el.setRangeText(added,start,end,'end');el.focus();return}
 }
 async function handleChange(e){const el=e.target;
+if(el.dataset.stageTaskId){await moveTaskStatus(el.dataset.stageTaskId,el.value);return}
 if(el.id==='filter-status'){state.filterStatus=el.value;render();return}
 if(el.id==='filter-space'){state.filterSpace=el.value;render();return}
 if(el.dataset.taskField){const field=el.dataset.taskField;let value=el.value;if(field==='title'&&!value.trim()){toast('Task title cannot be blank',true);render();return}if(field==='space_id'||field==='due_date')value=value||null;const id=el.dataset.id;await mutate(async()=>{await patch('tasks',id,{[field]:value});if(field==='notes'||field==='description')await autoCaptureLinks(id,value)},'Saved');return}
@@ -182,6 +223,10 @@ document.addEventListener('click',e=>{handleAction(e).catch(error=>toast(error.m
 document.addEventListener('submit',e=>{handleSubmit(e).catch(error=>toast(error.message,true))});
 document.addEventListener('change',e=>{handleChange(e).catch(error=>toast(error.message,true))});
 document.addEventListener('input',handleInput);
+document.addEventListener('dragstart',workDragStart);
+document.addEventListener('dragover',workDragOver);
+document.addEventListener('drop',e=>{workDrop(e).catch(error=>toast(error.message,true))});
+document.addEventListener('dragend',workDragEnd);
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(state.user)go('search')}if(e.key==='Escape'){if(state.modal)state.modal=null;else if(state.pageId)state.pageId=null;else state.taskId=null;render()}if(e.key==='Enter'&&e.target?.id==='quick-text'){e.preventDefault();quickCapture().catch(err=>toast(err.message,true))}});
 
 /* Private image assets for the authenticated Concept C whiteboard. */
