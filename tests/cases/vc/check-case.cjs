@@ -8,7 +8,7 @@ const read=(f)=>fs.readFileSync(path.join(base,f),'utf8');
 function rows(file){
  const lines=read(file).trimEnd().split(/\r?\n/);
  const columns=lines.shift().split(',');
- const out=lines.map(l=>Object.fromEntries(l.split(',').map((v,i)=>[columns[i],v])));
+ const out=lines.map(l=>{const cells=l.split(',');assert.equal(cells.length,columns.length,'CSV column width '+file);return Object.fromEntries(cells.map((v,i)=>[columns[i],v]));});
  if(out.some(r=>r.data_status!=='SIMULATED'))throw Error('Unlabeled simulated CSV '+file);
  return out;
 }
