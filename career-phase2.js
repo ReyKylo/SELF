@@ -3,7 +3,7 @@
 'use strict';
 let host=null,core=null;
 const C={touchpoints:[],cvs:[],interviews:[],templates:[],taskLinks:[],owner:null,ready:false,
- modal:null,busy:false,error:'',lastMove:null,dragId:null};
+ modal:null,dirty:false,busy:false,error:'',lastMove:null,dragId:null};
 const tables={touchpoint:'career_touchpoints',cv:'career_cv_versions',interview:'career_interviews',
  template:'career_templates',taskLink:'career_task_links'};
 const fields={touchpoint:['person_id','contact_at','channel','summary','next_step'],
@@ -30,7 +30,7 @@ const personName=id=>people().find(x=>x.id===id)?.full_name||'Contact';
 const date=d=>d?new Date(d).toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}):'No date';
 function reset(owner){
  C.owner=owner;C.ready=false;C.touchpoints=[];C.cvs=[];C.interviews=[];C.templates=[];C.taskLinks=[];
- C.modal=null;C.lastMove=null;C.error='';C.busy=false;
+ C.modal=null;C.dirty=false;C.lastMove=null;C.error='';C.busy=false;
 }
 async function load(owner){
  if(!owner||owner!==me())return;
@@ -243,7 +243,7 @@ async function submit(ev){
     notice(C.error,true);C.modal=null;await refresh();return true;
    }
   }
-  C.modal=null;C.error='';
+  C.modal=null;C.dirty=false;C.error='';
   if(type==='touchpoint'&&saved.person_id){
    const dateVal=saved.contact_at||new Date().toISOString().slice(0,10);
    const prior=people().find(x=>x.id===saved.person_id);
@@ -281,7 +281,7 @@ async function saveFollowup(formEl,data){
    (data.mode==='existing'?'':' Task remains safely in My Work. Link it as Existing Task.'));
    await host.reloadCore?.();return;
   }
-  C.modal=null;C.error='';await host.reloadCore?.();await refresh();notice('Career follow-up linked to My Work');
+  C.modal=null;C.dirty=false;C.error='';await host.reloadCore?.();await refresh();notice('Career follow-up linked to My Work');
  }catch(error){inlineError(formEl,'Not saved: '+error.message)}
  finally{C.busy=false;if(button?.isConnected)button.disabled=false}
 }
@@ -307,11 +307,12 @@ async function action(ev){
  ev.preventDefault();ev.stopPropagation();
  const a=b.dataset.career2,id=b.dataset.id,type=b.dataset.type;
  if(a==='open-modal'){
-  C.modal={type,id,personId:b.dataset.person,applicationId:b.dataset.application,
+  if(C.dirty&&!confirm('Discard unsaved Career changes?'))return true;
+  C.dirty=false;C.modal={type,id,personId:b.dataset.person,applicationId:b.dataset.application,
    targetKind:b.dataset.targetKind,targetId:b.dataset.targetId};
   C.error='';host.render();
   Promise.resolve().then(()=>document.querySelector?.('.career2-modal .career-field')?.focus?.());
- }else if(a==='close-modal'){C.modal=null;C.error='';host.render()}
+ }else if(a==='close-modal'){if(C.dirty&&!confirm('Discard unsaved Career changes?'))return true;C.modal=null;C.dirty=false;C.error='';host.render()}
  else if(a==='open-application'){core.ui.drawer={kind:'application',id};host.render()}
  else if(a==='open-person'){core.ui.drawer={kind:'person',id};host.render()}
  else if(a==='career-new'){core.ui.modal=b.dataset.kind;host.render()}
@@ -381,8 +382,19 @@ async function drop(ev){
  dragEnd();await setStage(id,stage);
 }
 function keydown(ev){
- if(C.modal&&ev.key==='Escape'){ev.preventDefault();ev.stopImmediatePropagation?.();C.modal=null;host.render();return true}
+ if(C.modal&&ev.key==='Escape'){ev.preventDefault();ev.stopImmediatePropagation?.();if(C.dirty&&!confirm('Discard unsaved Career changes?'))return true;C.modal=null;C.dirty=false;host.render();return true}
  return false;
+}
+function input(ev){
+ if(ev.target?.closest?.('#career2-form')){C.dirty=true;
+  const note=ev.target.closest('#career2-form').querySelector?.('.career-save-note');
+  if(note)note.textContent='Unsaved changes';return true}
+ return false;
+}
+function beforeNavigate(){
+ if(!C.modal)return true;
+ if(C.dirty&&!confirm('Discard unsaved Career changes?'))return false;
+ C.modal=null;C.dirty=false;return true;
 }
 function init(args){
  core=args.career;host=args.host;
@@ -391,5 +403,5 @@ function init(args){
  document.addEventListener('dragend',dragEnd);
  document.addEventListener('drop',ev=>{drop(ev).catch(err=>notice('Drag failed: '+err.message,true))});
 }
-window.SELFCareerPhase2={init,load,reset,renderApplications,renderPeople,renderCVs,renderInterviews,renderTemplates,renderReminders,renderDrawer,modalMarkup,action,submit,change,keydown,ui:C};
+window.SELFCareerPhase2={init,load,reset,renderApplications,renderPeople,renderCVs,renderInterviews,renderTemplates,renderReminders,renderDrawer,modalMarkup,action,submit,change,keydown,input,beforeNavigate,ui:C};
 })();
