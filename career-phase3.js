@@ -22,7 +22,8 @@ const titleOf=x=>String(x.role_title||x.title||'').trim();
 const companyOf=x=>String(x.company_name||x.company||'').trim();
 const locationOf=x=>String(x.location_label||x.candidate_required_location||'').trim();
 const asDate=v=>{if(!v)return null;const t=Date.parse(v);return Number.isFinite(t)?new Date(t).toISOString():null};
-const isOwned=()=>RADAR.owner&&RADAR.owner===host?.state?.()?.user?.id;
+const me=()=>host?.state?.()?.user?.id;
+const isOwned=()=>!!RADAR.owner&&RADAR.owner===me();
 function clusterFor(text,preferred=''){
  if(CLUSTERS.includes(preferred))return preferred;
  for(const [key,test] of Object.entries(MATCH))if(test.test(text))return key;
