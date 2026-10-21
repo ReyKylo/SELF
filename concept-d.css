@@ -139,3 +139,28 @@
 @media(prefers-reduced-motion:reduce){
  .c3-shell .d-toolbar,.c3-shell .d-toolbar *,.c3-shell .d-popover,.c3-shell .d-focus-panel{animation:none!important;transition:none!important}
 }
+
+
+/* Links and files stay within the original shape, not a secondary card. */
+.c3-shell .d-object-chips{pointer-events:auto;z-index:2}
+.c3-shell .d-object-chips .d-chip{
+  border:1px solid #ffffff24;color:inherit;text-decoration:none;
+  min-height:21px;max-width:32%;padding:3px 7px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:color-mix(in srgb,var(--fill) 60%,#101826);
+  cursor:pointer;font-family:inherit;font-weight:650;font-size:10px;
+}
+.c3-shell .d-object-chips .d-chip:hover{outline:1px solid currentColor;outline-offset:1px}
+.c3-shell .d-object-chips button.d-chip{appearance:none}
+.c3-shell .d-asset-thumb{
+  max-width:50%;max-height:31%;object-fit:contain;
+  position:absolute;right:12px;bottom:30px;border-radius:6px;
+  pointer-events:none;box-shadow:0 2px 5px #0002;
+}
+.c3-shell .d-check{
+  appearance:none;border:0;background:none;color:inherit;
+  padding:1px 3px;min-width:25px;font:inherit;cursor:pointer;
+  border-radius:5px;vertical-align:baseline;
+}
+.c3-shell .d-check:hover{outline:1px solid currentColor}
+.c3-shell .d-format-menu{max-height:50dvh}
