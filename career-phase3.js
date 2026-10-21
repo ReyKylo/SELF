@@ -38,18 +38,17 @@ function scoreOpportunity(raw){
  const foreignOnly=/\b(US only|USA only|United States only|Canada only|UK only|Europe only|EU only|North America only|EMEA only)\b/i.test(place);
  const indonesia=/\b(Jakarta|Indonesia|Jabodetabek|South Jakarta|Central Jakarta|West Java|Depok|Tangerang|Bekasi)\b/i.test(place);
  const worldwide=/\b(Worldwide|Anywhere|Global|Asia|APAC|Southeast Asia)\b/i.test(place);
- const remote=/\bremote\b/i.test(place);
- if(foreignOnly||(!indonesia&&!worldwide&&!remote))return null;
+ if(foreignOnly||(!indonesia&&!worldwide))return null;
  const roleTitleMatch=Object.values(MATCH).some(rx=>rx.test(title));
  const role=roleTitleMatch?45:(cluster?23:0);
- const location=indonesia?30:worldwide?23:remote?10:0;
+ const location=indonesia?30:worldwide?23:0;
  const sector=cluster?15:0;
  const timestamp=asDate(raw.posted_at||raw.publication_date);
  const days=timestamp?Math.max(0,(Date.now()-Date.parse(timestamp))/86400000):null;
  const fresh=days===null?0:days<=14?10:days<=35?7:days<=60?3:0;
  const score=Math.min(100,role+location+sector+fresh);
  const reasons=[roleTitleMatch?'Relevant role keywords':'Sector context matched',
- indonesia?'Jakarta/Indonesia eligible':worldwide?'Worldwide or regional remote':'Remote eligibility needs review',
+ indonesia?'Jakarta/Indonesia eligible':'Worldwide or regional eligibility (verify employer)',
  cluster+' cluster',days===null?'Publication date unavailable':days<=35?'Recent posting':'Older posting'];
  return {score,cluster,reason:reasons.join(' · '),place,postedAt:timestamp,sourceAge:days};
 }
@@ -181,12 +180,14 @@ async function scan(){
 }
 function sourceOf(url){return RADAR.results.find(x=>urlKey(x.job_url)===urlKey(url))||detected({job_url:url})}
 async function persist(o,status='saved'){
+ if(!isOwned())throw new Error('Session changed during save');
+ const owner=RADAR.owner;
  const existing=detected(o);
  if(existing)return existing;
  const data={provider:o.provider,provider_id:o.provider_id||'',role_title:o.role_title,company_name:o.company_name,
   location_label:o.location_label||'',job_url:o.job_url,cluster:o.cluster,posted_at:o.posted_at||null,
   relevance_score:o.relevance_score,score_reason:o.score_reason||'',status};
- const result=await host.insert('career_opportunities',data);RADAR.items.unshift(result);
+ const result=await host.insert('career_opportunities',data);if(RADAR.owner!==owner||me()!==owner)return result;RADAR.items.unshift(result);
  return result;
 }
 async function update(id,stage){
@@ -215,27 +216,28 @@ async function convert(o){
  if(RADAR.busy||!o||!isOwned())return;
  RADAR.busy=true;const owner=RADAR.owner;
  try{
-  const url=safeUrl(o.job_url);if(!url)throw new Error('Missing secure source URL');
+  const ensure=()=>{if(RADAR.owner!==owner||me()!==owner)throw new Error('Account changed during import')};
+  ensure();const url=safeUrl(o.job_url);if(!url)throw new Error('Missing secure source URL');
   const known=core.ui.applications.find(x=>urlKey(x.source_url||'')===urlKey(url));
   const live=await host.request('/rest/v1/career_applications?select=*&source_url=eq.'+encodeURIComponent(url));
-  let existing=known||live?.find(x=>urlKey(x.source_url||'')===urlKey(url));
+  ensure();let existing=known||live?.find(x=>urlKey(x.source_url||'')===urlKey(url));
   let company=core.ui.companies.find(x=>x.name.toLowerCase()===o.company_name.toLowerCase());
   if(!company&&!existing){
    company=await host.insert('career_companies',{name:o.company_name,industry:o.cluster,location:o.location_label||'',notes:''});
    core.ui.companies.push(company);
   }
   if(!existing){
-   existing=await host.insert('career_applications',{company_id:company.id,role_title:o.role_title,
+   ensure();existing=await host.insert('career_applications',{company_id:company.id,role_title:o.role_title,
     hiring_stage:'wishlist',source_url:url,notes:'Sourced via '+o.provider+' Radar · '+o.score_reason});
    core.ui.applications.unshift(existing);
   }
-  let record=detected(o);
+  ensure();let record=detected(o);
   try{
    if(!record)record=await persist(o,'converted');
-   const linked=await host.patch('career_opportunities',record.id,{status:'converted',application_id:existing.id});
+   ensure();const linked=await host.patch('career_opportunities',record.id,{status:'converted',application_id:existing.id});
    Object.assign(record,linked);
    // Stage remains Wishlist until user changes it. No external application submission.
-   await host.reloadCareer?.();
+   await host.reloadCareer?.();ensure();
    RADAR.modal=null;RADAR.view='history';RADAR.error='';host.notify('Draft added to Applications');
   }catch(error){RADAR.error='Application saved, but Radar status did not sync. The original job URL prevents duplicate imports when retried: '+error.message;host.render()}
  }catch(error){RADAR.error='Could not finish adding draft: '+error.message+'. Check Applications before retrying.';host.render()}
@@ -273,6 +275,12 @@ function keydown(event){
  if(RADAR.modal&&event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation?.();RADAR.modal=null;host.render();return true}
  return false;
 }
+function links(){
+ if(!isOwned())return [];
+ return RADAR.items.filter(o=>o.status==='saved'||o.status==='converted').map(o=>({
+  id:o.id,title:o.role_title+' — '+o.company_name,url:o.job_url,boardName:'Career · Radar'
+ }));
+}
 function init(args){host=args.host;core=args.career}
-window.SELFCareerPhase3={init,reset,load,render,action,submit,keydown,scan,scoreOpportunity,ui:RADAR};
+window.SELFCareerPhase3={init,reset,load,render,action,submit,keydown,scan,scoreOpportunity,links,ui:RADAR};
 })();
