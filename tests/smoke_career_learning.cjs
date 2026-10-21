@@ -21,7 +21,7 @@ function setup(owner='owner-a'){
  }};
 }
 async function main(){
- const f=setup();await f.learning.load();assert.equal(f.learning.ui.data.sources.length,41);assert.equal(f.learning.ui.data.panels.length,12);assert.equal(f.learning.ui.data.videos.length,9);
+ const f=setup();await f.learning.load();assert.equal(f.learning.ui.data.sources.length,41);assert.equal(f.learning.ui.data.panels.length,12);assert.equal(f.learning.ui.data.videos.length,11);
  let markup=f.learning.render();assert(markup.includes('Tiga proyek.'));assert(markup.includes('Data fiktif'));assert.equal(db.length,0,'reading does not seed tasks');
  await f.click('tab',{tab:'evidence'});markup=f.learning.render();assert(markup.includes('12 dari 12'));assert(markup.includes('INI APA')&&markup.includes('ANALISIS AI'));assert(markup.includes('PREVIEW EKSTERNAL'));assert(markup.includes('media.wallstreetprep.com'),'original publisher image visible in evidence markup');assert(markup.includes('INI APA')&&markup.includes('CARA ACHIEVE'));
  f.learning.ui.track='VC';markup=f.learning.render();assert(markup.includes('4 dari 12'));assert(!markup.includes('Sources &amp; Uses: uang'));
@@ -49,6 +49,6 @@ async function main(){
  contentFail=true;const broken=setup();await broken.learning.load();assert(broken.learning.render().includes('Materi belum terbuka.'));contentFail=false;await broken.learning.load();assert(broken.learning.render().includes('Tiga proyek.'));
  // Actual Career integration renders static content before unrelated API errors.
  const ctx={window:{SELFCareerLearning:{render:()=>'<h2>LEARNING AVAILABLE</h2>'}},document:{querySelector(){return null}},URL,confirm:()=>true,console};vm.createContext(ctx);vm.runInContext(fs.readFileSync(path.join(root,'career.js'),'utf8'),ctx);ctx.window.SELFCareer.init({state:()=>({user:{id:'a'}}),render(){}});Object.assign(ctx.window.SELFCareer.ui,{page:'learning',ready:false,error:'Career API failed'});assert(ctx.window.SELFCareer.render().includes('LEARNING AVAILABLE'));
- console.log('PASS Career Prep: 41/12/9 content, filters, empty/error/retry, context return, explicit video play, escaped content, canonical Task identity across tabs/reload/lost-ack, failed reads/writes, owner-switch isolation, unrelated Career failure.');
+ console.log('PASS Career Prep: 41/12/11 content, filters, empty/error/retry, context return, explicit video play, escaped content, canonical Task identity across tabs/reload/lost-ack, failed reads/writes, owner-switch isolation, unrelated Career failure.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
