@@ -16,7 +16,7 @@ const required=['ANALOGY','EXPLICIT_FORMAL_TERM','PRECISE_DEFINITION','SOURCE_VI
 for(const v of required)check(d.teach_contract.required_sequence.includes(v),'teaching contract missing '+v);
 check(d.teach_contract.required_sequence.indexOf('EXPLICIT_FORMAL_TERM')===d.teach_contract.required_sequence.indexOf('ANALOGY')+1,'formal naming MUST immediately follow analogy');
 check(d.teach_contract.naming_rule.toLowerCase().includes('yes, ini namanya'),'term naming template missing');
-for(const v of ['analogy_quality','source','video','feedback','memory_rule'].filter(k=>k!=='source')) check(Object.keys(d.teach_contract).includes(v),'teaching rule '+v);
+for(const v of ['analogy_quality','video_rule','feedback_rule','memory_rule']) check(Object.keys(d.teach_contract).includes(v),'teaching rule '+v);
 check(d.tracks.length===3,'must cover three industries');
 check(JSON.stringify(d.tracks.map(x=>x.id))===JSON.stringify(['PE','VC','Consulting']),'track identity and order');
 check(d.tracks.every(x=>x.skills.length>=12),'12 real competencies per track');
