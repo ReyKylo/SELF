@@ -220,9 +220,12 @@ function render(){
  (ui.error&&ui.ready?'<p class="career-warning">'+h(ui.error)+' '+button('Retry','retry')+'</p>':'')+
  main+'</div>'+modalMarkup()+drawerMarkup()+'</div>';
 }
+function focusCareerDialog(){
+ Promise.resolve().then(()=>document.querySelector?.('.career-capture-choices button:not(:disabled),.career-modal .career-field,.career-drawer .career-field')?.focus?.());
+}
 function clearPanel(target){
  if(ui.dirty&&!confirm('Discard changes you have not saved?'))return false;
- ui.drawer=null;ui.modal=null;ui.dirty=false;ui.saveError='';target&&target();host.render();return true;
+ ui.drawer=null;ui.modal=null;ui.dirty=false;ui.saveError='';target&&target();host.render();Promise.resolve().then(()=>document.querySelector?.('[data-career="quick-capture"]')?.focus?.());return true;
 }
 async function load(){
  if(ui.loading)return;
@@ -322,13 +325,13 @@ async function action(e){
   const root=document.querySelector('.career-workspace');
   root?.classList.toggle('career-sections-open');
  }
- if(x==='quick-capture'){ui.modal='choose';ui.drawer=null;ui.saveError='';ui.dirty=false;host.render()}
- if(x==='choose-kind'){if(b.dataset.kind==='task'){ui.modal=null;host.newTask();return true}ui.modal=b.dataset.kind;ui.saveError='';host.render()}
+ if(x==='quick-capture'){ui.modal='choose';ui.drawer=null;ui.saveError='';ui.dirty=false;host.render();focusCareerDialog()}
+ if(x==='choose-kind'){if(b.dataset.kind==='task'){ui.modal=null;host.newTask();return true}ui.modal=b.dataset.kind;ui.saveError='';host.render();focusCareerDialog()}
  if(x==='new'){
   if(b.dataset.kind==='application'&&!ui.companies.length){ui.modal='company';ui.saveError='';ui.drawer=null;host.render();return true}
-  ui.modal=b.dataset.kind;ui.drawer=null;ui.saveError='';ui.dirty=false;host.render();
+  ui.modal=b.dataset.kind;ui.drawer=null;ui.saveError='';ui.dirty=false;host.render();focusCareerDialog();
  }
- if(x==='open'){if(ui.dirty&&!confirm('Discard unsaved edits?'))return true;ui.drawer={kind:b.dataset.kind,id:b.dataset.id};ui.modal=null;ui.saveError='';ui.dirty=false;host.render()}
+ if(x==='open'){if(ui.dirty&&!confirm('Discard unsaved edits?'))return true;ui.drawer={kind:b.dataset.kind,id:b.dataset.id};ui.modal=null;ui.saveError='';ui.dirty=false;host.render();focusCareerDialog()}
  if(x==='close-modal')clearPanel();
  if(x==='close-drawer')clearPanel();
  if(x==='delete')await erase(b.dataset.kind,b.dataset.id);
