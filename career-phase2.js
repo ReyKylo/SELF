@@ -352,8 +352,8 @@ async function action(ev){
     while(offset+512<=raw.length){
      const header=raw.slice(offset,offset+512);
      if(header.every(x=>x===0))break;
-     const name=decoder.decode(header.slice(0,100)).split('\\0')[0];
-     const size=parseInt(decoder.decode(header.slice(124,136)).replace(/\\0/g,'').trim(),8);
+     const name=decoder.decode(header.slice(0,100)).split(String.fromCharCode(0))[0];
+     const size=parseInt(decoder.decode(header.slice(124,136)).replaceAll(String.fromCharCode(0),'').trim(),8);
      if(!Number.isFinite(size)||size<0||size>8388608||offset+512+size>raw.length)throw new Error('Invalid CV archive');
      if(name===cv.file_name){pdf=raw.slice(offset+512,offset+512+size);break}
      offset+=512+Math.ceil(size/512)*512;
