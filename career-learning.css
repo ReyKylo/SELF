@@ -86,3 +86,10 @@
 .learning-quality-details li{line-height:1.7;margin-bottom:6px;font-size:.9em}
 .learning-standard-disclaimer{color:var(--muted);font-size:.77em;line-height:1.6;margin:8px 0 0}
 @container (max-width:650px){.learning-recruiter-standard{padding:17px}.learning-pro-divider{grid-template-columns:1fr;gap:3px}}
+
+.learning-next-case{margin:16px 0 12px;padding:20px 24px;border:1px solid var(--line);border-radius:9px;background:var(--card2)}
+.learning-next-case summary{cursor:pointer;font-weight:720;line-height:1.5}
+.learning-next-case h3{margin:18px 0 7px}.learning-next-case p,.learning-next-case li{font-size:.89em;line-height:1.7}
+.learning-next-case h4{margin:16px 0 6px;font-size:.9em}
+.learning-next-case-sources{display:flex;flex-wrap:wrap;gap:9px}
+.learning-next-case-sources .career-btn{font-size:.85em;max-width:100%}
