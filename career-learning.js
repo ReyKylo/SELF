@@ -160,6 +160,14 @@ function professionalBenchmark(day){
  '<details class="learning-quality-details"><summary>Investment Director / Partner / Client challenges</summary><ol>'+p.pushback.map(s=>'<li>'+h(s)+'</li>').join('')+'</ol></details>'+
  '<p class="learning-standard-disclaimer">SELF provides educational assessment criteria. No private firm endorsement, executed deal, or hiring outcome is implied.</p></section>';
 }
+function publicCase(day){
+ const u=day.upgrade_case;if(!u)return '';
+ return '<details class="learning-next-case"><summary>Next-level independent case · real public sources (after sprint)</summary>'+
+ '<h3>'+h(u.title)+'</h3><p>'+h(u.objective)+'</p>'+
+ '<div class="learning-next-case-sources">'+u.sources.map(x=>external(x.name,x.url)).join('')+'</div>'+
+ '<h4>What an employer should be able to question</h4><ul>'+u.required.map(s=>'<li>'+h(s)+'</li>').join('')+'</ul>'+
+ '<p class="learning-standard-disclaimer">No access to private company records, no representation of closed deals, no claim that this is an official client engagement.</p></details>';
+}
 function sprint(){
  const days=ui.data.sprints;const day=days.find(d=>d.id===ui.day)||days[0];const task=existingTask(day.id);
  return '<div class="learning-sprint-intro"><span class="learning-label">LEARN BY BUILDING</span><h2>Tiga proyek. Bukti yang bisa lu tunjukkan.</h2><p>Belajar dari contoh asli, tonton bagian yang relevan, lalu langsung bikin. Target 6–8 jam per hari; boleh lanjut besok kalau butuh waktu.</p></div>'+
@@ -170,6 +178,7 @@ function sprint(){
  professionalBenchmark(day)+
  '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief PDF','download','data-id="'+h(day.id)+'" data-kind="pdf"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+(day.id==='Consulting'?button('↓ Editable 6-slide PPTX','download','data-id="'+h(day.id)+'" data-kind="pptx"'):'')+button(ui.workspace===day.id?'Tutup private workspace':'Buka private workspace','workspace','data-id="'+h(day.id)+'"')+'</div>'+
  (ui.workspace===day.id?(window.SELFCareerPortfolio?.render?.(day.id)||''):'')+
+ publicCase(day)+
  '<section class="learning-lesson"><h3>03 · DO → BUILD → REVIEW</h3><p class="learning-fixture-label">Data fiktif untuk latihan independen. Bukan transaksi atau proyek klien nyata.</p>'+markdown(day.lesson)+'</section></article>'+
  '<div class="learning-download"><a class="career-btn learning-link" href="./content/portfolio-sprint.md" download="SELF_Portfolio_Sprint.md">Download playbook lengkap ↓</a><p>Workbook, memo, dan deck dibuat sendiri dari latihan. Materi tidak menandakan pengalaman deal nyata.</p></div>';
 }
