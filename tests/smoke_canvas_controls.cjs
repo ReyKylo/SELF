@@ -66,6 +66,10 @@ async function main(){
  assert.equal(state.knowledgeCards.at(-1).title,'','shape needs no title');
  assert.equal(state.boardItems.at(-1).style.shape,'hexagon','shape variant survives storage payload');
  assert.match(window.SELFBoards.renderEditor(),/c3-variant-hexagon/,'shape variant renders after reload');
+ await click('shapes-toggle');
+ await click('shape-create',{shape:'pill'});
+ assert.equal(state.boardItems.at(-1).style.radius,90,'pill keeps a 90px corner radius');
+ assert.match(window.SELFBoards.renderEditor(),/max="120" data-c3-style="radius"/,'radius slider supports values above pill radius');
  // Select the original node for real-time control tests.
  ui.selected=new Set(['i1']);
  const oldPatches=patches;
@@ -97,6 +101,14 @@ async function main(){
  await new Promise(resolve=>setTimeout(resolve,20));
  assert(patches>=2);
  assert.equal(state.boardItems[0].style.fill,'#789abc');
+ range('stroke','#345678');
+ assert.equal(props['--stroke'],'#345678','border colour preview responds immediately');
+ range('color','#abc123');
+ assert.equal(props['--ink'],'#abc123','text colour preview responds immediately');
+ await listeners.change[0]({target:{dataset:{c3Style:'color'},value:'#abc123',closest(){return null}}});
+ await new Promise(resolve=>setTimeout(resolve,20));
+ assert.equal(state.boardItems[0].style.stroke,'#345678');
+ assert.equal(state.boardItems[0].style.color,'#abc123');
  // Sidebar is a real stateful navigation control, not decorative.
  assert(app.includes("localStorage.setItem('self.sidebarCollapsed'"),'sidebar collapse persists');
  assert(app.includes("action==='toggle-sidebar'"),'sidebar responds to click');
@@ -104,6 +116,6 @@ async function main(){
  assert(stylesheet.includes('.c3-shape-gallery'),'gallery has scoped styling');
  assert(stylesheet.includes('prefers-reduced-motion:reduce'),'reduced motion still supported');
  assert(stylesheet.includes('backdrop-filter: none !important'),'anti-blink preserved');
- console.log('PASS: collapse sidebar/dock, twelve shape choices, persisted hexagon, instant px/radius/opacity/colors, debounced save and no flashing.');
+ console.log('PASS: collapse sidebar/dock, twelve shapes, persisted pill/hexagon, live font/radius/opacity/fill/border/text colors, debounced save and no flashing.');
 }
 main().catch(err=>{console.error(err);process.exitCode=1});
