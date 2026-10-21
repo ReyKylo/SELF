@@ -5,7 +5,7 @@
 (()=>{'use strict';
 if(window.location?.search&&new URLSearchParams(window.location.search).get('canvas')==='legacy')return;
 let api;
-const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',quickAdd:null,connectFrom:null,mapCollapsed:false,mapGeometry:null,previousCameras:[],lastCameraAt:0};
+const ui={boardId:null,selected:new Set(),edge:null,tool:'select',tab:'style',modal:null,pan:{x:100,y:90},zoom:1,gesture:null,spaceDown:false,dirty:false,saveTimer:null,connecting:null,layout:'flow',history:[],redo:[],pending:new Map(),domSnapshots:new Map(),assetUrls:new Map(),loadingImages:new Set(),grid:true,notice:'',quickAdd:null,connectFrom:null,mapCollapsed:true,mapGeometry:null,inspectorOpen:false,toolsExpanded:false,helpOpen:false,previousCameras:[],lastCameraAt:0};
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const esc=h, clamp=(v,a,b)=>Math.min(b,Math.max(a,v)), num=(x,d=0)=>Number.isFinite(Number(x))?Number(x):d;
@@ -59,7 +59,7 @@ async function transact(operation,message){setBusy(true);try{await operation();a
 function history(undo,redo){ui.history.push({undo,redo});if(ui.history.length>70)ui.history.shift();ui.redo.length=0}
 async function step(direction){const src=direction==='undo'?ui.history:ui.redo,dst=direction==='undo'?ui.redo:ui.history;const op=src.pop();if(!op){say('Nothing to '+direction);return}setBusy(true);try{await op[direction]();dst.push(op);await sync(direction==='undo'?'Undone':'Redone')}catch(e){src.push(op);setBusy(false);say(e.message,true)}}
 const camera=(b)=>({x:num(b.pan_x,100),y:num(b.pan_y,90),z:clamp(num(b.zoom,1),.25,2.5)});
-function open(id){const b=state().boards.find(b=>b.id===id);if(!b)return say('Board not found',true);ui.boardId=id;ui.selected.clear();ui.edge=null;ui.tool='select';ui.modal=null;ui.tab='style';ui.quickAdd=null;ui.connectFrom=null;ui.previousCameras=[];let p=camera(b);ui.pan={x:p.x,y:p.y};ui.zoom=p.z;api.navigate('board-editor')}
+function open(id){const b=state().boards.find(b=>b.id===id);if(!b)return say('Board not found',true);ui.boardId=id;ui.selected.clear();ui.edge=null;ui.tool='select';ui.modal=null;ui.tab='style';ui.inspectorOpen=false;ui.toolsExpanded=false;ui.helpOpen=false;ui.quickAdd=null;ui.connectFrom=null;ui.previousCameras=[];let p=camera(b);ui.pan={x:p.x,y:p.y};ui.zoom=p.z;api.navigate('board-editor')}
 function library(spaceId=null){
  const list=state().boards.filter(b=>!spaceId||b.space_id===spaceId);
  const head=spaceId?'<div class="c3-lib-head"><div><h2>Whiteboards</h2><p>Think visually, connect ideas and work in one space.</p></div><button class="c3-primary" data-c3="new-board" data-space="'+h(spaceId)+'">＋ New board</button></div>':
@@ -196,7 +196,7 @@ function floatingUI(){
  const top=clamp(item.y*ui.zoom+ui.pan.y-58,12,vh-72);
  const left=clamp((item.x+item.w/2)*ui.zoom+ui.pan.x-171,12,Math.max(12,vw-360));
  return '<div class="c3-contextbar" id="c3-contextbar" style="left:'+left+'px;top:'+top+'px" role="toolbar" aria-label="Selected object quick actions">'+
- '<button data-c3="quick-edit" title="Edit text" aria-label="Edit text">✎</button>'+
+ '<button data-c3="quick-edit" title="Edit text" aria-label="Edit text">✎</button><button data-c3="quick-notes" title="Detailed notes" aria-label="Open detailed notes">▤</button>'+
  '<button data-c3="quick-duplicate" title="Duplicate object (Ctrl+D)" aria-label="Duplicate object">⧉</button>'+
  '<button data-c3="quick-connect" title="Connect to another object" aria-label="Connect to another object">⤳</button>'+
  '<span class="c3-context-sep"></span>'+
@@ -258,16 +258,16 @@ function canvas(){
  const objects=[...items()].sort((a,b)=>num(a.z)-num(b.z));
  ui.domSnapshots=new Map(objects.map(i=>[i.id,objectMarkup(i)]));
  return '<div class="self-board-editor c3-shell" data-board-id="'+h(b.id)+'"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
- '<div class="c3-toolbar">'+['select','rectangle','ellipse','diamond','connect','text','image','sticky','frame','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note',ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>'+
- '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo"')+button('redo','↷','title="Redo"')+'<span class="c3-scale">'+Math.round(ui.zoom*100)+'%</span>'+button('view-back','↶ View','id="c3-view-back" title="Return to previous canvas position"')+button('fit-selection','◈','title="Fit selected objects (F)"')+button('fit','⛶','title="Fit all objects" aria-label="Fit all objects"')+'</div></div>'+
- '<div class="c3-content"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
+ '<div class="c3-toolbar" role="toolbar" aria-label="Create and edit on the board">'+['select','rectangle','connect','text','sticky','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note'}[n]||n))).join('')+'<span class="c3-tool-divider"></span>'+button('tools-more',ui.toolsExpanded?'−':'＋','class="c3-tools-more" aria-label="'+(ui.toolsExpanded?'Show fewer tools':'Show more tools')+'" aria-expanded="'+ui.toolsExpanded+'"')+(ui.toolsExpanded?'<div class="c3-more-tools">'+['ellipse','diamond','image','frame'].map(n=>tool(n,({ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>':'')+'</div>'+
+ '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dirty?'● Saving':'✓ Saved')+'</span>'+button('undo','↶','title="Undo (Ctrl+Z)" aria-label="Undo"')+button('redo','↷','title="Redo (Ctrl+Shift+Z)" aria-label="Redo"')+button('inspector-toggle','⚙ Properties','id="c3-inspector-toggle" aria-label="'+(ui.inspectorOpen?'Close properties':'Open properties')+'" aria-expanded="'+ui.inspectorOpen+'"')+'</div></div>'+
+ '<div class="c3-content '+(ui.inspectorOpen?'c3-panel-open':'c3-panel-closed')+'"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
  '<div class="c3-world" id="c3-world" style="transform:translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')">'+
  '<svg class="c3-wires" id="c3-wires" aria-label="Connected objects">'+renderWires()+'</svg>'+
  objects.map(objectMarkup).join('')+'</div>'+
  (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
- '<div class="c3-smart-strip">'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
- '<div class="c3-bottom-tools">'+button('hand','✋ Pan','aria-label="Hand tool: drag anywhere to move canvas"')+button('select-tool','↖ Select','aria-label="Select objects"')+'<span class="c3-divider"></span>'+button('zoom-out','−')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋')+'</div>'+
- '<div id="c3-floating-ui">'+floatingUI()+'</div>'+minimapMarkup()+'<div class="c3-canvas-help">Drag to pan · Double-click empty space to add · Shift+drag to select</div>'+
+ '<div class="c3-smart-strip"'+(ui.selected.size<2?' hidden':'')+'>'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
+ '<div class="c3-bottom-tools">'+button('zoom-out','−','aria-label="Zoom out"')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋','aria-label="Zoom in"')+'<span class="c3-divider"></span>'+button('fit','⛶','aria-label="Fit all objects" title="Fit all objects"')+button('view-back','↶','id="c3-view-back" title="Previous view" aria-label="Previous view"')+button('help-toggle','?','aria-label="Show canvas shortcuts"')+'</div>'+
+ '<div id="c3-floating-ui">'+floatingUI()+'</div>'+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F to fit</div>'+
  '<div id="c3-marquee" hidden></div><input id="c3-upload" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"/></section>'+
  inspector()+'</div>'+modal()+'</div>';
 }
@@ -276,6 +276,7 @@ function canvas(){
 function updateInPlace(){
  if(state().view!=='board-editor'||!ui.boardId)return false;
  const shell=$('.c3-shell'),world=$('#c3-world'),scene=$('#c3-canvas');
+ const content=$('.c3-content');if(content){content.classList.toggle('c3-panel-open',ui.inspectorOpen);content.classList.toggle('c3-panel-closed',!ui.inspectorOpen);}
  if(!shell||!world||!scene||shell.dataset.boardId!==ui.boardId)return false;
  const next=items(),wanted=new Set(next.map(i=>i.id));
  for(const node of [...world.querySelectorAll('.c3-object[data-c3-item]')]){
@@ -307,6 +308,10 @@ function updateInPlace(){
      const refreshed=$('#c3-inspector');if(refreshed)refreshed.scrollTop=scroll;
    }
  }
+ const panelToggle=$('#c3-inspector-toggle');if(panelToggle){panelToggle.setAttribute('aria-expanded',String(ui.inspectorOpen));panelToggle.setAttribute('aria-label',ui.inspectorOpen?'Close properties':'Open properties');panelToggle.classList.toggle('is-active',ui.inspectorOpen)}
+ const dock=document.querySelector('.c3-toolbar');if(dock){const wantedTools=['select','rectangle','connect','text','sticky','knowledge'].map(n=>tool(n,({knowledge:'Knowledge Card',sticky:'Sticky note'}[n]||n))).join('')+'<span class="c3-tool-divider"></span>'+button('tools-more',ui.toolsExpanded?'−':'＋','class="c3-tools-more" aria-label="'+(ui.toolsExpanded?'Show fewer tools':'Show more tools')+'" aria-expanded="'+ui.toolsExpanded+'"')+(ui.toolsExpanded?'<div class="c3-more-tools">'+['ellipse','diamond','image','frame'].map(n=>tool(n,({ellipse:'Circle',image:'Image',frame:'Frame'}[n]||n))).join('')+'</div>':'');if(dock.innerHTML!==wantedTools)dock.innerHTML=wantedTools;}
+ const strip=document.querySelector('.c3-smart-strip');if(strip)strip.hidden=ui.selected.size<2;
+ const help=document.querySelector('.c3-canvas-help');if(help)help.hidden=!ui.helpOpen;
  for(const btn of document.querySelectorAll('.c3-tool')){
    const enabled=btn.dataset.kind===ui.tool;btn.classList.toggle('active',enabled);btn.setAttribute('aria-pressed',String(enabled));
  }
@@ -538,6 +543,10 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
   ui.pan={x:viewport.clientWidth/2-x*ui.zoom,y:viewport.clientHeight/2-y*ui.zoom};
   updateCam();saveCam();return
  }
+ if(a==='inspector-toggle'){ui.inspectorOpen=!ui.inspectorOpen;api.render();return}
+ if(a==='tools-more'){ui.toolsExpanded=!ui.toolsExpanded;api.render();return}
+ if(a==='help-toggle'){ui.helpOpen=!ui.helpOpen;api.render();return}
+ if(a==='quick-notes'){if(entries().length!==1)return;ui.tab='notes';ui.inspectorOpen=true;api.render();return}
  if(a==='open-board'){open(id);return}
  if(a==='back'){ui.boardId=null;api.navigate('boards');return}
  if(a==='new-board'){ui.modal={type:'board',space:el.dataset.space|| (state().view==='space'?state().spaceId:null)};api.render();return}
