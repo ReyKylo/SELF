@@ -126,9 +126,9 @@ function inspector(){
  else if(ui.tab==='style')body='<div class="c3-controls"><label>Fill <input type="color" data-c3-style="fill" value="'+validColour(s.fill==='transparent'?'#222b38':s.fill)+'"/></label>'+
  '<label>Border <input type="color" data-c3-style="stroke" value="'+validColour(s.stroke==='transparent'?'#222b38':s.stroke)+'"/></label>'+
  '<label>Text color <input type="color" data-c3-style="color" value="'+validColour(s.color)+'"/></label>'+
- '<label>Font size <input type="range" min="14" max="42" step="1" data-c3-style="fontSize" value="'+num(s.fontSize,20)+'"/><em>'+num(s.fontSize,20)+'px</em></label>'+
- '<label>Corner radius <input type="range" min="0" max="45" data-c3-style="radius" value="'+Math.min(45,num(s.radius,12))+'"/><em>'+num(s.radius,12)+'px</em></label>'+
- '<label>Opacity <input type="range" min="30" max="100" data-c3-style="opacity" value="'+Math.round(num(s.opacity,1)*100)+'"/><em>'+Math.round(num(s.opacity,1)*100)+'%</em></label></div>'+
+ '<label>Font size <input type="range" min="12" max="72" step="1" data-c3-style="fontSize" value="'+num(s.fontSize,20)+'"/><output>'+num(s.fontSize,20)+'px</output></label>'+
+ '<label>Corner radius <input type="range" min="0" max="45" data-c3-style="radius" value="'+Math.min(45,num(s.radius,12))+'"/><output>'+num(s.radius,12)+'px</output></label>'+
+ '<label>Opacity <input type="range" min="30" max="100" data-c3-style="opacity" value="'+Math.round(num(s.opacity,1)*100)+'"/><output>'+Math.round(num(s.opacity,1)*100)+'%</output></label></div>'+
  '<div class="c3-section-title">Quick palettes</div><div class="c3-swatches">'+Object.entries(palette).map(([key,val])=>'<button title="'+key+'" data-c3="swatch" data-value="'+val+'" style="background:'+val+'"></button>').join('')+'</div>';
  else if(ui.tab==='arrange')body='<div class="c3-section-title">Align selected</div><div class="c3-action-grid">'+['left','center','right','top','middle','bottom'].map(x=>button('align','↔ '+x,'data-align="'+x+'"')).join('')+'</div>'+
  '<div class="c3-section-title">Distribution and layering</div><div class="c3-action-grid">'+button('distribute','↔ Horizontal','data-axis="horizontal"')+button('distribute','↕ Vertical','data-axis="vertical"')+button('layer','Bring forward','data-dir="front"')+button('layer','Send backward','data-dir="back"')+'</div><p class="c3-side-hint">Shift+click objects or drag a selection box to select multiple.</p>';
@@ -478,12 +478,56 @@ async function distribute(axis){const arr=entries().sort((a,b)=>axis==='horizont
  const total=arr.reduce((x,i)=>x+(axis==='horizontal'?i.w:i.h),0),gap=(span-total)/(arr.length-1);let p=axis==='horizontal'?first.x:first.y;
  for(const i of arr){if(axis==='horizontal')i.x=p;else i.y=p;p+=(axis==='horizontal'?i.w:i.h)+gap}
  liveRefresh();await persistPositions(before,positions(arr.map(i=>i.id)),'Objects distributed')}
-async function applyStyle(field,value){const arr=entries();if(!arr.length)return;const old=arr.map(i=>({id:i.id,value:{...i.style}}));
- let v=['fontSize','radius','opacity'].includes(field)?num(value):value;if(field==='opacity')v=clamp(v/100,.3,1);
- const now=arr.map(i=>({id:i.id,value:{...style(i),[field]:v}}));for(const n of now){itm(n.id).style=n.value}
- await transact(async()=>{for(const n of now)await api.patchSimple('board_items',n.id,{style:n.value})},'Style updated');
- history(async()=>{for(const n of old)await api.patchSimple('board_items',n.id,{style:n.value})},async()=>{for(const n of now)await api.patchSimple('board_items',n.id,{style:n.value})});
+function styleValue(field,raw){
+ if(field==='opacity')return clamp(num(raw,100)/100,.3,1);
+ if(field==='fontSize')return clamp(num(raw,20),12,72);
+ if(field==='radius')return clamp(num(raw,12),0,90);
+ return validColour(raw);
 }
+function updateStylePreview(field,raw,source){
+ const selection=entries();if(!selection.length)return;
+ const ids=selection.map(i=>i.id),key=ids.join('|');
+ if(ui.styleSession&&ui.styleSession.key!==key)void commitStyle();
+ if(!ui.styleSession||ui.styleSession.key!==key)
+   ui.styleSession={key,ids,before:selection.map(i=>({id:i.id,style:{...i.style}}))};
+ const value=styleValue(field,raw);
+ for(const item of selection){
+  item.style={...style(item),[field]:value};
+  const node=document.querySelector('[data-c3-item="'+item.id+'"]');if(!node)continue;
+  if(field==='fontSize')node.style.setProperty('--font-size',value+'px');
+  else if(field==='radius')node.style.setProperty('--corner',value+'px');
+  else if(field==='fill')node.style.setProperty('--fill',value);
+  else if(field==='stroke')node.style.setProperty('--stroke',value);
+  else if(field==='color')node.style.setProperty('--ink',value);
+  else if(field==='opacity')node.style.opacity=String(value);
+ }
+ const output=source?.closest?.('label')?.querySelector?.('output');
+ if(output)output.textContent=field==='opacity'?Math.round(value*100)+'%':field==='radius'||field==='fontSize'?value+'px':value;
+ setBusy(true);
+ clearTimeout(ui.styleTimer);
+ ui.styleTimer=setTimeout(()=>{void commitStyle()},450);
+}
+async function commitStyle(){
+ clearTimeout(ui.styleTimer);ui.styleTimer=null;
+ const session=ui.styleSession;if(!session)return;
+ ui.styleSession=null;
+ const changes=session.ids.map(id=>itm(id)).filter(Boolean).map(i=>({id:i.id,style:{...i.style}}));
+ if(!changes.length){setBusy(false);return}
+ try{
+  ui.styleSaveQueue=(ui.styleSaveQueue||Promise.resolve()).catch(()=>{}).then(async()=>{
+   for(const row of changes)await api.patchSimple('board_items',row.id,{style:row.style});
+  });
+  await ui.styleSaveQueue;
+  history(async()=>{for(const x of session.before)await api.patchSimple('board_items',x.id,{style:x.style})},
+          async()=>{for(const x of changes)await api.patchSimple('board_items',x.id,{style:x.style})});
+  if(!ui.styleSession)setBusy(false);
+ }catch(error){
+  say('Style could not be saved: '+error.message,true);
+  try{await api.reload();if(!ui.styleSession)api.render()}catch{}
+  if(!ui.styleSession)setBusy(false);
+ }
+}
+async function applyStyle(field,value){updateStylePreview(field,value,null);await commitStyle()}
 async function addEdge(from,to,fromSide='auto',toSide='auto'){if(from===to||!itm(from)||!itm(to))return;let e;await transact(async()=>{e=await api.insert('board_edges',{board_id:ui.boardId,source_item_id:from,target_item_id:to,from_anchor:fromSide,to_anchor:toSide,route_type:'curved'})},'Connected');if(e)history(async()=>api.del('board_edges',e.id),async()=>api.insert('board_edges',{...e}))}
 async function upload(file){if(!file)return;const allowed=['image/jpeg','image/png','image/webp','image/gif'];if(!allowed.includes(file.type)||file.size>10485760)return say('Use a PNG, JPG, WebP or GIF under 10 MB',true);
  setBusy(true);try{const path=await api.uploadImage(file);const signed=await api.signImage(path);ui.assetUrls.set(path,signed);await create('image',null,{asset_path:path,title:''})}catch(e){setBusy(false);say('Upload failed: '+e.message,true)}}
@@ -640,7 +684,8 @@ async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-'))return;e.p
  }
  if(f.id==='c3-note-form'){const one=itm(f.dataset.id);if(!one)return;const u=o.url?.trim();if(u&&!url(u))return say('Invalid URL',true);
  await transact(()=>api.patch('knowledge_cards',one.card_id,{title:o.title||'',body:o.body||'',key_points:o.key_points||'',url:u||null,task_id:o.task_id||null,target_board_id:o.target_board_id||null}),'Notes saved to your knowledge library');return}}
-function change(e){const field=e.target.dataset.c3Style;if(field){applyStyle(field,e.target.value);return}
+function input(e){const field=e.target?.dataset?.c3Style;if(field)updateStylePreview(field,e.target.value,e.target)}
+function change(e){const field=e.target.dataset.c3Style;if(field){updateStylePreview(field,e.target.value,e.target);void commitStyle();return}
  if(e.target.matches('[data-c3-grid]'))ui.grid=e.target.checked;
  if(e.target.id==='c3-upload'){upload(e.target.files?.[0]);e.target.value=''}}
 function keydown(e){if(state().view!=='board-editor')return;const typing=e.target.closest('input,textarea,select,[contenteditable=true]');
@@ -681,6 +726,6 @@ function pasteOn(e){if(state().view!=='board-editor'||e.target.closest('input,te
  if(url(raw.trim())){e.preventDefault();create('reference',null,{url:raw.trim(),title:new URL(raw.trim()).hostname})}
 }
 
-function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);window.addEventListener('pointercancel',gestureCancel);window.addEventListener('blur',gestureCancel);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
+function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('input',input,true);document.addEventListener('pointerdown',gestureStart);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);window.addEventListener('pointercancel',gestureCancel);window.addEventListener('blur',gestureCancel);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
 window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{restorePending();queueMicrotask(imageResolve);return canvas()},updateInPlace,links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
 })();
