@@ -1,0 +1,70 @@
+/* Career Phase 2 — uses existing SELF tokens, spacious and compact. */
+.career2-title{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:0 0 22px}
+.career2-title h2{margin:0 0 8px;font-size:1.14em;letter-spacing:-.025em}
+.career2-title p{color:var(--muted);font-size:.87em;line-height:1.6;margin:0}
+.career2-title .career-primary{flex-shrink:0}
+.career2-pipeline{min-height:320px;grid-template-columns:repeat(5,minmax(185px,1fr))}
+.career2-job{padding:13px 12px 12px;background:var(--card);border:1px solid var(--line);border-radius:11px;
+ margin:0 0 10px;cursor:grab;transition:border-color .1s,transform .1s}
+.career2-job:hover{border-color:var(--blue)}
+.career2-job:active{cursor:grabbing}
+.career2-job>button,.career2-person-row>button,.career2-reminder>button:first-child{border:0;padding:0;
+ width:100%;text-align:left;background:transparent;color:var(--text);cursor:pointer;font:inherit}
+.career2-job>button strong,.career2-person-row strong,.career2-reminder strong{display:block;font-size:.85em;line-height:1.4;font-weight:750}
+.career2-job>button small,.career2-person-row small,.career2-reminder small{display:block;color:var(--muted);
+ font-size:.76em;margin-top:7px;line-height:1.4}
+.career2-job:has(.career2-stage-select select:focus-visible){outline:2px solid var(--blue)}
+.career2-stage-select{display:flex;flex-direction:column;gap:6px;margin-top:14px;padding-top:11px;border-top:1px solid var(--line);
+ color:var(--muted);font-size:.72em;font-weight:680}
+.career2-stage-select select{width:100%;min-height:33px;border-radius:8px;border:1px solid var(--line);
+ background:var(--card2);color:var(--text);font:inherit;font-size:1.02em;padding:6px;cursor:pointer}
+.career2-dragging{opacity:.65;border:1px dashed var(--blue)}
+.career2-drop{transition:border-color .11s,background-color .11s}
+.career2-over{border:1px solid var(--blue);background:color-mix(in srgb,var(--blue) 12%,var(--card2))}
+.career2-undo{display:flex;gap:13px;align-items:center;justify-content:space-between;
+ padding:9px 13px;background:var(--blueSoft);border:1px solid color-mix(in srgb,var(--blue) 20%,var(--line));
+ border-radius:11px;margin-bottom:14px;font-size:.84em}
+.career2-undo .career-btn{min-height:34px}
+.career2-person-row{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.career2-person-row:last-child{border-bottom:0}
+.career2-person-row span{color:var(--muted);font-size:.73em;text-align:right;white-space:nowrap;padding-top:3px}
+.career2-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.career2-resource{display:flex;flex-direction:column;gap:14px;min-width:0}
+.career2-resource-title{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.career2-resource-title strong{font-size:1em;line-height:1.3;display:block}
+.career2-resource-title small{font-size:.79em;color:var(--muted);display:block;margin-top:8px}
+.career2-resource>p{color:var(--muted);font-size:.83em;line-height:1.6;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.career2-resource .career2-preview{max-height:75px;overflow:hidden}
+.career2-chip{border:1px solid var(--line);border-radius:7px;padding:5px 9px;color:var(--muted);font-size:.72em;white-space:nowrap}
+.career2-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.career2-actions .career-btn{min-height:35px}
+.career2-empty{padding:25px 18px;border:1px dashed var(--line);border-radius:11px;color:var(--text);grid-column:1/-1}
+.career2-empty strong{display:block;font-size:.96em}
+.career2-empty p{color:var(--muted);font-size:.81em;line-height:1.6;margin:8px 0 0}
+.career2-reminder{display:flex;align-items:center;justify-content:space-between;gap:15px}
+.career2-reminder>button:first-child{flex:1;min-width:0}
+.career2-drawer-section{margin:30px 0 7px;border-top:1px solid var(--line);padding-top:21px}
+.career2-drawer-section .career2-title h2{font-size:1em}
+.career2-drawer-section .career2-title p{font-size:.79em}
+.career2-drawer-section .career2-title{gap:10px}
+.career2-timeline,.career2-row{padding:13px 0;display:flex;align-items:flex-start;justify-content:space-between;
+ gap:12px;border-bottom:1px solid var(--line)}
+.career2-timeline strong,.career2-row strong{display:block;font-size:.88em;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.career2-timeline small,.career2-row small{display:block;font-size:.73em;color:var(--muted);margin-top:5px}
+.career2-timeline p{color:var(--muted);font-size:.78em;white-space:pre-wrap}
+.career2-drawer-section .career-field{margin-top:10px}
+.career2-modal{width:min(580px,calc(100% - 18px));max-height:90dvh;overflow-y:auto}
+.career2-modal .career-record-form{padding-bottom:20px}
+.career2-modal .career-field[type=file]{font-size:.9em;cursor:pointer}
+.career2-modal-layer{z-index:27}
+@media(max-width:1100px){.career2-list{grid-template-columns:1fr}}
+@media(max-width:650px){
+ .career2-title{flex-wrap:wrap;gap:12px}
+ .career2-list{grid-template-columns:1fr}
+ .career2-pipeline{grid-template-columns:repeat(5,minmax(220px,1fr))}
+ .career2-reminder{flex-wrap:wrap}
+ .career2-modal{width:100%;max-height:100dvh}
+}
+@media(prefers-reduced-motion:reduce){
+ .career2-job,.career2-drop{transition:none!important;animation:none!important}
+}

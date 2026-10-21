@@ -228,7 +228,7 @@ function go(view){state.view=view;state.taskId=null;state.pageId=null;state.moda
 const urlRegex=/https?:\/\/[^\s<>"']+/gi;
 async function autoCaptureLinks(taskId,text){const urls=[...new Set((text.match(urlRegex)||[]).map(s=>s.replace(/[),.;!?]+$/,'')).filter(u=>normalUrl(u)))];const existing=state.links.filter(x=>x.task_id===taskId);for(const url of urls){if(!existing.some(x=>x.url===normalUrl(url))){await insert('task_links',{task_id:taskId,url:normalUrl(url),title:new URL(url).hostname})}}}
 function formData(form){return Object.fromEntries(new FormData(form).entries())}
-async function handleSubmit(e){const form=e.target;if(!form.id)return;if(form.id.startsWith('career-')){await window.SELFCareer?.submit?.(e);return}e.preventDefault();const v=formData(form);const id=form.dataset.id;
+async function handleSubmit(e){const form=e.target;if(!form.id)return;if(form.id.startsWith('career-')||form.id==='career2-form'){await window.SELFCareer?.submit?.(e);return}e.preventDefault();const v=formData(form);const id=form.dataset.id;
 if(form.id==='auth-form'){const btn=form.querySelector('button[type="submit"]');btn.disabled=true;state.authMessage='';try{await login(v.email,v.password,state.loginMode==='signup')}catch(e){state.authMessage='Error: '+e.message;render()}finally{if(btn.isConnected)btn.disabled=false}return}
 if(form.id==='create-task-form'){if(await mutate(async()=>{await insert('tasks',{title:v.title.trim(),space_id:v.space_id||null,status:v.status,due_date:v.due_date||null})},'Task created')){state.modal=null;render()}return}
 if(form.id==='create-space-form'){if(await mutate(async()=>{await insert('spaces',{name:v.name.trim(),icon:v.icon,accent:state.spaceAccent})},'Space created')){state.modal=null;render()}return}
@@ -239,7 +239,7 @@ if(form.id==='create-link-form'){const url=normalUrl(v.url);if(!url){toast('Use 
 if(form.id==='create-subpage-form'){let made;if(await mutate(async()=>{made=await insert('task_pages',{task_id:state.taskId,title:v.title.trim()})},'Subpage created')){state.modal=null;state.pageId=made?.id||null;render()}return}
 }
 async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='board'){let made;if(await mutate(async()=>{made=await insert('boards',{title:text})},'Board created')){state.captureDraft='';if(made)window.SELFBoards.open(made.id)}return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}if(await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured')){state.captureDraft='';render()}}
-async function handleAction(e){if(e.target.closest?.('[data-career]')){await window.SELFCareer?.action?.(e);return}const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if((e.target.closest('a, select, input, button')&&action==='open-task'&&e.target!==b))return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
+async function handleAction(e){if(e.target.closest?.('[data-career],[data-career2]')){await window.SELFCareer?.action?.(e);return}const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if((e.target.closest('a, select, input, button')&&action==='open-task'&&e.target!==b))return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
 if(action==='toggle-sidebar'){
  state.sidebarCollapsed=!state.sidebarCollapsed;
  localStorage.setItem('self.sidebarCollapsed',String(state.sidebarCollapsed));
@@ -283,7 +283,7 @@ if(action==='auth-toggle'){state.loginMode=state.loginMode==='signin'?'signup':'
 if(action==='logout'){await logout();return}
 if(action==='format-note'){const el=$('#task-notes');if(!el)return;const start=el.selectionStart,end=el.selectionEnd,selected=el.value.slice(start,end);let added='';if(b.dataset.format==='bold')added=`**${selected||'bold text'}**`;else if(b.dataset.format==='heading')added=`\n# ${selected||'Heading'}`;else if(b.dataset.format==='bullet')added=`\n- ${selected||'Key point'}`;else added=`[${selected||'Link title'}](https://)`;el.setRangeText(added,start,end,'end');el.focus();return}
 }
-async function handleChange(e){const el=e.target;
+async function handleChange(e){if(await window.SELFCareerPhase2?.change?.(e))return;const el=e.target;
 if(el.dataset.stageTaskId){await moveTaskStatus(el.dataset.stageTaskId,el.value);return}
 if(el.id==='filter-status'){state.filterStatus=el.value;render();return}
 if(el.id==='filter-space'){state.filterSpace=el.value;render();return}
@@ -347,6 +347,35 @@ async function signBoardImage(path){
  return SUPABASE_URL+(signed.startsWith('/storage/v1/')?'':'/storage/v1')+(signed.startsWith('/')?'':'/')+signed;
 }
 
-window.SELFCareer?.init?.({state:()=>state,render,navigate:go,request,insert,patch,del,notify:toast,icon:ic,newTask:()=>{state.newTaskSpace='';state.modal='task';render()}});
+
+function validateCareerDocument(file){
+ const allowed=['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+ return !!file&&file.size>0&&file.size<=8*1024*1024&&allowed.includes(file.type)&&
+ (file.type==='application/pdf'?/\.pdf$/i:/\.docx$/i).test(file.name||'');
+}
+async function uploadCareerDocument(file){
+ if(!validateCareerDocument(file))throw new Error('Choose PDF or DOCX, maximum 8 MB.');
+ if(!state.session?.access_token||!state.user?.id)throw new Error('Sign in to upload your CV.');
+ const ext=file.type==='application/pdf'?'pdf':'docx';
+ const path=state.user.id+'/'+crypto.randomUUID()+'.'+ext;
+ const uri=SUPABASE_URL+'/storage/v1/object/self-career-documents/'+path.split('/').map(encodeURIComponent).join('/');
+ const perform=async token=>fetch(uri,{method:'POST',headers:{apikey:PUBLIC_KEY,Authorization:'Bearer '+token,
+  'Content-Type':file.type,'x-upsert':'false'},body:file});
+ let response=await perform(state.session.access_token);
+ if(response.status===401&&await refresh())response=await perform(state.session.access_token);
+ if(!response.ok){const d=await response.json().catch(()=>({message:response.statusText}));throw new Error(d.message||d.error||'Upload failed')}
+ return path;
+}
+async function signCareerDocument(path){
+ if(!state.user?.id||!path?.startsWith(state.user.id+'/'))throw new Error('Document does not belong to your account.');
+ const data=await request('/storage/v1/object/sign/self-career-documents/'+path.split('/').map(encodeURIComponent).join('/'),
+  {method:'POST',body:{expiresIn:300}});
+ const signed=data?.signedURL||data?.signedUrl;
+ if(!signed)throw new Error('Could not create a private document link.');
+ if(signed.startsWith('https://'))return signed;
+ return SUPABASE_URL+(signed.startsWith('/storage/v1/')?'':'/storage/v1')+(signed.startsWith('/')?'':'/')+signed;
+}
+
+window.SELFCareer?.init?.({state:()=>state,render,navigate:go,request,insert,patch,del,notify:toast,icon:ic,newTask:()=>{state.newTaskSpace='';state.modal='task';render()},openTask:id=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},reloadCore:loadAll,uploadDocument:uploadCareerDocument,signDocument:signCareerDocument,validateDocument:validateCareerDocument});
 window.SELFBoards?.init?.({state:()=>state,render,navigate:go,uploadImage:uploadBoardImage,signImage:signBoardImage,openTask:(id)=>{window.SELFBoards.ui.selected?.clear?.();state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
 verifySession();

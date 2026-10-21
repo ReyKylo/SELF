@@ -79,7 +79,7 @@ function careerOverview(){
  return '<div class="career-two-col">'+
  '<section class="career-card career-card-tall">'+sectionHead('Career focus','Your career work connects to SELF, not a second task system.',
  button('Open My Work ↗','go-work'))+
- '<div class="career-focus-message"><strong>Next actions live in My Work.</strong><p>Career follow-up associations arrive in Phase 2. Until then, keep reminders in the existing Tasks system.</p>'+
+ '<div class="career-focus-message"><strong>Next actions live in My Work.</strong><p>Follow-ups linked to Career are still canonical SELF Tasks. Review and complete them through My Work.</p>'+
  taskHref('Review your tasks')+'</div></section>'+
  '<section class="career-card career-card-tall">'+sectionHead('Active applications','Your manually tracked hiring pipeline.',
  button('See pipeline →','page', 'data-page="applications"'))+
@@ -188,7 +188,8 @@ function drawerMarkup(){
  '<div class="career-drawer-scroll"><span class="career-eyebrow">Original record · saved privately</span>'+
  '<h2>'+h(row.name||row.full_name||row.role_title)+'</h2>'+related+
  recordForm(which.kind,row,'edit')+
- '<p class="career-drawer-note">Career status is separate from SELF Task status. Follow-up links arrive in Phase 2.</p></div></aside></div>';
+ (window.SELFCareerPhase2?.renderDrawer?.(which.kind,row)||'')+
+ '<p class="career-drawer-note">Career status and Task status remain independent, with explicit links between records.</p></div></aside></div>';
 }
 function render(){
  if(!host)return '<p>Career unavailable.</p>';
@@ -203,14 +204,14 @@ function render(){
  if(ui.loading&&!ui.ready)main=empty('Opening Career…','Loading your private records.');
  else if(ui.error&&!ui.ready)main=empty('Career could not load',ui.error,primary('Retry loading','retry'));
  else if(selected==='overview')main=careerOverview();
- else if(selected==='applications')main=careerApplications();
- else if(selected==='people')main=careerPeople();
+ else if(selected==='applications')main=window.SELFCareerPhase2?.renderApplications?.()||careerApplications();
+ else if(selected==='people')main=window.SELFCareerPhase2?.renderPeople?.()||careerPeople();
  else if(selected==='companies')main=careerCompanies();
  else if(selected==='radar')main=careerRadar();
- else if(selected==='cvs')main=future('CV Library','Version management and private attachments.','Phase 2');
- else if(selected==='interviews')main=future('Interview Prep','Linked sessions and preparation workflows.','Phase 2');
- else if(selected==='templates')main=future('Templates','Reusable messages and cover letter drafts.','Phase 2');
- else main=careerReminders();
+ else if(selected==='cvs')main=window.SELFCareerPhase2?.renderCVs?.()||future('CV Library','Version management and private attachments.','Phase 2');
+ else if(selected==='interviews')main=window.SELFCareerPhase2?.renderInterviews?.()||future('Interview Prep','Linked sessions and preparation workflows.','Phase 2');
+ else if(selected==='templates')main=window.SELFCareerPhase2?.renderTemplates?.()||future('Templates','Reusable messages and cover letter drafts.','Phase 2');
+ else main=window.SELFCareerPhase2?.renderReminders?.()||careerReminders();
  return '<div class="career-workspace">'+nav+
  '<div class="career-stage"><header class="career-page-head"><div><span class="career-eyebrow">CAREER / '+h(title).toUpperCase()+'</span><h1>'+h(selected==='overview'?'Career Overview':title)+'</h1>'+
  '<p>'+h(selected==='overview'?'Your next steps and actual records. No duplicate to-do system.':'One Career workspace, inside your existing SELF.')+'</p></div>'+
@@ -218,7 +219,7 @@ function render(){
  primary('+ Quick Capture','quick-capture')+'</div></header>'+
  '<div class="career-mobile-sections">'+PAGES.map(([id,label])=>button(label,'page','data-page="'+id+'" class="'+(selected===id?'active':'')+'"')).join('')+'</div>'+
  (ui.error&&ui.ready?'<p class="career-warning">'+h(ui.error)+' '+button('Retry','retry')+'</p>':'')+
- main+'</div>'+modalMarkup()+drawerMarkup()+'</div>';
+ main+'</div>'+modalMarkup()+drawerMarkup()+(window.SELFCareerPhase2?.modalMarkup?.()||'')+'</div>';
 }
 function focusCareerDialog(){
  Promise.resolve().then(()=>document.querySelector?.('.career-capture-choices button:not(:disabled),.career-modal .career-field,.career-drawer .career-field')?.focus?.());
@@ -235,6 +236,8 @@ async function load(){
    host.request('/rest/v1/'+t+'?select=*&order=updated_at.desc')));
   if(gen!==ui.generation)return;
   [ui.companies,ui.people,ui.applications]=tables.map(x=>Array.isArray(x)?x:[]);
+  await window.SELFCareerPhase2?.load?.(ui.owner);
+  if(gen!==ui.generation)return;
   ui.ready=true;ui.error='';
  }catch(e){if(gen!==ui.generation)return;ui.error=e?.message||String(e)}
  finally{if(gen===ui.generation){ui.loading=false;host.render()}}
@@ -246,12 +249,14 @@ function enter(){
   ui.owner=owner;ui.ready=false;ui.loading=false;ui.error='';
   ui.companies=[];ui.people=[];ui.applications=[];
   ui.drawer=null;ui.modal=null;ui.dirty=false;ui.generation++;
+  window.SELFCareerPhase2?.reset?.(owner);
  }
  if(!ui.ready&&!ui.loading)void load();
 }
 function setPage(id){
  if(!PAGES.some(x=>x[0]===id))return;
  if(ui.dirty&&!confirm('Discard unsaved edits?'))return;
+ if(window.SELFCareerPhase2?.beforeNavigate?.()===false)return;
  ui.page=id;ui.drawer=null;ui.modal=null;ui.dirty=false;ui.saveError='';host.render();
 }
 async function save(form){
@@ -315,6 +320,7 @@ async function erase(kind,id){
  }finally{ui.busy=false}
 }
 async function action(e){
+ if(await window.SELFCareerPhase2?.action?.(e))return true;
  const b=e.target.closest?.('[data-career]');
  if(!b)return false;
  e.preventDefault();e.stopPropagation();
@@ -340,11 +346,13 @@ async function action(e){
  return true;
 }
 async function submit(e){
+ if(await window.SELFCareerPhase2?.submit?.(e))return true;
  if(!/^career-(create|edit)$/.test(e.target?.id||''))return false;
  e.preventDefault();e.stopPropagation();
  await save(e.target);return true;
 }
 function input(e){
+ if(window.SELFCareerPhase2?.input?.(e))return true;
  if(!e.target?.closest?.('.career-record-form'))return false;
  ui.dirty=true;ui.saveError='';
  const el=e.target.closest('.career-record-form')?.querySelector('.career-save-note');
@@ -352,6 +360,7 @@ function input(e){
  return true;
 }
 function keydown(e){
+ if(window.SELFCareerPhase2?.keydown?.(e))return true;
  if(e.key!=='Escape'||(!ui.modal&&!ui.drawer))return false;
  e.stopImmediatePropagation?.();e.preventDefault();clearPanel();return true;
 }
@@ -363,5 +372,5 @@ function links(){
   ...ui.applications.filter(x=>safeUrl(x.source_url)).map(x=>({id:x.id,title:x.role_title+' — posting',url:safeUrl(x.source_url),boardName:'Career · Application'}))
  ];
 }
-window.SELFCareer={init(api){host=api},enter,render,action,submit,input,keydown,links,ui};
+window.SELFCareer={init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,ui};
 })();
