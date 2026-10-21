@@ -1,0 +1,45 @@
+{
+  "id": "self-consulting-turnaround-01",
+  "track": "Consulting",
+  "version": "0.1.0",
+  "status": "training-draft",
+  "title": "SajiRasa: recover a collapsing margin without exhausting execution capacity",
+  "decision_question": "Which interventions should the CEO fund within IDR 1,800m upfront and seven execution slots, subject to 90-day evidence gates?",
+  "case_type": "simulated",
+  "historical_cutoff": "2026-10-01",
+  "units": "IDR million except where explicitly labeled",
+  "source_ledger": "source-ledger.md",
+  "exhibits": [
+    "exhibits/01-historical.csv",
+    "exhibits/02-segment-economics.csv",
+    "exhibits/03-operations.csv",
+    "exhibits/04-initiatives.csv",
+    "exhibits/05-market-sizing.csv",
+    "exhibits/06-scenarios.csv"
+  ],
+  "competency_ids": [
+    "CO-01",
+    "CO-02",
+    "CO-03",
+    "CO-04",
+    "CO-05",
+    "CO-06",
+    "CO-07",
+    "CO-08",
+    "CO-09",
+    "CO-10",
+    "CO-11",
+    "CO-12"
+  ],
+  "learner_tasks": "learner-tasks.md",
+  "tutor_guide": "tutor-guide.md",
+  "assessment": "assessment.md",
+  "work_products": [
+    "Driver-based spreadsheet with profit bridge and scenario model",
+    "Six-slide CEO decision deck",
+    "90-day experiment plan and executive defense"
+  ],
+  "review_status": "unreviewed",
+  "solution_disclosure": "Training calculations and test assertions exist; no sealed independent answer key is shipped into browser-served case content",
+  "integration": "unregistered; Integrator-only changes to shared career-learning.json and application code"
+}
