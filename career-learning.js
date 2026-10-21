@@ -131,6 +131,15 @@ async function downloadStarter(id,kind){
   blobDownload(bytes,asset.filename,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   return;
  }
+ if(kind==='pdf'){
+  const bytes=window.SELFCareerKits?.pdfBrief?.(id);if(!bytes||bytes.length<1500)throw Error('Case PDF not available.');
+  blobDownload(bytes,'SELF_'+id+'_Case_Brief.pdf','application/pdf');return;
+ }
+ if(kind==='pptx'){
+  if(id!=='Consulting')throw Error('Deck is only for Consulting Day 3.');
+  const bytes=window.SELFCareerKits?.makeConsultingDeck?.();if(!bytes||bytes.length<5000)throw Error('Editable deck not available.');
+  blobDownload(bytes,'SELF_Consulting_Executive_Deck_Template.pptx','application/vnd.openxmlformats-officedocument.presentationml.presentation');return;
+ }
  if(kind==='brief'){
   const brief='# '+day.title+' — SELF Career Prep\n\n**Independent simulated case — NOT a real investment or client mandate.**\n\n'+day.lesson;
   blobDownload(brief,'SELF_'+id+'_Case_Brief.md','text/markdown;charset=utf-8');return;
@@ -148,7 +157,7 @@ function sprint(){
  '<article class="learning-day-detail"><div class="learning-assignment-head"><div><span class="learning-label">ASSIGNMENT · HARI '+day.day+'</span><h2 id="learning-day-title" tabindex="-1">'+h(day.title)+'</h2><p>'+h(day.summary)+'</p></div><div>'+button(ui.busy?'Memeriksa tugas…':task?'Buka task di My Work':'Tambah proyek ke My Work','task','data-id="'+h(day.id)+'" '+(ui.busy?'disabled':''),true)+'<small class="learning-task-note">'+(task?'Task SELF yang sama; status mengikuti My Work.':'Task dibuat saat lu memilih tombol ini.')+'</small></div></div>'+
  (ui.taskError?'<p class="learning-task-error" role="alert">'+h(ui.taskError)+'</p>':'')+
  '<div class="learning-workflow"><section><h3>01 · SEE</h3><p>Pelajari cara expert menyusun keputusan.</p><div class="learning-related">'+day.panels.map(evidenceButton).join('')+'</div></section><section><h3>02 · WATCH</h3><p>Tonton berurutan. Setelah tiap video, kerjakan hasilnya.</p><div class="learning-related">'+day.videos.map(id=>videoButton(ui.data.videos.find(v=>v.id===id)?.video_id)).join('')+'</div></section></div>'+
- '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief','download','data-id="'+h(day.id)+'" data-kind="brief"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+button(ui.workspace===day.id?'Tutup private workspace':'Buka private workspace','workspace','data-id="'+h(day.id)+'"')+'</div>'+
+ '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief PDF','download','data-id="'+h(day.id)+'" data-kind="pdf"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+(day.id==='Consulting'?button('↓ Editable 6-slide PPTX','download','data-id="'+h(day.id)+'" data-kind="pptx"'):'')+button(ui.workspace===day.id?'Tutup private workspace':'Buka private workspace','workspace','data-id="'+h(day.id)+'"')+'</div>'+
  (ui.workspace===day.id?(window.SELFCareerPortfolio?.render?.(day.id)||''):'')+
  '<section class="learning-lesson"><h3>03 · DO → BUILD → REVIEW</h3><p class="learning-fixture-label">Data fiktif untuk latihan independen. Bukan transaksi atau proyek klien nyata.</p>'+markdown(day.lesson)+'</section></article>'+
  '<div class="learning-download"><a class="career-btn learning-link" href="./content/portfolio-sprint.md" download="SELF_Portfolio_Sprint.md">Download playbook lengkap ↓</a><p>Workbook, memo, dan deck dibuat sendiri dari latihan. Materi tidak menandakan pengalaman deal nyata.</p></div>';
