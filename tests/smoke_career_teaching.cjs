@@ -4,7 +4,7 @@ const root=path.join(__dirname,'..');
 const teaching=JSON.parse(fs.readFileSync(path.join(root,'content/career-teaching.json'),'utf8'));
 const catalog=JSON.parse(fs.readFileSync(path.join(root,'content/career-learning.json'),'utf8'));
 assert.equal(teaching.version,1);assert.equal(teaching.mode,'GUIDED_PRACTICE_ONLY');
-assert.equal(teaching.lessons.length,6);
+assert.equal(teaching.lessons.length,18);
 const counts={PE:0,VC:0,Consulting:0};const ids=new Set();
 for(const l of teaching.lessons){
  assert(!ids.has(l.id),'duplicate lesson id');ids.add(l.id);counts[l.track]++;
@@ -22,14 +22,26 @@ for(const l of teaching.lessons){
  assert(Number.isFinite(l.practice.tolerance)&&l.practice.tolerance>=0);
  assert(!/expert certified|recruiter-approved|actual deal verified/i.test(l.source_notice));
 }
-assert.deepEqual(counts,{PE:2,VC:2,Consulting:2});
+assert.deepEqual(counts,{PE:6,VC:6,Consulting:6});
 const expected={
  'PE-L01':110-73,
  'PE-L02':(260-80+13.54+80+5)-130-(13.54-12),
  'VC-L01':270000*12,
  'VC-L02':(80000-4000-2000+9000)/80000*100,
  'CO-L01':7000-(-1400),
- 'CO-L02':100*1.4*0.8
+ 'CO-L02':100*1.4*0.8,
+ 'PE-L03':250-80+13.54,
+ 'PE-L04':13/12.5,
+ 'PE-L05':(Math.pow(2,1/5)-1)*100,
+ 'PE-L06':300.536-272.566,
+ 'VC-L03':1200/(200*.75),
+ 'VC-L04':900000/300000,
+ 'VC-L05':3/(16+4)*100,
+ 'VC-L06':5000*.04,
+ 'CO-L03':10000-7000-2000,
+ 'CO-L04':2000*.5*.3,
+ 'CO-L05':900/600*12,
+ 'CO-L06':7-3-4
 };
 for(const l of teaching.lessons)assert(Math.abs(l.practice.expected-expected[l.id])<=l.practice.tolerance,l.id+' guided math disagrees with independent answer');
 const aruna=fs.readFileSync(path.join(root,'content/career-cases/pe/exhibits/exhibit-01-historical.csv'),'utf8');
@@ -64,5 +76,5 @@ const mod=ctx.window.SELFCareerTeaching;mod.init(host);mod.reset('u1');
  const builder=fs.readFileSync(path.join(root,'tools/build_cloudflare.py'),'utf8');
  assert(builder.includes('career-teaching.js')&&builder.includes('content/career-teaching.json'));
  assert(!builder.includes('"tests/cases/')&&!builder.includes('"content/career-cases/'),'never ship sealed tests with guided source');
- console.log('PASS Phase3 Guided Masterclass: 6 lessons, original PE/VC/Consulting facts, 6 independent numeric checks, video/evidence mapping, retry/hint/check and account state reset');
+ console.log('PASS Phase3 Guided Masterclass: 18 lessons, original PE/VC/Consulting facts, 18 independent numeric checks, video/evidence mapping, retry/hint/check and account state reset');
 })().catch(e=>{console.error(e);process.exitCode=1});
