@@ -1,7 +1,7 @@
 /* SELF Phase 5 Director Review — local session only; no persisted answer key. */
 (function(){
 'use strict';
-const URL='./content/career-director-review/review-panels.json';
+const CONTENT_URL='./content/career-director-review/review-panels.json';
 const state={owner:null,data:null,error:'',loading:false,track:'PE',initial:'',reference:'',answers:{},twist:'',opposite:'',final:'',step:0,submitted:false};
 let host=null,sequence=0;
 const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -12,7 +12,7 @@ async function load(){
  if(state.loading||state.data)return;
  const seq=++sequence;state.loading=true;state.error='';
  try{
-  const res=await fetch(URL,{cache:'no-cache'});if(!res.ok)throw Error('HTTP '+res.status);
+  const res=await fetch(CONTENT_URL,{cache:'no-cache'});if(!res.ok)throw Error('HTTP '+res.status);
   const data=await res.json();
   if(data.phase!==5||data.tracks?.length!==3||data.tracks.some(t=>t.challenges?.length!==5))throw Error('Case format invalid');
   if(seq===sequence)state.data=data;
