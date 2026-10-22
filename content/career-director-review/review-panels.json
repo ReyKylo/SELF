@@ -1,0 +1,220 @@
+{
+  "schema_version": "1.0.0",
+  "program": "SELF Career Prep",
+  "phase": 5,
+  "title": "Director Review",
+  "status": "content-ready-integration-pending",
+  "simulation_notice": "All companies and challenge twists are simulated educational scenarios; no real investment advice or recruiter endorsement.",
+  "rubric": [
+    {
+      "id": "technical",
+      "points": 30
+    },
+    {
+      "id": "judgment",
+      "points": 25
+    },
+    {
+      "id": "evidence",
+      "points": 20
+    },
+    {
+      "id": "risk",
+      "points": 15
+    },
+    {
+      "id": "communication",
+      "points": 10
+    }
+  ],
+  "critical_gates": [
+    "unreconciled_financials",
+    "ev_equity_conflation",
+    "units_or_period_mismatch",
+    "fabricated_source",
+    "double_counting",
+    "hindsight_leakage"
+  ],
+  "tracks": [
+    {
+      "id": "PE",
+      "case": "Aruna Supply",
+      "reviewer_role": "Investment Committee Chair",
+      "opening": "Approve the acquisition, reprice it, or stop? State a price ceiling and two approval conditions.",
+      "challenges": [
+        {
+          "id": "PE-D1",
+          "prompt": "EBITDA looks healthy. Walk me from earnings to the cash actually available for debt service, including working capital and minimum cash. Which figure is not an acceptable shortcut?",
+          "evidence": [
+            "historical cash conversion",
+            "working capital",
+            "cash floor"
+          ]
+        },
+        {
+          "id": "PE-D2",
+          "prompt": "Reconcile enterprise value, seller equity proceeds and total Sources & Uses; why does the seller not receive the full enterprise value?",
+          "evidence": [
+            "EV bridge",
+            "old debt",
+            "existing cash",
+            "fees"
+          ]
+        },
+        {
+          "id": "PE-D3",
+          "prompt": "Our exit multiple falls and debt repayment slows. Which driver most threatens IRR? Show downside mechanics, not just a label.",
+          "evidence": [
+            "5-year forecast",
+            "debt roll-forward",
+            "exit sensitivity"
+          ]
+        },
+        {
+          "id": "PE-D4",
+          "prompt": "Give me your maximum justifiable entry bid for a stated hurdle. How would a higher entry price alter sponsor equity and returns?",
+          "evidence": [
+            "maximum-bid sensitivity",
+            "financing assumptions"
+          ]
+        },
+        {
+          "id": "PE-D5",
+          "prompt": "What covenant, interest burden or liquidity event would make your preferred transaction unfinanceable despite modelled upside?",
+          "evidence": [
+            "downside liquidity",
+            "coverage",
+            "covenants"
+          ]
+        }
+      ],
+      "twist": {
+        "announcement": "SIMULATED NEW INFO: the target's next-quarter receivables collection is slower than management previously assumed; free cash available for debt repayment is lower.",
+        "task": "State which cash/credit assumptions change, rerun or bound debt-service capacity, and revise the offer or diligence gates. Do not invent a numeric deterioration."
+      }
+    },
+    {
+      "id": "VC",
+      "case": "ArusOps",
+      "reviewer_role": "VC Investment Partner",
+      "opening": "Invest, pass or request diligence? Name investment terms and falsifiable milestones.",
+      "challenges": [
+        {
+          "id": "VC-D1",
+          "prompt": "ARR is rising. Is growth coming from healthy retention or replacing customers who churn? Reconcile same-age cohorts and NRR versus GRR.",
+          "evidence": [
+            "monthly recurring revenue",
+            "age-aligned cohorts",
+            "NRR/GRR"
+          ]
+        },
+        {
+          "id": "VC-D2",
+          "prompt": "Show the customer acquisition payback in gross-profit terms. What would happen if gross margin or churn worsened?",
+          "evidence": [
+            "CAC acquisition spend",
+            "gross profit payback",
+            "churn"
+          ]
+        },
+        {
+          "id": "VC-D3",
+          "prompt": "We fund this round; what is the post-money stake, and what changes after the next round of dilution?",
+          "evidence": [
+            "pre/post-money cap table",
+            "option pool",
+            "future financing"
+          ]
+        },
+        {
+          "id": "VC-D4",
+          "prompt": "At two exit values, whose money is returned first under the preferred equity terms? Compare actual investor proceeds to headline percentage ownership.",
+          "evidence": [
+            "liquidation preference",
+            "waterfall",
+            "investor proceeds"
+          ]
+        },
+        {
+          "id": "VC-D5",
+          "prompt": "If the sales plan misses for two quarters, when does runway become a problem, and what measured milestones justify the next cheque?",
+          "evidence": [
+            "net burn",
+            "cash runway",
+            "funding milestones"
+          ]
+        }
+      ],
+      "twist": {
+        "announcement": "SIMULATED NEW INFO: a new sales cohort shows weaker gross retention than earlier cohorts, without reliable evidence on long-run expansion.",
+        "task": "Explain what cannot be inferred from a young cohort, stress the cash runway and CAC recovery, and update the invest/pass/diligence decision."
+      }
+    },
+    {
+      "id": "CONSULTING",
+      "case": "SajiRasa",
+      "reviewer_role": "CEO / Steering Committee",
+      "opening": "Which intervention should management conditionally authorize under the cash and execution constraints, and how will we tell if it works?",
+      "challenges": [
+        {
+          "id": "CO-D1",
+          "prompt": "Operating profit is collapsing: quantify the price, volume/mix, unit-cost and fixed-cost bridge, and identify which items are still hypotheses about root causes.",
+          "evidence": [
+            "segment economics",
+            "profit bridge",
+            "causality log"
+          ]
+        },
+        {
+          "id": "CO-D2",
+          "prompt": "You put 2026 run-rate next to 2025 actual. What exactly is comparable and what cannot you claim about FY2026?",
+          "evidence": [
+            "annualized period convention",
+            "baseline"
+          ]
+        },
+        {
+          "id": "CO-D3",
+          "prompt": "Why not simply pick initiatives A and B together? Show cash and slots, and explain overlaps for viable combinations.",
+          "evidence": [
+            "1800m cash cap",
+            "seven slots",
+            "initiative interactions"
+          ]
+        },
+        {
+          "id": "CO-D4",
+          "prompt": "How much of the suggested benefit is recurring annual run-rate versus cash within 90 days? What ramp or operational evidence is missing?",
+          "evidence": [
+            "recurring annual benefit",
+            "one-time spend",
+            "implementation ramp"
+          ]
+        },
+        {
+          "id": "CO-D5",
+          "prompt": "What should the COO and CFO each track during the 90-day pilot, and which measured trigger would force a stop rather than scale?",
+          "evidence": [
+            "ownership",
+            "leading KPIs",
+            "kill/scale criteria"
+          ]
+        }
+      ],
+      "twist": {
+        "announcement": "SIMULATED NEW INFO: an initial supplier pilot has unfavorable quality-return signals, though the modeled unit-cost saving remains feasible on paper.",
+        "task": "Revise causal confidence, customer experience risk, pilot gates, and intervention sequencing; do not invent a statistically confirmed quality effect."
+      }
+    }
+  ],
+  "submission_fields": [
+    "original_recommendation",
+    "original_model_reference",
+    "facts_assumptions_unknowns",
+    "challenge_responses",
+    "counterfactual_recommendation",
+    "red_team_case",
+    "final_decision_ask",
+    "reviewer_scores"
+  ]
+}
