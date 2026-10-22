@@ -1,0 +1,64 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(__dirname,'..');
+const js=fs.readFileSync(path.join(root,'career-pe-projection.js'),'utf8');
+const ctx={window:{},console,URL,Number,Object};
+vm.createContext(ctx);vm.runInContext(js,ctx);
+const m=ctx.window.SELFPEProjection;assert(m);
+const approx=(a,b,n)=>assert(Math.abs(a-b)<1e-7,n+' expected '+b+' got '+a);
+approx(m.entryEquity(),160,'entry sponsor cash');
+const base=m.summary('base'),down=m.summary('downside');
+approx(base.rows[4].ebitda,69.5996709408,'base exit EBITDA');
+approx(base.rows[4].term,50.75525033896,'base exit term debt');
+approx(base.rows[4].cash,30.20758918805,'base exit cash');
+approx(base.exitProceeds,466.65003543468,'base exit equity');
+approx(base.rows[0].dscr,1.02338403756,'base FY26 lender cover');
+approx(base.irr,.23872317872716,'base IRR');
+assert(base.covenantsPass,'base covenants pass');
+approx(down.totalRescue,12.17875729621,'downside rescue');
+approx(down.rows[1].revolver,25,'downside revolver cap');
+assert(!down.covenantsPass,'downside covenant breach');
+approx(down.exitProceeds,223.2725962455,'downside exit equity');
+approx(down.irr,.05565433354354,'downside rescue-adjusted IRR');
+assert.equal(m.project('base').length,5);
+assert.equal(m.project('downside').length,5);
+assert.throws(()=>m.project('other'),/Unknown scenario/);
+for(const [name,sum] of [['base',base],['downside',down]]){
+ assert.equal(sum.rows.length,5);
+ for(const [i,y] of sum.rows.entries()){
+  assert.equal(y.year,2026+i);
+  assert(y.term>=0 && y.revolver>=0 && y.revolver<=25+1e-7);
+  assert(y.cash>=12-1e-7);
+  assert(Number.isFinite(y.cfads)&&Number.isFinite(y.dscr));
+ }
+}
+let renders=0;m.init({render(){renders++}});
+m.reset('owner-1');assert(m.render().includes('Debt Service Coverage Ratio'));
+const table=m.cells();assert.equal(table.length,7);
+for(const c of table)m.state.values[c.id]=String(c.v);
+assert(m.grade(),'correct base checkpoints');
+m.state.values.irr='100';
+assert(!m.grade(),'mutated IRR must fail');
+m.state.values.irr=String(table.find(c=>c.id==='irr').v);
+assert(m.grade());
+function press(name,scenario){m.action({target:{closest:()=>({dataset:{peModel:name,scenario}})},preventDefault(){},stopPropagation(){}})}
+press('scenario','downside');
+assert.equal(m.state.scenario,'downside');
+assert.equal(Object.keys(m.state.values).length,0);
+assert(!m.grade(),'blank downside cells must fail');
+for(const c of m.cells())m.state.values[c.id]=String(c.v);
+assert(m.grade(),'correct downside cells');
+m.reset('owner-2');assert.equal(Object.keys(m.state.values).length,0,'switching accounts clears entries');
+assert.equal(m.state.scenario,'base');
+assert(renders>=1,'host receives redraw after actions');
+const historical=fs.readFileSync(path.join(root,'content/career-cases/pe/exhibits/exhibit-01-historical.csv'),'utf8');
+const drivers=fs.readFileSync(path.join(root,'content/career-cases/pe/exhibits/exhibit-04-forecast-drivers.csv'),'utf8');
+assert(historical.includes('2025,345,252,54,39'));
+assert(drivers.includes('base,2030,0.07,0.130,0.230,18,13,0.11,7'));
+assert(drivers.includes('downside,2026,0.03,0.102,0.340,13,9,0.13,7'));
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const build=fs.readFileSync(path.join(root,'tools/build_cloudflare.py'),'utf8');
+assert(html.includes('src="./career-pe-projection.js"'));
+assert(build.includes('"career-pe-projection.js"'));
+assert(!build.includes('"content/career-cases/'),'review keys cannot become public assets');
+console.log('PASS PE five-year projection: sourced 2026-30 base/downside, cash/debt/rescue, loan covenants, IRR/MOIC, 7 learner checkpoints and state isolation');
