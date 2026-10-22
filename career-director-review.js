@@ -27,7 +27,8 @@ function render(){
  const total=t.challenges.length,challenge=t.challenges[Math.min(state.step,total-1)];
  const header='<div class="lab-intro"><span class="learning-label">PHASE 5 · DIRECTOR REVIEW · SIMULATED</span><h2>Defend your decision.</h2><p>Latihan mengambil keputusan di bawah tekanan. Ini bukan penilaian otomatis atau sertifikasi profesional. Jawaban tersimpan hanya selama sesi halaman ini.</p></div>';
  const selector='<div class="lab-facts">'+state.data.tracks.map(x=>'<button class="career-btn" data-director-action="track" data-track="'+h(x.id)+'" aria-pressed="'+(t.id===x.id)+'" '+(state.submitted?'disabled title="Reset untuk mengganti kasus"':'')+'>'+h(x.id)+' · '+h(x.case)+'</button>').join('')+'</div>';
- const controls='<div class="lab-controls"><button class="career-btn" data-director-action="export">Export dossier (.txt)</button><button class="career-btn" data-director-action="reset">Reset review</button></div>';
+ const exportReady=state.submitted&&state.step===5&&state.twist.trim()&&state.opposite.trim()&&state.final.trim();
+ const controls='<div class="lab-controls"><button class="career-btn" data-director-action="export" '+(exportReady?'':'disabled title="Complete all five defenses and final reflections first"')+'>Export dossier (.txt)</button><button class="career-btn" data-director-action="reset">Reset review</button></div>';
  if(!state.submitted)return header+'<article class="career-card"><h3>Pilih investment / strategy case</h3>'+selector+'<p><strong>'+h(t.reviewer_role)+'</strong>: '+h(t.opening)+'</p>'+field('initial','Initial recommendation (wajib)',state.initial,'Decision, approval terms and main risks…')+field('reference','Exhibit / model references (wajib)',state.reference,'Quote the figures, units and evidence files you actually used.')+'<button class="career-btn career-primary" data-director-action="submit" '+(!state.initial.trim()||!state.reference.trim()?'disabled':'')+'>Lock initial recommendation →</button><p>Keputusan awal dikunci agar perubahan setelah tantangan bisa dilihat. Jangan masukkan data pribadi.</p></article>';
  const lock='<section class="career-card"><span class="learning-label">LOCKED ORIGINAL DECISION</span><p>'+h(state.initial)+'</p><small>Evidence: '+h(state.reference)+'</small></section>';
  let main='';
@@ -49,7 +50,7 @@ function action(event){
  if(a==='next'&&state.step<5&&(state.answers[t.challenges[state.step].id]||'').trim())state.step++;
  if(a==='back')state.step=Math.max(0,state.step-1);
  if(a==='reset'){const owner=state.owner;reset(owner);void load()}
- if(a==='export')exportFile();
+ if(a==='export'&&state.step===5&&state.twist.trim()&&state.opposite.trim()&&state.final.trim())exportFile();
  host?.render?.();return true;
 }
 function input(event){
@@ -61,7 +62,7 @@ function input(event){
 }
 function change(event){const key=event.target?.dataset?.directorField;if(!key)return false;host?.render?.();return true}
 function exportFile(){
- const t=pick();if(!t||!state.submitted)return;
+ const t=pick();if(!t||!state.submitted||state.step!==5||!state.twist.trim()||!state.opposite.trim()||!state.final.trim())return;
  const blocks=['SELF DIRECTOR REVIEW | SIMULATED',t.case,'Track: '+t.id,'ORIGINAL DECISION\n'+state.initial,'MODEL EVIDENCE\n'+state.reference,...t.challenges.map(c=>c.id+' '+c.prompt+'\n'+(state.answers[c.id]||'[unanswered]')),'NEW INFO\n'+t.twist.announcement,'REASSESSMENT\n'+state.twist,'RED TEAM\n'+state.opposite,'FINAL DECISION\n'+state.final,'Reviewer rubric: technical 30 | judgment 25 | evidence 20 | risk 15 | communication 10','Not auto-graded; confirm source evidence independently.'];
  const blob=new Blob([blocks.join('\n\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='SELF_Director_Review_'+t.id+'.txt';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
 }
