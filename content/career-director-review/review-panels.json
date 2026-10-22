@@ -49,8 +49,7 @@
             "historical cash conversion",
             "working capital",
             "cash floor"
-          ],
-          "trap": "EBITDA is not free cash flow"
+          ]
         },
         {
           "id": "PE-D2",
@@ -60,8 +59,7 @@
             "old debt",
             "existing cash",
             "fees"
-          ],
-          "trap": "EV is not equity proceeds"
+          ]
         },
         {
           "id": "PE-D3",
@@ -70,8 +68,7 @@
             "5-year forecast",
             "debt roll-forward",
             "exit sensitivity"
-          ],
-          "trap": "IRR differs from MOIC"
+          ]
         },
         {
           "id": "PE-D4",
@@ -79,8 +76,7 @@
           "evidence": [
             "maximum-bid sensitivity",
             "financing assumptions"
-          ],
-          "trap": "Entry-price sensitivity must use consistent deal funding"
+          ]
         },
         {
           "id": "PE-D5",
@@ -89,8 +85,7 @@
             "downside liquidity",
             "coverage",
             "covenants"
-          ],
-          "trap": "Balanced Sources & Uses does not establish creditworthiness"
+          ]
         }
       ],
       "twist": {
@@ -111,8 +106,7 @@
             "monthly recurring revenue",
             "age-aligned cohorts",
             "NRR/GRR"
-          ],
-          "trap": "Cross-age cohorts cannot be compared as if identical"
+          ]
         },
         {
           "id": "VC-D2",
@@ -121,8 +115,7 @@
             "CAC acquisition spend",
             "gross profit payback",
             "churn"
-          ],
-          "trap": "Revenue is not gross profit"
+          ]
         },
         {
           "id": "VC-D3",
@@ -131,8 +124,7 @@
             "pre/post-money cap table",
             "option pool",
             "future financing"
-          ],
-          "trap": "Post-money ownership is not permanent"
+          ]
         },
         {
           "id": "VC-D4",
@@ -141,8 +133,7 @@
             "liquidation preference",
             "waterfall",
             "investor proceeds"
-          ],
-          "trap": "Stake multiplied by exit EV can misstate proceeds"
+          ]
         },
         {
           "id": "VC-D5",
@@ -151,8 +142,7 @@
             "net burn",
             "cash runway",
             "funding milestones"
-          ],
-          "trap": "Profitability forecasts are not current cash"
+          ]
         }
       ],
       "twist": {
@@ -173,8 +163,7 @@
             "segment economics",
             "profit bridge",
             "causality log"
-          ],
-          "trap": "Arithmetic attribution is not causal proof"
+          ]
         },
         {
           "id": "CO-D2",
@@ -182,8 +171,7 @@
           "evidence": [
             "annualized period convention",
             "baseline"
-          ],
-          "trap": "2026 annualized is not audited 2026 actual"
+          ]
         },
         {
           "id": "CO-D3",
@@ -192,8 +180,7 @@
             "1800m cash cap",
             "seven slots",
             "initiative interactions"
-          ],
-          "trap": "A+B costs 2150m and consumes eight slots"
+          ]
         },
         {
           "id": "CO-D4",
@@ -202,8 +189,7 @@
             "recurring annual benefit",
             "one-time spend",
             "implementation ramp"
-          ],
-          "trap": "Annualized impact is not first-90-days cash"
+          ]
         },
         {
           "id": "CO-D5",
@@ -212,8 +198,7 @@
             "ownership",
             "leading KPIs",
             "kill/scale criteria"
-          ],
-          "trap": "A roadmap without thresholds cannot prove success"
+          ]
         }
       ],
       "twist": {
