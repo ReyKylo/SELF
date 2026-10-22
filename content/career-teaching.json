@@ -3,7 +3,7 @@
   "phase": "3-expert-teaching",
   "mode": "GUIDED_PRACTICE_ONLY",
   "released_on": "2026-10-22",
-  "description": "18 guided lessons across PE VC Consulting; arithmetic exercises are disclosed guided drills, not sealed assessment. Some competencies are mapped in multi-skill lessons and require independent defense beyond this module.",
+  "description": "18 lessons with numeric practice AND new applied concept-transfer scenario per lesson, each requiring analogy → named professional term → evidence → practice → explanation; both checks are guided coaching, not blind assessment.",
   "privacy": "Do not bundle tests/cases/** reviewer keys; don't claim automated Excel auditing.",
   "lessons": [
     {
@@ -39,7 +39,19 @@
       "build_output": "Tambahkan working-capital schedule 2023–2025 dan bridge EBITDA→CFO ke workbook Aruna.",
       "director_challenge": "Jika laba naik dan CFO negatif, data penagihan dan persediaan apa yang perlu diminta sebelum membeli perusahaan?",
       "recall": "Besok: jelaskan mengapa EBITDA Rp39 miliar bisa terjadi bersamaan dengan CFO negatif tanpa melihat tutor.",
-      "source_notice": "Kasus Aruna seluruhnya SIMULATED; screenshot expert adalah professional worked model, bukan laporan Aruna."
+      "source_notice": "Kasus Aruna seluruhnya SIMULATED; screenshot expert adalah professional worked model, bukan laporan Aruna.",
+      "transfer": {
+        "question": "EBITDA naik, tetapi piutang dan persediaan tumbuh lebih cepat. Langkah analisis mana paling tepat?",
+        "options": [
+          "Anggap EBITDA otomatis menjadi uang tunai",
+          "Reconcile EBITDA ke CFO dan periksa perubahan working capital",
+          "Langsung menaikkan exit multiple"
+        ],
+        "correct_index": 1,
+        "explanation": "Working capital menyerap kas tanpa harus menurunkan EBITDA; rekonsiliasi CFO lebih tepat daripada menyimpulkan penyebab tanpa bukti.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "PE-L02",
@@ -74,7 +86,19 @@
       "build_output": "Buat transaction Sources & Uses dan EV-to-equity bridge dengan input EV yang bisa diubah.",
       "director_challenge": "Jika kas Rp13.54bn ada di target, mengapa sponsor tidak boleh memakai seluruhnya untuk menutup transaksi?",
       "recall": "Tanpa melihat contoh: bedakan EV, seller equity proceeds, debt refinance dan equity contribution.",
-      "source_notice": "Angka transaksi Aruna fiktif; preview Wall Street Prep adalah contoh modeling terpisah."
+      "source_notice": "Angka transaksi Aruna fiktif; preview Wall Street Prep adalah contoh modeling terpisah.",
+      "transfer": {
+        "question": "Sources & Uses seimbang. Apakah otomatis transaksi aman bagi kreditur?",
+        "options": [
+          "Ya, karena tidak ada funding gap",
+          "Belum; masih harus uji likuiditas, coverage dan risiko pembayaran utang",
+          "Ya, bila sponsor equity besar"
+        ],
+        "correct_index": 1,
+        "explanation": "Sources & Uses hanya membuktikan kebutuhan pendanaan seimbang; kemampuan membayar utang merupakan pengujian berbeda.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "VC-L01",
@@ -108,7 +132,19 @@
       "build_output": "Pisahkan live MRR/ARR dan booked-not-live pipeline di traction sheet; jangan double-count setup fee.",
       "director_challenge": "Apa yang terjadi jika 25% kontrak backlog batal go-live? Apakah live ARR historis September berubah?",
       "recall": "Besok: definisikan bookings, contracted ARR, live ARR, recognized revenue dan cash collection.",
-      "source_notice": "ArusOps adalah SIMULATED; grafik Shopify dari Bessemer menunjukkan data historis Shopify, bukan ArusOps."
+      "source_notice": "ArusOps adalah SIMULATED; grafik Shopify dari Bessemer menunjukkan data historis Shopify, bukan ArusOps.",
+      "transfer": {
+        "question": "Startup melaporkan $5m 'ARR' termasuk $1m kontrak belum live. Untuk underwriting live ARR?",
+        "options": [
+          "Pakai $5m sebagai live ARR",
+          "Pisahkan $1m bookings dari $4m live ARR",
+          "Hitung booked ARR sebagai cash collection"
+        ],
+        "correct_index": 1,
+        "explanation": "Booked-not-live bisa ditunjukkan sebagai pipeline, tetapi tidak boleh digabungkan dengan live ARR.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "VC-L02",
@@ -143,7 +179,19 @@
       "build_output": "Bangun bridge GRR dan NRR, serta tabel retention berdasarkan usia cohort yang sama.",
       "director_challenge": "Jika NRR 103.75% tetapi banyak pelanggan kecil berhenti, apakah investasinya otomatis bagus?",
       "recall": "Tanpa catatan: jelaskan NRR, GRR dan logo retention; tunjukkan perbedaan denominator.",
-      "source_notice": "ArusOps adalah SIMULATED. Exhibit PagerDuty adalah growth metric asli Bessemer; bukan cohort ArusOps dan bukan bukti kualitas ArusOps."
+      "source_notice": "ArusOps adalah SIMULATED. Exhibit PagerDuty adalah growth metric asli Bessemer; bukan cohort ArusOps dan bukan bukti kualitas ArusOps.",
+      "transfer": {
+        "question": "NRR 105% tetapi logo retention buruk. Apa pertanyaan paling bernilai?",
+        "options": [
+          "Apakah ekspansi dari sedikit pelanggan besar menutupi churn logo?",
+          "Berarti churn pasti nol",
+          "Berarti semua pelanggan lebih bahagia"
+        ],
+        "correct_index": 0,
+        "explanation": "NRR di atas 100% bisa terjadi karena expansion pelanggan yang tinggal, walau logo churn tinggi.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "CO-L01",
@@ -179,7 +227,19 @@
       "build_output": "Bangun bridge FY2025→2026 annualized dengan volume, price, unit cost dan overhead; angka total wajib reconcile.",
       "director_challenge": "Apakah kita sudah tahu penyebab penurunan volume, atau baru mengukur kontribusinya ke laba?",
       "recall": "Besok: jelaskan bedanya profit bridge, hypothesis, root cause dan verified causal evidence.",
-      "source_notice": "Electro-Light McKinsey adalah official practice case terpisah; angka SajiRasa adalah SIMULATED dan tidak berasal dari McKinsey."
+      "source_notice": "Electro-Light McKinsey adalah official practice case terpisah; angka SajiRasa adalah SIMULATED dan tidak berasal dari McKinsey.",
+      "transfer": {
+        "question": "Profit bridge menjelaskan volume menyumbang 60% penurunan laba. Apakah root cause sudah diketahui?",
+        "options": [
+          "Ya, pelanggan pasti sensitif harga",
+          "Belum; perlu uji apa yang menyebabkan volume berubah",
+          "Ya, supplier pasti salah"
+        ],
+        "correct_index": 1,
+        "explanation": "Driver arithmetic tidak membuktikan penyebab perilaku pelanggan atau operasi.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "CO-L02",
@@ -215,7 +275,19 @@
       "build_output": "Buat initiative model dengan overlap eksplisit, pembatas budget dan execution slots serta deck slide quantified impact.",
       "director_challenge": "Apakah A+C masih opsi terbaik bila C juga mengurangi kapasitas distribusi yang selama ini menghasilkan volume?",
       "recall": "Besok: jelaskan counterfactual, interaction effect, double counting, dan apa arti incremental profit.",
-      "source_notice": "Angka SajiRasa adalah SIMULATED; review source Oliver Wyman adalah practice case berbeda, bukan laporan proyek SajiRasa."
+      "source_notice": "Angka SajiRasa adalah SIMULATED; review source Oliver Wyman adalah practice case berbeda, bukan laporan proyek SajiRasa.",
+      "transfer": {
+        "question": "Dua inisiatif masing-masing tampak menghemat Rp200m pada basis volume sama. Cara menghitung total?",
+        "options": [
+          "Tambah otomatis jadi Rp400m",
+          "Hapus salah satu tanpa analisis",
+          "Periksa overlap volume dan interaction effects sebelum menjumlah"
+        ],
+        "correct_index": 2,
+        "explanation": "Gabungan harus memakai counterfactual basis yang telah disesuaikan agar tidak double-count.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "PE-L03",
@@ -250,7 +322,19 @@
       "build_output": "Buat EV-to-equity bridge terpisah dan label seluruh komponen.",
       "director_challenge": "Apakah cash Rp13.54bn seluruhnya benar-benar dapat dipakai tanpa mengancam likuiditas?",
       "recall": "Jelaskan tiga perbedaan EV, equity value, dan sponsor equity cheque.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "EV turun tetapi utang dan kas tetap. Apa yang berubah terlebih dahulu?",
+        "options": [
+          "Seller equity value turun",
+          "Debt hilang dari balance sheet otomatis",
+          "Pendapatan meningkat"
+        ],
+        "correct_index": 0,
+        "explanation": "EV-to-equity bridge menjaga penyesuaian net debt. Penurunan EV mengurangi nilai ekuitas seller, faktor lain tetap.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "PE-L04",
@@ -285,7 +369,19 @@
       "build_output": "Bangun debt roll-forward, covenant headroom, dan skenario kas minimum.",
       "director_challenge": "Apa yang terjadi bila piutang tertagih terlambat dan covenant gagal?",
       "recall": "Definisikan DSCR dan mengapa numerator harus disepakati dengan kreditur.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "DSCR 1.04x dan satu pelanggan besar terlambat membayar. Sikap investment analyst?",
+        "options": [
+          "Anggap coverage pasti aman karena di atas 1",
+          "Uji downside CFADS, covenant dan buffer kas",
+          "Abaikan kas karena EBITDA positif"
+        ],
+        "correct_index": 1,
+        "explanation": "Coverage 1.04x menyisakan buffer kecil; uji skenario gagal bayar dan aturan covenant sebenarnya.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "PE-L05",
@@ -320,7 +416,19 @@
       "build_output": "Buat IRR dan MOIC berbasis tanggal/tahun serta kasus sponsor rescue.",
       "director_challenge": "Jika exit MOIC naik tapi investor menyuntik modal lagi, bagaimana cara menghitung IRR yang benar?",
       "recall": "Apa dua alasan IRR dan MOIC bisa memberi kesan berbeda?",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "Dua deal sama-sama MOIC 2x, satu exit 3 tahun dan satu 8 tahun. Kesimpulan?",
+        "options": [
+          "IRR keduanya pasti sama",
+          "IRR berbeda karena waktu realisasi return",
+          "IRR tidak dapat dihitung dalam investasi PE"
+        ],
+        "correct_index": 1,
+        "explanation": "MOIC tidak menunjukkan kecepatan return. IRR mempertimbangkan waktu arus kas.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "PE-L06",
@@ -356,7 +464,19 @@
       "build_output": "Bangun bid cap berbasis target IRR, downside lender gates, dan memo conditional bid.",
       "director_challenge": "Mengapa manajemen seharusnya menolak transaksi yang secara nominal lolos IRR tapi gagal covenant?",
       "recall": "Bisa jelaskan perbedaan return-bound price dan financeable price tanpa contoh?",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "Maximum bid lolos target IRR tetapi melanggar minimum cash covenant. Apa keputusan?",
+        "options": [
+          "Invest karena IRR lolos",
+          "Naikkan exit multiple agar covenant terabaikan",
+          "Tolak struktur sekarang atau revisi pembiayaan/harga, lalu uji ulang"
+        ],
+        "correct_index": 2,
+        "explanation": "Investable price harus memenuhi return hurdle dan syarat likuiditas/kredit; keduanya berbeda.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "VC-L03",
@@ -390,7 +510,19 @@
       "build_output": "Buat tabel CAC, payback tiap segmen, dan sensitivitas margin.",
       "director_challenge": "Apakah CAC payback pendek tetap bagus bila cohort berhenti sebelum bulan kedelapan?",
       "recall": "Terangkan beda CAC, ARPA, gross margin, dan payback.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "CAC payback enam bulan dihitung memakai revenue tanpa gross margin. Apa masalahnya?",
+        "options": [
+          "Payback terlalu konservatif",
+          "Payback terlalu optimistis karena tidak memperhitungkan cost to serve",
+          "CAC tidak diperlukan untuk SaaS"
+        ],
+        "correct_index": 1,
+        "explanation": "CAC dipulihkan lewat gross profit contribution, bukan gross revenue.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "VC-L04",
@@ -424,7 +556,19 @@
       "build_output": "Buat cash bridge historis dan 2 skenario burn hingga closing tanggal investasi.",
       "director_challenge": "Jika round baru closing 4 bulan lagi, apakah kondisi runway 3 bulan aman?",
       "recall": "Jelaskan net burn, gross burn dan kenapa runway shortcut bisa menipu.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "Runway 3 bulan, fundraising diperkirakan closing 5 bulan lagi. Kesimpulan?",
+        "options": [
+          "Aman, karena sudah ada term sheet",
+          "Perlu pembiayaan jembatan atau pengurangan burn yang nyata; cek tanggal kas minimum",
+          "Runway tidak terkait keputusan investasi"
+        ],
+        "correct_index": 1,
+        "explanation": "Pipeline dana belum sama dengan kas tersedia; pembiayaan harus tiba sebelum likuiditas habis.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "VC-L05",
@@ -459,7 +603,19 @@
       "build_output": "Buat fully diluted cap table yang reconcile 100% dan skenario follow-on/no pro-rata.",
       "director_challenge": "Apakah exit stake 13.33% pasti bertahan ketika ada round berikutnya?",
       "recall": "Apa perbedaan primary issuance, secondary sale, option pool dan preference?",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "Investor baru membeli 15% saham. Round berikutnya menerbitkan saham baru. Apa risiko?",
+        "options": [
+          "Ownership investor awal dapat terdilusi jika tidak ikut pro-rata",
+          "Ownership investor awal tidak berubah selamanya",
+          "Pre-money valuation sama dengan investor proceeds"
+        ],
+        "correct_index": 0,
+        "explanation": "Dilution tergantung penerbitan saham baru, pro-rata, option pool dan terms.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "VC-L06",
@@ -497,7 +653,19 @@
       "build_output": "Buat bottom-up TAM/SAM/SOM dan tiga falsifiable due-diligence requests.",
       "director_challenge": "Data apa yang membuat lu langsung PASS walau TAM terlihat US$10bn?",
       "recall": "Jelaskan beda SOM estimate, forecast bookings, dan evidence customer demand.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "TAM $10bn terlihat besar. Bukti apa terpenting sebelum membuat proyeksi pelanggan?",
+        "options": [
+          "Slide market size yang bagus",
+          "Bottom-up reachable buyers, willingness to pay dan sales conversion",
+          "Menetapkan market share 5% tanpa dasar"
+        ],
+        "correct_index": 1,
+        "explanation": "TAM hanyalah batas teoritis; SOM perlu asumsi dan pembuktian pelanggan yang dapat diperoleh.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "CO-L03",
@@ -532,7 +700,19 @@
       "build_output": "Buat issue tree sendiri dan tandai mana angka yang diketahui vs hypothesis.",
       "director_challenge": "Jika volume turun, apakah itu otomatis karena harga terlalu tinggi?",
       "recall": "Jelaskan kapan issue tree tidak MECE dan cara memperbaikinya.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "Issue tree dibuat rapi tetapi tidak menjawab masalah CEO. Apakah sudah berkualitas?",
+        "options": [
+          "Ya, karena MECE secara visual",
+          "Belum; struktur harus menjawab keputusan serta memakai driver yang bisa diuji",
+          "Ya, cukup ulangi framework industri"
+        ],
+        "correct_index": 1,
+        "explanation": "MECE membantu pengorganisasian, tapi fokus pada masalah spesifik lebih penting daripada template.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "CO-L04",
@@ -566,7 +746,19 @@
       "build_output": "Bangun market funnel sampai expected packs dan beri tiga bukti go-to-market yang belum ada.",
       "director_challenge": "Apa yang berubah jika conversion turun setengah saat pilot?",
       "recall": "Apa perbedaan addressable accounts, expected contracts, dan realized annual sales?",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "SOM hasil perhitungan 300 account. Apakah sudah kontrak pelanggan?",
+        "options": [
+          "Ya, SOM adalah signed orders",
+          "Belum; SOM estimasi yang bergantung pada serviceability dan conversion",
+          "Ya, jika chart berwarna"
+        ],
+        "correct_index": 1,
+        "explanation": "Market sizing bukan penjualan terealisasi; perlu bukti funnel, konversi dan pricing.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "CO-L05",
@@ -601,7 +793,19 @@
       "build_output": "Buat scenario ranking menurut annual net benefit, upfront cash, slot tim dan evidence gates.",
       "director_challenge": "Apakah inisiatif paling tinggi annual benefit harus dipilih jika 90-day cash limit ketat?",
       "recall": "Bedakan capex, one-off opex, recurring cost dan payback.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "Inisiatif profit +Rp600m/tahun memerlukan Rp900m upfront. Apa cek berikutnya?",
+        "options": [
+          "Anggap payback 18 bulan pasti",
+          "Uji ramp-up, kas, risiko eksekusi, capex dan alternatif",
+          "Rekomendasikan hanya karena gross benefit terbesar"
+        ],
+        "correct_index": 1,
+        "explanation": "Simple payback belum memasukkan semua constraints dan timing cash flows.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     },
     {
       "id": "CO-L06",
@@ -638,7 +842,19 @@
       "build_output": "Susun 6-slide deck dengan headline kesimpulan, angka di satuan tepat, 90-day KPIs dan stop/scale gate.",
       "director_challenge": "Apa yang harus CEO setujui hari ini dan KPI mana yang memicu pembatalan pilot?",
       "recall": "Terangkan action title, pyramid principle, decision gate dan falsifiable KPI.",
-      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement."
+      "source_notice": "Seluruh angka latihan dan perusahaan SELF adalah SIMULATED. Referensi expert berasal dari penerbit asli untuk pembelajaran metode, bukan sumber angka kasus atau endorsement.",
+      "transfer": {
+        "question": "Slide punya tabel rinci tetapi headline-nya 'Data Profit'. Apa perbaikan terbaik?",
+        "options": [
+          "Tuliskan conclusion yang dibuktikan exhibit dan keputusan yang diminta",
+          "Tambah animasi agar kelihatan profesional",
+          "Hapus seluruh angka"
+        ],
+        "correct_index": 0,
+        "explanation": "Action title adalah pesan keputusan berbasis bukti, bukan nama tabel atau ornamen.",
+        "kind": "guided_concept_transfer",
+        "disclaimer": "Ini cek pemahaman konseptual, bukan validasi workbook atau evaluasi oleh profesional."
+      }
     }
   ]
 }
