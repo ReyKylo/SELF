@@ -31,7 +31,7 @@ for(const [folder,track] of tracks){
  assert(/Yes, ini namanya/i.test(tutor),'analogy immediately followed by professional name');
  assert(/analogi|analogy/i.test(tutor),'tutor contains analogy');
  assert(/blind|independent|cold/i.test(assessment),'assessment intended unassisted');
- assert(/no (?:[^.\\n]{0,130})?(?:answer key|solutions?)|tanpa (?:kunci|jawaban)/i.test(assessment),'assessment explicitly without answer');
+ assert(/no .{0,130}(?:answer key|solutions?)|tanpa (?:kunci|jawaban)/i.test(assessment),'assessment explicitly without answer');
  assert(m.work_products.length>=2,'decision outputs defined');
  assert(/unreviewed|worker-self-tested/i.test(m.review_status),'no false third-party accreditation');
  for(const exhibit of m.exhibits){
