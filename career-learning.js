@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const CONTENT_URL='./content/career-learning.json';
-const TABS=[['sprint','Sprint 3 hari'],['masterclass','Guided Masterclass'],['analystlab','Analyst Lab · PE'],['vclab','Analyst Lab · VC'],['evidence','Expert Evidence'],['videos','YouTube'],['sources','Sumber']];
+const TABS=[['sprint','Sprint 3 hari'],['masterclass','Guided Masterclass'],['analystlab','Analyst Lab · PE'],['vclab','Analyst Lab · VC'],['consultlab','Analyst Lab · Consulting'],['evidence','Expert Evidence'],['videos','YouTube'],['sources','Sumber']];
 const TRACKS=[['all','Semua bidang'],['PE','Private Equity'],['VC','Venture Capital'],['Consulting','Consulting']];
 const ui={tab:'sprint',track:'all',query:'',type:'all',panel:'PE01',video:null,day:'PE',backPanel:null,backContext:null,
  loading:false,error:'',data:null,owner:null,generation:0,busy:false,taskError:'',playing:false,start:0,workspace:null};
@@ -15,7 +15,7 @@ const trackName=id=>TRACKS.find(x=>x[0]===id)?.[1]||id;
 function focus(selector){Promise.resolve().then(()=>document.querySelector?.(selector)?.focus?.({preventScroll:true}))}
 function redraw(selector){host?.render();if(selector)focus(selector)}
 function reset(owner){
- clearTimeout(searchTimer);Object.assign(ui,{owner,generation:ui.generation+1,tab:'sprint',track:'all',query:'',type:'all',panel:'PE01',video:null,day:'PE',backPanel:null,backContext:null,busy:false,taskError:'',playing:false,start:0,workspace:null});window.SELFCareerPortfolio?.reset?.(owner);window.SELFCareerTeaching?.reset?.(owner);window.SELFCareerAnalystLab?.reset?.(owner);window.SELFVCAnalystLab?.reset?.(owner);
+ clearTimeout(searchTimer);Object.assign(ui,{owner,generation:ui.generation+1,tab:'sprint',track:'all',query:'',type:'all',panel:'PE01',video:null,day:'PE',backPanel:null,backContext:null,busy:false,taskError:'',playing:false,start:0,workspace:null});window.SELFCareerPortfolio?.reset?.(owner);window.SELFCareerTeaching?.reset?.(owner);window.SELFCareerAnalystLab?.reset?.(owner);window.SELFVCAnalystLab?.reset?.(owner);window.SELFConsultingLab?.reset?.(owner);
 }
 function ensureOwner(){const owner=host?.state?.()?.user?.id||null;if(ui.owner!==owner)reset(owner);return owner}
 function validateData(d){
@@ -186,7 +186,7 @@ function sprint(){
 function render(){
  ensureOwner();if(!ui.data&&!ui.loading&&!ui.error)Promise.resolve().then(load);
  const tabs='<div class="learning-tabs" aria-label="Career Prep sections">'+TABS.map(([key,label])=>'<button type="button" data-learning="tab" data-tab="'+key+'" class="'+(ui.tab===key?'active':'')+'" aria-pressed="'+(ui.tab===key)+'">'+label+'</button>').join('')+'</div>';
- let body=ui.error?'<div class="learning-empty" role="alert"><h2>Materi belum terbuka.</h2><p>'+h(ui.error)+'</p>'+button('Coba lagi','retry')+'</div>':!ui.data?'<div class="learning-empty" role="status"><h2>Membuka materi…</h2><p>Memuat contoh expert dan urutan latihan.</p></div>':ui.tab==='sprint'?sprint():ui.tab==='masterclass'?(window.SELFCareerTeaching?.render?.(ui.data)||'<p>Guided lessons belum tersedia.</p>'):ui.tab==='analystlab'?(window.SELFCareerAnalystLab?.render?.()||'<p>Analyst Lab tidak tersedia.</p>'):ui.tab==='vclab'?(window.SELFVCAnalystLab?.render?.()||'<p>VC Analyst Lab tidak tersedia.</p>'):ui.tab==='evidence'?evidence():ui.tab==='videos'?videos():sources();
+ let body=ui.error?'<div class="learning-empty" role="alert"><h2>Materi belum terbuka.</h2><p>'+h(ui.error)+'</p>'+button('Coba lagi','retry')+'</div>':!ui.data?'<div class="learning-empty" role="status"><h2>Membuka materi…</h2><p>Memuat contoh expert dan urutan latihan.</p></div>':ui.tab==='sprint'?sprint():ui.tab==='masterclass'?(window.SELFCareerTeaching?.render?.(ui.data)||'<p>Guided lessons belum tersedia.</p>'):ui.tab==='analystlab'?(window.SELFCareerAnalystLab?.render?.()||'<p>Analyst Lab tidak tersedia.</p>'):ui.tab==='vclab'?(window.SELFVCAnalystLab?.render?.()||'<p>VC Analyst Lab tidak tersedia.</p>'):ui.tab==='consultlab'?(window.SELFConsultingLab?.render?.()||'<p>Consulting Lab unavailable.</p>'):ui.tab==='evidence'?evidence():ui.tab==='videos'?videos():sources();
  return '<section class="learning-workspace">'+tabs+body+'</section>';
 }
 async function taskId(owner,id){
@@ -224,6 +224,7 @@ async function action(event){
  if(window.SELFCareerTeaching?.action?.(event))return true;
  if(window.SELFCareerAnalystLab?.action?.(event))return true;
  if(window.SELFVCAnalystLab?.action?.(event))return true;
+ if(window.SELFConsultingLab?.action?.(event))return true;
  const b=event.target.closest?.('[data-learning]');if(!b)return false;
  event.preventDefault();event.stopPropagation();ensureOwner();const action=b.dataset.learning;
  if(action==='download'){downloadStarter(b.dataset.id,b.dataset.kind).then(()=>host?.notify?.('File berhasil disiapkan untuk download')).catch(err=>host?.notify?.('Download gagal: '+(err?.message||String(err)),true));return true}
@@ -251,10 +252,11 @@ function input(event){
  if(window.SELFCareerTeaching?.input?.(event))return true;
  if(window.SELFCareerAnalystLab?.input?.(event))return true;
  if(window.SELFVCAnalystLab?.input?.(event))return true;
+ if(window.SELFConsultingLab?.input?.(event))return true;
  const node=event.target;if(node?.dataset?.learningFilter!=='query')return false;
  const value=node.value,position=node.selectionStart,owner=ui.owner,generation=ui.generation;clearTimeout(searchTimer);
  searchTimer=setTimeout(()=>{if(owner!==ui.owner||generation!==ui.generation)return;ui.query=value;ui.playing=false;host.render();const search=document.querySelector?.('#learning-search');search?.focus?.({preventScroll:true});search?.setSelectionRange?.(position,position)},160);return true;
 }
 function change(event){if(window.SELFCareerPortfolio?.change?.(event))return true;const node=event.target,key=node?.dataset?.learningFilter;if(!['track','type'].includes(key))return false;ensureOwner();ui[key]=node.value;ui.playing=false;redraw('#'+node.id);return true}
-window.SELFCareerLearning={init(api){host=api.host;core=api.career;window.SELFCareerPortfolio?.init?.(host);window.SELFCareerTeaching?.init?.(host);window.SELFCareerAnalystLab?.init?.(host);window.SELFVCAnalystLab?.init?.(host)},render,action,input,change,reset,load,ui,taskId};
+window.SELFCareerLearning={init(api){host=api.host;core=api.career;window.SELFCareerPortfolio?.init?.(host);window.SELFCareerTeaching?.init?.(host);window.SELFCareerAnalystLab?.init?.(host);window.SELFVCAnalystLab?.init?.(host);window.SELFConsultingLab?.init?.(host)},render,action,input,change,reset,load,ui,taskId};
 })();
