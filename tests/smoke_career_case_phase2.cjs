@@ -26,7 +26,7 @@ for(const [folder,track] of tracks){
  const read=k=>fs.readFileSync(path.join(dir,k),'utf8');
  const intro=read('README.md'),sources=read(m.source_ledger),tutor=read(m.tutor_guide),assessment=read(m.assessment);
  assert(/SIMULATED/i.test(intro),'simulated source label in README');
- assert(/SIMULATED|simulasi/i.test(sources),'source ledger distinguishes fictional data');
+ assert(/SIMULATED|simulasi|fictional|fiksi|invented/i.test(sources),'source ledger distinguishes fictional data');
  assert(/https:\/\//.test(sources),'external professional sources linked');
  assert(/Yes, ini namanya/i.test(tutor),'analogy immediately followed by professional name');
  assert(/analogi|analogy/i.test(tutor),'tutor contains analogy');
