@@ -2,7 +2,7 @@
 **SIMULATED / ORIGINAL SELF LEARNING CONTENT · 2026-10-22**
 
 ## Scope and readiness
-This is a **content-first, reviewer-ready Phase 5 packet**, NOT a deployed Director Review feature. It sits after three Phase 4 Analyst Labs (Aruna PE, ArusOps VC, SajiRasa Consulting). Shared UI and build files, Supabase and production are unchanged by this branch.
+This is the **original educational content contract**, paired with a browser-local Director Review UI merged into `main` on 22 October 2026 (commits `4342375` and `dd48055`). It follows the three Phase 4 Analyst Labs (Aruna PE, ArusOps VC, SajiRasa Consulting). Automated CI and isolated Chromium tests passed. **Live Cloudflare deployment and authenticated real-device UI have not been verified.** No Supabase schema changes or production data writes were required.
 
 **Outcome:** a candidate can defend an independently prepared investment/strategy decision against adversarial but evidence-based questions, without being coached into the reference answer. The exercise tests judgment and evidence as well as arithmetic.
 
@@ -42,7 +42,7 @@ Feedback should quote the relevant *learner's own* statement and explain what is
 
 A director's score is a **reviewer judgment**, not deterministic proof. Numeric test suites in the existing repo check example calculations, not the learner's private spreadsheet.
 
-## Integration contract for authorized Integrator (separate PR)
+## Historical integration contract (implemented in PR #29; production acceptance still open)
 - Expose a **Director Review** route under existing Career Prep navigation, without redesigning current features.
 - Read `review-panels.json` as *public challenge prompts only*. Isolate submissions by authenticated learner if persistence is approved; otherwise explicitly label local session mode.
 - Collect frozen original response before showing challenge 2; track answered/unanswered prompts. Never auto-mark vague free text as correct.
@@ -51,4 +51,4 @@ A director's score is a **reviewer judgment**, not deterministic proof. Numeric 
 - Integration and deploy require their own reviewed authorizations; this worker changes neither shared app files nor Supabase.
 
 ## Known limitations and acceptance
-This artifact has no running UI, no recorded oral defense, no automatic spreadsheet checker, no professional certification and no actual learner scoring. Phase 5 is **content authored, integration pending**. Accept the content after verifying prompts reference the correct case conventions; only call the feature shipped after separate integration and end-to-end QA.
+A browser-local UI is implemented and available in GitHub `main`, with no recorded oral defense, persistent drafts, automatic spreadsheet checker, professional certification, or actual learner scoring. The original test suite covers the isolated module, not a fully authenticated production session. Do **not** claim production launch until the checks in [PHASE5_PRODUCTION_RELEASE_GATE.md](./PHASE5_PRODUCTION_RELEASE_GATE.md) are evidenced.
