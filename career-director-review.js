@@ -28,14 +28,16 @@ function render(){
  const header='<div class="lab-intro"><span class="learning-label">PHASE 5 · DIRECTOR REVIEW · SIMULATED</span><h2>Defend your decision.</h2><p>Latihan mengambil keputusan di bawah tekanan. Ini bukan penilaian otomatis atau sertifikasi profesional. Jawaban tersimpan hanya selama sesi halaman ini.</p></div>';
  const selector='<div class="lab-facts">'+state.data.tracks.map(x=>'<button class="career-btn" data-director-action="track" data-track="'+h(x.id)+'" aria-pressed="'+(t.id===x.id)+'" '+(state.submitted?'disabled title="Reset untuk mengganti kasus"':'')+'>'+h(x.id)+' · '+h(x.case)+'</button>').join('')+'</div>';
  const exportReady=state.submitted&&state.step===5&&state.twist.trim()&&state.opposite.trim()&&state.final.trim();
- const controls='<div class="lab-controls"><button class="career-btn" data-director-action="export" '+(exportReady?'':'disabled title="Complete all five defenses and final reflections first"')+'>Export dossier (.txt)</button><button class="career-btn" data-director-action="reset">Reset review</button></div>';
- if(!state.submitted)return header+'<article class="career-card"><h3>Pilih investment / strategy case</h3>'+selector+'<p><strong>'+h(t.reviewer_role)+'</strong>: '+h(t.opening)+'</p>'+field('initial','Initial recommendation (wajib)',state.initial,'Decision, approval terms and main risks…')+field('reference','Exhibit / model references (wajib)',state.reference,'Quote the figures, units and evidence files you actually used.')+'<button class="career-btn career-primary" data-director-action="submit" '+(!state.initial.trim()||!state.reference.trim()?'disabled':'')+'>Lock initial recommendation →</button><p>Keputusan awal dikunci agar perubahan setelah tantangan bisa dilihat. Jangan masukkan data pribadi.</p></article>';
+ const draftReady=Boolean(state.initial.trim()||state.reference.trim()||Object.values(state.answers).some(v=>v.trim())||state.twist.trim()||state.opposite.trim()||state.final.trim());
+ const draftButton='<button type="button" class="career-btn" data-director-action="draft" '+(draftReady?'':'disabled')+'>Download draft (.txt)</button>';
+ const controls='<div class="lab-controls">'+draftButton+'<button type="button" class="career-btn" data-director-action="export" '+(exportReady?'':'disabled title="Complete all five defenses and final reflections first"')+'>Export final dossier (.txt)</button><button type="button" class="career-btn" data-director-action="reset">Reset review</button></div>';
+ if(!state.submitted)return header+'<article class="career-card"><h3 id="director-stage" tabindex="-1">Pilih investment / strategy case</h3>'+selector+'<p><strong>'+h(t.reviewer_role)+'</strong>: '+h(t.opening)+'</p>'+field('initial','Initial recommendation (wajib)',state.initial,'Decision, approval terms and main risks…')+field('reference','Exhibit / model references (wajib)',state.reference,'Quote the figures, units and evidence files you actually used.')+'<button class="career-btn career-primary" data-director-action="submit" '+(!state.initial.trim()||!state.reference.trim()?'disabled':'')+'>Lock initial recommendation →</button>'+draftButton+'<p>Keputusan awal dikunci. Draft hanya tersimpan selama halaman terbuka; download sebelum refresh atau reset. Jangan masukkan data pribadi.</p></article>';
  const lock='<section class="career-card"><span class="learning-label">LOCKED ORIGINAL DECISION</span><p>'+h(state.initial)+'</p><small>Evidence: '+h(state.reference)+'</small></section>';
  let main='';
  if(state.step<total){
-  main='<article class="career-card"><span class="learning-label">CHALLENGE '+(state.step+1)+' / '+total+'</span><h3>'+h(challenge.prompt)+'</h3><p>Director akan meminta bukti: '+challenge.evidence.map(h).join(' · ')+'</p>'+field('answer-'+challenge.id,'Your defense',state.answers[challenge.id]||'','Use the relevant exhibit, units and decision logic.')+'<div class="lab-controls"><button class="career-btn" data-director-action="back" '+(state.step===0?'disabled':'')+'>← Previous</button><button class="career-btn career-primary" data-director-action="next" '+(!(state.answers[challenge.id]||'').trim()?'disabled':'')+'>'+(state.step===total-1?'Read new information →':'Next challenge →')+'</button></div></article>';
+  main='<article class="career-card"><span class="learning-label">CHALLENGE '+(state.step+1)+' / '+total+'</span><h3 id="director-stage" tabindex="-1">'+h(challenge.prompt)+'</h3><p>Director akan meminta bukti: '+challenge.evidence.map(h).join(' · ')+'</p>'+field('answer-'+challenge.id,'Your defense',state.answers[challenge.id]||'','Use the relevant exhibit, units and decision logic.')+'<div class="lab-controls"><button class="career-btn" data-director-action="back" '+(state.step===0?'disabled':'')+'>← Previous</button><button class="career-btn career-primary" data-director-action="next" '+(!(state.answers[challenge.id]||'').trim()?'disabled':'')+'>'+(state.step===total-1?'Read new information →':'Next challenge →')+'</button></div></article>';
  }else{
- main='<article class="career-card"><span class="learning-label">NEW INFORMATION · SIMULATED</span><h3>'+h(t.twist.announcement)+'</h3><p>'+h(t.twist.task)+'</p>'+field('twist','What changes in your conclusion?',state.twist)+field('opposite','Strongest opposing argument',state.opposite)+field('final','Final recommendation & approval conditions',state.final)+'<p class="career-form-hint">SELF tidak otomatis menilai free-text sebagai benar. Gunakan rubrik bersama reviewer manusia.</p>'+controls+'</article>';
+ main='<article class="career-card"><span class="learning-label">NEW INFORMATION · SIMULATED</span><h3 id="director-stage" tabindex="-1">'+h(t.twist.announcement)+'</h3><p>'+h(t.twist.task)+'</p>'+field('twist','What changes in your conclusion?',state.twist)+field('opposite','Strongest opposing argument',state.opposite)+field('final','Final recommendation & approval conditions',state.final)+'<p class="career-form-hint">SELF tidak otomatis menilai free-text sebagai benar. Gunakan rubrik bersama reviewer manusia.</p><div class="lab-controls"><button type="button" class="career-btn" data-director-action="back">← Review tantangan 5</button></div>'+controls+'</article>';
  }
  const progress='<p role="status">Progress: '+Math.min(state.step,total)+' / '+total+' challenges; '+Object.values(state.answers).filter(x=>x.trim()).length+' defenses written.</p>';
  return header+selector+lock+progress+main+(state.step<total?controls:'')+'<p class="lab-disclaimer">Kriteria reviewer: technical 30, judgment 25, evidence 20, risk 15, communication 10. Setiap klaim harus dicocokkan dengan model yang benar.</p>';
@@ -45,13 +47,17 @@ function action(event){
  event.preventDefault();event.stopPropagation();
  const a=b.dataset.directorAction,t=pick();
  if(a==='retry'){state.error='';void load()}
- if(a==='track'&&!state.submitted&&state.data?.tracks.some(x=>x.id===b.dataset.track)){state.track=b.dataset.track;state.initial='';state.reference='';state.answers={};state.step=0}
+ if(a==='track'&&!state.submitted&&state.data?.tracks.some(x=>x.id===b.dataset.track)){
+  if(b.dataset.track!==state.track&&(state.initial.trim()||state.reference.trim())&&!window.confirm('Ganti kasus akan menghapus jawaban awal yang belum dikunci. Download draft dulu jika diperlukan. Lanjutkan?'))return true;
+  state.track=b.dataset.track;state.initial='';state.reference='';state.answers={};state.step=0
+ }
  if(a==='submit'&&state.initial.trim()&&state.reference.trim()){state.submitted=true;state.step=0}
  if(a==='next'&&state.step<5&&(state.answers[t.challenges[state.step].id]||'').trim())state.step++;
  if(a==='back')state.step=Math.max(0,state.step-1);
- if(a==='reset'){const owner=state.owner;reset(owner);void load()}
- if(a==='export'&&state.step===5&&state.twist.trim()&&state.opposite.trim()&&state.final.trim())exportFile();
- host?.render?.();return true;
+ if(a==='reset'&&window.confirm('Reset akan menghapus semua jawaban sesi ini. Download draft dulu jika diperlukan. Hapus sekarang?')){const owner=state.owner;reset(owner);void load()}
+ if(a==='draft')exportFile(true);
+ if(a==='export'&&state.step===5&&state.twist.trim()&&state.opposite.trim()&&state.final.trim())exportFile(false);
+ host?.render?.();if(['submit','next','back','track'].includes(a))Promise.resolve().then(()=>document.getElementById('director-stage')?.focus({preventScroll:true}));return true;
 }
 function input(event){
  const key=event.target?.dataset?.directorField;if(!key)return false;
@@ -65,13 +71,17 @@ function input(event){
  if(next){const t=pick();next.disabled=!((state.answers[t?.challenges?.[state.step]?.id]||'').trim())}
  const complete=state.submitted&&state.step===5&&state.twist.trim()&&state.opposite.trim()&&state.final.trim();
  for(const btn of document.querySelectorAll('[data-director-action="export"]'))btn.disabled=!complete;
+ const draftReady=Boolean(state.initial.trim()||state.reference.trim()||Object.values(state.answers).some(v=>v.trim())||state.twist.trim()||state.opposite.trim()||state.final.trim());
+ for(const btn of document.querySelectorAll('[data-director-action="draft"]'))btn.disabled=!draftReady;
  return true;
 }
 function change(event){return !!event.target?.dataset?.directorField}
-function exportFile(){
- const t=pick();if(!t||!state.submitted||state.step!==5||!state.twist.trim()||!state.opposite.trim()||!state.final.trim())return;
- const blocks=['SELF DIRECTOR REVIEW | SIMULATED',t.case,'Track: '+t.id,'ORIGINAL DECISION\n'+state.initial,'MODEL EVIDENCE\n'+state.reference,...t.challenges.map(c=>c.id+' '+c.prompt+'\n'+(state.answers[c.id]||'[unanswered]')),'NEW INFO\n'+t.twist.announcement,'REASSESSMENT\n'+state.twist,'RED TEAM\n'+state.opposite,'FINAL DECISION\n'+state.final,'Reviewer rubric: technical 30 | judgment 25 | evidence 20 | risk 15 | communication 10','Not auto-graded; confirm source evidence independently.'];
- const blob=new Blob([blocks.join('\n\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='SELF_Director_Review_'+t.id+'.txt';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
+function exportFile(draft=false){
+ const t=pick();if(!t)return;
+ if(!draft&&(!state.submitted||state.step!==5||!state.twist.trim()||!state.opposite.trim()||!state.final.trim()))return;
+ if(draft&&!state.initial.trim()&&!state.reference.trim()&&!Object.values(state.answers).some(v=>v.trim())&&!state.twist.trim()&&!state.opposite.trim()&&!state.final.trim())return;
+ const blocks=['SELF DIRECTOR REVIEW | SIMULATED',draft?'DRAFT — INCOMPLETE, NOT ASSESSED':'FINAL DOSSIER — NOT AUTO GRADED',t.case,'Track: '+t.id,'ORIGINAL DECISION\n'+state.initial,'MODEL EVIDENCE\n'+state.reference,...t.challenges.map(c=>c.id+' '+c.prompt+'\n'+(state.answers[c.id]||'[unanswered]')),'NEW INFO\n'+t.twist.announcement,'REASSESSMENT\n'+state.twist,'RED TEAM\n'+state.opposite,'FINAL DECISION\n'+state.final,'Reviewer rubric: technical 30 | judgment 25 | evidence 20 | risk 15 | communication 10','Not auto-graded; confirm source evidence independently.'];
+ const blob=new Blob([blocks.join('\n\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='SELF_Director_'+(draft?'Draft_':'Review_')+t.id+'.txt';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
 }
 window.SELFDirectorReview={init(api){host=api},render,action,input,change,reset,state,load};
 })();
