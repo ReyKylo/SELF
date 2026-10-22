@@ -21,7 +21,7 @@ assert.ok(source.includes("const CONTENT_URL="),'browser URL class must not be s
 assert.ok(source.includes('submit.disabled='),'submit must enable while user types');
 assert.ok(source.includes('next.disabled='),'challenge navigation must enable while user types');
 assert.ok(ui.includes("['director','Director Review']"));
-assert.ok(app.includes('[data-learning],[data-director-action]'),'SELF app root must dispatch Director Review buttons');
+assert.ok(app.includes("e.target.closest?.('[data-director-action]')"),'SELF app root must dispatch Director Review buttons');
 for(const entry of ['render','action','input','change','reset','init'])assert.ok(ui.includes('SELFDirectorReview?.'+entry+'?.('),'missing wiring '+entry);
 assert.ok(html.includes('src="./career-director-review.js"'));
 assert.ok(build.includes('"career-director-review.js"'));
