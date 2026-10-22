@@ -1,0 +1,9 @@
+year,sku,channel,on_time_in_full_pct,return_rate_pct,reorder_rate_pct
+2025,Core,Retail,96,2.0,72
+2025,Core,B2B,94,2.4,81
+2025,Premium,Retail,97,1.5,69
+2025,Premium,B2B,95,2.0,77
+2026,Core,Retail,89,4.5,64
+2026,Core,B2B,88,5.0,73
+2026,Premium,Retail,96,1.4,70
+2026,Premium,B2B,95,1.9,76
