@@ -28,6 +28,11 @@ for(const l of teaching.lessons){
  assert(l.transfer.disclaimer.includes('bukan validasi workbook'),'no fake professional scoring');
 }
 assert.deepEqual(counts,{PE:6,VC:6,Consulting:6});
+const blueprint=JSON.parse(fs.readFileSync(path.join(root,'content/career-prep-quality-blueprint.json'),'utf8'));
+const mapped=new Set(teaching.lessons.flatMap(l=>l.competencies));
+for(const t of blueprint.tracks)for(const item of t.skills)assert(mapped.has(item.id),'uncovered Phase 1 competency '+item.id);
+assert.equal(mapped.size,36,'all 36 Phase1 competencies covered (mapping != mastery)');
+
 const expected={
  'PE-L01':110-73,
  'PE-L02':(260-80+13.54+80+5)-130-(13.54-12),
