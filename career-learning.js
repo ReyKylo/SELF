@@ -176,7 +176,7 @@ function sprint(){
  (ui.taskError?'<p class="learning-task-error" role="alert">'+h(ui.taskError)+'</p>':'')+
  '<div class="learning-workflow"><section><h3>01 · SEE</h3><p>Pelajari cara expert menyusun keputusan.</p><div class="learning-related">'+day.panels.map(evidenceButton).join('')+'</div></section><section><h3>02 · WATCH</h3><p>Tonton berurutan. Setelah tiap video, kerjakan hasilnya.</p><div class="learning-related">'+day.videos.map(id=>videoButton(ui.data.videos.find(v=>v.id===id)?.video_id)).join('')+'</div></section></div>'+
  professionalBenchmark(day)+
- '<div class="learning-kit-row"+'+button('Belajar konsep case ini →','start-lessons','data-track="'+h(day.id)+'"',true)+
+ '<div class="teaching-sprint-launch">'+button('Belajar konsep case ini →','start-lessons','data-track="'+h(day.id)+'"',true)+'</div>'+
  '<div class="learning-kit-row" aria-label="Download starter kit">'+button('↓ Workbook XLSX','download','data-id="'+h(day.id)+'" data-kind="xlsx"')+button('↓ Case brief PDF','download','data-id="'+h(day.id)+'" data-kind="pdf"')+button('↓ Memo / recommendation','download','data-id="'+h(day.id)+'" data-kind="memo"')+(day.id==='Consulting'?button('↓ Editable 6-slide PPTX','download','data-id="'+h(day.id)+'" data-kind="pptx"'):'')+button(ui.workspace===day.id?'Tutup private workspace':'Buka private workspace','workspace','data-id="'+h(day.id)+'"')+'</div>'+
  (ui.workspace===day.id?(window.SELFCareerPortfolio?.render?.(day.id)||''):'')+
  publicCase(day)+
