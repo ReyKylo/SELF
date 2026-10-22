@@ -5,7 +5,7 @@ const f={preShares:12000000,founder:8400000,seed:2400000,options:1200000,preA:24
 const exits=[['distress',20000000],['low',75000000],['base',300000000],['upside',800000000]];
 const state={owner:null,exit:20000000,values:{},checked:false,hint:false};
 let host=null;
-const h=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const h=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function cap(){
  const r=f.raiseA/f.preA;
  const top=(f.pool*(1+r)*f.preShares-f.options)/(1-f.pool*(1+r));
