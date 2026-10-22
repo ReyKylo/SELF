@@ -2,6 +2,9 @@ name: Career Director Review QA
 on:
   pull_request:
     paths:
+      - 'app.js'
+      - 'career.js'
+      - 'career-learning.css'
       - 'career-director-review.js'
       - 'career-learning.js'
       - 'content/career-director-review/**'
