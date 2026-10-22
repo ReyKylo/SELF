@@ -28,6 +28,7 @@ jobs:
           node --check career-phase3.js
           node --check career-learning.js
           node --check career-teaching.js
+          node --check career-analyst-lab.js
       - name: Phase 1 render smoke
         run: node tests/smoke_render.cjs
       - name: Phase 1 API smoke
@@ -64,6 +65,8 @@ jobs:
         run: node tests/smoke_career_case_phase2.cjs
       - name: Phase 3 guided teaching curriculum and numeric checks
         run: node tests/smoke_career_teaching.cjs
+      - name: Phase 4 PE analyst lab linked funding checks
+        run: node tests/smoke_career_analyst_lab.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
@@ -96,6 +99,7 @@ jobs:
           test -s dist/career-phase3.js
           test -s dist/career-phase3.css
           test -s dist/career-teaching.js
+          test -s dist/career-analyst-lab.js
           test -s dist/content/career-teaching.json
           test ! -e dist/content/career-cases
           test ! -e dist/tests
