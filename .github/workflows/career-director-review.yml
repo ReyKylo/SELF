@@ -1,0 +1,52 @@
+name: Career Director Review QA
+on:
+  pull_request:
+    paths:
+      - 'career-director-review.js'
+      - 'career-learning.js'
+      - 'content/career-director-review/**'
+      - 'tests/career-director-review.test.cjs'
+      - 'tests/career-director-review.browser.cjs'
+      - 'index.html'
+      - 'tools/build_cloudflare.py'
+      - '.github/workflows/career-director-review.yml'
+  workflow_dispatch:
+jobs:
+  director-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check career-director-review.js
+          node --check career-learning.js
+      - name: Director Review contract
+        run: node tests/career-director-review.test.cjs
+      - name: Existing PE VC Consulting source regression
+        run: |
+          node tests/cases/pe/check-case.cjs
+          node tests/cases/vc/check-case.cjs
+          node tests/cases/consulting/check-case.cjs
+      - name: Cloudflare static build
+        run: python3 tools/build_cloudflare.py
+  director-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium automation tooling
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Run real Chromium interaction tests
+        run: node tests/career-director-review.browser.cjs
