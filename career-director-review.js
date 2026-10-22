@@ -67,7 +67,7 @@ function input(event){
  for(const btn of document.querySelectorAll('[data-director-action="export"]'))btn.disabled=!complete;
  return true;
 }
-function change(event){const key=event.target?.dataset?.directorField;if(!key)return false;host?.render?.();return true}
+function change(event){return !!event.target?.dataset?.directorField}
 function exportFile(){
  const t=pick();if(!t||!state.submitted||state.step!==5||!state.twist.trim()||!state.opposite.trim()||!state.final.trim())return;
  const blocks=['SELF DIRECTOR REVIEW | SIMULATED',t.case,'Track: '+t.id,'ORIGINAL DECISION\n'+state.initial,'MODEL EVIDENCE\n'+state.reference,...t.challenges.map(c=>c.id+' '+c.prompt+'\n'+(state.answers[c.id]||'[unanswered]')),'NEW INFO\n'+t.twist.announcement,'REASSESSMENT\n'+state.twist,'RED TEAM\n'+state.opposite,'FINAL DECISION\n'+state.final,'Reviewer rubric: technical 30 | judgment 25 | evidence 20 | risk 15 | communication 10','Not auto-graded; confirm source evidence independently.'];
