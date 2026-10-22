@@ -57,7 +57,14 @@ function input(event){
  const key=event.target?.dataset?.directorField;if(!key)return false;
  if(key.startsWith('answer-'))state.answers[key.slice(7)]=event.target.value;
  else if(['initial','reference','twist','opposite','final'].includes(key)&&!(state.submitted&&['initial','reference'].includes(key)))state[key]=event.target.value;
- // Do not rerender on each keystroke: preserve focus and cursor. Buttons are updated via change.
+ // Update disabled controls immediately while typing: a disabled button cannot receive focus/click
+ // and therefore cannot reliably trigger the textarea's native "change" event.
+ const submit=document.querySelector('[data-director-action="submit"]');
+ if(submit)submit.disabled=!(state.initial.trim()&&state.reference.trim());
+ const next=document.querySelector('[data-director-action="next"]');
+ if(next){const t=pick();next.disabled=!((state.answers[t?.challenges?.[state.step]?.id]||'').trim())}
+ const complete=state.submitted&&state.step===5&&state.twist.trim()&&state.opposite.trim()&&state.final.trim();
+ for(const btn of document.querySelectorAll('[data-director-action="export"]'))btn.disabled=!complete;
  return true;
 }
 function change(event){const key=event.target?.dataset?.directorField;if(!key)return false;host?.render?.();return true}
