@@ -143,7 +143,7 @@
       "build_output": "Bangun bridge GRR dan NRR, serta tabel retention berdasarkan usia cohort yang sama.",
       "director_challenge": "Jika NRR 103.75% tetapi banyak pelanggan kecil berhenti, apakah investasinya otomatis bagus?",
       "recall": "Tanpa catatan: jelaskan NRR, GRR dan logo retention; tunjukkan perbedaan denominator.",
-      "source_notice": "Exhibit PagerDuty adalah growth metric asli Bessemer; bukan cohort ArusOps dan bukan bukti kualitas ArusOps."
+      "source_notice": "ArusOps adalah SIMULATED. Exhibit PagerDuty adalah growth metric asli Bessemer; bukan cohort ArusOps dan bukan bukti kualitas ArusOps."
     },
     {
       "id": "CO-L01",
@@ -179,7 +179,7 @@
       "build_output": "Bangun bridge FY2025→2026 annualized dengan volume, price, unit cost dan overhead; angka total wajib reconcile.",
       "director_challenge": "Apakah kita sudah tahu penyebab penurunan volume, atau baru mengukur kontribusinya ke laba?",
       "recall": "Besok: jelaskan bedanya profit bridge, hypothesis, root cause dan verified causal evidence.",
-      "source_notice": "Elektro-Light McKinsey adalah contoh case resmi terpisah; angka SajiRasa simulasi dan tidak berasal dari McKinsey."
+      "source_notice": "Electro-Light McKinsey adalah official practice case terpisah; angka SajiRasa adalah SIMULATED dan tidak berasal dari McKinsey."
     },
     {
       "id": "CO-L02",
@@ -204,7 +204,7 @@
       "worked_equation": "150 (thousand packs) × 1.4 (thousand Rp per pack) × 0.80 = 168 (Rp million)",
       "worked_result": "Overlapping benefit yang tidak boleh dihitung lagi: Rp168 juta per tahun pada asumsi steady-state.",
       "practice": {
-        "question": "Kalau C menutup 100 ribu eligible-base Core packs (80% eligible, penghematan Rp1.4 ribu/pack), berapa saving overlap yang hilang, dalam Rp juta?",
+        "question": "Kalau C menghentikan 100 ribu Core packs (80% eligible, penghematan Rp1.4 ribu/pack), berapa saving overlap yang hilang, dalam Rp juta?",
         "expected": 112,
         "tolerance": 0.001,
         "unit": "Rp juta",
