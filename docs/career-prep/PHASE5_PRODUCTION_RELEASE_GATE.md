@@ -40,3 +40,20 @@ Do not call this production complete until all read-only live checks above are e
 
 ## How to file evidence
 Add a future `docs/career-prep/PHASE5_PRODUCTION_VERIFICATION.md` only after real observations; record exact origin + verified build identifier but redact account IDs, credentials, private links and screenshots containing user data. Separately document whether Cloudflare automatically deployed the latest `main` commit.
+
+
+## Phase 5.1 — Reproducible production parity check (read-only)
+Production static parity can be **measured** from a user-verified public SELF Worker URL, without Supabase credentials, a deploy action, or guessing a `workers.dev` hostname.
+
+**Opt-in manual GitHub Action:** [SELF production parity (manual read-only)](../../.github/workflows/self-production-parity.yml). In GitHub, open **Actions → SELF production parity (manual read-only) → Run workflow** and paste only the exact HTTPS origin copied from **Cloudflare Worker `self` → Deployments / Settings**. The workflow checks out current `main` and sends GET requests for four public assets and three private-source canaries. It never initiates Cloudflare deployment or writes to an account.
+
+**Standalone command, from repository root (Node 22):**
+```sh
+node tests/check_career_production.test.mjs
+node tools/check_career_production.mjs --origin https://YOUR-VERIFIED-SELF-ORIGIN
+```
+Replace the placeholder with the actual authorized origin; this is an example format, **not** an asserted site URL.
+
+**PASS means:** byte-for-byte equality against current GitHub `main` for `index.html`, `career-learning.js`, `career-director-review.js`, and `review-panels.json`, correct response MIME types, no sealed answer hints, and absence of private-source file exposure (HTTP 403/404 or unchanged index.html SPA fallback). Redirects are not automatically followed.
+
+**PASS does not mean:** Cloudflare deployment ID/date is known, the authenticated app works, RLS/isolation has been proven, or mobile usability is accepted. These require separate real evidence. A FAIL can mean stale deployment, misrouted hostname, temporary network failure, or a source leak; investigate before claiming release parity. No runtime will probe the unconfirmed `reyself.tampilresmi.com` automatically.

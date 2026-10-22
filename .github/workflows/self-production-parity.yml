@@ -1,0 +1,31 @@
+name: SELF production parity (manual read-only)
+on:
+  workflow_dispatch:
+    inputs:
+      production_origin:
+        description: "Verified SELF Cloudflare Worker HTTPS origin from the dashboard (no path or credentials)"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  verify:
+    name: Compare live public assets to current main
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run local parity-gate regression first
+        run: node tests/check_career_production.test.mjs
+      - name: Check production parity (GET requests only)
+        env:
+          SELF_VERIFIED_PRODUCTION_ORIGIN: ${{ inputs.production_origin }}
+        run: |
+          printf 'Expected git SHA: '
+          git rev-parse HEAD
+          node tools/check_career_production.mjs --origin "$SELF_VERIFIED_PRODUCTION_ORIGIN"

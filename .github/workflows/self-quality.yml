@@ -27,6 +27,7 @@ jobs:
           node --check career-phase2.js
           node --check career-phase3.js
           node --check career-learning.js
+          node --check career-director-review.js
           node --check career-teaching.js
           node --check career-analyst-lab.js
           node --check career-vc-analyst-lab.js
@@ -82,6 +83,11 @@ jobs:
         run: node tests/smoke_vc_waterfall.cjs
       - name: Consulting analyst profit bridge and initiative scenario
         run: node tests/smoke_consulting_lab.cjs
+      - name: Phase 5 Director Review public contract and read-only parity fixtures
+        run: |
+          node tests/career-director-review.test.cjs
+          node --check tools/check_career_production.mjs
+          node tests/check_career_production.test.mjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
@@ -118,6 +124,8 @@ jobs:
           test -s dist/career-vc-analyst-lab.js
           test -s dist/career-vc-waterfall.js
           test -s dist/career-consulting-lab.js
+          test -s dist/career-director-review.js
+          test -s dist/content/career-director-review/review-panels.json
           test -s dist/career-pe-projection.js
           test -s dist/career-pe-sensitivity.js
           test -s dist/content/career-teaching.json
