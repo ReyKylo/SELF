@@ -59,7 +59,7 @@ const content=fs.readFileSync('content/career-director-review/review-panels.json
    const [download]=await Promise.all([page.waitForEvent('download'),page.locator('[data-director-action="export"]').click()]);
    assert.match(download.suggestedFilename(),new RegExp(track+'\\.txt$'));
    const data=fs.readFileSync(await download.path(),'utf8');
-   assert.ok(data.includes('DEFENSE')===false || data.includes('CHALLENGE')===false || data.includes('MODEL EVIDENCE'),'dossier generated');
+   assert.ok(data.includes('MODEL EVIDENCE'),'dossier generated');
    for(let i=1;i<=5;i++)assert.ok(data.includes(prefix+'-D'+i),'all challenges exported');
    assert.ok(data.includes('Conditional approval'),'final recommendation exported');
    await page.locator('[data-director-action="reset"]').first().click();
