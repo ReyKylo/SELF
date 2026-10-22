@@ -21,8 +21,18 @@ for(const l of teaching.lessons){
  assert(Number.isFinite(l.practice.expected));
  assert(Number.isFinite(l.practice.tolerance)&&l.practice.tolerance>=0);
  assert(!/expert certified|recruiter-approved|actual deal verified/i.test(l.source_notice));
+ assert(l.transfer?.options?.length===3,'three plausible options for '+l.id);
+ assert(Number.isInteger(l.transfer.correct_index)&&l.transfer.correct_index>=0&&l.transfer.correct_index<3);
+ assert(l.transfer.question.length>=35&&l.transfer.explanation.length>=40,'concept transfer is substantial');
+ assert(new Set(l.transfer.options).size===3,'no duplicate choices');
+ assert(l.transfer.disclaimer.includes('bukan validasi workbook'),'no fake professional scoring');
 }
 assert.deepEqual(counts,{PE:6,VC:6,Consulting:6});
+const blueprint=JSON.parse(fs.readFileSync(path.join(root,'content/career-prep-quality-blueprint.json'),'utf8'));
+const mapped=new Set(teaching.lessons.flatMap(l=>l.competencies));
+for(const t of blueprint.tracks)for(const item of t.skills)assert(mapped.has(item.id),'uncovered Phase 1 competency '+item.id);
+assert.equal(mapped.size,36,'all 36 Phase1 competencies covered (mapping != mastery)');
+
 const expected={
  'PE-L01':110-73,
  'PE-L02':(260-80+13.54+80+5)-130-(13.54-12),
@@ -70,11 +80,19 @@ const mod=ctx.window.SELFCareerTeaching;mod.init(host);mod.reset('u1');
  ctx.document.querySelector=()=>({value:'999'});
  click('check');assert.equal(mod.state.check,'wrong');
  click('hint');assert.equal(mod.state.hints,1);
- click('select','VC-L02');assert.equal(mod.state.selected,'VC-L02');assert.equal(mod.state.check,null);
+ click('transfer-select','1');assert.equal(mod.state.transferChoice,1);
+ click('transfer-check');assert.equal(mod.state.transferChecked,true);
+ assert(mod.render(catalog).includes('Tepat.'),'correct concept transfer has evidence-based explanation');
+ click('transfer-select','0');click('transfer-check');assert(mod.render(catalog).includes('Perlu dikoreksi.'),'wrong concept transfer has explanation');
+  click('select','VC-L02');assert.equal(mod.state.selected,'VC-L02');assert.equal(mod.state.check,null);
+ assert.equal(mod.state.transferChoice,null,'concept choice resets across lessons');
+ click('track','Consulting');assert.equal(mod.state.selected,'CO-L01');
+ assert(mod.render(catalog).includes('Buka video terkait'),'video remains linked');
+ assert(!mod.render(catalog).includes('PE-L06'),'only selected track lesson navigation displayed');
  mod.fromTrack('Consulting');assert.equal(mod.state.selected,'CO-L01');
  mod.reset('u2');assert.equal(mod.state.answer,'');assert.equal(mod.state.check,null);
  const builder=fs.readFileSync(path.join(root,'tools/build_cloudflare.py'),'utf8');
  assert(builder.includes('career-teaching.js')&&builder.includes('content/career-teaching.json'));
  assert(!builder.includes('"tests/cases/')&&!builder.includes('"content/career-cases/'),'never ship sealed tests with guided source');
- console.log('PASS Phase3 Guided Masterclass: 18 lessons, original PE/VC/Consulting facts, 18 independent numeric checks, video/evidence mapping, retry/hint/check and account state reset');
+ console.log('PASS Phase3 Guided Masterclass: 18 lessons, original PE/VC/Consulting facts, 18 independent numeric + 18 guided concept transfer checks, video/evidence mapping, retry/hint/check and account state reset');
 })().catch(e=>{console.error(e);process.exitCode=1});
