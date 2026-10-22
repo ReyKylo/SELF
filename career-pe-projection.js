@@ -101,5 +101,5 @@ function action(e){const el=e.target?.closest?.('[data-pe-model]');if(!el)return
  host?.render?.();return true;
 }
 function input(e){const el=e.target;if(!el?.dataset?.peModelInput)return false;state.values[el.dataset.peModelInput]=el.value;state.checked=false;return true}
-window.SELFPEProjection={project,summary,annualIrr,entryEquity,exitProceeds,cells,grade,reset,render,action,input,state,terms,drivers:d};
+window.SELFPEProjection={init(api){host=api},project,summary,annualIrr,entryEquity,exitProceeds,cells,grade,reset,render,action,input,state,terms,drivers:d};
 })();
