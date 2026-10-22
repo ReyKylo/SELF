@@ -31,6 +31,7 @@ jobs:
           node --check career-analyst-lab.js
           node --check career-vc-analyst-lab.js
           node --check career-vc-waterfall.js
+          node --check career-consulting-lab.js
           node --check career-pe-projection.js
           node --check career-pe-sensitivity.js
       - name: Phase 1 render smoke
@@ -79,6 +80,8 @@ jobs:
         run: node tests/smoke_vc_analyst_lab.cjs
       - name: VC cap table and exit waterfall math
         run: node tests/smoke_vc_waterfall.cjs
+      - name: Consulting analyst profit bridge and initiative scenario
+        run: node tests/smoke_consulting_lab.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
@@ -114,6 +117,7 @@ jobs:
           test -s dist/career-analyst-lab.js
           test -s dist/career-vc-analyst-lab.js
           test -s dist/career-vc-waterfall.js
+          test -s dist/career-consulting-lab.js
           test -s dist/career-pe-projection.js
           test -s dist/career-pe-sensitivity.js
           test -s dist/content/career-teaching.json
