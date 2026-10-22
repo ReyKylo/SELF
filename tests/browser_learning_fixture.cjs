@@ -7,7 +7,9 @@ async function launch(options={}){
   const file=path.resolve(__dirname,'..',relative),root=path.resolve(__dirname,'..');if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return}
   fs.readFile(file,(err,data)=>{if(err){res.writeHead(404).end();return}const ext=path.extname(file),mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.md':'text/markdown'}[ext]||'application/octet-stream';res.writeHead(200,{'Content-Type':mime});res.end(data)})});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const localBase='http://127.0.0.1:'+server.address().port;
- const browser=await chromium.launch({headless:true,executablePath:process.env.SELF_QA_CHROMIUM||'/tmp/self-browser/chrome-headless-shell-linux64/chrome-headless-shell',args:['--no-sandbox']});
+ const legacyBrowser='/tmp/self-browser/chrome-headless-shell-linux64/chrome-headless-shell';
+ const browserPath=process.env.SELF_QA_CHROMIUM||(fs.existsSync(legacyBrowser)?legacyBrowser:null);
+ const browser=await chromium.launch({headless:true,...(browserPath?{executablePath:browserPath}:{}),args:['--no-sandbox']});
  const originalClose=browser.close.bind(browser);browser.close=async()=>{await originalClose();await new Promise(r=>server.close(r))};
  const context=await browser.newContext({viewport:options.viewport||{width:1366,height:768},reducedMotion:'reduce'});
  const fixture={user:{id:'5cd5464c-9879-492d-8e74-b34f99ad15bb',email:'synthetic-qa@example.invalid'},tasks:[],failCareer:false,failTasks:false,dropAck:false,postCount:0,delay:0,contentFail:false};

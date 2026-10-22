@@ -2,11 +2,16 @@ name: Career Director Review QA
 on:
   pull_request:
     paths:
+      - 'app.js'
+      - 'career.js'
+      - 'career-learning.css'
       - 'career-director-review.js'
       - 'career-learning.js'
       - 'content/career-director-review/**'
       - 'tests/career-director-review.test.cjs'
       - 'tests/career-director-review.browser.cjs'
+      - 'tests/browser_director_full_app.cjs'
+      - 'tests/browser_learning_fixture.cjs'
       - 'index.html'
       - 'tools/build_cloudflare.py'
       - '.github/workflows/career-director-review.yml'
@@ -48,5 +53,7 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.56.1
           npx playwright install --with-deps chromium
-      - name: Run real Chromium interaction tests
+      - name: Director module Chromium interaction tests
         run: node tests/career-director-review.browser.cjs
+      - name: Real SELF shell synthetic-login and mobile Chromium tests
+        run: node tests/browser_director_full_app.cjs
