@@ -12,7 +12,9 @@ const content=fs.readFileSync('content/career-director-review/review-panels.json
   for(const track of ['PE','VC','CONSULTING']){
    const page=await browser.newPage({acceptDownloads:true});
    const errors=[];
+   let confirmLoss=false;
    page.on('pageerror',e=>errors.push(e.message));
+   page.on('dialog',d=>confirmLoss?d.accept():d.dismiss());
    await page.route('http://self.test/**',route=>{
     const url=route.request().url();
     if(url.endsWith('/content/career-director-review/review-panels.json'))return route.fulfill({status:200,contentType:'application/json',body:content});
@@ -33,9 +35,13 @@ const content=fs.readFileSync('content/career-director-review/review-panels.json
    if(track!=='PE')await page.locator('[data-director-action="track"][data-track="'+track+'"]').click();
    const submit=page.locator('[data-director-action="submit"]');
    assert.equal(await submit.isEnabled(),false,'initial submit starts disabled');
+   assert.equal(await page.locator('[data-director-action="draft"]').isEnabled(),false,'empty draft disabled');
    const initial='Proceed conditionally <img src=x onerror=alert(1)> ('+track+')';
    await page.locator('#director-initial').fill(initial);
    assert.equal(await submit.isEnabled(),false,'reference is also required');
+   assert.equal(await page.locator('[data-director-action="draft"]').isEnabled(),true,'can save unfinished initial recommendation');
+   const [earlyDraft]=await Promise.all([page.waitForEvent('download'),page.locator('[data-director-action="draft"]').click()]);
+   assert.match(fs.readFileSync(await earlyDraft.path(),'utf8'),/DRAFT — INCOMPLETE/,'draft clearly labeled');
    await page.locator('#director-reference').fill('Model exhibit 01; Rp bn; assumed example');
    assert.equal(await submit.isEnabled(),true,'submit unlocks without blur');
    await submit.click();
@@ -49,8 +55,14 @@ const content=fs.readFileSync('content/career-director-review/review-panels.json
     await page.locator('#director-answer-'+prefix+'-D'+i).fill('Defense '+i+': model evidence and tradeoff '+track);
     assert.equal(await next.isEnabled(),true,track+' next unlocks without blur');
     await next.click();
+    assert.equal(await page.evaluate(()=>document.activeElement?.id),'director-stage','new challenge heading gains focus');
    }
    assert.equal(await page.locator('[data-director-action="export"]').isEnabled(),false,'no partial final dossier export');
+   await page.locator('[data-director-action="back"]').click();
+   assert.equal(await page.locator('#director-answer-'+prefix+'-D5').inputValue(),'Defense 5: model evidence and tradeoff '+track,'revisit last answer without losing it');
+   await page.locator('[data-director-action="next"]').click();
+   const [draft]=await Promise.all([page.waitForEvent('download'),page.locator('[data-director-action="draft"]').click()]);
+   assert.match(fs.readFileSync(await draft.path(),'utf8'),/DRAFT — INCOMPLETE/);
    await page.locator('#director-twist').fill('Revise assumptions with new information');
    await page.locator('#director-opposite').fill('Strongest credible downside case');
    assert.equal(await page.locator('[data-director-action="export"]').isEnabled(),false,'final required');
@@ -62,6 +74,9 @@ const content=fs.readFileSync('content/career-director-review/review-panels.json
    assert.ok(data.includes('MODEL EVIDENCE'),'dossier generated');
    for(let i=1;i<=5;i++)assert.ok(data.includes(prefix+'-D'+i),'all challenges exported');
    assert.ok(data.includes('Conditional approval'),'final recommendation exported');
+   await page.locator('[data-director-action="reset"]').first().click();
+   assert.equal(await page.locator('#director-final').inputValue(),'Conditional approval with numeric diligence gates','cancelled reset preserves work');
+   confirmLoss=true;
    await page.locator('[data-director-action="reset"]').first().click();
    await page.locator('#director-initial').waitFor();
    assert.equal(await page.locator('#director-initial').inputValue(),'','reset clears initial decision');
