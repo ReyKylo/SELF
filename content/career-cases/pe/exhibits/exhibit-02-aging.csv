@@ -1,0 +1,8 @@
+as_of,asset_class,segment,gross_balance,at_risk_portion,risk_definition,note
+2025-12-31,AR,Independent hospitals,29,7,Past due over 90 days,Concentration and dispute validation needed
+2025-12-31,AR,Hospital chains,18,3,Past due over 90 days,Central invoice acceptance risk
+2025-12-31,AR,Regional dealers,16,5,Past due over 90 days,Counterparty and channel exposure
+2025-12-31,AR,Clinics,12,1,Past due over 90 days,Fragmented collection effort
+2025-12-31,INVENTORY,Imaging devices,36,6,Age over 180 days,Product obsolescence diligence
+2025-12-31,INVENTORY,Diagnostics units,28,8,Age over 180 days,Check SKU turnover and warranty
+2025-12-31,INVENTORY,Consumables,16,3,Age over 180 days,Check shelf life

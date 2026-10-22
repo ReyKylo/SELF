@@ -1,0 +1,58 @@
+{
+  "id": "self-pe-flagship-01",
+  "track": "PE",
+  "version": "0.1.0",
+  "status": "training-draft",
+  "title": "SIMULATED | Aruna Supply: EBITDA up, where did the cash go?",
+  "decision_question": "Should a PE sponsor acquire PT Aruna Supply at 7.0x 2025 EBITDA, with what binding maximum EV and financing conditions, given falling cash conversion and liquidity risk?",
+  "case_type": "simulated",
+  "historical_cutoff": "2025-12-31",
+  "case_prepared_on": "2026-10-22",
+  "units": "IDR billion; ratios as decimals in CSV",
+  "source_ledger": "source-ledger.md",
+  "exhibits": [
+    "exhibits/exhibit-01-historical.csv",
+    "exhibits/exhibit-02-aging.csv",
+    "exhibits/exhibit-03-deal-terms.csv",
+    "exhibits/exhibit-04-forecast-drivers.csv",
+    "exhibits/exhibit-05-covenants.csv",
+    "exhibits/exhibit-06-exit-sensitivity.csv"
+  ],
+  "competency_ids": [
+    "PE-01",
+    "PE-02",
+    "PE-03",
+    "PE-04",
+    "PE-05",
+    "PE-06",
+    "PE-07",
+    "PE-08",
+    "PE-09",
+    "PE-10",
+    "PE-11",
+    "PE-12"
+  ],
+  "learner_tasks": "learner-tasks.md",
+  "tutor_guide": "tutor-guide.md",
+  "assessment": "assessment.md",
+  "work_products": [
+    "Linked historical IS/BS/CF reconstruction",
+    "5-year cash/debt/return spreadsheet with sensitivity",
+    "Two-page investment committee memo",
+    "Five-minute live defense with revised model"
+  ],
+  "test_command": "node tests/cases/pe/check-case.cjs",
+  "review_status": "unreviewed",
+  "rights": "Original simulated company, data and exercises; external sources are linked, not reproduced",
+  "teaching_language": "Bahasa Indonesia with immediate English professional terminology",
+  "private_answer_key_present": false,
+  "integration_status": "not integrated into shared Career UI",
+  "exhibit_git_blob_sha1": {
+    "exhibits/exhibit-01-historical.csv": "c3ee594e135bb1a16e7c4c6621fe651a80a8cff9",
+    "exhibits/exhibit-02-aging.csv": "f5b8b323f3e86bfcfdb8dca8dc37a45d4c4b5da6",
+    "exhibits/exhibit-03-deal-terms.csv": "07c8d1f7984ccc88105b348ed428ebe04f3a27d8",
+    "exhibits/exhibit-04-forecast-drivers.csv": "fa77745f1c5747dfabafbb81b01496b5dce91a2d",
+    "exhibits/exhibit-05-covenants.csv": "d7f1742d8afd4c585f8bb4c16e5529eb7407b313",
+    "exhibits/exhibit-06-exit-sensitivity.csv": "6fb1edc87309cc8bac5b3c15678302d70d43e4a3"
+  }
+}

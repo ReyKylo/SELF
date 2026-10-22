@@ -1,0 +1,17 @@
+parameter,value,unit,provenance,explanation
+seller_ask_ev_multiple,7.0,x_2025_EBITDA,CASE_ASSUMPTION,Nonbinding asking price
+reference_2025_ebitda,39,IDR_bn,SIMULATED_EXHIBIT_01,2025 unadjusted EBITDA
+existing_debt,80,IDR_bn,SIMULATED_EXHIBIT_01,Repaid at closing
+existing_cash,13.54,IDR_bn,SIMULATED_EXHIBIT_01,Unrestricted ending cash
+minimum_cash,12,IDR_bn,CASE_ASSUMPTION,Required operating floor at closing and throughout
+deal_fees,5,IDR_bn,CASE_ASSUMPTION,Sponsor funded cash expense not capitalized
+new_term_debt,130,IDR_bn,CASE_ASSUMPTION,Assumed lender availability subject to DD
+revolver_commitment,25,IDR_bn,CASE_ASSUMPTION,Assumed fully available for stress liquidity
+annual_term_amortization,7,IDR_bn,CASE_ASSUMPTION,Year end after annual interest
+base_term_interest_rate,0.11,decimal,CASE_ASSUMPTION,Fixed annual on opening balance
+down_term_interest_rate,0.13,decimal,CASE_ASSUMPTION,Stress refinance repricing
+revolver_interest_rate,0.14,decimal,CASE_ASSUMPTION,Annual on opening revolver balance
+cash_tax_rate,0.22,decimal,CASE_ASSUMPTION,Simplifying tax assumption not legal advice
+cash_sweep_fraction,0.50,decimal,CASE_ASSUMPTION,Sweep half cash above floor after revolver repayment
+target_irr,0.20,decimal,CASE_ASSUMPTION,Annual equity hurdle
+holding_years,5,years,CASE_ASSUMPTION,FY2026 to FY2030

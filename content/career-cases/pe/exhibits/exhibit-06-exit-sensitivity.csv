@@ -1,0 +1,10 @@
+entry_ev,entry_ev_multiple_2025_ebitda,exit_ev_multiple_2030_ebitda,sponsor_equity,exit_equity_proceeds,moic,annual_irr,scenario
+260,6.666667,6,147.000000,397.050364,2.701023,0.219848,base_operating_no_distributions
+260,6.666667,7,147.000000,466.650035,3.174490,0.259896,base_operating_no_distributions
+260,6.666667,8,147.000000,536.249706,3.647957,0.295418,base_operating_no_distributions
+273,7.000000,6,160.000000,397.050364,2.481565,0.199348,base_operating_no_distributions
+273,7.000000,7,160.000000,466.650035,2.916563,0.238723,base_operating_no_distributions
+273,7.000000,8,160.000000,536.249706,3.351561,0.273648,base_operating_no_distributions
+285,7.307692,6,172.000000,397.050364,2.308432,0.182125,base_operating_no_distributions
+285,7.307692,7,172.000000,466.650035,2.713082,0.220935,base_operating_no_distributions
+285,7.307692,8,172.000000,536.249706,3.117731,0.255358,base_operating_no_distributions
