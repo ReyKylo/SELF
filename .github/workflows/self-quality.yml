@@ -51,6 +51,30 @@ jobs:
         run: |
           node tools/check_worker_scope.cjs --self-test
           node tools/check_worker_scope.cjs
+      # Phase 2 Integration D: independently execute exactly the submitted PR-head case validators.
+      # Temporary preflight; convert to main-path checks after individual case PR merges.
+      - uses: actions/checkout@v4
+        with:
+          ref: 6030e2ebf0b64216b290dafbf2158595e94f1c5b
+          path: case-checks/pe
+          persist-credentials: false
+      - name: Independent native Node financial QA — PE (pinned PR SHA)
+        run: node case-checks/pe/tests/cases/pe/check-case.cjs
+      - uses: actions/checkout@v4
+        with:
+          ref: a248305533d9c92589c0e62353d265ce84e4d0dc
+          path: case-checks/vc
+          persist-credentials: false
+      - name: Independent native Node financial QA — VC (pinned PR SHA)
+        run: node case-checks/vc/tests/cases/vc/check-case.cjs
+      - uses: actions/checkout@v4
+        with:
+          ref: 13c2ebea32a5701d78666f53a1ba5692bd33b0ca
+          path: case-checks/consulting
+          persist-credentials: false
+      - name: Independent native Node financial QA — Consulting (pinned PR SHA)
+        run: node case-checks/consulting/tests/cases/consulting/check-case.cjs
+
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
