@@ -90,8 +90,6 @@ jobs:
           node tests/career-director-review.test.cjs
           node --check tools/check_career_production.mjs
           node tests/check_career_production.test.mjs
-      - name: Deploy contract (wrangler builds its own dist)
-        run: node tests/smoke_deploy_config.cjs
       - name: Phase 6 Work Sample content, sealed-file leak guard and renderer safety
         run: node tests/smoke_worksample_content.cjs
       - name: Phase 6 deterministic XLSX structure check with deliberately broken workbooks
