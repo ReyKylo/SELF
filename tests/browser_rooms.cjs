@@ -126,6 +126,18 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await page.locator('[data-action="nav"][data-view="settings"]:visible').first().click();
  assert.equal(await page.locator('.rooms-bar .door[aria-current="page"]').count(),0,'Settings has no current door');
 
+ /* 7b. Wide fallback fonts at 150% text must not push the page sideways (a CI runner without Inter did exactly that) */
+ await page.goto(x.base);await page.locator('.shell[data-shell="rooms"]').waitFor();
+ await page.evaluate(()=>{document.documentElement.style.setProperty('--scale','1.5');const s=document.createElement('style');s.textContent='body,body *{font-family:"DejaVu Sans",sans-serif!important}';document.head.appendChild(s)});
+ for(const room of ['today','work','hunt','study','studio']){
+  await page.locator('.rooms-bar .door[data-room="'+room+'"]').click();await page.waitForTimeout(150);
+  const dims=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
+  assert.ok(dims.scroll<=dims.viewport+1,room+' overflows at 390px, 150% text, wide font: '+JSON.stringify(dims));
+ }
+ await page.locator('[data-action="nav"][data-view="settings"]:visible').first().click();
+ {const d=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));assert.ok(d.scroll<=d.viewport+1,'settings overflows: '+JSON.stringify(d))}
+ await page.evaluate(()=>{document.documentElement.style.removeProperty('--scale')});
+
  /* 8. Classic shell is one URL parameter away */
  await page.setViewportSize({width:1366,height:768});
  await page.goto(x.base+'/?shell=classic');await page.locator('.sidebar .nav-btn').first().waitFor();

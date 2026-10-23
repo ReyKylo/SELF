@@ -106,6 +106,10 @@ body[data-theme='light'] .shell[data-shell="rooms"] .main::before{opacity:.7}
  .rooms-bar .door small{display:none}
  .rooms-bar .rail-ind{left:0;right:auto;top:0;height:3px;border-radius:0 0 3px 3px;background:var(--tint)}
  .rooms-settings{display:inline-flex}
+ /* The door bar already says where you are; the breadcrumb and a wrapping action row keep the top bar inside 390px with wide fallback fonts at 150% text. */
+ .shell[data-shell="rooms"] .crumb{display:none}
+ .shell[data-shell="rooms"] .topbar{justify-content:flex-end}
+ .shell[data-shell="rooms"] .top-actions{flex-wrap:wrap;justify-content:flex-end;min-width:0}
  .toast{left:16px;right:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px))}
  .shell[data-shell="rooms"] .kanban{grid-auto-flow:column;grid-auto-columns:86%;grid-template-columns:none;scroll-snap-type:x mandatory}
  .shell[data-shell="rooms"] .kanban-col{scroll-snap-align:center}
