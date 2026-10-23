@@ -15,7 +15,7 @@
 | R1 shell and routing | **Done** | `rooms.js`, `rooms.css`; `chrome()`, `go()` in `app.js`. Rollback: `?shell=classic`. Deviations: the phone breakpoint is 600px (the app's existing one, not 700px); Hunt and Study both use Career's own rail until R3 splits it, so the Career pages are unchanged |
 | M1 motion and feel | **Done, minus three items** | press, ripple, room entrance (once per navigation), aurora, tint glide, indicator slide, toast spring, burst on Done and Offer, count-up on Home, circular theme reveal, reduced motion. Not yet: Undo progress line on toasts, the save-tick drawing, click sounds |
 | D1 drag and drop | **Done for the board and Applications** | `self-dnd.js` (pointer, touch grip or long-press, keyboard). Not yet: calendar week view and Three for today (their adapters, `due` and `three`, belong to the phases that add those screens) |
-| R2 Today | Not started | |
+| R2 Today | **Done** | `today.js`: Three for today (pins per device and day, drag or keyboard reorder, swap), agenda merge (tasks, interviews, follow-ups; Career data is opt-in via a button), one-at-a-time inbox triage (Make task, File to Space, Keep, Delete with a 5 s Undo window, swipe). Quick Capture keeps its mode chips until R4; the Focus button waits for R5, so rows open the task sheet. "My Priorities" is replaced by Three for today in Rooms and is unchanged in the classic shell |
 | R3 Hunt and Study | Not started | |
 | R4 palette and capture grammar | Not started | `Ctrl K` still opens Search |
 | R5 Focus mode | Not started | |

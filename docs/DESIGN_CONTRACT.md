@@ -20,6 +20,7 @@ The user approved the Rooms direction and asked for it to be built. Spec: `docs/
 - **Badges** come only from loaded data. No placeholder numbers (gate 4 below still applies).
 - **Motion:** 90 to 420 ms, transform and opacity only, entrance once per navigation (never on a data refresh), and everything off under `prefers-reduced-motion`.
 - **Drag and drop** works by mouse, touch and keyboard, saves only through the existing save functions with Undo, and never implies an order that is not stored.
+- **Today (Home in Rooms):** Quick Capture stays on top. My Priorities becomes **Three for today** (pinned or best-ranked open tasks) beside an Agenda and an Inbox triage stack; Continue Where You Left Off and the activity counts stay below. The classic shell keeps the original Home.
 - **Unchanged:** 16px base text with 100 to 150% scaling, targets around 40px or more (doors 72px; the phone bar 58px plus the safe area), designed dark and light themes.
 
 ## Acceptance gates

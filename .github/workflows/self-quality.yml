@@ -24,6 +24,7 @@ jobs:
           node --check rooms.js
           node --check motion.js
           node --check self-dnd.js
+          node --check today.js
           node --check boards.js
           node --check canvas-v3.js
           node --check career.js
@@ -46,6 +47,8 @@ jobs:
         run: node tests/smoke_rooms.cjs
       - name: Drag-and-drop engine, landing slots and board markup
         run: node tests/smoke_dnd.cjs
+      - name: Today room agenda merge, Three for today and inbox triage
+        run: node tests/smoke_today.cjs
       - name: Phase 1 API smoke
         run: node tests/smoke_api.cjs
       - name: Career Phase 1 integration and ownership regression
@@ -125,6 +128,7 @@ jobs:
           test -s dist/motion.js
           test -s dist/motion.css
           test -s dist/self-dnd.js
+          test -s dist/today.js
           test -s dist/styles.css
           test -s dist/boards.js
           test -s dist/boards.css
