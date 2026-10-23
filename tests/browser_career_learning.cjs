@@ -36,8 +36,10 @@ const noOverflow=async p=>{const width=await p.evaluate(()=>({actual:document.do
   assert.match(await x.page.locator('.learning-count').innerText(),/4 dari 12/);
   await x.page.locator('#learning-search').fill('this will never match a source');await x.page.locator('.learning-empty').waitFor();assert.match(await x.page.locator('.learning-count').innerText(),/0 dari 12/);
   await x.page.locator('[data-learning="clear"]').first().click();assert.match(await x.page.locator('.learning-count').innerText(),/12 dari 12/);
+  await x.page.locator('[data-learning="panel-select"][data-id="VC03"]').click();
+  assert(await x.page.locator('.learning-original .learning-pointer-note').first().isVisible());assert.equal(await x.page.locator('.learning-original img').count(),0);
   await x.page.locator('[data-learning="panel-select"][data-id="VC04"]').click();
-  assert(await x.page.locator('.learning-pointer-note').isVisible());assert.equal(await x.page.locator('.learning-original img').count(),0);
+  assert.equal(await x.page.locator('.learning-original .learning-document-mark').count(),0);assert.equal(await x.page.locator('.learning-original img').count(),1);
   await x.page.locator('.learning-related [data-learning="video"]').first().click();assert.equal(await x.page.locator('iframe').count(),0);
   assert(await x.page.locator('[data-learning="back-evidence"]').isVisible());
   await x.page.locator('[data-learning="back-evidence"]').click();assert.match(await x.page.locator('#learning-evidence-title').innerText(),/PagerDuty/);

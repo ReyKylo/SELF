@@ -11,6 +11,8 @@ on:
       - 'tests/career-director-review.test.cjs'
       - 'tests/career-director-review.browser.cjs'
       - 'tests/browser_director_full_app.cjs'
+      - 'tests/browser_career_learning.cjs'
+      - 'content/career-learning.json'
       - 'tests/browser_learning_fixture.cjs'
       - 'index.html'
       - 'tools/build_cloudflare.py'
@@ -57,3 +59,5 @@ jobs:
         run: node tests/career-director-review.browser.cjs
       - name: Real SELF shell synthetic-login and mobile Chromium tests
         run: node tests/browser_director_full_app.cjs
+      - name: Career Prep evidence, Task and focus Chromium tests
+        run: node tests/browser_career_learning.cjs
