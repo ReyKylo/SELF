@@ -1,0 +1,192 @@
+<title>SELF Redesign Concepts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a single review column (~70ch) with full-width prototype frames that break out to 1200px. */
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --line:#dde3ec; --text:#142033; --muted:#55657c; --faint:#8592a6;
+  --blue:#2369e0; --ledger:#b4433c; --desk:#0b63c5; --rooms:#16855f; --good:#16855f; --mid:#a8650c; --weak:#c3484f;
+  --display:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;
+  --body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'DM Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d141d; --surface:#151f2b; --line:#263445; --text:#f2f5f9; --muted:#a0adbd; --faint:#6f7f92;
+  --blue:#5b9bff; --ledger:#e07a72; --desk:#4fc3f7; --rooms:#3dce9e; --good:#3dce9e; --mid:#f0b862; --weak:#f68e94; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d141d; --surface:#151f2b; --line:#263445; --text:#f2f5f9; --muted:#a0adbd; --faint:#6f7f92;
+  --blue:#5b9bff; --ledger:#e07a72; --desk:#4fc3f7; --rooms:#3dce9e; --good:#3dce9e; --mid:#f0b862; --weak:#f68e94; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.6}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.page{max-width:1200px;margin:0 auto;padding-block:48px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.col{max-width:72ch}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:clamp(2.4rem,6vw,3.8rem);font-weight:800;margin:0 0 16px}
+h2{font-size:clamp(1.6rem,3.4vw,2.2rem);margin:72px 0 14px}
+h3{font-size:1.25rem;margin:0 0 6px}
+p{margin:0 0 14px}
+.eyebrow{font-family:var(--mono);font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.lede{font-size:1.15rem;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.fact b{font-family:var(--display);font-size:2.1rem;display:block;line-height:1}
+.fact span{color:var(--muted);font-size:.92rem}
+.fact code{font-family:var(--mono);font-size:.8rem}
+
+.concept{margin-top:56px;display:grid;gap:18px}
+.chead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start}
+.badge{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--c);color:var(--c);border-radius:999px;padding:3px 12px;white-space:nowrap;margin-top:6px}
+.chead h3{font-size:clamp(1.6rem,3vw,2rem)}
+.chead p{color:var(--muted);margin:0}
+.frame{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.frame .bar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.78rem;color:var(--faint);flex-wrap:wrap}
+.frame .bar .sp{flex:1}
+.frame .bar a,.frame .bar button{font:inherit;color:var(--text);border:1px solid var(--line);background:transparent;border-radius:8px;padding:6px 10px;cursor:pointer;text-decoration:none;min-height:36px;display:inline-flex;align-items:center}
+.frame .bar button[aria-pressed="true"]{border-color:var(--text)}
+.frame iframe{display:block;width:100%;height:640px;border:0;background:var(--bg)}
+.frame.phone iframe{width:390px;max-width:100%;margin:0 auto;height:720px;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.split div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.split h4{margin:0 0 8px;font-size:.78rem;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:500}
+.split ul{margin:0;padding-left:18px}
+.split li{margin-bottom:6px}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:500}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:700;width:24%}
+.r{font-family:var(--mono);font-size:.82rem;white-space:nowrap}
+.r i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;background:var(--line)}
+.r i.on{background:var(--c)}
+td small{display:block;color:var(--muted);font-size:.86rem;margin-top:4px}
+
+.verdict{margin-top:24px;border:2px solid var(--rooms);border-radius:18px;padding:24px;background:var(--surface)}
+.verdict h3{font-size:1.6rem}
+.verdict ol{padding-left:20px;margin:12px 0 0}
+.verdict li{margin-bottom:8px}
+.phases{display:grid;gap:10px;margin-top:18px}
+.ph{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.ph b{font-family:var(--mono);color:var(--rooms)}
+.ph code,.col code{font-family:var(--mono);font-size:.84em;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:0 4px;overflow-wrap:anywhere}
+.ph p{margin:0;color:var(--muted);font-size:.95rem}
+.ph strong{display:block}
+.foot{margin-top:56px;color:var(--faint);font-size:.9rem}
+.toggle{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;font-size:.85rem;cursor:pointer;z-index:5}
+
+@media (max-width:820px){
+  .facts,.split{grid-template-columns:minmax(0,1fr)}
+  .chead{grid-template-columns:minmax(0,1fr)}
+  .frame iframe{height:560px}
+}
+</style>
+
+<button class="toggle" id="theme" type="button">◐ Theme</button>
+<div class="page">
+  <div class="col">
+    <div class="eyebrow">SELF · design exploration · 23 Oct 2026</div>
+    <h1>Three ways SELF could work</h1>
+    <p class="lede">SELF already does a lot: tasks across Spaces, whiteboards, links, and a full career operation from pipeline to case labs. The design hasn't kept up. These are three different answers to that, each one clickable.</p>
+    <p>What I found in the repository, which every concept below responds to:</p>
+  </div>
+  <div class="facts">
+    <div class="fact"><b>27</b><span>destinations across three stacked navigation layers: sidebar (8), Career rail (10), Career Prep tabs (9).</span></div>
+    <div class="fact"><b>0</b><span>interviews or follow-ups on Home. <code>renderHome()</code> ranks tasks only, though interview and touchpoint data is already loaded in the browser.</span></div>
+    <div class="fact"><b>1</b><span>thing you can do with an Inbox capture: delete it. There is no way to turn it into a task or file it to a Space.</span></div>
+  </div>
+
+  <h2>The concepts</h2>
+  <p class="col">Each prototype is a standalone HTML file with sample data. Nothing saves. Use the buttons to switch between desktop and phone width, or open one full size. Every prototype has its own light and dark theme.</p>
+
+  <section class="concept" id="ledger" style="--c:var(--ledger)">
+    <div class="chead"><span class="badge">01 · Ledger</span><div><h3>Time is the spine</h3><p>Every SELF record already has a date: task due dates, interview times, last-contact dates, capture times. Ledger turns each day into one ruled page, like an accounting day-book. Overdue items are "carried forward", the tally box reconciles opened against closed, and you write in one line: <code>Kirim CV besok #Career !high</code>.</p></div></div>
+    <div class="frame" data-frame><div class="bar"><span>ledger.html</span><span class="sp"></span><button type="button" data-w="desk" aria-pressed="true">Desktop</button><button type="button" data-w="phone" aria-pressed="false">Phone</button><a href="ledger.html" target="_blank" rel="noopener">Open full size ↗</a></div><iframe src="ledger.html" title="Ledger prototype" loading="lazy"></iframe></div>
+    <div class="split">
+      <div><h4>Try</h4><ul><li>Type in the capture line and watch it parse into chips</li><li>Press Enter to file it</li><li>Click a bullet to close it; the balance updates</li><li>"Move to today" on overdue items</li></ul></div>
+      <div><h4>Wins</h4><ul><li>Career shows up in the day at last</li><li>Calmest concept, and the best at 150% text</li><li>Needs no schema change</li></ul></div>
+      <div><h4>Costs</h4><ul><li>Weak for browsing companies, boards or labs</li><li>Paper texture and serif type move far from Wireframe V2</li><li>A timeline gets long on busy weeks</li></ul></div>
+    </div>
+  </section>
+
+  <section class="concept" id="desk" style="--c:var(--desk)">
+    <div class="chead"><span class="badge">02 · Desk</span><div><h3>An analyst's deal desk</h3><p>You're training for PE, VC and consulting, so the workspace looks like the job: five numbered panes on one screen (work queue, pipeline funnel with conversion, contact aging buckets, sprint, inbox), a command line, function keys and an activity tape. Built for the keyboard first.</p></div></div>
+    <div class="frame" data-frame><div class="bar"><span>desk.html</span><span class="sp"></span><button type="button" data-w="desk" aria-pressed="true">Desktop</button><button type="button" data-w="phone" aria-pressed="false">Phone</button><a href="desk.html" target="_blank" rel="noopener">Open full size ↗</a></div><iframe src="desk.html" title="Desk prototype" loading="lazy"></iframe></div>
+    <div class="split">
+      <div><h4>Try</h4><ul><li>Click inside, then press <code>/</code> and type <code>new "Kirim CV" @career !high due:mon</code></li><li>Press <code>1</code> to <code>5</code> to focus panes, <code>j</code>/<code>k</code> to move, Enter to inspect</li><li><code>find aruna</code> filters the queue</li><li><code>?</code> lists every key</li></ul></div>
+      <div><h4>Wins</h4><ul><li>Everything visible at once, with no navigation</li><li>Contact aging is a real CRM signal, borrowed from receivables aging</li><li>Fastest for a power user</li></ul></div>
+      <div><h4>Costs</h4><ul><li>Breaks the contract: 36px rows, and dense panes fight 150% text</li><li>On a phone it collapses into a long scroll</li><li>Feels like work even on a rest day</li></ul></div>
+    </div>
+  </section>
+
+  <section class="concept" id="rooms" style="--c:var(--rooms)">
+    <div class="chead"><span class="badge">03 · Rooms</span><div><h3>Organized by what you're doing</h3><p>Five rooms replace 27 destinations: <strong>Today</strong>, <strong>Work</strong>, <strong>Hunt</strong>, <strong>Study</strong> and <strong>Studio</strong>. Each room has its own layout and takes its tint from SELF's existing accent colors, and none has more than one row of sub-navigation. Any task opens in a full-screen <strong>Focus</strong> mode, and Ctrl K jumps anywhere.</p></div></div>
+    <div class="frame" data-frame><div class="bar"><span>rooms.html</span><span class="sp"></span><button type="button" data-w="desk" aria-pressed="true">Desktop</button><button type="button" data-w="phone" aria-pressed="false">Phone</button><a href="rooms.html" target="_blank" rel="noopener">Open full size ↗</a></div><iframe src="rooms.html" title="Rooms prototype" loading="lazy"></iframe></div>
+    <div class="split">
+      <div><h4>Try</h4><ul><li>Walk through the five doors</li><li>Press <strong>Focus</strong> on a task; Esc leaves</li><li>Triage the inbox one card at a time</li><li>Ctrl K, type "hunt", press Enter</li></ul></div>
+      <div><h4>Wins</h4><ul><li>Navigation goes from three layers to two at most</li><li>Each existing module moves into a room; none is rewritten</li><li>Five doors fit the phone bar exactly</li></ul></div>
+      <div><h4>Costs</h4><ul><li>A new mental model, so names must be clear</li><li>Changes to the shell touch locked shared files</li><li>Room tints need discipline to stay subtle</li></ul></div>
+    </div>
+  </section>
+
+  <h2>Side by side</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Criterion</th><th>Ledger</th><th>Desk</th><th>Rooms</th></tr></thead>
+    <tbody>
+      <tr><td>Cuts navigation depth</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i></i><small>Tabs help, but the Career sub-rail remains</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Panes plus function keys</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>27 destinations become 5 rooms with one sub-row each</small></td></tr>
+      <tr><td>Brings Career into the day</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Its whole premise</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i class="on"></i><i></i><small>Visible, but in separate panes</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>The Today agenda merges tasks, interviews and follow-ups</small></td></tr>
+      <tr><td>Phone and 150% text</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i class="on"></i><small>A single column by nature</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i></i><i></i><small>Density is the point, so it breaks</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Five-door bottom bar</small></td></tr>
+      <tr><td>Fits the zero-build codebase</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i></i><small>New Home view; the rest stays as it is</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i></i><i></i><small>Rewrites most renderers</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small><code>state.view</code> stays; rooms sit on top of it</small></td></tr>
+      <tr><td>Respects the design contract</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i></i><i></i><small>New visual language</small></td><td class="r" style="--c:var(--desk)"><i></i><i></i><i></i><small>Smaller targets, dense type</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i></i><small>Same palette and fonts; the shell changes</small></td></tr>
+      <tr><td>Daily feel</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Calm and reflective</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i class="on"></i><i></i><small>Powerful but always "on"</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Changes with the room you're in</small></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Recommendation: Rooms, with two parts borrowed</h2>
+  <div class="col">
+    <p>Rooms fixes the problem that grows with every feature you add, which is depth. It does that without rewriting modules: <code>career.js</code> already lets the shell set its page, and <code>boards.js</code> and <code>career-learning.js</code> mount the same way, so each module moves into a room more or less intact. Ledger has the better Home and Desk the better keyboard, so I'd take one piece from each:</p>
+  </div>
+  <div class="verdict">
+    <h3>The build</h3>
+    <ol>
+      <li><strong>Rooms shell</strong>: a door rail, a tint per room, one sub-navigation row at most, and Focus mode.</li>
+      <li><strong>From Ledger:</strong> the capture grammar (<code>#space !priority besok</code>) and the agenda that merges tasks, interviews and follow-ups, both in the Today room.</li>
+      <li><strong>From Desk:</strong> the Ctrl K palette, Alt+1–5 room keys, and the stage-to-stage funnel conversion in Hunt.</li>
+      <li><strong>Left out:</strong> Ledger's paper texture and Desk's density. Both look striking, and both cost readability at 150% text.</li>
+    </ol>
+  </div>
+
+  <h2>Blueprint for the build</h2>
+  <p class="col">The full plan is in <code>docs/design/ROOMS_REDESIGN_BLUEPRINT.md</code>: verified line references, a route map, file paths and acceptance criteria for each phase. In short:</p>
+  <div class="phases">
+    <div class="ph"><b>R0</b><div><strong>Contract and approval</strong><p>Docs only. You approve; <code>DESIGN_CONTRACT.md</code> gets a Rooms section. No code merges without this.</p></div></div>
+    <div class="ph"><b>R1</b><div><strong>Door rail and routing</strong><p>New <code>rooms.js</code> and <code>rooms.css</code>; <code>chrome()</code> in <code>app.js</code> calls them. <code>state.view</code> is unchanged and <code>roomOf()</code> is derived from it. Badges count only data that is loaded.</p></div></div>
+    <div class="ph"><b>R2</b><div><strong>Today room</strong><p>New <code>today.js</code>: Three for today (from <code>priorityRank()</code>), a merged agenda, and inbox triage built from the existing insert, patch and delete calls.</p></div></div>
+    <div class="ph"><b>R3</b><div><strong>Hunt and Study</strong><p><code>SELFCareer.render({hosted})</code> turns the Career rail into pills. The 9 Career Prep tabs are grouped as Build, Learn and Get challenged, with the same ids.</p></div></div>
+    <div class="ph"><b>R4</b><div><strong>Palette and capture grammar</strong><p>A pure <code>parseCapture()</code> function with at least 25 fixtures, including Indonesian weekdays. It never creates a Space without asking.</p></div></div>
+    <div class="ph"><b>R5</b><div><strong>Focus mode</strong><p>A full-screen task that reuses the existing <code>data-task-field</code> save path. The timer stays on the device.</p></div></div>
+    <div class="ph"><b>R6</b><div><strong>Visual system</strong><p><code>--room</code> tokens and a display face for room titles only; both themes checked against WCAG AA.</p></div></div>
+  </div>
+  <p class="col" style="margin-top:18px">Every phase: no Supabase migration, all existing smoke tests pass, and Playwright screenshots at 1366 and 390 px, 100% and 150% text, light and dark, using the fixture pattern that never writes to production.</p>
+
+  <p class="foot">Prototypes live in <code>design/concepts/</code>. That folder is outside the Cloudflare build list, so nothing here can deploy. All names and records are sample data.</p>
+</div>
+
+<script>
+(function(){
+document.querySelectorAll('[data-frame]').forEach(f=>{
+  f.addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;
+    f.classList.toggle('phone',b.dataset.w==='phone');
+    f.querySelectorAll('[data-w]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
+});
+document.getElementById('theme').addEventListener('click',()=>{
+  const r=document.documentElement;const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  const next=cur==='dark'?'light':'dark';r.dataset.theme=next;
+  document.querySelectorAll('iframe').forEach(i=>{try{i.contentDocument.documentElement.dataset.theme=next}catch(e){}});
+});
+})();
+</script>
