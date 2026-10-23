@@ -1,0 +1,4 @@
+id,core_cost_saving_k_idr_per_pack,core_eligible_share,premium_retail_increment_k_packs,core_retail_cannibal_k_packs,premium_retail_discount_k_idr_per_pack,core_b2b_exited_k_packs,remaining_core_b2b_price_uplift_k_idr_per_pack,annual_recurring_cost_idr_m,annual_route_saving_idr_m,one_time_execution_expense_idr_m,upfront_capex_idr_m,execution_slots
+A_procurement,1.4,0.8,0,0,0,0,0,300,0,500,800,4
+B_premium_relaunch,0,0,150,50,1,0,0,600,0,450,400,4
+C_b2b_contract_reset,0,0,0,0,0,150,2,200,600,250,100,3

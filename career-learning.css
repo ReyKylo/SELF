@@ -122,3 +122,36 @@
 
 /* Aruna guided 5-year operating / debt forecast */
 .lab-projection{margin-top:28px;border:1px solid var(--line);border-radius:10px;padding:24px;background:var(--card2)}.lab-projection-switch{display:flex;gap:8px;margin:15px 0 18px}.lab-projection-switch button{padding:11px 17px;min-height:42px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:7px;cursor:pointer}.lab-projection-switch button[aria-pressed=true]{background:var(--blue);color:white;border-color:var(--blue)}.lab-model-scroll{overflow:auto;max-width:100%}.lab-model-table{width:100%;min-width:630px;border-collapse:collapse;font-size:.8em;font-variant-numeric:tabular-nums}.lab-model-table th,.lab-model-table td{border-bottom:1px solid var(--line);text-align:right;padding:10px 7px}.lab-model-table th:first-child{text-align:left;position:sticky;left:0;background:var(--card2)}.lab-model-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin:18px 0}.lab-model-summary>div{padding:13px;border:1px solid var(--line);border-radius:7px}.lab-model-summary small{display:block;color:var(--muted)}.lab-model-summary strong{display:block;margin-top:6px}.lab-model-exercises{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:12px;margin:15px 0}.lab-model-exercise{display:flex;flex-direction:column;gap:8px}.lab-model-exercise label{font-size:.84em;line-height:1.45}.lab-model-exercise input{font:inherit;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:10px;min-height:42px}.lab-projection .lab-disclaimer{font-size:.8em;line-height:1.6}@media(max-width:700px){.lab-projection{padding:15px}}
+
+/* Phase 6 — Independent Work Samples (reuses Career Prep tokens; no new visual direction) */
+.ws-root{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;max-width:980px;min-width:0}.ws-root>*{min-width:0}
+.ws-tracks{display:flex;flex-wrap:wrap;gap:8px}
+.ws-tracks .career-btn{min-height:44px}
+.ws-head h2{font-size:1.55rem;margin:8px 0 10px}.ws-head p{max-width:70ch;line-height:1.7;color:var(--muted)}
+.ws-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0 0}
+.ws-facts div{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card2)}
+.ws-facts dt{font-size:.7em;font-weight:780;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.ws-facts dd{margin:4px 0 0;line-height:1.5}
+.ws-flow{display:grid;gap:8px;padding-left:22px;line-height:1.6}
+.ws-brief{border:1px solid var(--line);border-radius:12px;padding:22px 24px;background:var(--card);line-height:1.7;overflow-wrap:anywhere}
+.ws-brief h2,.ws-brief h3,.ws-brief h4{margin:20px 0 8px}.ws-brief h2:first-child{margin-top:0}
+.ws-brief blockquote{margin:12px 0;padding:10px 14px;border-left:3px solid var(--blue);background:var(--card2);border-radius:0 8px 8px 0}
+.ws-brief code{background:var(--card2);padding:1px 5px;border-radius:5px}
+.ws-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:12px 0;max-width:100%}
+.ws-scroll:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ws-scroll table{border-collapse:collapse;width:100%;min-width:max-content;font-size:.88em}
+.ws-scroll th,.ws-scroll td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.ws-scroll th{background:var(--card2);color:var(--muted);font-weight:700}
+.ws-data-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.ws-data-head h4{margin:0}
+.ws-deliver ol{padding-left:22px;line-height:1.7;display:grid;gap:6px}
+.ws-check{border:1px solid var(--line);border-radius:12px;padding:20px 22px;background:var(--card2);display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.ws-check>*{min-width:0}
+.ws-check h3{margin:0}.ws-note{color:var(--muted);line-height:1.65;max-width:75ch}
+.ws-file{font-weight:700}.ws-check input[type=file]{width:100%;max-width:100%;min-height:44px}
+.ws-check-opt{display:flex;gap:10px;align-items:flex-start;line-height:1.5}.ws-check-opt input{width:20px;height:20px;margin-top:2px}
+.ws-sheets,.ws-findings{padding-left:20px;line-height:1.6;display:grid;gap:4px}
+.ws-findings .ws-error strong{color:var(--red)}.ws-findings .ws-warn strong{color:var(--blue)}
+.ws-error{color:var(--red)}
+.ws-actions{display:flex;flex-wrap:wrap;gap:10px}.ws-actions .career-btn{min-height:44px}
+@media(max-width:600px){.ws-brief{padding:16px}.ws-actions .career-btn{flex:1 1 100%}.ws-tracks .career-btn{flex:1 1 100%}}
+@media(prefers-reduced-motion:reduce){.ws-root *{transition:none!important}}
+.ws-badge{display:inline-block;font-size:.7em;font-weight:780;letter-spacing:.08em;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted)}
+#ws-check-result:focus{outline:none}#ws-check-result:focus-visible{outline:2px solid var(--blue);outline-offset:3px}

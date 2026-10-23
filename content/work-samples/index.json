@@ -1,0 +1,78 @@
+{
+  "version": "1.0.0",
+  "phase": "Career Prep Phase 6 — Independent Work Samples",
+  "notice": "Semua perusahaan dan angka di sini SIMULASI untuk latihan. Bukan transaksi, klien, atau rekomendasi investasi nyata. Tidak ada kunci jawaban di aplikasi; hasil kerja lu dinilai lewat review manusia dan sesi defense, bukan skor otomatis.",
+  "samples": [
+    {
+      "track": "PE",
+      "label": "Private Equity",
+      "company": "PT Sagara CareTrade (fiktif)",
+      "title": "Sagara CareTrade: harga tawar tertinggi yang masih bisa dibiayai",
+      "timebox": "100 menit",
+      "cutoff": "FY2025 (31 Des 2025)",
+      "competencies": "PE-01 sampai PE-12",
+      "brief": "./content/work-samples/pe/brief.md",
+      "data": [],
+      "dataNote": "Seluruh data kasus ada di dalam brief.",
+      "starter": "PE",
+      "deliverables": [
+        "Hipotesis NWC dan cash conversion historis, plus minimal 3 permintaan diligence yang membedakan data tercatat dari klaim penjual",
+        "Pada harga tawaran: seller consideration, Sources & Uses, dan sponsor equity (EV pembelian dipisah dari proceeds penjual)",
+        "Model 5 tahun base dan downside: cash waterfall, covenant gate, suntikan sponsor, hutang akhir, dan exit sponsor equity",
+        "Sensitivitas entry × exit (termasuk exit 6,5× dan 5,5×) dan EV maksimum untuk IRR 20% bila pendanaan lolos tes",
+        "Memo IC 2 halaman dengan satu permintaan keputusan, 3 gate yang bisa difalsifikasi, dan defense lisan 5 menit"
+      ]
+    },
+    {
+      "track": "VC",
+      "label": "Venture Capital",
+      "company": "Pilot regional ArusOps (fiktif, data terpisah)",
+      "title": "ArusOps transfer audit: underwriting ulang pilot regional",
+      "timebox": null,
+      "cutoff": "30 Sep 2026",
+      "competencies": "VC-01 sampai VC-12",
+      "brief": "./content/work-samples/vc/brief.md",
+      "data": [
+        {"label": "Kohort pilot (CSV)", "path": "./content/work-samples/vc/holdout-cohorts.csv", "filename": "SELF_VC_Holdout_Cohorts.csv"}
+      ],
+      "starter": "VC",
+      "deliverables": [
+        "(a) MRR, ARR, jumlah logo September, serta GRR/NRR pelanggan lama",
+        "(b) Retensi logo dan revenue bulan ke-3 hanya untuk kohort yang eligible",
+        "(c) CAC dan payback gross profit untuk kedua segmen",
+        "(d) Net burn September, kas akhir, dan runway dengan burn yang diusulkan founder",
+        "(e) Top-up option pool, kepemilikan lead setelah dua putaran dan grant 4%, MOIC base, dan payout preferensi saat distress",
+        "(f) TAM/SAM/SOM dan satu alasan sensitif harga untuk PASS",
+        "Semua dikumpulkan di tab workbook bernama Holdout"
+      ]
+    },
+    {
+      "track": "Consulting",
+      "label": "Strategy Consulting",
+      "company": "SajiRasa (fiktif)",
+      "title": "SajiRasa: pulihkan margin tanpa menghabiskan kapasitas eksekusi",
+      "timebox": "100 menit analisis + 30 menit deck + 15 menit tantangan partner",
+      "cutoff": "1 Okt 2026 (run-rate tahunan 2026, bukan FY2026 yang diaudit)",
+      "competencies": "CO-01 sampai CO-12",
+      "brief": "./content/work-samples/consulting/brief.md",
+      "data": [
+        {"label": "E01 Historis", "path": "./content/work-samples/consulting/E01.csv", "filename": "SELF_Consulting_E01.csv"},
+        {"label": "E02 Ekonomi segmen", "path": "./content/work-samples/consulting/E02.csv", "filename": "SELF_Consulting_E02.csv"},
+        {"label": "E03 Operasional", "path": "./content/work-samples/consulting/E03.csv", "filename": "SELF_Consulting_E03.csv"},
+        {"label": "E04 Inisiatif", "path": "./content/work-samples/consulting/E04.csv", "filename": "SELF_Consulting_E04.csv"},
+        {"label": "E05 Ukuran pasar", "path": "./content/work-samples/consulting/E05.csv", "filename": "SELF_Consulting_E05.csv"},
+        {"label": "E06 Skenario", "path": "./content/work-samples/consulting/E06.csv", "filename": "SELF_Consulting_E06.csv"}
+      ],
+      "starter": "Consulting",
+      "deliverables": [
+        "Issue tree yang sempit dan profit bridge 2025 ke run-rate 2026 yang rekonsiliasi",
+        "Funnel pasar E05 dan keputusan apakah target inisiatif B mungkin secara aritmetika",
+        "Evaluasi tiga inisiatif tunggal dan semua pasangan: kontribusi run-rate, perlakuan one-off, kas awal, payback, slot, dan overlap",
+        "Skenario downside dan upside A+C dari E06 dan sensitivitas utamanya",
+        "Enam slide dengan judul berbasis kesimpulan, masing-masing didukung satu exhibit",
+        "Permintaan persetujuan dalam IDR juta dan slot kerja, dengan gate 90 hari: pemilik, KPI kuantitatif, dan kriteria berhenti",
+        "Jawaban atas tantangan partner (lisan atau tertulis)"
+      ]
+    }
+  ]
+}

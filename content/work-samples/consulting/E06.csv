@@ -1,0 +1,4 @@
+scenario,procurement_eligible_share,procurement_saving_k_idr_per_pack,procurement_annual_recurring_cost_idr_m,b2b_exited_k_packs,b2b_price_uplift_k_idr_per_pack,b2b_route_saving_idr_m,b2b_annual_recurring_cost_idr_m
+base,0.8,1.4,300,150,2,600,200
+downside,0.6,0.8,450,300,1,600,200
+upside,0.9,1.6,300,100,2.5,600,200

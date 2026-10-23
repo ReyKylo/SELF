@@ -28,6 +28,8 @@ jobs:
           node --check career-phase3.js
           node --check career-learning.js
           node --check career-director-review.js
+          node --check career-workbook-check.js
+          node --check career-worksample.js
           node --check career-teaching.js
           node --check career-analyst-lab.js
           node --check career-vc-analyst-lab.js
@@ -88,6 +90,10 @@ jobs:
           node tests/career-director-review.test.cjs
           node --check tools/check_career_production.mjs
           node tests/check_career_production.test.mjs
+      - name: Phase 6 Work Sample content, sealed-file leak guard and renderer safety
+        run: node tests/smoke_worksample_content.cjs
+      - name: Phase 6 deterministic XLSX structure check with deliberately broken workbooks
+        run: node tests/smoke_workbook_check.cjs
       - name: Core Phase 3 task and data integrity
         run: node tests/smoke_core_phase3.cjs
       - name: Phase 2 legacy canvas smoke
@@ -125,6 +131,14 @@ jobs:
           test -s dist/career-vc-waterfall.js
           test -s dist/career-consulting-lab.js
           test -s dist/career-director-review.js
+          test -s dist/career-workbook-check.js
+          test -s dist/career-worksample.js
+          test -s dist/content/work-samples/index.json
+          test -s dist/content/work-samples/pe/brief.md
+          test -s dist/content/work-samples/vc/brief.md
+          test -s dist/content/work-samples/vc/holdout-cohorts.csv
+          test -s dist/content/work-samples/consulting/brief.md
+          test -s dist/content/work-samples/consulting/E06.csv
           test -s dist/content/career-director-review/review-panels.json
           test -s dist/career-pe-projection.js
           test -s dist/career-pe-sensitivity.js
