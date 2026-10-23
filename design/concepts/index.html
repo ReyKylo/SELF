@@ -95,7 +95,7 @@ td small{display:block;color:var(--muted);font-size:.86rem;margin-top:4px}
     <p>What I found in the repository, which every concept below responds to:</p>
   </div>
   <div class="facts">
-    <div class="fact"><b>27</b><span>destinations across three stacked navigation layers: sidebar (8), Career rail (10), Career Prep tabs (9).</span></div>
+    <div class="fact"><b>28</b><span>destinations across three stacked navigation layers: sidebar (8), Career rail (10), Career Prep tabs (10, now including Work Sample).</span></div>
     <div class="fact"><b>0</b><span>interviews or follow-ups on Home. <code>renderHome()</code> ranks tasks only, though interview and touchpoint data is already loaded in the browser.</span></div>
     <div class="fact"><b>1</b><span>thing you can do with an Inbox capture: delete it. There is no way to turn it into a task or file it to a Space.</span></div>
   </div>
@@ -124,7 +124,7 @@ td small{display:block;color:var(--muted);font-size:.86rem;margin-top:4px}
   </section>
 
   <section class="concept" id="rooms" style="--c:var(--rooms)">
-    <div class="chead"><span class="badge">03 · Rooms</span><div><h3>Organized by what you're doing</h3><p>Five rooms replace 27 destinations: <strong>Today</strong>, <strong>Work</strong>, <strong>Hunt</strong>, <strong>Study</strong> and <strong>Studio</strong>. Each room has its own layout and takes its tint from SELF's existing accent colors, and none has more than one row of sub-navigation. Any task opens in a full-screen <strong>Focus</strong> mode, and Ctrl K jumps anywhere.</p></div></div>
+    <div class="chead"><span class="badge">03 · Rooms</span><div><h3>Organized by what you're doing</h3><p>Five rooms replace 28 destinations: <strong>Today</strong>, <strong>Work</strong>, <strong>Hunt</strong>, <strong>Study</strong> and <strong>Studio</strong>. Each room has its own layout and takes its tint from SELF's existing accent colors, and none has more than one row of sub-navigation. Any task opens in a full-screen <strong>Focus</strong> mode, and Ctrl K jumps anywhere.</p></div></div>
     <div class="frame" data-frame><div class="bar"><span>rooms.html</span><span class="sp"></span><button type="button" data-w="desk" aria-pressed="true">Desktop</button><button type="button" data-w="phone" aria-pressed="false">Phone</button><a href="rooms.html" target="_blank" rel="noopener">Open full size ↗</a></div><iframe src="rooms.html" title="Rooms prototype" loading="lazy"></iframe></div>
     <div class="split">
       <div><h4>Try</h4><ul><li>Walk through the five doors</li><li>Press <strong>Focus</strong> on a task; Esc leaves</li><li>Triage the inbox one card at a time</li><li>Ctrl K, type "hunt", press Enter</li></ul></div>
@@ -137,7 +137,7 @@ td small{display:block;color:var(--muted);font-size:.86rem;margin-top:4px}
   <div class="tablewrap"><table>
     <thead><tr><th>Criterion</th><th>Ledger</th><th>Desk</th><th>Rooms</th></tr></thead>
     <tbody>
-      <tr><td>Cuts navigation depth</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i></i><small>Tabs help, but the Career sub-rail remains</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Panes plus function keys</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>27 destinations become 5 rooms with one sub-row each</small></td></tr>
+      <tr><td>Cuts navigation depth</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i></i><small>Tabs help, but the Career sub-rail remains</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Panes plus function keys</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>28 destinations become 5 rooms with one sub-row each</small></td></tr>
       <tr><td>Brings Career into the day</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Its whole premise</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i class="on"></i><i></i><small>Visible, but in separate panes</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>The Today agenda merges tasks, interviews and follow-ups</small></td></tr>
       <tr><td>Phone and 150% text</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i class="on"></i><small>A single column by nature</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i></i><i></i><small>Density is the point, so it breaks</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small>Five-door bottom bar</small></td></tr>
       <tr><td>Fits the zero-build codebase</td><td class="r" style="--c:var(--ledger)"><i class="on"></i><i class="on"></i><i></i><small>New Home view; the rest stays as it is</small></td><td class="r" style="--c:var(--desk)"><i class="on"></i><i></i><i></i><small>Rewrites most renderers</small></td><td class="r" style="--c:var(--rooms)"><i class="on"></i><i class="on"></i><i class="on"></i><small><code>state.view</code> stays; rooms sit on top of it</small></td></tr>
@@ -166,7 +166,7 @@ td small{display:block;color:var(--muted);font-size:.86rem;margin-top:4px}
     <div class="ph"><b>R0</b><div><strong>Contract and approval</strong><p>Docs only. You approve; <code>DESIGN_CONTRACT.md</code> gets a Rooms section. No code merges without this.</p></div></div>
     <div class="ph"><b>R1</b><div><strong>Door rail and routing</strong><p>New <code>rooms.js</code> and <code>rooms.css</code>; <code>chrome()</code> in <code>app.js</code> calls them. <code>state.view</code> is unchanged and <code>roomOf()</code> is derived from it. Badges count only data that is loaded.</p></div></div>
     <div class="ph"><b>R2</b><div><strong>Today room</strong><p>New <code>today.js</code>: Three for today (from <code>priorityRank()</code>), a merged agenda, and inbox triage built from the existing insert, patch and delete calls.</p></div></div>
-    <div class="ph"><b>R3</b><div><strong>Hunt and Study</strong><p><code>SELFCareer.render({hosted})</code> turns the Career rail into pills. The 9 Career Prep tabs are grouped as Build, Learn and Get challenged, with the same ids.</p></div></div>
+    <div class="ph"><b>R3</b><div><strong>Hunt and Study</strong><p><code>SELFCareer.render({hosted})</code> turns the Career rail into pills. The 10 Career Prep tabs are grouped as Build, Learn and Get challenged, with the same ids.</p></div></div>
     <div class="ph"><b>R4</b><div><strong>Palette and capture grammar</strong><p>A pure <code>parseCapture()</code> function with at least 25 fixtures, including Indonesian weekdays. It never creates a Space without asking.</p></div></div>
     <div class="ph"><b>R5</b><div><strong>Focus mode</strong><p>A full-screen task that reuses the existing <code>data-task-field</code> save path. The timer stays on the device.</p></div></div>
     <div class="ph"><b>R6</b><div><strong>Visual system</strong><p><code>--room</code> tokens and a display face for room titles only; both themes checked against WCAG AA.</p></div></div>
@@ -183,6 +183,31 @@ td small{display:block;color:var(--muted);font-size:.86rem;margin-top:4px}
     </ul>
   </div>
   <p class="col" style="margin-top:18px">Every phase: no Supabase migration, all existing smoke tests pass, and Playwright screenshots at 1366 and 390 px, 100% and 150% text, light and dark, using the fixture pattern that never writes to production.</p>
+
+  <h2>Beyond the visuals: the product upgrade</h2>
+  <div class="col">
+    <p>SELF already holds four products in one: tasks, a thinking canvas, a job-search CRM and a training studio. They barely talk to each other. A company's people, applications and interviews sit on five separate pages, the canvas can't hold a company or an application, and your Career Prep work never shows up at the interview it was for. The upgrade connects what already exists and adds a few rituals. Full plan: <code>docs/design/SELF_PRODUCT_UPGRADE_PLAN.md</code>.</p>
+  </div>
+  <div class="split" style="margin-top:18px">
+    <div><h4>★ Dossier · Hunt</h4><p>One living page per company: applications, people with days since contact, a merged timeline, the next interview, and your boards and Work Samples for it.</p></div>
+    <div><h4>★ Studio Recipes · Canvas</h4><p>Analyst templates instead of a moodboard: Issue Tree, Deal Thesis, IC Memo Spine, Story Bank and a Company Map that fills itself from a dossier.</p></div>
+    <div><h4>★ Walkthrough · Canvas</h4><p>Present any board frame by frame with smooth camera moves and a pace timer. Rehearse a case the way you'd deliver it.</p></div>
+    <div><h4>★ Game Day · Hunt × Study</h4><p>The interview becomes an event: countdown, dossier, that track's real Director challenges, story bank and a drill timer, then reflection and a thank-you task.</p></div>
+    <div><h4>Rituals · Today</h4><p>Weekly Review (wins, carry or drop, people, stale applications, next week's three), Shutdown at the end of the day, and a 5-minute Daily Drill.</p></div>
+    <div><h4>Small, sharp tools</h4><p>Message Composer with merge fields, Add to calendar (.ics), Radar Swipe, Harvest (cards to tasks), Structure Check, Skill Map across 36 competencies, and Proof Pack.</p></div>
+  </div>
+  <div class="tablewrap" style="margin-top:18px"><table>
+    <thead><tr><th>Wave</th><th>What</th><th>Database</th><th>Built by</th></tr></thead>
+    <tbody>
+      <tr><td>0 · Rooms</td><td>Shell, motion, drag and drop (build spec R0–R6, M1, D1)</td><td>No change</td><td>Sonnet + Haiku</td></tr>
+      <tr><td>1 · Connect</td><td>Dossier, Recipes, Walkthrough, Game Day, rituals, small tools (U1–U7)</td><td>No change</td><td>Sonnet + Haiku</td></tr>
+      <tr><td>2 · Remember</td><td>Live canvas cards, stage history, Momentum, recurring tasks, synced progress</td><td>Additive tables and columns, each approved by you</td><td>Integrator, then Sonnet or Haiku</td></tr>
+      <tr><td>3 · Explore</td><td>Board image export, local mock-interview audio, a real AI assist</td><td>Needs its own decision</td><td>Not scheduled</td></tr>
+    </tbody>
+  </table></div>
+  <div class="col" style="margin-top:18px">
+    <p><strong>Merged or retired, nothing lost:</strong> Overview and Applications become Pipeline; Companies becomes Dossiers; CVs, Templates and Reminders become Kit; Career Prep's 10 tabs become Build, Learn and Get challenged; the legacy canvas retires only after you confirm.</p>
+  </div>
 
   <p class="foot">Prototypes live in <code>design/concepts/</code>. That folder is outside the Cloudflare build list, so nothing here can deploy. All names and records are sample data.</p>
 </div>

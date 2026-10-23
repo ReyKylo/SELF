@@ -409,7 +409,7 @@ Sub-nav: **Build · Learn · Get challenged**, mapping onto the existing `TABS` 
   - The current stop (the first one that isn't complete) gets a pulsing tinted ring (2.4 s).
 - **Build:** Sprint detail (existing sprint renderer) and lab cards (PE projection, PE sensitivity, VC waterfall, Consulting bridge), each with a tiny static preview drawn from the lab's existing default inputs. They open the existing labs.
 - **Learn:** Masterclass, Evidence (12 panels, e.g. "VC01 · Bessemer Venture Partners · Shopify: nilai kualitas pertumbuhan"), YouTube (9 videos; still load only on Play) and Sources (41). Track filter chips (Semua / PE / VC / Consulting) use a sliding thumb, and the cards reflow with FLIP.
-- **Get challenged:** Director Review (existing), with a 5-step progress rail across the top. "Next challenge" slides the prompt in from the right (`translateX(24px)→0`). The **"Session only · not saved"** badge stays visible at all times.
+- **Get challenged:** Work Sample (existing, blind briefs) and Director Review (existing), with a 5-step progress rail across the top. "Next challenge" slides the prompt in from the right (`translateX(24px)→0`). The **"Session only · not saved"** badge stays visible at all times.
 
 ### 5.5 Studio (`view:'boards'|'board-editor'`)
 - The board library uses the existing `SELFBoards.renderLibrary()`, wrapped in the room header. Each tile gets a hover state where its connector lines animate (`stroke-dasharray` marching, 1.2 s). This is only possible if the library renders an SVG thumbnail; otherwise skip it and **don't fake thumbnails**.
@@ -750,6 +750,9 @@ Each prompt is meant to be pasted into a fresh Sonnet or Haiku session as-is. Re
 > Run the full checklist in spec §7–§8 and blueprint §5. Fix only what fails. Commit screenshots to `docs/rooms-review/R6/` at 1366 and 390 px, 100% and 150% text, dark and light, plus reduced motion. Record the contrast ratios. Report anything still unverified.
 
 ---
+
+### After R6
+Feature phases U1–U7 and the Wave 2 migrations are specified in [`SELF_PRODUCT_UPGRADE_PLAN.md`](./SELF_PRODUCT_UPGRADE_PLAN.md) §8, with their own prompts. Start them only after the Rooms phases above have merged.
 
 ## 10. Definition of done (whole project)
 - [ ] Every route in blueprint §3 is reachable, and every existing feature still works (all README checks pass).

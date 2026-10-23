@@ -22,7 +22,7 @@
 | The shell is one template: 8-item sidebar, topbar and 6-item mobile bar | `app.js:74` `chrome()`, `app.js:73` `nav()` |
 | Routing is `state.view` mapped to a renderer | `app.js:226` `render()`, `app.js:227` `go()` |
 | Career adds a second rail with 10 pages | `career.js:4` `PAGES`, `career.js:~196` `render()`, `career.js:261` `setPage()` |
-| Career Prep adds a third layer of 9 tabs | `career-learning.js:5` `TABS` |
+| Career Prep adds a third layer of 10 tabs (Work Sample added in `14ef361`) | `career-learning.js:5` `TABS` |
 | Home ranks tasks only; interviews and follow-ups never reach it | `app.js:81` `priorityRank()`, `app.js:90` `renderHome()` |
 | Inbox can only be deleted from; there is no "turn into task" or "file to Space" | `app.js:185` `renderInbox()` |
 | Inbox, tasks and the other Phase 1 tables allow owner `update` under RLS | `supabase/migrations/20261020172006_…sql:91-95` |
@@ -32,7 +32,7 @@
 | Deploys copy an explicit file list | `tools/build_cloudflare.py:9` `ASSETS` |
 | CI runs `node --check` per file, then the smoke suite | `.github/workflows/self-quality.yml` |
 
-The core problem: a user can face **three stacked navigation layers and 27 destinations** (8 + 10 + 9) before reaching content, and the daily view cannot see the Career data that drives the user's week.
+The core problem: a user can face **three stacked navigation layers and 28 destinations** (8 + 10 + 10) before reaching content, and the daily view cannot see the Career data that drives the user's week.
 
 ## 2. The direction in one paragraph
 
@@ -52,7 +52,7 @@ Do **not** rename or remove `state.view` values. Tests, `go()`, Career `enter()`
 | `career` with page `overview`, `applications` | Hunt | Pipeline |
 | `career` with page `people`, `companies`, `radar`, `interviews` | Hunt | People, Companies, Radar, Interviews |
 | `career` with page `cvs`, `templates`, `reminders` | Hunt | Kit (three tabs inside one section) |
-| `career` with page `learning` | Study | Build: `sprint`, `analystlab`, `vclab`, `consultlab` · Learn: `masterclass`, `evidence`, `videos`, `sources` · Get challenged: `director` |
+| `career` with page `learning` | Study | Build: `sprint`, `analystlab`, `vclab`, `consultlab` · Learn: `masterclass`, `evidence`, `videos`, `sources` · Get challenged: `director`, `worksample` |
 | `boards`, `board-editor` | Studio | Editor runs full bleed, rail collapsed |
 | `search` | Palette (the page stays as a fallback route) | none |
 | `settings` | Rail footer icon | none |
