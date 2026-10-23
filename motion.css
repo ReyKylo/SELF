@@ -1,0 +1,33 @@
+/* SELF motion kit (spec §3). Transform and opacity only. The global reduced-motion rule in styles.css also applies. */
+.btn,.primary-btn,.ghost-btn,.soft-btn,.icon-btn,.choice,.tab,.rooms-subnav button,.kanban-task,.career2-job,.space-tile,.continue-item,.link-tile{
+ transition:transform var(--d-quick,140ms) var(--ease-spring,cubic-bezier(.34,1.56,.64,1)),box-shadow var(--d-base,220ms) var(--ease-out,ease),background-color var(--d-quick,140ms) linear,border-color var(--d-quick,140ms) linear;
+ -webkit-tap-highlight-color:transparent;
+}
+@media(hover:hover){.kanban-task:hover,.career2-job:hover{transform:translateY(-2px);box-shadow:var(--e-2,0 6px 18px #0004)}}
+.primary-btn:active,.icon-btn:active,.ghost-btn:active,.soft-btn:active,.choice:active,.tab:active,.rooms-subnav button:active,.door:active,.kanban-task:active{transform:scale(.96);transition-duration:var(--d-instant,90ms)}
+.primary-btn{position:relative;overflow:hidden;isolation:isolate}
+.ripple{position:absolute;border-radius:50%;background:currentColor;pointer-events:none;z-index:-1}
+.spark{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:60}
+
+/* Room entrance: only when the shell asks for it (room or sub-page change), never on a data refresh. */
+.body[data-enter="1"]>*{animation:rise var(--d-slow,360ms) var(--ease-out,ease) both;animation-delay:calc(var(--i,0)*45ms)}
+.body[data-enter="1"]>:nth-child(1){--i:0}.body[data-enter="1"]>:nth-child(2){--i:1}.body[data-enter="1"]>:nth-child(3){--i:2}
+.body[data-enter="1"]>:nth-child(4){--i:3}.body[data-enter="1"]>:nth-child(5){--i:4}.body[data-enter="1"]>:nth-child(6){--i:5}
+.body[data-enter="1"]>:nth-child(n+7){--i:6}
+@keyframes rise{from{opacity:.001;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
+
+/* Toasts spring in; the existing 4.3s removal still applies. */
+.toast{animation:toastIn var(--d-base,220ms) var(--ease-spring,cubic-bezier(.34,1.56,.64,1))}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+
+/* Task panel slides in with a spring. */
+.panel{animation:panelIn 260ms var(--ease-spring,cubic-bezier(.34,1.56,.64,1))}
+@keyframes panelIn{from{opacity:.4;transform:translateX(32px)}to{opacity:1;transform:none}}
+
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+
+@media(prefers-reduced-motion:reduce){
+ .body[data-enter="1"]>*{animation:none}
+ .ripple,.spark{display:none}
+ .kanban-task:hover,.career2-job:hover{transform:none}
+}

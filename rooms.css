@@ -1,0 +1,116 @@
+/* SELF Rooms shell (spec: docs/design/ROOMS_BUILD_SPEC.md §2, §4).
+   Layout: a door rail on the left (bottom bar on phones). Each room tints the shell with an existing SELF accent. */
+@property --tint{syntax:'<color>';inherits:true;initial-value:#428cff}
+:root{
+ --room-today:#428cff;--room-work:#3fc5d2;--room-hunt:#3dce9e;--room-study:#ad92fa;--room-studio:#f0b862;
+ --font-display:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;
+ --d-instant:90ms;--d-quick:140ms;--d-base:220ms;--d-slow:360ms;--d-room:420ms;
+ --ease-out:cubic-bezier(.2,.8,.2,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
+ --e-1:0 1px 2px #0003,0 4px 14px #0002;--e-2:0 6px 18px #0004,0 18px 48px #0003;--e-lift:0 18px 40px #0006;
+}
+body[data-theme='light']{
+ --room-today:#2369e0;--room-work:#0f8e9b;--room-hunt:#16855f;--room-study:#7552c8;--room-studio:#a8650c;
+ --e-1:0 1px 2px #1a2b4514,0 4px 14px #1a2b4510;--e-2:0 6px 18px #1a2b451c,0 18px 48px #1a2b4514;--e-lift:0 18px 40px #1a2b4530;
+}
+.shell[data-shell="rooms"]{--tint:var(--room-today);--tint-soft:color-mix(in srgb,var(--tint) 16%,transparent);--tint-line:color-mix(in srgb,var(--tint) 50%,transparent);transition:--tint var(--d-room) var(--ease-out)}
+.shell[data-room="today"]{--tint:var(--room-today)}
+.shell[data-room="work"]{--tint:var(--room-work)}
+.shell[data-room="hunt"]{--tint:var(--room-hunt)}
+.shell[data-room="study"]{--tint:var(--room-study)}
+.shell[data-room="studio"]{--tint:var(--room-studio)}
+
+/* ---------- Door rail ---------- */
+.shell[data-shell="rooms"] .sidebar{width:104px;min-width:104px;padding:22px 10px 16px}
+.shell[data-shell="rooms"] .main{margin-left:104px;width:calc(100% - 104px)}
+.rooms-rail .brand{flex-direction:column;gap:10px;padding:0 0 18px;justify-content:center}
+.rooms-rail .brand-text{display:none}
+.rooms-rail .brand .sidebar-toggle{margin:0}
+.rooms-rail .nav-items{position:relative;gap:4px}
+.door{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;min-height:72px;
+ border:0;background:transparent;color:var(--muted);border-radius:16px;padding:10px 4px 8px;cursor:pointer;overflow:hidden;isolation:isolate}
+.door svg{width:24px;height:24px;transition:transform var(--d-quick) var(--ease-spring),color var(--d-quick)}
+.door span{font-size:.78em;font-weight:700;letter-spacing:-.01em}
+.door small{font:500 .64em/1.2 ui-monospace,'DM Mono',Menlo,monospace;color:var(--faint);min-height:1.2em;white-space:nowrap}
+@media(hover:hover){.door:hover{color:var(--text)}.door:hover svg{transform:translateY(-2px)}}
+.door[aria-current="page"]{color:var(--text)}
+.door[aria-current="page"] svg{color:var(--c)}
+.door:focus-visible{outline:3px solid var(--tint);outline-offset:-3px}
+.rail-ind{position:absolute;left:0;right:0;top:0;height:72px;border-radius:16px;background:var(--tint-soft);z-index:0;pointer-events:none;
+ transition:transform var(--d-room) var(--ease-spring),height var(--d-base) var(--ease-out),opacity var(--d-quick)}
+.rooms-rail .rail-ind::before{content:"";position:absolute;left:-10px;top:18px;bottom:18px;width:4px;border-radius:0 4px 4px 0;background:var(--tint)}
+.rooms-rail .sidebar-foot .nav-btn{justify-content:center;flex-direction:column;gap:4px;padding:10px 4px}
+.rooms-rail .sidebar-foot .nav-btn span{font-size:.78em}
+.rooms-rail .profile{justify-content:center;padding:7px 0}
+.rooms-rail .profile-text{display:none}
+.shell[data-shell="rooms"].self-sidebar-collapsed .sidebar{width:70px;min-width:70px;padding-left:8px;padding-right:8px}
+.shell[data-shell="rooms"].self-sidebar-collapsed .main{margin-left:70px;width:calc(100% - 70px)}
+.self-sidebar-collapsed .door span,.self-sidebar-collapsed .door small{display:none}
+.self-sidebar-collapsed .door{min-height:56px}
+.self-sidebar-collapsed .rooms-rail .sidebar-foot .nav-btn span{display:none}
+body:has(.c3-shell) .shell[data-shell="rooms"] .sidebar{width:72px;min-width:72px;padding:16px 8px}
+body:has(.c3-shell) .shell[data-shell="rooms"] .main{margin-left:72px;width:calc(100% - 72px)}
+body:has(.c3-shell) .shell[data-shell="rooms"] .door span,body:has(.c3-shell) .shell[data-shell="rooms"] .door small{display:none}
+body:has(.c3-shell) .shell[data-shell="rooms"] .main::before{display:none}
+
+/* ---------- Main area: aurora wash, room title, sub-nav ---------- */
+.shell[data-shell="rooms"] .main{position:relative}
+.shell[data-shell="rooms"] .main::before{content:"";position:absolute;inset:0 0 auto 0;height:420px;pointer-events:none;z-index:0;
+ background:radial-gradient(60% 100% at 75% -10%,var(--tint-soft),transparent 70%),radial-gradient(40% 80% at 15% -20%,color-mix(in srgb,var(--tint) 9%,transparent),transparent 70%);
+ animation:aurora 24s ease-in-out infinite alternate}
+body[data-theme='light'] .shell[data-shell="rooms"] .main::before{opacity:.7}
+@keyframes aurora{to{transform:translate3d(-3%,2%,0) scale(1.05)}}
+.shell[data-shell="rooms"] .main>.body{position:relative;z-index:1}
+.shell[data-shell="rooms"] .hero h1{font-family:var(--font-display);font-weight:800;font-size:clamp(2.1em,4.6vw,3.6em);letter-spacing:-.035em;line-height:.98}
+.shell[data-shell="rooms"] .hero .eyebrow{color:var(--tint)}
+.shell[data-shell="rooms"] .primary-btn{background:linear-gradient(135deg,color-mix(in srgb,var(--tint) 100%,#fff 8%),color-mix(in srgb,var(--tint) 82%,#000));border-color:color-mix(in srgb,var(--tint) 70%,#fff 10%)}
+.shell[data-shell="rooms"] .tab.active{border-bottom-color:var(--tint)}
+.shell[data-shell="rooms"] .kanban-col{border-radius:var(--r-room,16px)}
+.rooms-subnav{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 22px}
+.rooms-subnav button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:0 16px;min-height:40px;font-weight:700;font-size:.86em;color:var(--muted)}
+.rooms-subnav button:hover{color:var(--text);background:var(--hover)}
+.rooms-subnav button[aria-current="page"]{background:var(--tint-soft);border-color:var(--tint);color:var(--text)}
+.rooms-settings{display:none}
+/* The empty-column hint goes away while a card is in the column, including the drag placeholder. */
+.kanban-items:has([data-dnd-item]) .kanban-empty,.career2-drop:has([data-dnd-item]) .career-kanban-empty{display:none}
+
+/* ---------- Kanban cards, grips and drag states (D1) ---------- */
+.kanban-task,.career2-job{position:relative}
+.grip{border:0;background:transparent;color:var(--faint);cursor:grab;min-width:32px;min-height:32px;border-radius:8px;touch-action:none;display:inline-grid;place-items:center;padding:0;flex:0 0 auto}
+.grip:hover{background:var(--hover);color:var(--text)}
+.career2-job .grip{position:absolute;top:6px;right:6px}
+.dnd-ghost{position:fixed;z-index:70;pointer-events:none;margin:0;box-shadow:var(--e-lift);border-color:var(--tint-line)!important;will-change:translate,transform;cursor:grabbing}
+.dnd-placeholder{opacity:.35;outline:2px dashed var(--tint-line,#5b9bff88);outline-offset:-2px}
+.dnd-placeholder>*{visibility:hidden}
+.dnd-over{background:var(--tint-soft,#5b9bff22)!important;box-shadow:inset 0 0 0 2px var(--tint-line,#5b9bff88);transition:background var(--d-quick)}
+.dnd-kbd{outline:3px solid var(--tint,#428cff);outline-offset:3px;transform:translateY(-3px) rotate(-1deg);box-shadow:var(--e-lift)}
+.dnd-active,.dnd-active *{cursor:grabbing!important;user-select:none}
+.is-saving{overflow:hidden}
+.is-saving::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--tint,#428cff) 20%,transparent),transparent);background-size:200% 100%;animation:shimmer 1s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Tablet ---------- */
+@media(max-width:960px){
+ .shell[data-shell="rooms"] .sidebar{width:88px;min-width:88px}
+ .shell[data-shell="rooms"] .main{margin-left:88px;width:calc(100% - 88px)}
+ .shell[data-shell="rooms"].self-sidebar-collapsed .main{margin-left:70px;width:calc(100% - 70px)}
+ .door small{display:none}
+}
+/* ---------- Phone: door bar at the bottom ---------- */
+@media(max-width:600px){
+ .shell[data-shell="rooms"] .sidebar{display:none}
+ .shell[data-shell="rooms"] .main,.shell[data-shell="rooms"].self-sidebar-collapsed .main{margin-left:0;width:100%}
+ .rooms-bar{padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));gap:2px;justify-content:stretch;position:fixed}
+ .rooms-bar .door{flex:1;min-height:58px;padding:8px 2px;width:auto;font-size:1em}
+ .rooms-bar .door span{font-size:.7em}
+ .rooms-bar .door small{display:none}
+ .rooms-bar .rail-ind{left:0;right:auto;top:0;height:3px;border-radius:0 0 3px 3px;background:var(--tint)}
+ .rooms-settings{display:inline-flex}
+ .toast{left:16px;right:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+ .shell[data-shell="rooms"] .kanban{grid-auto-flow:column;grid-auto-columns:86%;grid-template-columns:none;scroll-snap-type:x mandatory}
+ .shell[data-shell="rooms"] .kanban-col{scroll-snap-align:center}
+}
+@media(prefers-reduced-motion:reduce){
+ .shell[data-shell="rooms"] .main::before{animation:none}
+ .dnd-kbd{transform:none}
+}

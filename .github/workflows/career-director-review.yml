@@ -13,6 +13,13 @@ on:
       - 'tests/browser_director_full_app.cjs'
       - 'tests/browser_career_learning.cjs'
       - 'tests/browser_worksample.cjs'
+      - 'tests/browser_rooms.cjs'
+      - 'rooms.js'
+      - 'rooms.css'
+      - 'motion.js'
+      - 'motion.css'
+      - 'self-dnd.js'
+      - 'career-phase2.js'
       - 'tests/xlsx_fixture.cjs'
       - 'career-worksample.js'
       - 'career-workbook-check.js'
@@ -68,3 +75,5 @@ jobs:
         run: node tests/browser_career_learning.cjs
       - name: Work Sample Chromium tests in the real SELF shell
         run: node tests/browser_worksample.cjs
+      - name: Rooms shell and drag-and-drop Chromium tests
+        run: node tests/browser_rooms.cjs

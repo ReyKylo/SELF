@@ -52,11 +52,13 @@ function renderApplications(){
  (C.lastMove?'<div class="career2-undo"><span>Moved '+h(C.lastMove.title)+' to '+h(C.lastMove.to)+'.</span>'+btn('↶ Undo','undo-stage')+'</div>':'')+
  '<div class="career-kanban career2-pipeline">'+stageNames.map(([stage,title])=>{
  const rows=apps().filter(x=>x.hiring_stage===stage);
- return '<section class="career-kanban-col career2-drop" data-career2-drop="'+stage+'"><div class="career-kanban-head"><strong>'+title+'</strong><span>'+rows.length+'</span></div>'+
- (rows.map(x=>'<article class="career2-job" draggable="true" data-career2-drag="'+e(x.id)+'">'+
+ return '<section class="career-kanban-col career2-drop" data-career2-drop="'+stage+'" data-dnd-zone="stage:'+stage+'"><div class="career-kanban-head"><strong>'+title+'</strong><span data-count-for="stage:'+stage+'">'+rows.length+'</span></div>'+
+ (rows.map(x=>'<article class="career2-job" draggable="true" data-career2-drag="'+e(x.id)+'" data-dnd-item="'+e(x.id)+'" data-dnd-type="application" tabindex="0" role="group" aria-roledescription="Draggable application" aria-describedby="dnd-help" aria-label="'+e(x.role_title)+'">'+
+ '<button type="button" class="grip" data-dnd-grip aria-label="Drag handle for '+e(x.role_title)+'" tabindex="-1">⋮⋮</button>'+
  '<button type="button" data-career2="open-application" data-id="'+e(x.id)+'"><strong>'+h(x.role_title)+'</strong><small>'+h(companyName(x.company_id))+'</small></button>'+
  statusRow(x)+'</article>').join('')||'<div class="career-kanban-empty">Drop a role here</div>')+'</section>';
- }).join('')+'</div>';
+ }).join('')+'</div>'+
+ '<p id="dnd-help" class="sr-only">Press Space to pick up. Use the arrow keys to move between stages. Press Space to drop or Escape to cancel.</p><div id="dnd-live" class="sr-only" aria-live="assertive"></div>';
 }
 function renderPeople(){
  const chunks=[['new','New'],['reached_out','Reached Out'],['in_conversation','In Conversation'],['maintain','Maintain']];
@@ -295,7 +297,7 @@ async function setStage(id,value,{undo=false}={}){
   await host.patch('career_applications',id,{hiring_stage:value});
   item.hiring_stage=value;
   C.lastMove=undo?null:{id,from,to:value,title:item.role_title};
-  host.render();return true;
+  host.render();if(value==='offer')window.SELFMotion?.burstAt('[data-dnd-item="'+id+'"]',{count:22});return true;
  }catch(err){
   notice('Stage not changed: '+err.message,true);
   host.render();return false;
@@ -437,6 +439,14 @@ function beforeNavigate(){
 }
 function init(args){
  core=args.career;host=args.host;
+ /* Pointer/touch/keyboard drag (self-dnd.js). The save is setStage; the landing slot follows the rendered order of apps(). */
+ window.SELFDnd?.register('stage',{
+  accepts:el=>el.dataset.dndType==='application',
+  landingIndex:(el,zone,others)=>{const list=apps(),me=list.find(x=>x.id===el.dataset.dndItem);if(!me)return null;
+   return window.SELFDnd.sortedSlot(others.map(n=>list.find(x=>x.id===n.dataset.dndItem)).filter(Boolean),me,(a,b)=>list.indexOf(a)-list.indexOf(b))},
+  commit:(id,from,to)=>setStage(id,to),
+  label:v=>(stageNames.find(x=>x[0]===v)||[v,v])[1]
+ });
  document.addEventListener('dragstart',dragStart);
  document.addEventListener('dragover',dragOver);
  document.addEventListener('dragend',dragEnd);

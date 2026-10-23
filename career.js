@@ -385,6 +385,6 @@ function links(){
   ...(window.SELFCareerPhase3?.links?.()||[])
  ];
 }
-window.SELFCareer={init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
+window.SELFCareer={setPage,init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
 })();
 

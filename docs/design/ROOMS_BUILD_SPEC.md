@@ -7,6 +7,22 @@
 
 ---
 
+## Build status (updated as phases land)
+
+| Phase | State | Notes |
+|---|---|---|
+| R0 contract | **Done** | `docs/DESIGN_CONTRACT.md` has a Rooms shell section; the user approved the direction and said to build |
+| R1 shell and routing | **Done** | `rooms.js`, `rooms.css`; `chrome()`, `go()` in `app.js`. Rollback: `?shell=classic`. Deviations: the phone breakpoint is 600px (the app's existing one, not 700px); Hunt and Study both use Career's own rail until R3 splits it, so the Career pages are unchanged |
+| M1 motion and feel | **Done, minus three items** | press, ripple, room entrance (once per navigation), aurora, tint glide, indicator slide, toast spring, burst on Done and Offer, count-up on Home, circular theme reveal, reduced motion. Not yet: Undo progress line on toasts, the save-tick drawing, click sounds |
+| D1 drag and drop | **Done for the board and Applications** | `self-dnd.js` (pointer, touch grip or long-press, keyboard). Not yet: calendar week view and Three for today (their adapters, `due` and `three`, belong to the phases that add those screens) |
+| R2 Today | Not started | |
+| R3 Hunt and Study | Not started | |
+| R4 palette and capture grammar | Not started | `Ctrl K` still opens Search |
+| R5 Focus mode | Not started | |
+| R6 polish and QA | Partly | browser tests cover shell, drag, 390px; screenshots under `docs/rooms-review/` are still to do |
+
+**Where the code differs from the sketches below:** `self-dnd.js` is the source of truth. It sets the landed marker *before* the save starts, because the save re-renders the page (the sketch set it after), and it only celebrates a landing when the card is back in the target column after the render (a failed save re-renders the card home). Task order is now deterministic: `taskOrder` in `app.js` breaks due-date ties on `created_at` then `id`, because the API returns rows unordered.
+
 ## 0. How to use this document
 
 ### Rules for the building model (put these at the top of every session)
