@@ -1,0 +1,4 @@
+year,period_type,revenue_idr_m,variable_cost_idr_m,fixed_cash_cost_idr_m,case_operating_profit_idr_m
+2024,actual,69000,45000,18000,6000
+2025,actual,77000,50300,19700,7000
+2026,annualized_run_rate_as_of_2026-10-01,75400,56200,20600,-1400

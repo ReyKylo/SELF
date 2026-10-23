@@ -83,5 +83,12 @@ function exportFile(draft=false){
  const blocks=['SELF DIRECTOR REVIEW | SIMULATED',draft?'DRAFT — INCOMPLETE, NOT ASSESSED':'FINAL DOSSIER — NOT AUTO GRADED',t.case,'Track: '+t.id,'ORIGINAL DECISION\n'+state.initial,'MODEL EVIDENCE\n'+state.reference,...t.challenges.map(c=>c.id+' '+c.prompt+'\n'+(state.answers[c.id]||'[unanswered]')),'NEW INFO\n'+t.twist.announcement,'REASSESSMENT\n'+state.twist,'RED TEAM\n'+state.opposite,'FINAL DECISION\n'+state.final,'Reviewer rubric: technical 30 | judgment 25 | evidence 20 | risk 15 | communication 10','Not auto-graded; confirm source evidence independently.'];
  const blob=new Blob([blocks.join('\n\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='SELF_Director_'+(draft?'Draft_':'Review_')+t.id+'.txt';document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
 }
-window.SELFDirectorReview={init(api){host=api},render,action,input,change,reset,state,load};
+/** Cross-tab entry: switch case only when no work would be discarded. Returns whether the requested case is now active. */
+function focusTrack(track){
+ if(state.data&&!state.data.tracks.some(t=>t.id===track))return false;
+ if(state.track===track)return true;
+ if(state.submitted||state.initial.trim()||state.reference.trim())return false;
+ state.track=track;state.answers={};state.step=0;return true;
+}
+window.SELFDirectorReview={init(api){host=api},render,action,input,change,reset,state,load,focusTrack};
 })();

@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Source integration | Phase 5 content PR #28 and UI PR #29 merged into `main` | VERIFIED |
 | CI build/regression | Post-merge SELF quality gate run 39772715260 passed; Phase 5 isolated Chromium and static checks passed on PR head | VERIFIED |
-| Cloudflare actual deployment | Repo documents a Worker named `self` with `dist` static assets; no accessible Cloudflare deployment build ID/production domain in the repository | **NOT VERIFIED** |
+| Cloudflare actual deployment | Owner screenshot (23 Oct 2026): all `main` deployments Ready; newest version `fe1ff8d6` titled like `c8b3f1a`, active. Version IDs, not SHAs; production URL still unknown | **PARTIAL: deployed, behaviour unverified** |
 | Full authenticated application | No owner-authenticated live browser session or screenshot checked | **NOT VERIFIED** |
 | Two-account isolation | Not evaluated in production; Director Review uses in-memory local session only; no DB writes | **NOT VERIFIED** |
 | Real-device visual QA | No real iPhone/Android screenshot or accessibility audit | **NOT VERIFIED** |
