@@ -128,6 +128,8 @@ python3 -c "import json; c=json.load(open('wrangler.jsonc')); assert c['name']==
 ls dist/
 ```
 
+**Why the build is also in `wrangler.jsonc`:** a Workers Build log from 2026-10-09 shows the dashboard running only `npx wrangler deploy` (no build step), which fails with *Could not detect a directory containing static files* because `./dist` does not exist yet. `wrangler.jsonc` now carries `build.command` (`python3 tools/build_cloudflare.py`), so `wrangler deploy` builds `dist/` itself. Keeping the dashboard Build command as well is harmless (the build is idempotent). Verified with `npx wrangler@4.149.0 deploy --dry-run`: it runs the custom build and reads 53 files from `dist/`. This is a dry run, not a deployment.
+
 A new commit to `main` should trigger a new Workers Build. Use **Deployments** to check the build and deployment status; a successful GitHub commit alone does not mean Cloudflare is live.
 
 ## Phase 2.5 — Concept C whiteboard rebuild (design locked)

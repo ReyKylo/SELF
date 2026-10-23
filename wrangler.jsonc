@@ -1,6 +1,9 @@
 {
   "name": "self",
   "compatibility_date": "2026-10-20",
+  "build": {
+    "command": "python3 tools/build_cloudflare.py"
+  },
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
