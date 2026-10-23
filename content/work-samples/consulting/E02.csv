@@ -1,0 +1,9 @@
+year,sku,channel,volume_k_packs,realized_price_k_idr_per_pack,variable_cost_k_idr_per_pack
+2025,Core,Retail,1200,24,15
+2025,Core,B2B,900,20,14
+2025,Premium,Retail,500,40,25
+2025,Premium,B2B,300,34,24
+2026,Core,Retail,1300,23,17
+2026,Core,B2B,1050,19,16
+2026,Premium,Retail,400,42,27
+2026,Premium,B2B,250,35,26

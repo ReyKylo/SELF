@@ -1,0 +1,7 @@
+metric,value,unit,source_type
+target_city_retail_accounts,2400,accounts,simulated_assumption
+cold_chain_serviceable_share,0.55,ratio,simulated_assumption
+category_qualified_share,0.35,ratio,simulated_assumption
+contractable_share_of_qualified,0.30,ratio,simulated_assumption
+annual_premium_packs_per_contracted_account,12000,packs_per_account,simulated_assumption
+incremental_factory_capacity,400000,packs_per_year,simulated_assumption

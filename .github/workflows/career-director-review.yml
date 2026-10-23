@@ -12,6 +12,11 @@ on:
       - 'tests/career-director-review.browser.cjs'
       - 'tests/browser_director_full_app.cjs'
       - 'tests/browser_career_learning.cjs'
+      - 'tests/browser_worksample.cjs'
+      - 'tests/xlsx_fixture.cjs'
+      - 'career-worksample.js'
+      - 'career-workbook-check.js'
+      - 'content/work-samples/**'
       - 'content/career-learning.json'
       - 'tests/browser_learning_fixture.cjs'
       - 'index.html'
@@ -61,3 +66,5 @@ jobs:
         run: node tests/browser_director_full_app.cjs
       - name: Career Prep evidence, Task and focus Chromium tests
         run: node tests/browser_career_learning.cjs
+      - name: Work Sample Chromium tests in the real SELF shell
+        run: node tests/browser_worksample.cjs
