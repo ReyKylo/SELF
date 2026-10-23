@@ -4,6 +4,7 @@
 **Prototypes:** `design/concepts/ledger.html`, `design/concepts/desk.html`, `design/concepts/rooms.html` (static and self-contained; not in the Cloudflare `ASSETS` list, so they never deploy).
 **Base:** `main` at `c8b3f1a`. Re-verify every line reference below against latest `main` before editing.
 **Executor:** a single Integrator session (per `AGENTS.md`). Shared files are touched in every phase, so each phase needs explicit user authorization.
+**Detailed build spec:** [`ROOMS_BUILD_SPEC.md`](./ROOMS_BUILD_SPEC.md) covers the motion system, the drag-and-drop engine, screen-by-screen specs and copy-paste prompts per phase. Where the two differ, the spec wins.
 
 ---
 

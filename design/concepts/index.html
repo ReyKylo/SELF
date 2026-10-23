@@ -171,6 +171,17 @@ td small{display:block;color:var(--muted);font-size:.86rem;margin-top:4px}
     <div class="ph"><b>R5</b><div><strong>Focus mode</strong><p>A full-screen task that reuses the existing <code>data-task-field</code> save path. The timer stays on the device.</p></div></div>
     <div class="ph"><b>R6</b><div><strong>Visual system</strong><p><code>--room</code> tokens and a display face for room titles only; both themes checked against WCAG AA.</p></div></div>
   </div>
+  <h2>Build spec for Sonnet or Haiku</h2>
+  <div class="col">
+    <p>You chose Rooms. <code>docs/design/ROOMS_BUILD_SPEC.md</code> is the complete plan for building it with Sonnet or Haiku, with nothing left to guess:</p>
+    <ul>
+      <li><strong>Motion and feel:</strong> exact durations and easings, a springy press, ripple, staggered room entrances, a room colour that glides between rooms, the aurora wash, a save tick that draws itself, toasts with Undo, a restrained celebration burst, and a circular reveal when the theme changes.</li>
+      <li><strong>Drag and drop:</strong> a dependency-free engine (reference code included and syntax-checked) for mouse, touch and keyboard. The card lifts and tilts, a placeholder opens a gap, siblings glide aside, and the drop settles with a spring. Used on the My Work board, a new week calendar, the Hunt pipeline and Three for today.</li>
+      <li><strong>An honest landing spot:</strong> tasks and applications have no stored order, so a card always lands where it will actually appear after saving.</li>
+      <li><strong>Every screen</strong> as ASCII layouts, with data sources, interactions and empty states.</li>
+      <li><strong>Nine phases</strong> (P0 hi-fi prototype first, then R0–R6), each with a recommended model and a prompt you can paste straight into Sonnet or Haiku.</li>
+    </ul>
+  </div>
   <p class="col" style="margin-top:18px">Every phase: no Supabase migration, all existing smoke tests pass, and Playwright screenshots at 1366 and 390 px, 100% and 150% text, light and dark, using the fixture pattern that never writes to production.</p>
 
   <p class="foot">Prototypes live in <code>design/concepts/</code>. That folder is outside the Cloudflare build list, so nothing here can deploy. All names and records are sample data.</p>
