@@ -34,3 +34,19 @@ Unchanged and reused: the Portfolio Workspace stores the written decision, self-
 - `tests/browser_worksample.cjs` — real SELF shell in Chromium at 390px and 1366px with 150% text: three tracks, downloads round-trip byte-identical, workbook check, keyboard, hand-offs to Director Review and Portfolio, 503 retry, account switch.
 
 Production acceptance for this tab follows `PHASE5_PRODUCTION_RELEASE_GATE.md` (same unverified items).
+
+## Independent review (23 Oct 2026) — findings and outcome
+A separate reviewer with no access to the builder's notes attacked the change. No critical or high findings (XSS, answer-key leakage, over-claiming and Career-tab regressions were checked clean). Reproduced defects were fixed and are covered by regression tests:
+
+| Finding | Fix | Regression test |
+|---|---|---|
+| Shared counter let a file check strand the content loader ("Membuka work sample…" forever) | separate `loadSeq` / `checkSeq` | `browser_worksample.cjs` race scenario fails if the counters are shared again |
+| Late file read could show learner A's file under learner B, or under another track | owner, track and sequence guard before and after the read | same scenario |
+| Namespaced (`<x:c>`) or single-quoted XLSX parsed as "no formulas" — a false deterministic claim | prefix and quote tolerant parser; unreadable bodies report "no cells read" instead | `smoke_workbook_check.cjs` |
+| Declared-small ZIP entry inflating to hundreds of MB was buffered before rejection | capped streaming inflate | `smoke_workbook_check.cjs` (50 MB bomb, bounded RSS) |
+| Quadratic regex on unclosed cells | linear split-based scan | 20,000-cell flood under 1.5 s |
+| Keyboard focus lost after re-render | focus restored to the triggering control or the result region | `browser_worksample.cjs` |
+| Director hand-off silently landed on a different active case | keeps the active case and tells the learner | `browser_worksample.cjs` |
+| Boolean cells counted as typed numbers; `DETERMINISTIC_VERIFIED` never shown; flow text contradicted the PE brief | corrected, badge shown, text aligned with brief | content + workbook tests |
+
+Known and accepted: `content/work-samples/vc/holdout-cohorts.csv` has duplicate column names (`age0_logos`, `age0_mrr_usd`); it is a byte-identical copy of the reviewed source and was not edited here. The leak guard compares served files with every sealed text file line by line, but a leak introduced into the *source* brief itself would pass the byte-identity check; that is a content-review concern.

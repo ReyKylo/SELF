@@ -63,6 +63,38 @@ const {readZip,writeZip,starterBytes,sheetPath,mutate,cellRe}=require('./xlsx_fi
   await assert.rejects(()=>W.inspect(new Uint8Array(lying)),/Ukuran isi ZIP|rusak/,'size mismatch rejected');
   console.log('PASS empty, text, truncated, non-workbook and size-lying inputs are rejected with a readable error');
 
+  // Reviewer findings, locked in as regressions.
+  // 1) Namespaced tags and single-quoted attributes are still read (no false "no formulas").
+  const peBase=reports.PE_LBO;
+  const ns=await W.inspect(mutate('PE_LBO',1,xml=>xml.replace(/<c r="([A-Z]+\d+)"([^>]*)>/g,"<x:c r='$1'$2>").replace(/<\/c>/g,'</x:c>').replace(/<f>/g,'<x:f>').replace(/<\/f>/g,'</x:f>')));
+  assert.equal(ns.sheets.find(z=>z.name==='OPERATIONS').formulas.length,peBase.sheets.find(z=>z.name==='OPERATIONS').formulas.length,'namespaced/single-quoted workbook keeps its formulas');
+  assert(!ns.findings.some(f=>f.code==='no_formulas'),'no false "no formulas" claim');
+  console.log('PASS namespaced tags and single-quoted attributes are read');
+  // 2) A file that declares 100 bytes but inflates to 50 MB is aborted, quickly and without buffering it.
+  const bombFiles=readZip(starterBytes('PE_LBO'));bombFiles.set('xl/workbook.xml',Buffer.alloc(50*1024*1024,32));
+  const bomb=Buffer.from(writeZip(bombFiles));
+  let bq=bomb.readUInt32LE(bomb.length-6);
+  for(let i=0;i<bomb.readUInt16LE(bomb.length-12);i++){const nl=bomb.readUInt16LE(bq+28),el=bomb.readUInt16LE(bq+30),cl=bomb.readUInt16LE(bq+32);if(bomb.toString('utf8',bq+46,bq+46+nl)==='xl/workbook.xml')bomb.writeUInt32LE(100,bq+24);bq+=46+nl+el+cl}
+  const rss0=process.memoryUsage().rss;
+  await assert.rejects(()=>W.inspect(new Uint8Array(bomb)),/Ukuran isi ZIP/,'decompression bomb rejected');
+  assert(process.memoryUsage().rss-rss0<30*1024*1024,'bomb rejected without buffering the whole output');
+  console.log('PASS decompression bomb is aborted without buffering its output');
+  // 3) 20,000 unclosed cells must stay linear.
+  const flood=mutate('PE_LBO',1,xml=>xml.replace('<sheetData>','<sheetData>'+'<c r="A1">'.repeat(20000)));
+  const t0=Date.now();const fr=await W.inspect(flood);
+  assert(Date.now()-t0<1500,'flood parsed in linear time ('+(Date.now()-t0)+' ms)');assert(fr.sheets.length===3);
+  console.log('PASS 20,000 unclosed cells parse in linear time');
+  // 4) Boolean cells are not "typed numbers"; an unreadable sheet body does not claim "no formulas".
+  const bools=await W.inspect(mutate('Consulting_Profitability',0,xml=>xml.replace(/<c r="([A-Z]+\d+)"[^>]*><v>[^<]*<\/v><\/c>/,'<c r="$1" t="b"><v>1</v></c>')));
+  const baseC=reports.Consulting_Profitability.sheets[0];
+  assert.equal(bools.sheets[0].constants.length,baseC.constants.length-1,'boolean cell removed from the typed-number count');
+  assert.equal(bools.sheets[0].boolCells,1);
+  const odd=readZip(starterBytes('PE_LBO'));
+  for(const n of [0,1,2]){const pth=sheetPath(odd,n);odd.set(pth,Buffer.from(odd.get(pth).toString().replace(/<sheetData>[\s\S]*<\/sheetData>/,'<sheetData><row><weird/></row></sheetData>')))}
+  const unreadable=await W.inspect(writeZip(odd));
+  assert(unreadable.findings.some(f=>f.code==='no_cells_read')&&!unreadable.findings.some(f=>f.code==='no_formulas'),'unrecognised sheet body is reported as unreadable, not as "no formulas"');
+  console.log('PASS boolean cells and unreadable sheet bodies are reported honestly');
+
   // Honesty: the module reports structure only.
   const src=fs.readFileSync(__dirname+'/../career-workbook-check.js','utf8');
   assert(!/expert|certif|approved|benar secara finansial/i.test(src.replace(/never judges[^\n]*/,'')),'checker makes no correctness or endorsement claim');

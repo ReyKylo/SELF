@@ -153,3 +153,5 @@
 .ws-actions{display:flex;flex-wrap:wrap;gap:10px}.ws-actions .career-btn{min-height:44px}
 @media(max-width:600px){.ws-brief{padding:16px}.ws-actions .career-btn{flex:1 1 100%}.ws-tracks .career-btn{flex:1 1 100%}}
 @media(prefers-reduced-motion:reduce){.ws-root *{transition:none!important}}
+.ws-badge{display:inline-block;font-size:.7em;font-weight:780;letter-spacing:.08em;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted)}
+#ws-check-result:focus{outline:none}#ws-check-result:focus-visible{outline:2px solid var(--blue);outline-offset:3px}

@@ -45,10 +45,19 @@ const sealed=[...walk('tests/cases'),
 const sealedHashes=new Set(sealed.map(f=>sha(rd(f))));
 for(const f of served)assert(!sealedHashes.has(sha(rd(f))),f+' must not equal any sealed/worked file');
 for(const f of served.filter(x=>/\.md$/.test(x)))assert(!/reviewer-key/i.test(rd(f).toString()),f+' does not reference the restricted reviewer key');
-const reviewerKey=rd('tests/cases/vc/reviewer-key.md').toString();
-const lines=reviewerKey.split('\n').filter(l=>l.trim().length>25);
-assert(lines.length>3,'reviewer key present to compare against');
-for(const f of served){const body=rd(f).toString();for(const l of lines)assert(!body.includes(l.trim()),f+' leaks a reviewer-key line')}
+// Line-level guard against every sealed or worked-out text file, not only whole-file hashes.
+const sealedText=sealed.filter(f=>/\.(md|csv|json)$/.test(f)&&f!=='tests/cases/vc/reviewer-key.md');
+assert(sealed.includes('tests/cases/vc/reviewer-key.md')&&sealedText.length>8,'sealed corpus present to compare against');
+const sealedLines=new Map();
+for(const f of ['tests/cases/vc/reviewer-key.md',...sealedText])for(const l of rd(f).toString().split('\n').map(x=>x.trim()).filter(x=>x.length>40&&!/^[|\-:\s]+$/.test(x)))if(!sealedLines.has(l))sealedLines.set(l,f);
+assert(sealedLines.size>30);
+for(const f of served){
+  const body=rd(f).toString();
+  for(const [l,from] of sealedLines){
+    if(!body.includes(l))continue;
+    assert(false,f+' contains a line from sealed file '+from+': '+l.slice(0,80));
+  }
+}
 assert(!fs.existsSync(path.join(root,'dist/content/career-cases')),'case packets stay unserved');
 
 // Wiring: script, build, CI, host tab.

@@ -102,6 +102,47 @@ const tabs=x=>x.page.locator('[data-ws="track"]');
     }finally{await x.browser.close()}
   }
 
+  // Races found in independent review: superseded loads, late file reads, focus after re-render, Director hand-off with unsaved work.
+  const r=await launch();r.page.setDefaultTimeout(8000);
+  try{
+    let hold=true;
+    await r.context.route('**/content/work-samples/vc/brief.md',async route=>{if(hold)await new Promise(res=>setTimeout(res,1200));route.fallback()});
+    await openSample(r);
+    // (1) VC fetch is slow, switch away, check a file mid-flight: VC must still load afterwards.
+    await tabs(r).filter({hasText:/Venture/}).click();
+    await tabs(r).filter({hasText:/Private Equity/}).click();
+    await r.page.locator('#ws-file').setInputFiles({name:'a.xlsx',mimeType:'application/octet-stream',buffer:X.starterBytes('PE_LBO')});
+    await r.page.locator('.ws-check').getByText('a.xlsx').waitFor();
+    assert.equal(await r.page.evaluate(()=>document.activeElement?.id),'ws-check-result','focus lands on the result region, not the page start');
+    await r.page.locator('[data-ws-starter]').check();
+    await r.page.locator('.ws-check').getByText('Tidak ada temuan struktural').waitFor();
+    assert.equal(await r.page.evaluate(()=>document.activeElement?.id),'ws-starter','checkbox keeps keyboard focus after re-render');
+    hold=false;
+    await tabs(r).filter({hasText:/Venture/}).click();
+    await r.page.locator('#ws-title').filter({hasText:/ArusOps/}).waitFor({timeout:6000});
+    // (2) A file chosen for PE must not appear under another track.
+    await tabs(r).filter({hasText:/Private Equity/}).click();
+    await r.page.locator('#ws-title').filter({hasText:/Sagara/}).waitFor();
+    await r.page.locator('#ws-file').setInputFiles({name:'pe_only.xlsx',mimeType:'application/octet-stream',buffer:X.starterBytes('PE_LBO')});
+    await tabs(r).filter({hasText:/Consulting/}).click();
+    await r.page.locator('#ws-title').filter({hasText:/SajiRasa/}).waitFor();
+    await r.page.waitForTimeout(400);
+    assert.doesNotMatch(await r.page.locator('.ws-check').innerText(),/pe_only/);
+    assert.equal(await r.page.evaluate(()=>window.SELFWorkSample.state.check.report),null);
+    // (3) Director with unsaved work is not silently replaced by another case.
+    await r.page.locator('[data-learning="tab"][data-tab="director"]').click();
+    await r.page.locator('#director-initial').fill('PE work in progress');
+    await r.page.locator('[data-learning="tab"][data-tab="worksample"]').click();
+    await tabs(r).filter({hasText:/Venture/}).click();
+    await r.page.locator('#ws-title').filter({hasText:/ArusOps/}).waitFor();
+    await r.page.locator('[data-ws="director"]').click();
+    await r.page.locator('#director-initial').waitFor();
+    assert.equal(await r.page.locator('[data-director-action="track"][data-track="PE"]').getAttribute('aria-pressed'),'true','existing PE work is kept');
+    assert.equal(await r.page.locator('#director-initial').inputValue(),'PE work in progress');
+    assert.deepEqual(r.errors,[]);
+    console.log('PASS Work Sample races: superseded load recovers, stale file reads dropped, focus restored, unsaved Director work protected');
+  }finally{await r.browser.close()}
+
   // Content failure is explicit and recoverable.
   const f=await launch();f.page.setDefaultTimeout(8000);
   try{

@@ -263,10 +263,13 @@ function input(event){
 function change(event){if(window.SELFDirectorReview?.change?.(event))return true;if(window.SELFWorkSample?.change?.(event))return true;if(window.SELFCareerPortfolio?.change?.(event))return true;const node=event.target,key=node?.dataset?.learningFilter;if(!['track','type'].includes(key))return false;ensureOwner();ui[key]=node.value;ui.playing=false;redraw('#'+node.id);return true}
 function openPortfolio(track){
  if(!ui.data?.sprints.some(d=>d.id===track))return false;
- ui.tab='sprint';ui.day=track;ui.workspace=track;void window.SELFCareerPortfolio?.open?.(track);redraw('#learning-day-title');return true;
+ switchTab('sprint');ui.day=track;ui.workspace=track;void window.SELFCareerPortfolio?.open?.(track);redraw('#learning-day-title');return true;
 }
 function openDirector(track){
- window.SELFDirectorReview?.focusTrack?.(track);switchTab('director');redraw();return true;
+ const switched=window.SELFDirectorReview?.focusTrack?.(track);
+ switchTab('director');redraw();
+ if(switched===false)host?.notify?.('Director Review dibuka di kasus yang sedang dikerjakan. Reset atau selesaikan dulu untuk berpindah ke '+track+'.');
+ return true;
 }
 window.SELFCareerLearning={init(api){host=api.host;core=api.career;window.SELFCareerPortfolio?.init?.(host);window.SELFCareerTeaching?.init?.(host);window.SELFCareerAnalystLab?.init?.(host);window.SELFVCAnalystLab?.init?.(host);window.SELFConsultingLab?.init?.(host);window.SELFDirectorReview?.init?.(host);window.SELFWorkSample?.init?.(host)},render,action,input,change,reset,load,ui,taskId,openPortfolio,openDirector};
 })();
