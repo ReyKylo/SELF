@@ -1,5 +1,7 @@
 # Hunt › Outreach: one people board per company
 
+**Status (24 Oct 2026): built (O1–O5).** `outreach.js`, `outreach.css`, `tests/smoke_outreach.cjs`, `tests/browser_outreach.cjs`. Differences from the first draft: a follow-up is a touchpoint `next_step` ("Follow up once if no reply (7 days)"), which Today's Needs a touch already lists, rather than a separate Task; "Let go?" appears at 21 days after Approached; the composer uses built-in Bahasa and English templates plus your own Kit templates; the weekly cap and campus are per-device settings.
+
 **Goal (the user's own workflow):** research target companies → find the people who work there by hand → paste their LinkedIn links into that company's board → move each card **Found → Connect sent → Connected → Approached → Talking**, knowing that not everyone accepts → click a card to open that person's LinkedIn profile.
 
 **Verdict:** this should be the centre of Hunt. Applications are an outcome; relationships are what most often get you there. Most of the plumbing already exists (`career_people.company_id`, `profile_url`, `relationship_stage`, touchpoints, `career_task_links`, the drag-and-drop engine, Today's follow-ups). What's missing is the board, three stage values, fast entry and the nudges.

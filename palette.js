@@ -38,7 +38,7 @@ const SECTIONS=[
  {label:'Work · Links',hint:'My Links',run:{type:'view',view:'links'}},
  {label:'Work · Inbox',hint:'Captured notes and links',run:{type:'view',view:'inbox'}},
  {label:'Hunt · Pipeline',hint:'Applications by stage',run:{type:'career',page:'applications'}},
- {label:'Hunt · People',hint:'Networking and follow-ups',run:{type:'career',page:'people'}},
+ {label:'Hunt · Outreach (people)',hint:'LinkedIn, one board per company, follow-ups',run:{type:'career',page:'people'}},
  {label:'Hunt · Companies',hint:'Research and notes',run:{type:'career',page:'companies'}},
  {label:'Hunt · Radar',hint:'Public job feed',run:{type:'career',page:'radar'}},
  {label:'Hunt · Interviews',hint:'Preparation and reflection',run:{type:'career',page:'interviews'}},

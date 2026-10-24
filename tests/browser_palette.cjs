@@ -50,9 +50,9 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await page.keyboard.press('ArrowDown');assert.equal(await input.getAttribute('aria-activedescendant'),'pal-opt-1');
  await page.keyboard.press('ArrowUp');await page.keyboard.press('ArrowUp');const n=await page.locator('#pal-list .pal-item').count();assert.equal(await input.getAttribute('aria-activedescendant'),'pal-opt-'+(n-1),'arrows wrap');
  await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await pal().waitFor({state:'detached'});assert.equal(await current(),'hunt');
- /* a section: Hunt · People opens Career on that page */
+ /* a section: Hunt · Outreach opens Career on that page */
  await page.keyboard.press('Control+k');await page.locator('#pal-input').fill('people');await page.keyboard.press('Enter');
- await page.locator('.career-pill.active').waitFor();assert.equal(await page.locator('.career-pill.active').innerText(),'People');
+ await page.locator('.career-pill.active').waitFor();assert.equal(await page.locator('.career-pill.active').innerText(),'Outreach');
 
  /* 3. create a task from shorthand: the chips preview it and exactly one POST carries it */
  await page.keyboard.press('Control+k');await pal().waitFor();

@@ -16,6 +16,9 @@ on:
       - 'tests/browser_rooms.cjs'
       - 'tests/browser_today.cjs'
       - 'tests/browser_hunt.cjs'
+      - 'tests/browser_outreach.cjs'
+      - 'outreach.js'
+      - 'outreach.css'
       - 'career-learning.css'
       - 'rooms.js'
       - 'rooms.css'
@@ -90,3 +93,5 @@ jobs:
         run: node tests/browser_hunt.cjs
       - name: Command palette Chromium tests
         run: node tests/browser_palette.cjs
+      - name: Outreach board Chromium tests
+        run: node tests/browser_outreach.cjs

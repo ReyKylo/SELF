@@ -30,7 +30,7 @@ const ranked=P.rank([{label:'Beta'},{label:'Alpha'},{label:'Alphabet soup'}],'al
 /* an unknown Space is offered, never created implicitly */
 {const l=items('Bayar listrik #Rumah');const c=l.find(i=>i.run.type==='create-space');assert.equal(c.label,'Create Space “Rumah”');assert.equal(l[0].run.capture.spaceId,null);assert.ok(!l.slice(0,2).some(i=>i.run.type==='create-space'),'the Space is an extra choice, not the default');n+=3}
 /* a query that names a command runs it, even if it has two words or looks like a verb */
-for(const [q,expect] of [['switch theme',r=>r.type==='theme'],['search everything',r=>r.view==='search'],['study',r=>r.room==='study'],['work',r=>r.room==='work'],['hunt people',r=>r.type==='career'&&r.page==='people'],['settings',r=>r.view==='settings']]){
+for(const [q,expect] of [['switch theme',r=>r.type==='theme'],['search everything',r=>r.view==='search'],['study',r=>r.room==='study'],['work',r=>r.room==='work'],['hunt outreach',r=>r.type==='career'&&r.page==='people'],['settings',r=>r.view==='settings']]){
  const first=items(q)[0];assert.ok(expect(first.run),JSON.stringify(q)+' should run a command first, got '+first.label);n++}
 {const l=items('Study for exam besok');assert.equal(l[0].group,'Create');assert.equal(l[0].run.capture.dueDate,'2026-10-24');n+=2}
 {const l=items('work on memo');assert.equal(l[0].group,'Create','a sentence that merely starts with a command word is a capture');n++}

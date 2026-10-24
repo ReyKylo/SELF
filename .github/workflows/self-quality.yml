@@ -25,6 +25,7 @@ jobs:
           node --check motion.js
           node --check self-dnd.js
           node --check today.js
+          node --check outreach.js
           node --check capture-parse.js
           node --check palette.js
           node --check boards.js
@@ -55,6 +56,8 @@ jobs:
         run: node tests/smoke_capture_parse.cjs
       - name: Command palette ranking, items and markup safety
         run: node tests/smoke_palette.cjs
+      - name: Outreach helpers (links, names, nudges, CSV, messages)
+        run: node tests/smoke_outreach.cjs
       - name: Phase 1 API smoke
         run: node tests/smoke_api.cjs
       - name: Career Phase 1 integration and ownership regression

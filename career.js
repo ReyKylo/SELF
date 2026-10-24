@@ -3,13 +3,13 @@
 'use strict';
 const PAGES=[
  ['overview','Overview','home'],['applications','Applications','briefcase'],
- ['people','People','person'],['companies','Companies','grid'],
+ ['people','Outreach','person'],['companies','Companies','grid'],
  ['radar','Opportunity Radar','search'],['cvs','CV Library','note'],
  ['learning','Career Prep','graduation'],['interviews','Interview Prep','calendar'],['templates','Templates','book'],
  ['reminders','Reminders','clock']
 ];
 const HIRING=[['wishlist','Wishlist'],['applied','Applied'],['interviewing','Interviewing'],['offer','Offer'],['closed','Closed']];
-const RELATIONSHIPS=[['new','New'],['reached_out','Reached Out'],['in_conversation','In Conversation'],['maintain','Maintain']];
+const RELATIONSHIPS=[['new','Found'],['connect_sent','Connect sent'],['connected','Connected'],['reached_out','Approached'],['in_conversation','Talking'],['maintain','Ally'],['no_reply','No reply']];
 const TYPES={company:'career_companies',person:'career_people',application:'career_applications'};
 const names={company:'Company',person:'Person',application:'Application'};
 const ui={page:'overview',railCollapsed:false,ready:false,loading:false,error:'',
@@ -192,7 +192,7 @@ function drawerMarkup(){
  '<p class="career-drawer-note">Career status and Task status remain independent, with explicit links between records.</p></div></aside></div>';
 }
 /* ---- Rooms: Career is hosted inside the Hunt and Study rooms. The classic shell keeps its own rail. ---- */
-const HUNT_PILLS=[['overview','Overview'],['applications','Pipeline'],['people','People'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['cvs','Kit']];
+const HUNT_PILLS=[['overview','Overview'],['applications','Pipeline'],['people','Outreach'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['cvs','Kit']];
 const KIT_PAGES=[['cvs','CV Library'],['templates','Templates'],['reminders','Reminders']];
 const inKit=id=>KIT_PAGES.some(x=>x[0]===id);
 function huntPills(selected){
@@ -246,14 +246,14 @@ function render(){
  else if(ui.error&&!ui.ready)main=empty('Career could not load',ui.error,primary('Retry loading','retry'));
  else if(selected==='overview')main=careerOverview();
  else if(selected==='applications')main=window.SELFCareerPhase2?.renderApplications?.()||careerApplications();
- else if(selected==='people')main=window.SELFCareerPhase2?.renderPeople?.()||careerPeople();
+ else if(selected==='people')main=window.SELFOutreachUI?.render?.()||window.SELFCareerPhase2?.renderPeople?.()||careerPeople();
  else if(selected==='companies')main=careerCompanies();
  else if(selected==='radar')main=window.SELFCareerPhase3?.render?.()||careerRadar();
  else if(selected==='cvs')main=window.SELFCareerPhase2?.renderCVs?.()||future('CV Library','Version management and private attachments.','Phase 2');
  else if(selected==='interviews')main=window.SELFCareerPhase2?.renderInterviews?.()||future('Interview Prep','Linked sessions and preparation workflows.','Phase 2');
  else if(selected==='templates')main=window.SELFCareerPhase2?.renderTemplates?.()||future('Templates','Reusable messages and cover letter drafts.','Phase 2');
  else main=window.SELFCareerPhase2?.renderReminders?.()||careerReminders();
- if(hosted&&ui.ready){if(selected==='applications')main=pipelineKpis()+main;else if(selected==='people')main=needsTouch()+main}
+ if(hosted&&ui.ready){if(selected==='applications')main=pipelineKpis()+main;else if(selected==='people'&&!window.SELFOutreachUI?.state?.company)main=needsTouch()+main}
  return '<div class="career-workspace'+(hosted?' career-hosted':'')+'">'+nav+
  '<div class="career-stage">'+(hosted&&selected!=='learning'?huntPills(selected):'')+'<header class="career-page-head"><div><span class="career-eyebrow">CAREER / '+h(title).toUpperCase()+'</span><h1>'+h(selected==='overview'?'Career Overview':title)+'</h1>'+
  '<p>'+h(selected==='overview'?'Your next steps and actual records. No duplicate to-do system.':'One Career workspace, inside your existing SELF.')+'</p></div>'+
@@ -296,6 +296,7 @@ function enter(){
   window.SELFCareerPhase2?.reset?.(owner);
   window.SELFCareerPhase3?.reset?.(owner);
   window.SELFCareerLearning?.reset?.(owner);
+  window.SELFOutreachUI?.reset?.();
  }
  if(!ui.ready&&!ui.loading)void load();
 }
@@ -367,6 +368,7 @@ async function erase(kind,id){
  }finally{ui.busy=false}
 }
 async function action(e){
+ if(await window.SELFOutreachUI?.action?.(e))return true;
  if(await window.SELFCareerLearning?.action?.(e))return true;
  if(await window.SELFCareerPhase3?.action?.(e))return true;
  if(await window.SELFCareerPhase2?.action?.(e))return true;
@@ -402,6 +404,7 @@ async function submit(e){
  await save(e.target);return true;
 }
 function input(e){
+ if(window.SELFOutreachUI?.input?.(e))return true;
  if(window.SELFCareerLearning?.input?.(e))return true;
  if(window.SELFCareerPhase3?.input?.(e))return true;
  if(window.SELFCareerPhase2?.input?.(e))return true;
@@ -412,6 +415,7 @@ function input(e){
  return true;
 }
 function keydown(e){
+ if(window.SELFOutreachUI?.keydown?.(e))return true;
  if(window.SELFCareerPhase3?.keydown?.(e))return true;
  if(window.SELFCareerPhase2?.keydown?.(e))return true;
  if(e.key!=='Escape'||(!ui.modal&&!ui.drawer))return false;
@@ -426,6 +430,6 @@ function links(){
   ...(window.SELFCareerPhase3?.links?.()||[])
  ];
 }
-window.SELFCareer={setPage,init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
+window.SELFCareer={setPage,init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api});window.SELFOutreachUI?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
 })();
 

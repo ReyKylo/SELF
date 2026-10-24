@@ -31,7 +31,7 @@ function pickThree({tasks,pins=[],rank}){
 const daysBetween=(from,to)=>Math.floor((Date.parse(to)-Date.parse(from))/864e5);
 const hhmm=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',hour12:false});
 const dayLabel=new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',weekday:'short',day:'numeric',month:'short'});
-const FOLLOW_STAGES=['reached_out','in_conversation'];
+const FOLLOW_STAGES=['connect_sent','connected','reached_out','in_conversation'];
 const STALE_DAYS=14,WEEK=7*24*3600*1000,MAX_ITEMS=8;
 /* Who needs a touch: people with a logged next step (latest touchpoint decides), then people in an active stage with no contact for more than STALE_DAYS.
    People with no logged contact at all are skipped: there is nothing to measure. Shared by the Today agenda and the Hunt room. */

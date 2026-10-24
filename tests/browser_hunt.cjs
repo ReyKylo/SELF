@@ -28,7 +28,7 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  /* 1. Hunt: pills replace the rail; the heading stays for assistive tech and tests */
  await page.goto(x.base);await page.locator('.rooms-rail .door[data-room="hunt"]').click();
  await page.locator('.career-pills').waitFor();assert.equal(await current(),'hunt');
- assert.deepEqual(await page.locator('.career-pills .career-pill').allInnerTexts(),['Overview','Pipeline','People','Companies','Radar','Interviews','Kit','Career Prep →']);
+ assert.deepEqual(await page.locator('.career-pills .career-pill').allInnerTexts(),['Overview','Pipeline','Outreach','Companies','Radar','Interviews','Kit','Career Prep →']);
  assert.equal(await page.locator('.career-rail').count(),0,'no second sidebar inside Hunt');
  assert.equal(await page.locator('.career-workspace h2.sr-only').innerText(),'CAREER STUDIO');
  assert.equal(await page.locator('.career-pill.active').innerText(),'Overview');
