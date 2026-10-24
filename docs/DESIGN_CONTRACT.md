@@ -21,6 +21,7 @@ The user approved the Rooms direction and asked for it to be built. Spec: `docs/
 - **Motion:** 90 to 420 ms, transform and opacity only, entrance once per navigation (never on a data refresh), and everything off under `prefers-reduced-motion`.
 - **Drag and drop** works by mouse, touch and keyboard, saves only through the existing save functions with Undo, and never implies an order that is not stored.
 - **Today (Home in Rooms):** Quick Capture stays on top. My Priorities becomes **Three for today** (pinned or best-ranked open tasks) beside an Agenda and an Inbox triage stack; Continue Where You Left Off and the activity counts stay below. The classic shell keeps the original Home.
+- **Palette:** Ctrl/⌘ K (or `/` outside a text field) opens a command palette: go to a room or section, open a task, Space, board, person or company, or create from shorthand (`Kirim CV besok #Career !high`). It never creates a Space without an explicit command and saves nothing until Enter. The classic shell keeps Ctrl K for Search.
 - **Unchanged:** 16px base text with 100 to 150% scaling, targets around 40px or more (doors 72px; the phone bar 58px plus the safe area), designed dark and light themes.
 
 ## Acceptance gates

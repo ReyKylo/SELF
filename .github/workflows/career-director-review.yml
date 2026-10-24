@@ -23,6 +23,9 @@ on:
       - 'motion.css'
       - 'self-dnd.js'
       - 'today.js'
+      - 'palette.js'
+      - 'capture-parse.js'
+      - 'tests/browser_palette.cjs'
       - 'career-phase2.js'
       - 'tests/xlsx_fixture.cjs'
       - 'career-worksample.js'
@@ -85,3 +88,5 @@ jobs:
         run: node tests/browser_today.cjs
       - name: Hunt and Study rooms Chromium tests
         run: node tests/browser_hunt.cjs
+      - name: Command palette Chromium tests
+        run: node tests/browser_palette.cjs
