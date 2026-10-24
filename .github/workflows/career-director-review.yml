@@ -29,6 +29,12 @@ on:
       - 'data-export.js'
       - 'work-tools.js'
       - 'work-tools.css'
+      - 'tests/browser_studio.cjs'
+      - 'studio-recipes.js'
+      - 'studio-present.js'
+      - 'studio-tools.css'
+      - 'canvas-v3.js'
+      - 'content/studio-recipes.json'
       - 'content/career-lessons-v2.json'
       - 'career-learning.css'
       - 'rooms.js'
@@ -110,3 +116,5 @@ jobs:
         run: node tests/browser_lesson_loop.cjs
       - name: Work tools and Export Chromium tests
         run: node tests/browser_work_tools.cjs
+      - name: Studio recipes and Walkthrough Chromium tests
+        run: node tests/browser_studio.cjs

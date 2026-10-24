@@ -1,5 +1,8 @@
 # SELF product upgrade plan: from five modules to one career operating system
 
+**Build status (24 Oct 2026):** built so far: Studio Recipes (§5.2, `studio-recipes.js`, six recipes), Walkthrough (§5.3, `studio-present.js`), Message Composer (§5.7, inside Outreach), Hunt Outreach (replaces the People page), Daily Drill (§5.12, device-local), Export and bulk actions (see ERP_UX_PLAN). Still to build: Dossier, Game Day, Weekly Review, Shutdown, Add to calendar, Radar Swipe, Harvest, Structure Check, Skill Map, Proof Pack and all Wave 2 items.
+
+
 **Role:** product direction, written as the PM for SELF. It sits on top of the Rooms redesign ([blueprint](./ROOMS_REDESIGN_BLUEPRINT.md), [build spec](./ROOMS_BUILD_SPEC.md)) and turns it from a visual change into a product upgrade.
 **Base:** `main` at `14ef361` (includes Career Prep Phase 6 Work Samples).
 **Builders:** Sonnet and Haiku, one phase per PR, using the prompts in §8. Nothing here has been built.

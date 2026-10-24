@@ -1,0 +1,24 @@
+/* Studio: recipe picker and the Walkthrough (Present) strip. */
+.c3-recipes{display:grid;gap:8px;max-height:260px;overflow:auto;margin:8px 0}
+.c3-recipe{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--c3-line,var(--line));border-radius:12px;cursor:pointer}
+.c3-recipe:hover,.c3-recipe:has(input:checked){border-color:var(--blue,#6595fa);background:color-mix(in srgb,var(--blue,#6595fa) 10%,transparent)}
+.c3-recipe input{margin-top:4px;flex:0 0 auto}.c3-recipe small{color:var(--muted,#9aa7bb);font-weight:600;margin-left:6px}.c3-recipe em{display:block;font-style:normal;font-size:.84em;color:var(--muted,#9aa7bb);margin-top:3px}
+.c3-recipe-fill{border:1px solid var(--c3-line,var(--line));border-radius:12px;padding:10px 12px;display:grid;gap:8px;margin:6px 0 0}.c3-recipe-fill legend{font-size:.78em;color:var(--muted,#9aa7bb);padding:0 6px}
+.c3-error{color:var(--red,#ff8f88);font-size:.85em}
+/* presenting: the board is read-only and its chrome steps aside */
+html.is-presenting .c3-header,html.is-presenting .c3-toolbar,html.is-presenting .c3-minimap,html.is-presenting .c3-contextbar,html.is-presenting .c3-bottom-tools,html.is-presenting .c3-inspector,html.is-presenting .c3-quick-add,html.is-presenting .c3-empty,html.is-presenting .rooms-rail,html.is-presenting .rooms-bar,html.is-presenting .topbar,html.is-presenting .sidebar{display:none!important}
+html.is-presenting #c3-world,html.is-presenting #c3-world *{pointer-events:none!important;user-select:none}
+html.is-presenting .main{margin-left:0!important;width:100%!important}
+html.is-presenting #c3-canvas{cursor:default!important}
+#present-bar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 20px);padding:10px 12px;border:1px solid var(--line,#334);border-radius:18px;background:var(--side,#101923);color:var(--text,#fff);box-shadow:var(--shadow,0 18px 60px #0007);flex-wrap:wrap;justify-content:center}
+#present-bar .pr-btn{border:1px solid var(--line,#334);background:var(--card2,#1b2936);color:inherit;border-radius:12px;min-width:46px;min-height:46px;padding:0 14px;font-weight:700}
+#present-bar .pr-btn:disabled{opacity:.35}#present-bar .pr-next{background:var(--blue,#3b84ff);border-color:var(--blue,#3b84ff);color:#fff}
+#present-bar .pr-info{display:grid;gap:4px;min-width:150px;max-width:340px}#present-bar .pr-info strong{font-size:.95em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#present-bar .pr-count{font-size:.75em;color:var(--muted,#9aa7bb);font-family:ui-monospace,Menlo,monospace}
+#present-bar .pr-track{display:block;height:4px;border-radius:4px;background:var(--hover,#253446);overflow:hidden}#present-bar .pr-track b{display:block;height:100%;background:var(--blue,#3b84ff);transition:width .3s}
+#present-bar .pr-target{display:inline-flex;gap:6px;align-items:center;font-size:.78em;color:var(--muted,#9aa7bb)}#present-bar .pr-target input{width:62px;border:1px solid var(--line,#334);background:var(--card2,#1b2936);color:inherit;border-radius:8px;padding:6px;min-height:36px}
+#present-bar .pr-clock{font-family:ui-monospace,Menlo,monospace;font-size:.82em;min-width:110px;text-align:center}
+@media (prefers-reduced-motion:reduce){#present-bar .pr-track b{transition:none}}
+/* The Present button stays a small icon on narrow headers so the other controls keep their room */
+@media (max-width:900px){.c3-shell .c3-header-right [data-c3="present"]{min-width:38px;width:38px;font-size:0;padding:0}.c3-shell .c3-header-right [data-c3="present"]::before{content:"▶";font-size:15px}}
+@media (max-width:600px){.c3-shell .c3-header-right [data-c3="present"]{display:inline-flex!important;align-items:center;justify-content:center;min-height:40px}}

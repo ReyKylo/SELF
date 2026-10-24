@@ -1,0 +1,574 @@
+{
+  "version": 1,
+  "description": "Studio recipes: structured starting points for analyst work. Each recipe is a chain of frames (so Present can walk through them) holding prompt cards. Templates only: not expert-certified answers, and nothing here fetches outside data.",
+  "recipes": [
+    {
+      "id": "issue-tree",
+      "title": "Issue Tree",
+      "track": "Consulting",
+      "columns": 5,
+      "summary": "One key question, MECE branches, a hypothesis for each, and the analyses that would prove or kill it.",
+      "guide": "Hypothesis-driven issue tree: start from one key question, split it into mutually exclusive, collectively exhaustive branches, state a hypothesis for each, then list the analysis that would test it. A standard consulting structure offered as a template, not an expert-checked answer.",
+      "frames": [
+        {
+          "key": "q",
+          "title": "1 · Key question",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Key question",
+              "summary": "One sentence: what decision, for whom, by when? Example: should we enter this market?"
+            }
+          ]
+        },
+        {
+          "key": "b",
+          "title": "2 · Branches (MECE)",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Branch A",
+              "summary": "Name one driver of the answer."
+            },
+            {
+              "kind": "knowledge",
+              "title": "Branch B",
+              "summary": "A second driver, with no overlap with A."
+            },
+            {
+              "kind": "knowledge",
+              "title": "Branch C",
+              "summary": "A third driver, so nothing important is missing."
+            },
+            {
+              "kind": "sticky",
+              "title": "MECE check",
+              "summary": "No overlap between branches. Nothing important missing."
+            }
+          ]
+        },
+        {
+          "key": "h",
+          "title": "3 · Hypotheses",
+          "cards": [
+            {
+              "kind": "sticky",
+              "title": "Hypothesis for A",
+              "summary": "If this is true, what would we see in the data?"
+            },
+            {
+              "kind": "sticky",
+              "title": "Hypothesis for B",
+              "summary": "If this is true, what would we see in the data?"
+            },
+            {
+              "kind": "sticky",
+              "title": "Hypothesis for C",
+              "summary": "If this is true, what would we see in the data?"
+            }
+          ]
+        },
+        {
+          "key": "a",
+          "title": "4 · Analyses to run",
+          "cards": [
+            {
+              "kind": "task",
+              "title": "Analysis for A",
+              "summary": "Data needed · method · due"
+            },
+            {
+              "kind": "task",
+              "title": "Analysis for B",
+              "summary": "Data needed · method · due"
+            },
+            {
+              "kind": "task",
+              "title": "Analysis for C",
+              "summary": "Data needed · method · due"
+            }
+          ]
+        }
+      ],
+      "links": [
+        [
+          "q:0",
+          "b:0"
+        ],
+        [
+          "q:0",
+          "b:1"
+        ],
+        [
+          "q:0",
+          "b:2"
+        ]
+      ]
+    },
+    {
+      "id": "deal-thesis",
+      "title": "Deal Thesis",
+      "track": "PE",
+      "columns": 3,
+      "summary": "A thesis, the few value drivers behind it, what could break it, the diligence that tests it, and when you would walk away.",
+      "guide": "A one-page deal logic for a PE case: a thesis, the value drivers behind it, the risks that could break it, the diligence questions that test them and the conditions under which you would walk away. A template to structure thinking, not an investment recommendation.",
+      "frames": [
+        {
+          "key": "t",
+          "title": "1 · Thesis",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Thesis",
+              "summary": "Why this business, at this price, with this plan? One paragraph."
+            }
+          ]
+        },
+        {
+          "key": "d",
+          "title": "2 · Value drivers",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Driver 1",
+              "summary": "Example prompt: revenue growth. What has to be true?"
+            },
+            {
+              "kind": "knowledge",
+              "title": "Driver 2",
+              "summary": "Example prompt: margin. What has to be true?"
+            },
+            {
+              "kind": "knowledge",
+              "title": "Driver 3",
+              "summary": "Example prompt: cash conversion. What has to be true?"
+            }
+          ]
+        },
+        {
+          "key": "r",
+          "title": "3 · Key risks",
+          "cards": [
+            {
+              "kind": "sticky",
+              "title": "Risk 1",
+              "summary": "What would break the thesis?"
+            },
+            {
+              "kind": "sticky",
+              "title": "Risk 2",
+              "summary": "What would break the thesis?"
+            },
+            {
+              "kind": "sticky",
+              "title": "Risk 3",
+              "summary": "What would break the thesis?"
+            }
+          ]
+        },
+        {
+          "key": "q",
+          "title": "4 · Diligence questions",
+          "cards": [
+            {
+              "kind": "task",
+              "title": "Question 1",
+              "summary": "Which risk does it test? What evidence settles it?"
+            },
+            {
+              "kind": "task",
+              "title": "Question 2",
+              "summary": "Which risk does it test? What evidence settles it?"
+            },
+            {
+              "kind": "task",
+              "title": "Question 3",
+              "summary": "Which risk does it test? What evidence settles it?"
+            }
+          ]
+        },
+        {
+          "key": "k",
+          "title": "5 · Kill criteria",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Walk-away condition 1",
+              "summary": "If this is true, we do not proceed."
+            },
+            {
+              "kind": "knowledge",
+              "title": "Walk-away condition 2",
+              "summary": "Price, structure or evidence that ends the deal."
+            }
+          ]
+        }
+      ],
+      "links": [
+        [
+          "t:0",
+          "d:0"
+        ],
+        [
+          "t:0",
+          "d:1"
+        ],
+        [
+          "t:0",
+          "d:2"
+        ]
+      ]
+    },
+    {
+      "id": "ic-memo",
+      "title": "IC Memo Spine",
+      "track": "VC",
+      "columns": 3,
+      "summary": "Eight sections of an investment-committee memo, so you fill the structure from evidence rather than from the pitch deck.",
+      "guide": "An investment-committee memo spine for an early-stage deal. Each frame is one section; fill it from evidence, not from the pitch deck. A structure to rehearse, not a finished memo. A template to fill in, not an answer key.",
+      "frames": [
+        {
+          "key": "rec",
+          "title": "1 · Recommendation",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Recommendation",
+              "summary": "Invest, pass or wait, with the single strongest reason."
+            }
+          ]
+        },
+        {
+          "key": "mkt",
+          "title": "2 · Market",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Market size and timing",
+              "summary": "Bottom-up if you can. Why now?"
+            }
+          ]
+        },
+        {
+          "key": "prd",
+          "title": "3 · Product",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Product and edge",
+              "summary": "What do customers do differently because of it?"
+            }
+          ]
+        },
+        {
+          "key": "trc",
+          "title": "4 · Traction",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Traction",
+              "summary": "Cohorts, retention, net revenue retention. Evidence, not claims."
+            }
+          ]
+        },
+        {
+          "key": "tem",
+          "title": "5 · Team",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Team and gaps",
+              "summary": "What is proven, what is missing, who fills it?"
+            }
+          ]
+        },
+        {
+          "key": "trm",
+          "title": "6 · Terms and ownership",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Round terms",
+              "summary": "Price, instrument, preferences."
+            },
+            {
+              "kind": "knowledge",
+              "title": "Ownership after dilution",
+              "summary": "Ownership now and after the next round."
+            }
+          ]
+        },
+        {
+          "key": "rsk",
+          "title": "7 · Risks",
+          "cards": [
+            {
+              "kind": "sticky",
+              "title": "Risk 1",
+              "summary": "What would make this a loss?"
+            },
+            {
+              "kind": "sticky",
+              "title": "Risk 2",
+              "summary": "What would make this a loss?"
+            }
+          ]
+        },
+        {
+          "key": "ask",
+          "title": "8 · Ask",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Ask and conditions",
+              "summary": "What do you want the committee to approve, and on what conditions?"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "story-bank",
+      "title": "Story Bank",
+      "track": "Interviews",
+      "columns": 4,
+      "summary": "Six behavioural stories in STAR form, one per common competency.",
+      "guide": "Six behavioural stories in STAR form (Situation, Task, Action, Result). Put a number in the Result only if you honestly have one; never invent an outcome. A template for practice, not a script.",
+      "frames": [
+        {
+          "key": "lead",
+          "title": "Leadership",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Leadership story",
+              "summary": "S: …\nT: …\nA: …\nR: …"
+            }
+          ]
+        },
+        {
+          "key": "anal",
+          "title": "Analysis",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Analysis story",
+              "summary": "S: …\nT: …\nA: …\nR: …"
+            }
+          ]
+        },
+        {
+          "key": "conf",
+          "title": "Conflict",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Conflict story",
+              "summary": "S: …\nT: …\nA: …\nR: …"
+            }
+          ]
+        },
+        {
+          "key": "fail",
+          "title": "Failure",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Failure story",
+              "summary": "S: …\nT: …\nA: …\nR and what you changed: …"
+            }
+          ]
+        },
+        {
+          "key": "init",
+          "title": "Initiative",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Initiative story",
+              "summary": "S: …\nT: …\nA: …\nR: …"
+            }
+          ]
+        },
+        {
+          "key": "team",
+          "title": "Teamwork",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Teamwork story",
+              "summary": "S: …\nT: …\nA: …\nR: …"
+            }
+          ]
+        }
+      ],
+      "links": []
+    },
+    {
+      "id": "company-map",
+      "title": "Company Map",
+      "track": "Hunt",
+      "columns": 3,
+      "needs": [
+        "company"
+      ],
+      "summary": "One page for a target firm: what it does, the people you are approaching, the roles you target, and what you still need to learn.",
+      "guide": "A one-page map of a target firm: what it does, the people you are approaching, the roles you are targeting and what you still need to learn. Names come from your own Outreach board; nothing is looked up online. A template to fill in, not an answer key.",
+      "frames": [
+        {
+          "key": "co",
+          "title": "{company}",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "What they do",
+              "summary": "In your own words, after reading their site."
+            },
+            {
+              "kind": "knowledge",
+              "title": "Why this firm",
+              "summary": "One specific reason, not a compliment."
+            }
+          ]
+        },
+        {
+          "key": "pe",
+          "title": "People",
+          "each": "people",
+          "cards": [
+            {
+              "kind": "reference",
+              "title": "Person 1",
+              "summary": "Role · stage · last touch"
+            }
+          ]
+        },
+        {
+          "key": "ap",
+          "title": "Applications",
+          "cards": [
+            {
+              "kind": "task",
+              "title": "Role to apply for",
+              "summary": "Deadline · CV version · status"
+            }
+          ]
+        },
+        {
+          "key": "oq",
+          "title": "Open questions",
+          "cards": [
+            {
+              "kind": "sticky",
+              "title": "Question 1",
+              "summary": "What do I still need to know?"
+            },
+            {
+              "kind": "sticky",
+              "title": "Question 2",
+              "summary": "What do I still need to know?"
+            }
+          ]
+        },
+        {
+          "key": "nt",
+          "title": "Notes",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Research notes",
+              "summary": "Recent news, with the source and date."
+            }
+          ]
+        }
+      ],
+      "links": [
+        [
+          "co:0",
+          "pe:0"
+        ]
+      ]
+    },
+    {
+      "id": "weekly-map",
+      "title": "Weekly Map",
+      "track": "Rituals",
+      "columns": 5,
+      "summary": "A weekly review in four boxes: this week's three, wins, carry-over, and what to learn next.",
+      "guide": "A weekly review in four boxes. Close what you can, carry over only what you must, and choose next week's three. A template to fill in, not an answer key.",
+      "frames": [
+        {
+          "key": "th",
+          "title": "This week's three",
+          "cards": [
+            {
+              "kind": "task",
+              "title": "Priority 1",
+              "summary": "Why it matters."
+            },
+            {
+              "kind": "task",
+              "title": "Priority 2",
+              "summary": "Why it matters."
+            },
+            {
+              "kind": "task",
+              "title": "Priority 3",
+              "summary": "Why it matters."
+            }
+          ]
+        },
+        {
+          "key": "wn",
+          "title": "Wins",
+          "cards": [
+            {
+              "kind": "sticky",
+              "title": "Win 1",
+              "summary": "Something that moved forward."
+            },
+            {
+              "kind": "sticky",
+              "title": "Win 2",
+              "summary": "Something that moved forward."
+            }
+          ]
+        },
+        {
+          "key": "co",
+          "title": "Carry-over",
+          "cards": [
+            {
+              "kind": "task",
+              "title": "Carry 1",
+              "summary": "Why it slipped."
+            },
+            {
+              "kind": "task",
+              "title": "Carry 2",
+              "summary": "Why it slipped."
+            }
+          ]
+        },
+        {
+          "key": "ln",
+          "title": "Learn next",
+          "cards": [
+            {
+              "kind": "knowledge",
+              "title": "Learn 1",
+              "summary": "One concept to study this week."
+            },
+            {
+              "kind": "knowledge",
+              "title": "Learn 2",
+              "summary": "One skill to practise."
+            }
+          ]
+        }
+      ],
+      "links": []
+    }
+  ]
+}
