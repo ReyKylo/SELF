@@ -66,7 +66,8 @@ function createItems(c,{altOnly=false}={}){
 function buildItems(ctx,query){
  const q=String(query||'').trim();
  const nav=[...ROOM_ITEMS.map(([id,label,hint])=>({group:'Go to',label:'Go to '+label,hint,run:{type:'room',room:id},key:label,offset:'Go to '.length,bonus:40})),
-  ...SECTIONS.map(s=>({group:s.run.type==='theme'?'Actions':'Go to',label:s.label,hint:s.hint,run:s.run}))];
+  ...SECTIONS.map(s=>({group:s.run.type==='theme'?'Actions':'Go to',label:s.label,hint:s.hint,run:s.run})),
+  ...(ctx.views||[]).map(v=>({group:'Go to',label:'View · '+v.name,hint:'Saved Work view',run:{type:'saved-view',id:v.id}}))];
  if(!q)return [...nav.slice(0,5),...nav.filter(n=>['Settings','Search everything','Switch theme'].includes(n.label))].map((n,i)=>({...n,id:'i'+i,idx:[]}));
  const navHits=rank(nav.map(n=>({...n,label:n.label})),q,6);
  const records=[];
@@ -96,7 +97,7 @@ const el=(tag,cls,text)=>{const n=doc.createElement(tag);if(cls)n.className=cls;
 function context(query){
  const st=host.state(),c=host.careerUi?.()||{};
  const ctx={tasks:[...st.tasks].sort((a,b)=>(a.status==='done')-(b.status==='done')),spaces:st.spaces,boards:st.boards,links:st.links,
-  people:c.ready?c.people:[],companies:c.ready?c.companies:[],spaceName:id=>host.spaceName(id),statusName:s=>host.statusName(s)};
+  people:c.ready?c.people:[],companies:c.ready?c.companies:[],views:host.views?host.views():[],spaceName:id=>host.spaceName(id),statusName:s=>host.statusName(s)};
  ctx.capture=query.trim()?root.SELFCapture.parseCapture(query,{today:host.today(),spaces:st.spaces}):null;
  return ctx;
 }
@@ -162,6 +163,7 @@ async function run(item){
  if(r.type==='space')return host.openSpace(r.id);
  if(r.type==='board')return host.openBoard(r.id);
  if(r.type==='theme')return host.toggleTheme();
+ if(r.type==='saved-view')return host.applyView(r.id);
  if(r.type==='link'){root.open?.(r.url,'_blank','noopener,noreferrer');return}
  if(r.type==='create-space'){const name=r.name.charAt(0).toUpperCase()+r.name.slice(1,80);return host.mutate(async()=>{await host.insert('spaces',{name})},'Space “'+name+'” created. Run your capture again to file it there.')}
  if(r.type==='create')return create(r.capture);

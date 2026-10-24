@@ -1,5 +1,8 @@
 # SELF UX: what professional ERPs do that SELF should borrow
 
+**Build status (24 Oct 2026):** built: Export and backup (`data-export.js`, Settings › Your data), Saved views and Bulk actions (`work-tools.js`: selection, bulk status/priority/due/Space, partial-failure report with Undo, in-page delete confirm, views in Ctrl K), and the X key to select. Not built: Table view with inline editing, the list keyboard model beyond X, and everything marked W2.
+
+
 **Context:** the Rooms shell, motion, drag-and-drop, Today, Hunt and Study, and the Ctrl K palette are built (PR #34). This plan picks the professional-ERP patterns (from Linear, Notion, Airtable, Asana, Salesforce, Odoo, SAP Fiori) that fit a **one-person** ERP. It leaves out the ones that only make sense for teams.
 
 **Selection test:** a pattern is in only if it removes repeated effort, prevents a costly mistake, or makes data trustworthy. Decoration alone doesn't qualify.

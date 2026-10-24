@@ -30,6 +30,8 @@ jobs:
           node --check career-visuals.js
           node --check career-review.js
           node --check career-lesson-loop.js
+          node --check data-export.js
+          node --check work-tools.js
           node --check capture-parse.js
           node --check palette.js
           node --check boards.js
@@ -68,6 +70,10 @@ jobs:
         run: node tests/smoke_lessons_v2.cjs
       - name: Review queue spaced recall
         run: node tests/smoke_review.cjs
+      - name: Export CSV escaping and backup
+        run: node tests/smoke_export.cjs
+      - name: Work tools saved views and bulk planning
+        run: node tests/smoke_work_tools.cjs
       - name: Phase 1 API smoke
         run: node tests/smoke_api.cjs
       - name: Career Phase 1 integration and ownership regression

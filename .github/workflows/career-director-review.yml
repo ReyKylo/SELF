@@ -25,6 +25,10 @@ on:
       - 'career-review.js'
       - 'career-lesson-loop.js'
       - 'career-lesson-loop.css'
+      - 'tests/browser_work_tools.cjs'
+      - 'data-export.js'
+      - 'work-tools.js'
+      - 'work-tools.css'
       - 'content/career-lessons-v2.json'
       - 'career-learning.css'
       - 'rooms.js'
@@ -104,3 +108,5 @@ jobs:
         run: node tests/browser_outreach.cjs
       - name: Lesson Loop v2 and Daily Drill Chromium tests
         run: node tests/browser_lesson_loop.cjs
+      - name: Work tools and Export Chromium tests
+        run: node tests/browser_work_tools.cjs
