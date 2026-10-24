@@ -240,7 +240,7 @@ function board(){
  return '<div class="outreach">'+
   '<div class="outreach-head"><button type="button" class="career-btn" data-outreach="back">← Outreach</button><div class="outreach-title"><h2>'+h(name)+'</h2><p>'+h(c?[c.industry,c.location].filter(Boolean).join(' · '):'People you have not linked to a company')+
   (site?' · <a href="'+h(site)+'" target="_blank" rel="noopener noreferrer">website ↗</a>':'')+'</p></div>'+
-  '<div class="outreach-actions"><button type="button" class="career-btn career-primary" data-outreach="paste-toggle" aria-expanded="'+S.pasteOpen+'">Paste links</button></div></div>'+
+  '<div class="outreach-actions">'+(c&&root.SELFBoards?.createFromRecipe?'<button type="button" class="career-btn" data-outreach="map" title="Create a Studio board from the Company Map recipe, with these people">Company map</button>':'')+'<button type="button" class="career-btn career-primary" data-outreach="paste-toggle" aria-expanded="'+S.pasteOpen+'">Paste links</button></div></div>'+
   (c?'<div class="outreach-find" aria-label="Find people on LinkedIn"><span>Find people on LinkedIn:</span>'+finders.map(([l,k])=>'<a class="career-btn" href="'+h(linkedInSearch(c.name,k))+'" target="_blank" rel="noopener noreferrer">'+h(l)+' ↗</a>').join('')+
    '<label class="outreach-campus">your campus <input class="career-field" data-outreach-campus value="'+h(campus)+'" placeholder="e.g. UI" aria-label="Your campus for alumni search"></label>'+
    '<span class="outreach-cover" title="Role group is guessed from titles">'+peer+' peer · '+senior+' senior · aim for 3 to 5 people per firm</span></div>':'')+
@@ -386,6 +386,7 @@ async function action(e){
  const a=b.dataset.outreach,id=b.dataset.id;
  e.preventDefault();e.stopPropagation();
  if(a==='open-company'){S.company=id;S.pasteOpen=false;S.preview=null;S.menu=null;host.render()}
+ else if(a==='map'){const c=companyOf(S.company);if(!c||S.busy)return true;S.busy=true;try{const people=boardFor(c.id).list.filter(p=>p.relationship_stage!==NO_REPLY).map(p=>({name:p.full_name,role:p.role_title||'',stage:stageLabel(p.relationship_stage)}));await root.SELFBoards.createFromRecipe(c.name+' map','company-map',{fill:{company:c.name,people}})}finally{S.busy=false}}
  else if(a==='back'){S.company=null;S.menu=null;S.undo=null;host.render()}
  else if(a==='paste-toggle'){S.pasteOpen=!S.pasteOpen;host.render();if(S.pasteOpen)Promise.resolve().then(()=>document.getElementById('outreach-paste-in')?.focus())}
  else if(a==='preview'){const {profiles,skipped}=extractLinkedIn(S.paste);const d=dedupeAgainst(profiles,people());S.preview={fresh:d.filter(x=>!x.existing),dupes:d.filter(x=>x.existing),skipped};host.render()}

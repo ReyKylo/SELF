@@ -120,6 +120,12 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await card('Ayu Lestari').focus();const [pop2]=await Promise.all([context.waitForEvent('page'),page.keyboard.press('Enter')]);await pop2.waitForLoadState().catch(()=>{});assert.match(pop2.url(),/linkedin\.com\/in\/ayu-lestari/,'Enter on a focused card opens the profile');await pop2.close();
  await card('Ayu Lestari').locator('.outreach-more').click();assert.equal(await page.locator('.outreach-menu').count(),1);await page.keyboard.press('Escape');assert.equal(await page.locator('.outreach-menu').count(),0);
 
+ /* 11b. Company map: hands the company and its people to the Studio recipe */
+ await page.evaluate(()=>{window.__map=null;window.SELFBoards={...(window.SELFBoards||{}),createFromRecipe:async(t,r,o)=>{window.__map={t,r,o}}}});
+ await page.locator('[data-outreach="back"]').click();await page.locator('.outreach-row',{hasText:'Sample Capital'}).click();
+ await page.locator('[data-outreach="map"]').click();await settle();
+ {const m=await page.evaluate(()=>window.__map);assert.equal(m.t,'Sample Capital map');assert.equal(m.r,'company-map');assert.equal(m.o.fill.company,'Sample Capital');
+  assert.ok(m.o.fill.people.some(p=>p.name==='Sari Anindya'&&p.role==='Associate'&&p.stage==='Connect sent'),'people carry role and stage');assert.ok(!m.o.fill.people.some(p=>p.name==='Hendra Wijaya'&&p.stage==='No reply'),'people you let go of are not on the map')}
  /* 12. campus search link appears once set */
  await page.locator('[data-outreach-campus]').fill('UI');await page.locator('[data-outreach-campus]').press('Tab');
  assert.equal(await page.locator('.outreach-find a').count(),4);assert.match(await page.locator('.outreach-find a').last().getAttribute('href'),/UI$/);
