@@ -91,7 +91,7 @@ Derived from stage plus the latest touchpoint date; nothing is sent anywhere:
 - **Follow-up:** one polite nudge.
 - **Thank-you:** after a call, with the one thing you'll act on.
 
-## 3. Data change (one small, additive migration; Integrator only, with explicit approval)
+## 3. Data change: **applied 24 Oct 2026** with the user's explicit approval (live version `20261024164207`, repo file `supabase/migrations/20261024164207_career_outreach_stages.sql`, constraint verified afterwards)
 Add three values to the stage CHECK. **Existing rows are untouched.** `reached_out` keeps its meaning, "messaged them", and is relabelled **Approached**.
 ```sql
 ALTER TABLE public.career_people DROP CONSTRAINT IF EXISTS career_people_relationship_stage_check;
@@ -100,7 +100,7 @@ ALTER TABLE public.career_people ADD CONSTRAINT career_people_relationship_stage
 ```
 Verify the live constraint name before running (`\d career_people`), and run it once only. **Board order:** `new`=Found, `connect_sent`=Connect sent, `connected`=Connected, `reached_out`=Approached, `in_conversation`=Talking, `maintain`=Ally (shown under Talking as a badge, filterable), `no_reply`=tray.
 
-**Fallback until approved:** ship the board with the four current stages (Found, Approached, Talking, Ally). Connect sent and Connected stay hidden behind the `outreach:sevenStages` flag, which the client turns on once a test insert confirms the new values are accepted.
+The client must still offer the new stages only through the Outreach board; the existing People forms keep the four original options until O2 ships, so nothing renders in an unknown column.
 
 ## 4. Company research → SELF (the "lu research, gw cari orangnya" part)
 Workflow with Claude in chat:
@@ -123,13 +123,13 @@ The research text lands in `career_companies.notes`, so the Dossier (upgrade pla
 | Step | What | Builder |
 |---|---|---|
 | O1 | `outreach.js` pure helpers (link extraction, normalisation, slug → name, dedupe, nudges, role-group guess) + `smoke_outreach.cjs` | Haiku |
-| O2 | Overview + company board on the current 4 stages, with card-is-a-link; drag engine: allow `[data-dnd-link]` anchors to start a drag | Sonnet |
+| O2 | Overview + company board on the seven stages (§3), with card-is-a-link; drag engine: allow `[data-dnd-link]` anchors to start a drag | Sonnet |
 | O3 | Paste links, Import companies CSV, Find-people search links | Sonnet |
 | O4 | Moves do the bookkeeping + Message Composer hook + nudges in Today | Sonnet |
-| O5 | Migration (§3) by the Integrator, then switch on the seven stages | Integrator + Haiku |
+| O5 | ~~Migration (§3)~~ done; O2 uses all seven stages from the start | — |
 
 **O2 prompt (copy-paste):**
-> Read `AGENTS.md`, `docs/design/HUNT_OUTREACH_PLAN.md` §2.1–2.2 and §5, `career.js`, `career-phase2.js` and `self-dnd.js`. Replace the People pill with **Outreach**: an overview of companies with stage counts, and a per-company Kanban using the existing four stages. Card markup: an `<article data-dnd-item data-dnd-type="person">` with an inner `<a data-dnd-link href=safeUrl(profile_url) target=_blank rel="noopener noreferrer">` and a `⋯` button that opens the existing person drawer. In `self-dnd.js`, let a pointerdown inside `[data-dnd-link]` start a drag (keep the 6 px threshold and click suppression). Add a `person-stage` adapter that PATCHes only `relationship_stage`. Add a browser test: a click opens a popup with the profile URL, a drag moves stage without a popup, and there is no overflow at 390 px. Don't touch `supabase/**`.
+> Read `AGENTS.md`, `docs/design/HUNT_OUTREACH_PLAN.md` §2.1–2.2 and §5, `career.js`, `career-phase2.js` and `self-dnd.js`. Replace the People pill with **Outreach**: an overview of companies with stage counts, and a per-company Kanban using the seven stages in §3 (already live in the database). Card markup: an `<article data-dnd-item data-dnd-type="person">` with an inner `<a data-dnd-link href=safeUrl(profile_url) target=_blank rel="noopener noreferrer">` and a `⋯` button that opens the existing person drawer. In `self-dnd.js`, let a pointerdown inside `[data-dnd-link]` start a drag (keep the 6 px threshold and click suppression). Add a `person-stage` adapter that PATCHes only `relationship_stage`. Add a browser test: a click opens a popup with the profile URL, a drag moves stage without a popup, and there is no overflow at 390 px. Don't touch `supabase/**`.
 
 ## 7. Never
 - Fetch, scrape or automate LinkedIn, or send any message from SELF.
