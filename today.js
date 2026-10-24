@@ -142,7 +142,7 @@ function render(){
   (queue.length?'<p class="today-sub">One at a time. Swipe right to make a task, left to delete (with Undo).</p><div class="triage-stack">'+queue.slice(0,3).map(card).join('')+'</div>':
    '<div class="empty-mini">Inbox clear. Quick Capture lands here.'+(skipped.size?'<br><button type="button" class="soft-btn" data-today="triage-reset">Show the '+skipped.size+' kept for later</button>':'')+'</div>')+'</section>';
 
- return '<div class="today-grid"><div class="today-main">'+threeCard+'</div><div class="today-side">'+agendaCard+triageCard+'</div></div>';
+ return '<div class="today-grid"><div class="today-main">'+threeCard+'</div><div class="today-side">'+agendaCard+(root.SELFReview?.card?.()||'')+triageCard+'</div></div>';
 }
 
 /* ---------- actions ---------- */

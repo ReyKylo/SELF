@@ -1,0 +1,221 @@
+{
+  "version": 2,
+  "mode": "GUIDED_PRACTICE_ONLY",
+  "released_on": "2026-10-24",
+  "description": "Lesson Loop v2: predict, watch, see it, how pros lay it out, worked example, ladder, defend, lock in. All numbers come from content/career-cases/**; tests/smoke_lessons_v2.cjs recomputes every one.",
+  "lessons": [
+    {
+      "id": "PE-L01",
+      "base_id": "PE-L01",
+      "track": "PE",
+      "case_id": "self-pe-flagship-01",
+      "title": "Laba naik, tapi kas hilang?",
+      "competencies": ["PE-01", "PE-05"],
+      "minutes": 30,
+      "source_notice": "Kasus Aruna seluruhnya SIMULATED. Format jembatan arus kas mengikuti praktik umum di model profesional; angkanya milik kasus SELF, bukan laporan perusahaan nyata.",
+      "predict": {
+        "question": "EBITDA Aruna naik dari Rp29 miliar (2024) ke Rp39 miliar (2025), naik 34%. Bagaimana arus kas operasi (CFO) 2025?",
+        "options": [
+          "Naik, mengikuti EBITDA (positif dan lebih besar dari 2024)",
+          "Tetap positif, tetapi lebih kecil dari EBITDA",
+          "Negatif: operasi justru menyerap kas"
+        ],
+        "answer_index": 2,
+        "reveal": "CFO 2025 = −Rp9,5 miliar. EBITDA Rp39 miliar habis untuk bunga, pajak, dan terutama tambahan modal kerja Rp37 miliar. Lanjut lihat ke mana tepatnya kas itu pergi."
+      },
+      "watch": {
+        "video_id": "V03",
+        "start": null,
+        "end": null,
+        "segment_verified": false,
+        "watch_for": [
+          "Di mana perubahan modal kerja masuk ke jadwal arus kas?",
+          "Kenapa pelunasan utang memakai kas, bukan EBITDA?",
+          "Apa yang dilakukan model ketika kas tidak cukup?"
+        ],
+        "note": "Waktu mulai dan selesai segmen belum diverifikasi manusia, jadi video diputar dari awal dan tidak ada timestamp karangan. Fokus ke tiga pertanyaan di samping."
+      },
+      "see_it": {
+        "unit": "Rp miliar",
+        "title": "Aruna 2025: dari EBITDA ke kas yang benar-benar bergerak",
+        "data_ref": "pe/exhibit-01-historical.csv#2025",
+        "analogy": "Bayangin toko yang jualannya laris, tapi pelanggan belum bayar dan gudang menumpuk stok. Di kertas untung; uangnya belum masuk.",
+        "analogy_limit": "Telat bayar belum tentu macet. Exhibit 02 menunjukkan Rp16 miliar dari piutang Rp75 miliar sudah lewat jatuh tempo lebih dari 90 hari, dan Rp17 miliar dari persediaan Rp80 miliar berumur di atas 180 hari. Itu alasan meminta aging, bukan langsung menyimpulkan rugi.",
+        "steps": [
+          {"id": "ebitda", "label": "EBITDA", "kind": "total", "value": 39, "term": "EBITDA", "caption": "Laba operasi sebelum bunga, pajak, depresiasi, dan amortisasi. Naik 34% dari 2024. Kelihatan sehat."},
+          {"id": "interest", "label": "Bunga", "kind": "delta", "value": -6, "term": "Bunga kas", "caption": "Dibayar ke pemberi utang dalam bentuk kas."},
+          {"id": "tax", "label": "Pajak", "kind": "delta", "value": -5.5, "term": "Pajak kas", "caption": "Yang benar-benar keluar dari rekening untuk pajak, bukan angka beban di laporan laba rugi."},
+          {"id": "nwc", "label": "Δ NWC", "kind": "delta", "value": -37, "term": "Operating Net Working Capital (NWC)", "caption": "Yes, ini namanya Operating NWC = piutang usaha + persediaan − utang usaha. Kenaikannya mengikat kas.",
+            "parts": [
+              {"label": "Piutang usaha", "detail": "50 → 75", "value": -25},
+              {"label": "Persediaan", "detail": "58 → 80", "value": -22},
+              {"label": "Utang usaha", "detail": "35 → 45 (sumber kas)", "value": 10}
+            ]},
+          {"id": "cfo", "label": "CFO", "kind": "total", "value": -9.5, "term": "Cash Flow from Operations (CFO)", "caption": "Operasi saja sudah menyerap kas, sebelum satu rupiah pun untuk investasi."},
+          {"id": "capex", "label": "Capex", "kind": "delta", "value": -13, "term": "Capital expenditure", "caption": "Peralatan dan fasilitas, juga dibayar tunai."},
+          {"id": "fcf", "label": "FCF", "kind": "total", "value": -22.5, "term": "Free Cash Flow (FCF)", "caption": "Bisnis mengonsumsi Rp22,5 miliar kas tahun ini."},
+          {"id": "debt", "label": "Utang baru", "kind": "delta", "value": 23, "term": "Net debt issuance", "caption": "Pinjaman menutup lubang itu. Inilah cerita sebenarnya di balik \"laba naik\"."},
+          {"id": "cash", "label": "Δ kas", "kind": "total", "value": 0.5, "term": "Perubahan kas", "caption": "Kas bergerak dari 13,04 ke 13,54. Jembatannya cocok (tie out)."}
+        ]
+      },
+      "pro_layout": {
+        "title": "Format yang dipakai di model profesional",
+        "rows": [
+          {"id": "ebitda", "label": "EBITDA", "value": 39, "input": true},
+          {"id": "interest", "label": "Cash interest", "value": -6, "input": true},
+          {"id": "tax", "label": "Cash taxes", "value": -5.5, "input": true, "badge": "2"},
+          {"id": "nwc", "label": "(Increase) / decrease in NWC", "value": -37, "badge": "1"},
+          {"id": "cfo", "label": "Cash flow from operations", "value": -9.5, "total": true},
+          {"id": "capex", "label": "Capex", "value": -13, "input": true},
+          {"id": "fcf", "label": "Free cash flow", "value": -22.5, "total": true},
+          {"id": "debt", "label": "Net debt issuance", "value": 23, "input": true},
+          {"id": "cash", "label": "Change in cash", "value": 0.5, "total": true, "badge": "3"}
+        ],
+        "check": {"label": "Check: ending cash − beginning cash − change in cash", "value": "13.54 − 13.04 − 0.50 = 0.00"},
+        "callouts": [
+          {"n": "1", "rows": ["nwc"], "point": "Kenaikan modal kerja ditulis sebagai (increase) dalam kurung: itu penggunaan kas, bukan tambahan. Salah tanda di sini adalah kesalahan analis junior yang paling sering."},
+          {"n": "2", "rows": ["tax"], "point": "Pajak di baris ini adalah pajak kas, bukan beban pajak buku. Keduanya bisa berbeda karena timing."},
+          {"n": "3", "rows": ["cash"], "point": "Baris check mengikat jembatan ke neraca (kas 13,04 → 13,54). Kalau tidak sama dengan 0,00, modelnya salah."}
+        ],
+        "convention": "Biru = angka input dari laporan keuangan, hitam = rumus. Ini konvensi umum di model bank dan fund.",
+        "original": {"label": "Seri LBO Wall Street Prep, bagian arus kas dan debt schedule (referensi format)", "url": "https://www.wallstreetprep.com/knowledge/lbo-model/"}
+      },
+      "worked": {
+        "title": "Kenaikan NWC operasi 2023 → 2024",
+        "grid": {
+          "columns": ["2023", "2024"],
+          "rows": [
+            {"n": 5, "label": "Piutang usaha", "cells": [34, 50]},
+            {"n": 6, "label": "Persediaan", "cells": [45, 58]},
+            {"n": 7, "label": "Utang usaha", "cells": [28, 35]},
+            {"n": 8, "label": "NWC operasi = 5 + 6 − 7", "cells": ["=B5+B6-B7", "=C5+C6-C7"]},
+            {"n": 9, "label": "Kenaikan NWC = C8 − B8", "cells": [null, "=C8-B8"]}
+          ]
+        },
+        "steps": [
+          {"text": "Hitung NWC operasi tiap tahun: 34 + 45 − 28 = 51 (2023) dan 50 + 58 − 35 = 73 (2024).", "cell": "B8:C8"},
+          {"text": "Kenaikan = akhir − awal: 73 − 51 = 22.", "cell": "C9", "value": 22},
+          {"text": "Arah di arus kas: kenaikan NWC mengurangi CFO sebesar 22 (Rp22 miliar kas terikat), dengan faktor lain dianggap tetap.", "cell": "CFO"}
+        ]
+      },
+      "ladder": [
+        {
+          "rung": "complete",
+          "title": "Lengkapi sel",
+          "prompt": "Sekarang 2025. Isi sel C9 untuk kenaikan NWC 2025: boleh rumus (diawali =) atau angka. Model yang baik menautkan ke sel lain, bukan mengetik hasil.",
+          "grid": {
+            "columns": ["2024", "2025"],
+            "rows": [
+              {"n": 5, "label": "Piutang usaha", "cells": [50, 75]},
+              {"n": 6, "label": "Persediaan", "cells": [58, 80]},
+              {"n": 7, "label": "Utang usaha", "cells": [35, 45]},
+              {"n": 8, "label": "NWC operasi = 5 + 6 − 7", "cells": ["=B5+B6-B7", "=C5+C6-C7"]},
+              {"n": 9, "label": "Kenaikan NWC 2025", "cells": [null, "?"]}
+            ]
+          },
+          "target": "C9",
+          "expect": {"value": 37, "tolerance": 1e-6, "refs": ["C5", "C6", "C7", "B5", "B6", "B7"]},
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {"value": 183, "feedback": "Itu hasil menjumlah dua saldo (110 + 73). Perubahan = akhir − awal, bukan penjumlahan."},
+            {"value": -37, "feedback": "Ukurannya benar, tetapi pertanyaannya meminta besar kenaikan NWC. Tanda negatif baru muncul ketika kenaikan itu masuk ke arus kas."},
+            {"value": 110, "feedback": "110 adalah saldo NWC akhir 2025, bukan perubahannya."},
+            {"value": 73, "feedback": "73 adalah saldo NWC 2024, bukan perubahan 2025."},
+            {"value": 22, "feedback": "22 adalah kenaikan 2024. Untuk 2025 pakai 110 − 73."}
+          ],
+          "hints": [
+            "Konsep: perubahan = angka akhir − angka awal.",
+            "Metode: baris 8 sudah menghitung NWC tiap tahun. Kurangkan 2024 dari 2025.",
+            "Jawaban: =C8-B8, yaitu 110 − 73 = 37."
+          ],
+          "hardcoded_feedback": "Angkanya benar, tetapi diketik langsung. Di model sungguhan hasilnya harus tertaut ke sel input supaya ikut berubah. Coba =C8-B8."
+        },
+        {
+          "rung": "independent",
+          "title": "Kerjakan sendiri",
+          "prompt": "Susun CFO 2024 dari: EBITDA 29, bunga kas 4, pajak kas 3,96, dan kenaikan NWC 22 (Rp miliar).",
+          "expect": {"value": -0.96, "tolerance": 0.011},
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {"value": 43.04, "feedback": "Kenaikan NWC kebalik: kamu menambahkannya. Itu penggunaan kas, jadi dikurangkan."},
+            {"value": 0.96, "feedback": "Besarnya benar, tandanya terbalik. 29 − 4 − 3,96 − 22 hasilnya negatif."},
+            {"value": 3, "feedback": "Pajak kas 3,96 belum dikurangkan."},
+            {"value": 21.04, "feedback": "Kenaikan NWC 22 belum dikurangkan. Itulah yang menyerap kas."}
+          ],
+          "hints": [
+            "Konsep: CFO = EBITDA − bunga kas − pajak kas − kenaikan NWC.",
+            "Metode: kurangkan tiga angka dari 29, satu per satu.",
+            "Jawaban: 29 − 4 − 3,96 − 22 = −0,96."
+          ]
+        },
+        {
+          "rung": "twist",
+          "title": "Ubah satu asumsi",
+          "prompt": "Seandainya piutang usaha tetap sebesar porsi 2023 terhadap pendapatan (34 dari 240), dan pendapatan 2025 adalah 345, berapa kas yang tidak akan tertahan di piutang 2025? Jawab dalam Rp miliar, satu desimal.",
+          "expect": {"value": 26.125, "tolerance": 0.15},
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {"value": 48.875, "feedback": "48,9 adalah piutang yang seharusnya. Pertanyaannya selisih terhadap piutang aktual 75."},
+            {"value": 25, "feedback": "25 adalah kenaikan piutang aktual 2024 → 2025. Pertanyaan ini membandingkan dengan porsi 2023."},
+            {"value": 41, "feedback": "Kamu memakai saldo piutang 2023 (34) tanpa menyesuaikan pertumbuhan penjualan ke 345."}
+          ],
+          "hints": [
+            "Konsep: piutang \"normal\" = pendapatan 2025 × (34 / 240).",
+            "Metode: hitung piutang normal, lalu kurangkan dari 75.",
+            "Jawaban: 345 × 34 / 240 = 48,875; 75 − 48,875 = 26,125."
+          ]
+        },
+        {
+          "rung": "red_pen",
+          "title": "Pena merah",
+          "prompt": "Analis junior menyerahkan jembatan arus kas ini dan menulis CFO = +64,5. Klik baris yang salah, lalu isi CFO yang benar.",
+          "artefact": {
+            "rows": [
+              {"id": "ebitda", "label": "EBITDA", "value": 39},
+              {"id": "interest", "label": "Cash interest", "value": -6},
+              {"id": "tax", "label": "Cash taxes", "value": -5.5},
+              {"id": "nwc", "label": "(Increase) / decrease in NWC", "value": 37},
+              {"id": "cfo", "label": "Cash flow from operations", "value": 64.5, "total": true}
+            ]
+          },
+          "flaw_row": "nwc",
+          "row_feedback": {
+            "ebitda": "Baris ini cocok dengan Exhibit 01: EBITDA 2025 = 39.",
+            "interest": "Cocok dengan Exhibit 01: bunga 2025 = 6, tanda negatif sudah benar.",
+            "tax": "Cocok dengan Exhibit 01: pajak 2025 = 5,5, tanda negatif sudah benar.",
+            "cfo": "Itu gejalanya, bukan penyebabnya. Cari baris input yang tandanya tidak sesuai artinya."
+          },
+          "found_feedback": "Tepat. Kenaikan NWC 37 ditambahkan padahal itu penggunaan kas. Seharusnya (37,0), dan CFO menjadi −9,5.",
+          "expect": {"value": -9.5, "tolerance": 1e-6},
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {"value": 64.5, "feedback": "Itu angka junior tadi. Perbaiki tanda NWC dulu."},
+            {"value": 9.5, "feedback": "Besarnya benar, tandanya terbalik: 39 − 6 − 5,5 − 37 = −9,5."}
+          ],
+          "hints": [
+            "Konsep: bandingkan setiap baris dengan artinya: apakah ini menambah atau mengurangi kas?",
+            "Metode: kenaikan modal kerja mengikat kas.",
+            "Jawaban: 39 − 6 − 5,5 − 37 = −9,5."
+          ]
+        }
+      ],
+      "defend": {
+        "prompt": "Direktur: \"Laba naik, tapi CFO negatif. Tiga data apa yang lu minta sebelum kita membeli perusahaan ini?\"",
+        "model_points": [
+          "Aging piutang per pelanggan dan segmen, plus daftar sengketa (Rp16 miliar sudah lewat 90 hari).",
+          "Aging persediaan dan perputaran per SKU, plus cadangan obsolesensi (Rp17 miliar berumur di atas 180 hari).",
+          "Termin pembayaran pemasok: apakah utang usaha ditahan untuk mempercantik kas?"
+        ],
+        "note": "Tulis jawabanmu dulu, baru buka poin model. Jawaban hanya disimpan di perangkat ini."
+      },
+      "lock_in": {
+        "build_output": "Tambahkan working-capital schedule 2023–2025 dan bridge EBITDA→CFO ke workbook Aruna.",
+        "cards": [
+          {"id": "PE-L01-c1", "front": "Di mana kenaikan NWC masuk ke CFO, dan dengan tanda apa?", "back": "Dikurangkan: uang yang terikat di piutang dan persediaan adalah penggunaan kas."},
+          {"id": "PE-L01-c2", "front": "Kenapa EBITDA Rp39 miliar bisa bersamaan dengan CFO −Rp9,5 miliar?", "back": "Bunga 6, pajak kas 5,5, dan tambahan NWC 37 menyerap seluruhnya."},
+          {"id": "PE-L01-c3", "front": "Tiga data yang diminta ketika konversi kas memburuk?", "back": "Aging piutang, aging persediaan, dan termin pemasok."}
+        ]
+      }
+    }
+  ]
+}

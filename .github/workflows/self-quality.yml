@@ -26,6 +26,10 @@ jobs:
           node --check self-dnd.js
           node --check today.js
           node --check outreach.js
+          node --check career-grid.js
+          node --check career-visuals.js
+          node --check career-review.js
+          node --check career-lesson-loop.js
           node --check capture-parse.js
           node --check palette.js
           node --check boards.js
@@ -58,6 +62,12 @@ jobs:
         run: node tests/smoke_palette.cjs
       - name: Outreach helpers (links, names, nudges, CSV, messages)
         run: node tests/smoke_outreach.cjs
+      - name: Practice grid formula engine fixtures
+        run: node tests/smoke_career_grid.cjs
+      - name: Lesson Loop v2 content recomputed from the case exhibits
+        run: node tests/smoke_lessons_v2.cjs
+      - name: Review queue spaced recall
+        run: node tests/smoke_review.cjs
       - name: Phase 1 API smoke
         run: node tests/smoke_api.cjs
       - name: Career Phase 1 integration and ownership regression

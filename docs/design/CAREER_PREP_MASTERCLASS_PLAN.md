@@ -1,5 +1,8 @@
 # Career Prep: from well-sourced study guide to masterclass
 
+**Build status (24 Oct 2026):** M1 Lesson Loop v2 shell, M3 practice engine (`career-grid.js`, 96 fixtures) and M5 review queue with the Daily Drill in Today are built. M2 has the Waterfall and the model-format bridge (`career-visuals.js`); BalanceBars, RollForward, CohortTriangle, CapTable and Sensitivity are still to build with the VC and Consulting lessons. M4 has PE-L01 rebuilt in `content/career-lessons-v2.json` (all numbers recomputed from the Aruna exhibits by `tests/smoke_lessons_v2.cjs`); the other five starter lessons, the Skill Map and the Next-up path (M6), foundations (M7) and the interview layer (M8) are not started. The video segment for PE-L01 is still unverified, so the lesson plays from the start and says so.
+
+
 **Purpose:** an honest audit of SELF Career Prep as it stands on `3165c04`, and a build plan that turns it into a programme that produces a top-quartile first-year analyst in PE, VC or strategy consulting. Written for Sonnet or Haiku to build from (§12), and for the owner to decide on.
 **Method:**
 - Read all 18 guided lessons, 12 evidence panels, 11 videos, 3 sprints, the 36-competency blueprint, the Director Review panels and the Work Sample index.

@@ -19,6 +19,13 @@ on:
       - 'tests/browser_outreach.cjs'
       - 'outreach.js'
       - 'outreach.css'
+      - 'tests/browser_lesson_loop.cjs'
+      - 'career-grid.js'
+      - 'career-visuals.js'
+      - 'career-review.js'
+      - 'career-lesson-loop.js'
+      - 'career-lesson-loop.css'
+      - 'content/career-lessons-v2.json'
       - 'career-learning.css'
       - 'rooms.js'
       - 'rooms.css'
@@ -95,3 +102,5 @@ jobs:
         run: node tests/browser_palette.cjs
       - name: Outreach board Chromium tests
         run: node tests/browser_outreach.cjs
+      - name: Lesson Loop v2 and Daily Drill Chromium tests
+        run: node tests/browser_lesson_loop.cjs

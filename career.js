@@ -369,6 +369,7 @@ async function erase(kind,id){
 }
 async function action(e){
  if(await window.SELFOutreachUI?.action?.(e))return true;
+ if(await window.SELFLessonLoop?.action?.(e))return true;
  if(await window.SELFCareerLearning?.action?.(e))return true;
  if(await window.SELFCareerPhase3?.action?.(e))return true;
  if(await window.SELFCareerPhase2?.action?.(e))return true;
@@ -405,6 +406,7 @@ async function submit(e){
 }
 function input(e){
  if(window.SELFOutreachUI?.input?.(e))return true;
+ if(window.SELFLessonLoop?.input?.(e))return true;
  if(window.SELFCareerLearning?.input?.(e))return true;
  if(window.SELFCareerPhase3?.input?.(e))return true;
  if(window.SELFCareerPhase2?.input?.(e))return true;
@@ -416,6 +418,7 @@ function input(e){
 }
 function keydown(e){
  if(window.SELFOutreachUI?.keydown?.(e))return true;
+ if(window.SELFLessonLoop?.keydown?.(e))return true;
  if(window.SELFCareerPhase3?.keydown?.(e))return true;
  if(window.SELFCareerPhase2?.keydown?.(e))return true;
  if(e.key!=='Escape'||(!ui.modal&&!ui.drawer))return false;
