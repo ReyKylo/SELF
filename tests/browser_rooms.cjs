@@ -87,11 +87,11 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
 
  /* 5. Hunt and Study doors split Career; Applications drag */
  await page.locator('.rooms-rail .door[data-room="study"]').click();
- await page.locator('.career-workspace').waitFor();assert.equal(await current(),'study');
- assert.equal(await page.locator('[data-career="page"][data-page="learning"]:visible').getAttribute('aria-current'),'page');
+ await page.locator('.career-workspace').waitFor();await page.locator('.learning-workspace').waitFor();assert.equal(await current(),'study');
+ assert.equal(await page.locator('.career-pills').count(),0,'Study shows Career Prep, not the Hunt pills');
  await page.locator('.rooms-rail .door[data-room="hunt"]').click();assert.equal(await current(),'hunt');
- assert.equal(await page.locator('[data-career="page"][data-page="overview"]:visible').getAttribute('aria-current'),'page','Hunt leaves the learning page');
- await page.locator('.career-subnav[data-page="applications"]').click();
+ await page.locator('.career-pills').waitFor();assert.equal(await page.locator('.career-pill.active').innerText(),'Overview','Hunt leaves the learning page');
+ await page.locator('.career-pill[data-page="applications"]').click();
  await page.locator('[data-dnd-zone="stage:wishlist"] [data-dnd-item]').waitFor();
  assert.equal(await current(),'hunt','applications stay in Hunt');
  patches.length=0;

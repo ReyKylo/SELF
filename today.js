@@ -33,6 +33,25 @@ const hhmm=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digi
 const dayLabel=new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',weekday:'short',day:'numeric',month:'short'});
 const FOLLOW_STAGES=['reached_out','in_conversation'];
 const STALE_DAYS=14,WEEK=7*24*3600*1000,MAX_ITEMS=8;
+/* Who needs a touch: people with a logged next step (latest touchpoint decides), then people in an active stage with no contact for more than STALE_DAYS.
+   People with no logged contact at all are skipped: there is nothing to measure. Shared by the Today agenda and the Hunt room. */
+function followUps({people=[],touchpoints=[],day}){
+ const latest=new Map();
+ for(const tp of touchpoints){const cur=latest.get(tp.person_id);if(!cur||String(tp.contact_at)>String(cur.contact_at)||(tp.contact_at===cur.contact_at&&String(tp.created_at)>String(cur.created_at)))latest.set(tp.person_id,tp)}
+ const follows=[],suggested=[];
+ for(const p of people){
+  const tp=latest.get(p.id);
+  if(tp?.next_step?.trim()){follows.push({person:p,step:tp.next_step.trim(),contact_at:String(tp.contact_at||''),age:tp.contact_at?daysBetween(tp.contact_at,day):null});continue}
+  if(!FOLLOW_STAGES.includes(p.relationship_stage))continue;
+  const last=[p.last_contacted_at,tp?.contact_at].filter(Boolean).sort().pop();
+  if(!last)continue;
+  const age=daysBetween(last,day);
+  if(age>STALE_DAYS)suggested.push({person:p,age,last});
+ }
+ follows.sort((a,b)=>a.contact_at.localeCompare(b.contact_at)||String(a.person.id).localeCompare(String(b.person.id)));
+ suggested.sort((a,b)=>b.age-a.age||String(a.person.id).localeCompare(String(b.person.id)));
+ return {follows,suggested};
+}
 /* Merges tasks due today or overdue, interviews in the next 7 days and follow-ups. Career data is optional. */
 function buildAgenda({tasks=[],day,now=Date.now(),career=null}){
  const items=[];
@@ -53,20 +72,9 @@ function buildAgenda({tasks=[],day,now=Date.now(),career=null}){
    items.push({key:'interview:'+i.id,kind:'interview',tone:'hunt',time:(sameDay?'':dayLabel.format(at)+' ')+hhmm.format(at),title:i.title,
     sub:['Interview',app?[app.role_title,companyName(app.company_id)].filter(Boolean).join(' · '):'',i.format].filter(Boolean).join(' · '),open:{action:'open-career',page:'interviews'}});
   }
-  const latest=new Map();
-  for(const tp of career.touchpoints||[]){const cur=latest.get(tp.person_id);if(!cur||String(tp.contact_at)>String(cur.contact_at)||(tp.contact_at===cur.contact_at&&String(tp.created_at)>String(cur.created_at)))latest.set(tp.person_id,tp)}
-  const follows=[],suggested=[];
-  for(const p of career.people||[]){
-   const tp=latest.get(p.id);
-   if(tp?.next_step?.trim()){follows.push({key:'follow:'+p.id,kind:'follow',tone:'person',time:'Follow up',title:p.full_name,sub:'Next step · '+tp.next_step.trim(),open:{action:'open-career',page:'people'},sort:String(tp.contact_at)});continue}
-   if(!FOLLOW_STAGES.includes(p.relationship_stage))continue;
-   const last=[p.last_contacted_at,tp?.contact_at].filter(Boolean).sort().pop();
-   if(!last)continue;                                   // no contact logged: nothing to measure
-   const age=daysBetween(last,day);
-   if(age>STALE_DAYS)suggested.push({key:'suggest:'+p.id,kind:'suggest',tone:'person',time:'Suggested',title:p.full_name,sub:'Last contact '+age+' days ago',open:{action:'open-career',page:'people'},age});
-  }
-  follows.sort((a,b)=>a.sort.localeCompare(b.sort));suggested.sort((a,b)=>b.age-a.age);
-  items.push(...follows,...suggested);
+  const {follows,suggested}=followUps({people:career.people,touchpoints:career.touchpoints,day});
+  for(const f of follows)items.push({key:'follow:'+f.person.id,kind:'follow',tone:'person',time:'Follow up',title:f.person.full_name,sub:'Next step · '+f.step,open:{action:'open-career',page:'people'}});
+  for(const g of suggested)items.push({key:'suggest:'+g.person.id,kind:'suggest',tone:'person',time:'Suggested',title:g.person.full_name,sub:'Last contact '+g.age+' days ago',open:{action:'open-career',page:'people'}});
  }
  return {items:items.slice(0,MAX_ITEMS),hidden:Math.max(0,items.length-MAX_ITEMS)};
 }
@@ -237,7 +245,7 @@ function init(h){
  });
  if(root.document)root.document.addEventListener('pointerdown',swipeDown);
 }
-const api={init,render,action,change,pickThree,buildAgenda,triageQueue,readPins,writePins,pinKey};
+const api={init,render,action,change,pickThree,buildAgenda,followUps,triageQueue,readPins,writePins,pinKey};
 root.SELFToday=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

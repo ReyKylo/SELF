@@ -155,3 +155,9 @@
 @media(prefers-reduced-motion:reduce){.ws-root *{transition:none!important}}
 .ws-badge{display:inline-block;font-size:.7em;font-weight:780;letter-spacing:.08em;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted)}
 #ws-check-result:focus{outline:none}#ws-check-result:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
+/* Career Prep tabs grouped as Build, Learn and Get challenged. All ten stay visible. */
+.learning-tab-group{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0;padding-right:12px}
+.learning-tab-label{font:700 .64em/1 ui-monospace,'DM Mono',Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:0 6px 0 4px;white-space:nowrap}
+.learning-tabs{row-gap:10px}
+@media(max-width:600px){.learning-tab-group{padding-right:0;width:100%}}

@@ -46,7 +46,8 @@ function down(e){
  if(e.button>0||d||kbd)return;
  const item=e.target.closest?.('[data-dnd-item]');if(!item)return;
  const onGrip=!!e.target.closest('[data-dnd-grip]');
- if(!onGrip&&e.target.closest('button,a,input,select,textarea,label'))return;
+ /* Buttons are fine to drag from: a drag only starts after 6px of movement and then swallows the click. Form controls and links are not. */
+ if(!onGrip&&e.target.closest('a,input,select,textarea,label,[data-dnd-nodrag]'))return;
  const touch=e.pointerType!=='mouse';
  d={item,id:item.dataset.dndItem,from:zoneOf(item),fromNext:item.nextElementSibling,x0:e.clientX,y0:e.clientY,pid:e.pointerId,started:false,touch,armed:!touch||onGrip,timer:0};
  if(touch&&!onGrip)d.timer=setTimeout(()=>{if(d&&!d.started){d.armed=true;navigator.vibrate?.(8);start(e)}},350);

@@ -15,6 +15,8 @@ on:
       - 'tests/browser_worksample.cjs'
       - 'tests/browser_rooms.cjs'
       - 'tests/browser_today.cjs'
+      - 'tests/browser_hunt.cjs'
+      - 'career-learning.css'
       - 'rooms.js'
       - 'rooms.css'
       - 'motion.js'
@@ -81,3 +83,5 @@ jobs:
         run: node tests/browser_rooms.cjs
       - name: Today room Chromium tests
         run: node tests/browser_today.cjs
+      - name: Hunt and Study rooms Chromium tests
+        run: node tests/browser_hunt.cjs

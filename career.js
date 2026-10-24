@@ -191,10 +191,50 @@ function drawerMarkup(){
  (window.SELFCareerPhase2?.renderDrawer?.(which.kind,row)||'')+
  '<p class="career-drawer-note">Career status and Task status remain independent, with explicit links between records.</p></div></aside></div>';
 }
+/* ---- Rooms: Career is hosted inside the Hunt and Study rooms. The classic shell keeps its own rail. ---- */
+const HUNT_PILLS=[['overview','Overview'],['applications','Pipeline'],['people','People'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['cvs','Kit']];
+const KIT_PAGES=[['cvs','CV Library'],['templates','Templates'],['reminders','Reminders']];
+const inKit=id=>KIT_PAGES.some(x=>x[0]===id);
+function huntPills(selected){
+ const pill=([id,label])=>{const on=selected===id||(id==='cvs'&&inKit(selected));
+  return '<button type="button" class="career-pill'+(on?' active':'')+'" data-career="page" data-page="'+id+'" aria-current="'+(on?'page':'false')+'">'+h(label)+'</button>'};
+ return '<nav class="career-pills" aria-label="Hunt sections">'+HUNT_PILLS.map(pill).join('')+
+  '<button type="button" class="career-pill career-pill-link" data-career="page" data-page="learning" aria-current="false">Career Prep →</button></nav>'+
+  (inKit(selected)?'<div class="career-kit-tabs" role="group" aria-label="Kit">'+KIT_PAGES.map(([id,label])=>
+   '<button type="button" class="career-kit-tab'+(selected===id?' active':'')+'" data-career="page" data-page="'+id+'" aria-pressed="'+(selected===id)+'">'+h(label)+'</button>').join('')+'</div>':'');
+}
+/* Counts per stage from the loaded applications. There is no stage history yet, so the only honest ratio is each stage's share of
+   applications that have left the Wishlist; it is not a conversion rate and is labelled as a share. */
+function pipelineStats(apps){
+ const n=Object.fromEntries(HIRING.map(([k])=>[k,0]));
+ for(const a of apps)if(a.hiring_stage in n)n[a.hiring_stage]++;
+ const submitted=n.applied+n.interviewing+n.offer+n.closed;
+ return {counts:n,submitted,share:k=>k==='wishlist'||!submitted||!n[k]?null:Math.round(n[k]/submitted*100)};
+}
+function pipelineKpis(){
+ const st=pipelineStats(ui.applications);
+ return '<section class="career-kpis" aria-label="Pipeline summary">'+HIRING.map(([k,label])=>{
+  const share=st.share(k);
+  return '<div class="career-kpi"><b data-countup="'+st.counts[k]+'">'+st.counts[k]+'</b><span>'+h(label)+'</span><small>'+(share==null?'':share+'% of submitted')+'</small></div>'}).join('')+'</section>';
+}
+function needsTouch(){
+ const T=window.SELFToday,p2=window.SELFCareerPhase2?.ui;
+ if(!T?.followUps||!p2?.ready)return '';
+ const day=new Date().toLocaleDateString('en-CA');
+ const {follows,suggested}=T.followUps({people:ui.people,touchpoints:p2.touchpoints||[],day});
+ const rows=[...follows.map(f=>({p:f.person,age:f.age,note:'Next step · '+f.step})),...suggested.map(g=>({p:g.person,age:g.age,note:'Last contact '+g.age+' days ago'}))];
+ if(!rows.length)return '';
+ const tone=age=>age==null?'':age>30?' late':age>14?' warn':' ok';
+ return '<section class="career-card career-touch" aria-labelledby="touch-h"><div class="career-small-heading"><strong id="touch-h">Needs a touch</strong><span>'+rows.length+'</span></div>'+
+  rows.slice(0,5).map(r=>'<button type="button" class="career-touch-row" data-career2="open-person" data-id="'+a(r.p.id)+'"><span class="career-avatar" aria-hidden="true">'+h((r.p.full_name||'?').trim().charAt(0).toUpperCase())+'</span>'+
+   '<span><strong>'+h(r.p.full_name)+'</strong><small>'+h(r.note)+'</small></span>'+(r.age==null?'':'<span class="career-days'+tone(r.age)+'">'+r.age+'d</span>')+'</button>').join('')+
+  (rows.length>5?'<p class="career-soft-empty">+'+(rows.length-5)+' more below in People.</p>':'')+'</section>';
+}
 function render(){
  if(!host)return '<p>Career unavailable.</p>';
+ const hosted=!!host.rooms?.();
  const selected=ui.page,title=PAGES.find(x=>x[0]===selected)?.[1]||'Overview';
- const nav='<nav class="career-rail '+(ui.railCollapsed?'collapsed':'')+'" aria-label="Career subpages"><div class="career-rail-head"><strong>CAREER STUDIO</strong>'+
+ const nav=hosted?'<h2 class="sr-only">CAREER STUDIO</h2>':'<nav class="career-rail '+(ui.railCollapsed?'collapsed':'')+'" aria-label="Career subpages"><div class="career-rail-head"><strong>CAREER STUDIO</strong>'+
  button(ui.railCollapsed?'›':'‹','toggle-rail','aria-label="Toggle Career navigation"')+'</div>'+
  PAGES.map(([id,label,icon],index)=> (index===5?'<div class="career-rail-category">RESOURCES</div>':'')+
  '<button type="button" class="career-subnav '+(selected===id?'active':'')+'" data-career="page" data-page="'+id+'" title="'+label+'" aria-current="'+(selected===id?'page':'false')+'">'+
@@ -213,12 +253,13 @@ function render(){
  else if(selected==='interviews')main=window.SELFCareerPhase2?.renderInterviews?.()||future('Interview Prep','Linked sessions and preparation workflows.','Phase 2');
  else if(selected==='templates')main=window.SELFCareerPhase2?.renderTemplates?.()||future('Templates','Reusable messages and cover letter drafts.','Phase 2');
  else main=window.SELFCareerPhase2?.renderReminders?.()||careerReminders();
- return '<div class="career-workspace">'+nav+
- '<div class="career-stage"><header class="career-page-head"><div><span class="career-eyebrow">CAREER / '+h(title).toUpperCase()+'</span><h1>'+h(selected==='overview'?'Career Overview':title)+'</h1>'+
+ if(hosted&&ui.ready){if(selected==='applications')main=pipelineKpis()+main;else if(selected==='people')main=needsTouch()+main}
+ return '<div class="career-workspace'+(hosted?' career-hosted':'')+'">'+nav+
+ '<div class="career-stage">'+(hosted&&selected!=='learning'?huntPills(selected):'')+'<header class="career-page-head"><div><span class="career-eyebrow">CAREER / '+h(title).toUpperCase()+'</span><h1>'+h(selected==='overview'?'Career Overview':title)+'</h1>'+
  '<p>'+h(selected==='overview'?'Your next steps and actual records. No duplicate to-do system.':'One Career workspace, inside your existing SELF.')+'</p></div>'+
- '<div class="career-head-actions">'+button('Sections','toggle-sections','aria-label="Choose Career subpage"')+
- primary('+ Quick Capture','quick-capture')+'</div></header>'+
- '<div class="career-mobile-sections">'+PAGES.map(([id,label])=>button(label,'page','data-page="'+id+'" class="'+(selected===id?'active':'')+'"')).join('')+'</div>'+
+ (hosted?(selected==='learning'?'':'<div class="career-head-actions">'+primary('+ Quick Capture','quick-capture')+'</div>'):'<div class="career-head-actions">'+button('Sections','toggle-sections','aria-label="Choose Career subpage"')+
+ primary('+ Quick Capture','quick-capture')+'</div>')+'</header>'+
+ (hosted?'':'<div class="career-mobile-sections">'+PAGES.map(([id,label])=>button(label,'page','data-page="'+id+'" class="'+(selected===id?'active':'')+'"')).join('')+'</div>')+
  (ui.error&&ui.ready?'<p class="career-warning">'+h(ui.error)+' '+button('Retry','retry')+'</p>':'')+
  main+'</div>'+modalMarkup()+drawerMarkup()+(window.SELFCareerPhase2?.modalMarkup?.()||'')+'</div>';
 }

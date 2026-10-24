@@ -447,7 +447,7 @@ async function removePortfolioFile(path){
  return request('/storage/v1/object/self-career-portfolio/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE'});
 }
 
-window.SELFCareer?.init?.({state:()=>state,render,navigate:go,request,insert,patch,del,notify:toast,icon:ic,newTask:()=>{state.newTaskSpace='';state.modal='task';render()},openTask:id=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},reloadCore:loadAll,uploadDocument:uploadCareerDocument,signDocument:signCareerDocument,validateDocument:validateCareerDocument,uploadPortfolioFile,signPortfolioFile,removePortfolioFile,reloadCareer:()=>window.SELFCareer?.reload?.()});
+window.SELFCareer?.init?.({state:()=>state,rooms:useRooms,render,navigate:go,request,insert,patch,del,notify:toast,icon:ic,newTask:()=>{state.newTaskSpace='';state.modal='task';render()},openTask:id=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},reloadCore:loadAll,uploadDocument:uploadCareerDocument,signDocument:signCareerDocument,validateDocument:validateCareerDocument,uploadPortfolioFile,signPortfolioFile,removePortfolioFile,reloadCareer:()=>window.SELFCareer?.reload?.()});
 window.SELFBoards?.init?.({state:()=>state,render,navigate:go,uploadImage:uploadBoardImage,signImage:signBoardImage,openTask:(id)=>{window.SELFBoards.ui.selected?.clear?.();state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
 window.SELFToday?.init?.({state:()=>state,esc,attr,ic,today,spaceOf,statusOf,dueBadge,rank:todayRank,insert,patch,del,mutate,toast,render,go});
 verifySession();

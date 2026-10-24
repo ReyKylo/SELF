@@ -77,7 +77,9 @@ body[data-theme='light'] .shell[data-shell="rooms"] .main::before{opacity:.7}
 .kanban-task,.career2-job{position:relative}
 .grip{border:0;background:transparent;color:var(--faint);cursor:grab;min-width:32px;min-height:32px;border-radius:8px;touch-action:none;display:inline-grid;place-items:center;padding:0;flex:0 0 auto}
 .grip:hover{background:var(--hover);color:var(--text)}
-.career2-job .grip{position:absolute;top:6px;right:6px}
+.career2-job>button.grip{position:absolute;top:6px;right:6px;left:auto;width:32px;min-width:32px;height:32px;min-height:32px;padding:0;margin:0;display:inline-grid;place-items:center;text-align:center;background:transparent;border-radius:8px}
+.career2-job>button.grip:hover{background:var(--hover)}
+.career2-job>button:not(.grip){padding-right:30px}
 .dnd-ghost{position:fixed;z-index:70;pointer-events:none;margin:0;box-shadow:var(--e-lift);border-color:var(--tint-line)!important;will-change:translate,transform;cursor:grabbing}
 .dnd-placeholder{opacity:.35;outline:2px dashed var(--tint-line,#5b9bff88);outline-offset:-2px}
 .dnd-placeholder>*{visibility:hidden}
@@ -172,4 +174,38 @@ body[data-theme='light'] .shell[data-shell="rooms"] .main::before{opacity:.7}
  .three-row>.badge{display:none}
  .agenda-list::before{left:70px}
  .agenda-list li{grid-template-columns:58px 16px minmax(0,1fr)}
+}
+
+/* ---------- Hunt and Study: Career hosted inside the Rooms shell ---------- */
+.career-workspace.career-hosted{display:block;min-height:0}
+.career-hosted .career-rail,.career-hosted .career-mobile-sections{display:none}
+.career-pills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 22px;min-width:0}
+.career-pill{border:1px solid var(--line);background:transparent;border-radius:999px;padding:0 16px;min-height:40px;font-weight:700;font-size:.86em;color:var(--muted);cursor:pointer}
+.career-pill:hover{color:var(--text);background:var(--hover)}
+.career-pill.active{background:var(--tint-soft);border-color:var(--tint);color:var(--text)}
+.career-pill-link{margin-left:auto;border-style:dashed}
+.career-kit-tabs{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--card2);margin:-6px 0 20px;flex-wrap:wrap}
+.career-kit-tab{border:0;background:transparent;border-radius:9px;padding:0 14px;min-height:38px;font-weight:700;font-size:.82em;color:var(--muted);cursor:pointer}
+.career-kit-tab.active{background:var(--tint-soft);color:var(--text)}
+.career-hosted .career-page-head h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.035em}
+.career-hosted .career-eyebrow{color:var(--tint)}
+.career-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 18px}
+.career-kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;min-width:0}
+.career-kpi b{display:block;font-family:var(--font-display);font-size:2em;line-height:1;font-variant-numeric:tabular-nums}
+.career-kpi span{display:block;color:var(--muted);font-size:.8em;margin-top:6px}
+.career-kpi small{display:block;color:var(--tint);font:500 .68em ui-monospace,'DM Mono',Menlo,monospace;margin-top:4px;min-height:1.2em}
+.career-touch{margin:0 0 18px}
+.career-touch-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:transparent;border-top:1px solid var(--line);padding:10px 4px;min-height:56px;color:var(--text);cursor:pointer;border-radius:10px}
+.career-touch-row:first-of-type{border-top:0}
+.career-touch-row:hover{background:var(--hover)}
+.career-touch-row strong{display:block;font-size:.9em}
+.career-touch-row small{display:block;color:var(--muted);font-size:.76em;margin-top:2px;overflow-wrap:anywhere}
+.career-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--card2);border:1px solid var(--line);font-weight:700;font-size:.85em}
+.career-days{font:600 .74em ui-monospace,'DM Mono',Menlo,monospace;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.career-days.ok{color:var(--green)}.career-days.warn{color:var(--yellow)}.career-days.late{color:var(--red)}
+@media(max-width:900px){.career-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){
+ .career-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .career-pills{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+ .career-pill{flex:none}.career-pill-link{margin-left:0}
 }
