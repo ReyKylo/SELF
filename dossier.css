@@ -1,0 +1,35 @@
+/* Company Dossier and Game Day */
+.career-company-wrap{display:flex;flex-direction:column;gap:6px}
+.dossier-open-btn{align-self:flex-start;min-height:36px}
+.dossier-head{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.dossier-head>div:nth-child(2){flex:1;min-width:200px}
+.dossier-head h2{margin:0;font-size:1.35em}
+.dossier-head p{margin:4px 0 0;color:var(--muted)}
+.dossier-actions{display:flex;gap:8px;flex-wrap:wrap}
+.dossier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:12px}
+.dossier .career-card{margin-bottom:12px}
+.dossier-grid .career-card{margin-bottom:0}
+.dossier-row{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;background:transparent;border:0;border-top:1px solid var(--line);padding:9px 2px;min-height:44px;color:var(--text);cursor:pointer;font:inherit}
+.dossier-row:hover{background:var(--hover)}
+.dossier-row small{color:var(--muted)}
+.dossier-row-split{flex-direction:row;align-items:center;justify-content:space-between;gap:10px;cursor:default}
+.dossier-row-split:hover{background:transparent}
+.dossier-row-split>span{display:flex;flex-direction:column;gap:2px}
+.dossier-notes textarea{width:100%;resize:vertical}
+.dossier-notes-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
+.dossier-timeline{list-style:none;margin:0;padding:0}
+.dossier-timeline .dossier-row{flex-direction:row;gap:10px;align-items:flex-start}
+.dossier-timeline .dossier-row>span:last-child{display:flex;flex-direction:column;gap:2px}
+.dossier-tag{flex:none;font-size:.68em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 7px;border-radius:999px;background:var(--card2);color:var(--muted);min-width:64px;text-align:center}
+.dossier-tag-interview{color:var(--blue)}
+.dossier-phases{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.dossier-phase{min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;font:inherit}
+.dossier-phase.active{border-color:var(--blue);color:var(--blue);font-weight:600}
+.dossier-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.dossier-questions{padding-left:20px;display:grid;gap:10px;margin:8px 0}
+.dossier-open{margin:6px 0}
+.dossier-prep{white-space:normal;margin:6px 0 10px}
+.dossier-timer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dossier-timer output{font-variant-numeric:tabular-nums;font-size:1.8em;font-weight:700;min-width:3.4ch}
+.dossier-strip{margin-bottom:14px}
+@media (max-width:600px){.dossier-head{flex-direction:column}.dossier-grid{grid-template-columns:1fr}}

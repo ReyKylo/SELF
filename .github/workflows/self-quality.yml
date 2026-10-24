@@ -26,6 +26,7 @@ jobs:
           node --check self-dnd.js
           node --check today.js
           node --check outreach.js
+          node --check dossier.js
           node --check career-grid.js
           node --check career-visuals.js
           node --check career-review.js
@@ -67,6 +68,8 @@ jobs:
         run: node tests/smoke_palette.cjs
       - name: Outreach helpers (links, names, nudges, CSV, messages)
         run: node tests/smoke_outreach.cjs
+      - name: Dossier and Game Day smoke tests
+        run: node tests/smoke_dossier.cjs
       - name: Practice grid formula engine fixtures
         run: node tests/smoke_career_grid.cjs
       - name: Lesson Loop v2 content recomputed from the case exhibits

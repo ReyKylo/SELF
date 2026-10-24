@@ -121,10 +121,10 @@ function careerCompanies(){
  primary('+ Add company','new','data-kind="company"'))+
  (ui.companies.length?'<div class="career-grid-two">'+ui.companies.map(c=>{
   const n=ui.people.filter(p=>p.company_id===c.id).length,m=ui.applications.filter(p=>p.company_id===c.id).length;
-  return '<button type="button" class="career-company" data-career="open" data-kind="company" data-id="'+a(c.id)+'">'+
+  return '<div class="career-company-wrap"><button type="button" class="career-company" data-career="open" data-kind="company" data-id="'+a(c.id)+'">'+
   '<div class="career-monogram">'+h((c.name||'?')[0].toUpperCase())+'</div>'+
   '<div><strong>'+h(c.name)+'</strong><small>'+h([c.industry,c.location].filter(Boolean).join(' · ')||'Company profile')+'</small>'+
-  '<span>'+n+' people · '+m+' applications</span></div><b>›</b></button>';
+  '<span>'+n+' people · '+m+' applications</span></div><b>›</b></button>'+(window.SELFDossier?.companyButton?.(c)||'')+'</div>';
  }).join('')+'</div>':
  empty('Build your company universe','Start with target firms, then connect real roles and people.',primary('+ Create first company','new','data-kind="company"')));
 }
@@ -247,10 +247,10 @@ function render(){
  else if(selected==='overview')main=careerOverview();
  else if(selected==='applications')main=window.SELFCareerPhase2?.renderApplications?.()||careerApplications();
  else if(selected==='people')main=window.SELFOutreachUI?.render?.()||window.SELFCareerPhase2?.renderPeople?.()||careerPeople();
- else if(selected==='companies')main=careerCompanies();
+ else if(selected==='companies')main=window.SELFDossier?.renderCompanies?.()||careerCompanies();
  else if(selected==='radar')main=window.SELFCareerPhase3?.render?.()||careerRadar();
  else if(selected==='cvs')main=window.SELFCareerPhase2?.renderCVs?.()||future('CV Library','Version management and private attachments.','Phase 2');
- else if(selected==='interviews')main=window.SELFCareerPhase2?.renderInterviews?.()||future('Interview Prep','Linked sessions and preparation workflows.','Phase 2');
+ else if(selected==='interviews')main=window.SELFDossier?.renderInterviews?.()||window.SELFCareerPhase2?.renderInterviews?.()||future('Interview Prep','Linked sessions and preparation workflows.','Phase 2');
  else if(selected==='templates')main=window.SELFCareerPhase2?.renderTemplates?.()||future('Templates','Reusable messages and cover letter drafts.','Phase 2');
  else main=window.SELFCareerPhase2?.renderReminders?.()||careerReminders();
  if(hosted&&ui.ready){if(selected==='applications')main=pipelineKpis()+main;else if(selected==='people'&&!window.SELFOutreachUI?.state?.company)main=needsTouch()+main}
@@ -297,6 +297,7 @@ function enter(){
   window.SELFCareerPhase3?.reset?.(owner);
   window.SELFCareerLearning?.reset?.(owner);
   window.SELFOutreachUI?.reset?.();
+  window.SELFDossier?.reset?.();
  }
  if(!ui.ready&&!ui.loading)void load();
 }
@@ -368,6 +369,7 @@ async function erase(kind,id){
  }finally{ui.busy=false}
 }
 async function action(e){
+ if(await window.SELFDossier?.action?.(e))return true;
  if(await window.SELFOutreachUI?.action?.(e))return true;
  if(await window.SELFLessonLoop?.action?.(e))return true;
  if(await window.SELFCareerLearning?.action?.(e))return true;
@@ -377,7 +379,7 @@ async function action(e){
  if(!b)return false;
  e.preventDefault();e.stopPropagation();
  const x=b.dataset.career;
- if(x==='page')setPage(b.dataset.page);
+ if(x==='page'){window.SELFDossier?.nav?.();setPage(b.dataset.page)}
  if(x==='toggle-rail'){ui.railCollapsed=!ui.railCollapsed;host.render()}
  if(x==='toggle-sections'){
   const root=document.querySelector('.career-workspace');
@@ -405,6 +407,7 @@ async function submit(e){
  await save(e.target);return true;
 }
 function input(e){
+ if(window.SELFDossier?.input?.(e))return true;
  if(window.SELFOutreachUI?.input?.(e))return true;
  if(window.SELFLessonLoop?.input?.(e))return true;
  if(window.SELFCareerLearning?.input?.(e))return true;
@@ -433,6 +436,6 @@ function links(){
   ...(window.SELFCareerPhase3?.links?.()||[])
  ];
 }
-window.SELFCareer={setPage,init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api});window.SELFOutreachUI?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
+window.SELFCareer={setPage,init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api});window.SELFOutreachUI?.init?.({career:window.SELFCareer,host:api});window.SELFDossier?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
 })();
 

@@ -33,6 +33,11 @@ const hhmm=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digi
 const dayLabel=new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',weekday:'short',day:'numeric',month:'short'});
 const FOLLOW_STAGES=['connect_sent','connected','reached_out','in_conversation'];
 const STALE_DAYS=14,WEEK=7*24*3600*1000,MAX_ITEMS=8;
+/* An interview whose reflection is still empty 1 to 14 days after it happened (same rule as Game Day). */
+function reflectDue(i,now,dismissed){
+ const at=Date.parse(i.scheduled_at);if(!Number.isFinite(at)||String(i.reflection||'').trim()||(dismissed||[]).includes(i.id))return false;
+ const age=now-at;return age>=24*3600*1000&&age<=14*24*3600*1000;
+}
 /* Who needs a touch: people with a logged next step (latest touchpoint decides), then people in an active stage with no contact for more than STALE_DAYS.
    People with no logged contact at all are skipped: there is nothing to measure. Shared by the Today agenda and the Hunt room. */
 function followUps({people=[],touchpoints=[],day}){
@@ -72,6 +77,10 @@ function buildAgenda({tasks=[],day,now=Date.now(),career=null}){
    items.push({key:'interview:'+i.id,kind:'interview',tone:'hunt',time:(sameDay?'':dayLabel.format(at)+' ')+hhmm.format(at),title:i.title,
     sub:['Interview',app?[app.role_title,companyName(app.company_id)].filter(Boolean).join(' · '):'',i.format].filter(Boolean).join(' · '),open:{action:'open-career',page:'interviews'}});
   }
+  for(const i of (career.interviews||[])){
+   if(!reflectDue(i,now,career.dismissed))continue;
+   items.push({key:'reflect:'+i.id,kind:'reflect',tone:'hunt',time:'Reflect',title:'Reflect on '+i.title,sub:'Interview · write what you learned',open:{action:'open-career',page:'interviews'}});
+  }
   const {follows,suggested}=followUps({people:career.people,touchpoints:career.touchpoints,day});
   for(const f of follows)items.push({key:'follow:'+f.person.id,kind:'follow',tone:'person',time:'Follow up',title:f.person.full_name,sub:'Next step · '+f.step,open:{action:'open-career',page:'people'}});
   for(const g of suggested)items.push({key:'suggest:'+g.person.id,kind:'suggest',tone:'person',time:'Suggested',title:g.person.full_name,sub:'Last contact '+g.age+' days ago',open:{action:'open-career',page:'people'}});
@@ -88,7 +97,7 @@ function triageQueue(inbox,skippedIds,pendingIds){
 function careerData(){
  const c=root.SELFCareer?.ui,p=root.SELFCareerPhase2?.ui;
  if(!c?.ready||!p?.ready)return null;
- return {people:c.people||[],applications:c.applications||[],companies:c.companies||[],interviews:p.interviews||[],touchpoints:p.touchpoints||[]};
+ return {people:c.people||[],applications:c.applications||[],companies:c.companies||[],interviews:p.interviews||[],touchpoints:p.touchpoints||[],dismissed:root.SELFDossier?.dismissed?.()||[]};
 }
 function render(){
  const {state,esc,attr,ic,today,spaceOf,statusOf,dueBadge}=host,day=today(),st=state();
