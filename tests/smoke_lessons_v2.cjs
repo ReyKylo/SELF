@@ -21,9 +21,12 @@ for(const L of data.lessons){
   assert.ok(learning.videos.some(v=>v.id===L.watch.video_id&&v.track===L.track),'video exists');
  });
  t(L.id+' predict',()=>{const p=L.predict;assert.equal(p.options.length,3);assert.ok(p.answer_index>=0&&p.answer_index<3);assert.equal(new Set(p.options).size,3);assert.ok(p.reveal.length>20)});
- t(L.id+' watch is honest about unverified segments',()=>{const w=L.watch;const v=learning.videos.find(x=>x.id===w.video_id);assert.equal(w.watch_for.length,3);
-  if(!(v.chapters||[]).length)assert.equal(w.segment_verified,false,'no verified chapters upstream, so no verified segment');
-  if(!w.segment_verified){assert.equal(w.start,null);assert.equal(w.end,null)}else{assert.ok(Number.isFinite(w.start)&&w.end>w.start&&w.end<=v.duration_seconds)}});
+ t(L.id+' watch is honest about what was verified',()=>{const w=L.watch;const v=learning.videos.find(x=>x.id===w.video_id);assert.equal(w.watch_for.length,3);
+  const secs=(v.chapters||[]).map(c=>{const m=/^(\d+):(\d+)\b/.exec(c);return m?(+m[1])*60+(+m[2]):null}).filter(n=>n!=null);
+  assert.equal(w.segment_verified,false,'no segment is human-verified yet');
+  if(w.segment_basis){assert.equal(w.segment_basis,'publisher_chapters');assert.ok(secs.includes(w.start),'start is a chapter boundary from the video owner: '+w.start);assert.ok(secs.includes(w.end)&&w.end>w.start,'end is a later chapter boundary: '+w.end);assert.ok(w.segment_label&&/\d\d:\d\d/.test(w.segment_label));assert.match(w.note,/belum ditonton dan diverifikasi/i)}
+  else{assert.equal(w.start,null);assert.equal(w.end,null)}
+  assert.ok(!w.segment_basis||secs.length>0,'a chapter-based segment needs chapters upstream')});
  t(L.id+' no external images',()=>{assert.ok(!/<img|https?:\/\/[^"]+\.(png|jpe?g|gif|webp)/i.test(JSON.stringify(L)),'visuals are SELF-native')});
 }
 
@@ -59,7 +62,7 @@ t('pro layout rows match the waterfall',()=>{
  const v=Object.fromEntries(L.pro_layout.rows.map(r=>[r.id,r.value]));
  assert.equal(v.ebitda+v.interest+v.tax+v.nwc,v.cfo);assert.equal(v.cfo+v.capex,v.fcf);assert.ok(near(v.fcf+v.debt,v.cash));
  const ids=new Set(L.pro_layout.rows.map(r=>r.id));for(const c of L.pro_layout.callouts)for(const r of c.rows)assert.ok(ids.has(r),'callout row '+r);
- assert.equal(L.pro_layout.callouts.length,3);assert.ok(L.pro_layout.check.value.includes(String(y25.ending_cash))&&L.pro_layout.check.value.includes(String(y24.ending_cash)));
+ assert.equal(L.pro_layout.callouts.length,3);assert.ok(L.pro_layout.check.value.includes(String(y25.ending_cash).replace('.',','))&&L.pro_layout.check.value.includes(String(y24.ending_cash).replace('.',',')));
  assert.ok(L.pro_layout.original.url.startsWith('https://'));
 });
 t('worked example grid evaluates to the exhibit',()=>{

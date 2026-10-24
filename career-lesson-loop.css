@@ -83,3 +83,9 @@
 .review-front{font-size:1.15em;font-weight:700;margin:6px 0;line-height:1.45}.review-back{padding:12px 14px;border-radius:12px;background:var(--blueSoft);margin:0}
 .review-actions{display:flex;gap:8px;flex-wrap:wrap}.review-actions kbd{font-size:.72em;opacity:.7;margin-left:4px}
 @media (prefers-reduced-motion:reduce){.wf-bar.is-new rect,.ll-steps-list li.is-new{animation:none}.ll-option,.ll-card{transition:none}}
+
+/* Study › Next up */
+.nextup{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:16px 18px;margin:0 0 16px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:14px;background:var(--card2)}
+.nextup-main{min-width:0;flex:1 1 280px}.nextup h3{margin:4px 0 4px;font-size:1.1em;letter-spacing:-.01em}.nextup p{margin:0 0 6px;color:var(--muted);font-size:.88em}
+.nextup-meta,.nextup-due{font-size:.78em!important;color:var(--faint)!important}
+.nextup-dots{display:flex;gap:5px;margin:6px 0}.nextup-dots i{width:22px;height:6px;border-radius:4px;background:var(--hover)}.nextup-dots i.is-done{background:var(--green)}.nextup-dots i.is-now{background:var(--blue)}

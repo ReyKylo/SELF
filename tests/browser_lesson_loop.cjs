@@ -35,8 +35,8 @@ const {launch}=require('./browser_learning_fixture.cjs');
  assert.match(await txt('.ll-parts'),/Piutang usaha\s+50 → 75\s+−25/);assert.match(await txt('.ll-parts'),/Utang usaha\s+35 → 45 \(sumber kas\)\s+\+10/);assert.match(await txt('.ll-parts'),/Total\s+−37/);
  assert.match(await txt('.ll-limit'),/Rp16 miliar dari piutang Rp75 miliar/);
  await page.locator('[data-lesson="wf-all"]').click();assert.equal(await page.locator('.wf-bar').count(),9);
- assert.deepEqual(await page.locator('.wf-val').evaluateAll(n=>n.map(e=>e.textContent)),['39','−6','−5.5','−37','−9.5','−13','−22.5','+23','0.5']);
- assert.match(await txt('.ll-ok'),/Jembatan cocok/);assert.match(await page.locator('svg.wf desc').evaluate(e=>e.textContent),/CFO −9.5 Rp miliar/);
+ assert.deepEqual(await page.locator('.wf-val').evaluateAll(n=>n.map(e=>e.textContent)),['39','−6','−5,5','−37','−9,5','−13','−22,5','+23','0,5']);
+ assert.match(await txt('.ll-ok'),/Jembatan cocok/);assert.match(await page.locator('svg.wf desc').evaluate(e=>e.textContent),/CFO −9,5 Rp miliar/);
  if(process.env.LESSON_SHOT)await page.screenshot({path:process.env.LESSON_SHOT+'-see.png'});
  await page.locator('[data-lesson="wf-table"]').click();assert.equal(await page.locator('.wf-table tbody tr').count(),9);assert.equal(await page.locator('svg.wf').count(),0);
  await page.locator('[data-lesson="wf-table"]').click();
@@ -45,7 +45,7 @@ const {launch}=require('./browser_learning_fixture.cjs');
 
  /* 3 Format pro */
  assert.match(await beat(),/Format pro/);assert.equal(await page.locator('.bridge-table tbody tr').count(),10,'nine rows and the check row');
- assert.match(await txt('.bridge-table'),/\(37\.0\)/);assert.match(await txt('.is-check'),/13\.54 − 13\.04 − 0\.50 = 0\.00/);
+ assert.match(await txt('.bridge-table'),/\(37,0\)/);assert.match(await txt('.is-check'),/13,54 − 13,04 − 0,50 = 0,00/);
  await page.locator('.ll-callout').first().click();assert.equal(await page.locator('.bridge-table tr.is-hl').getAttribute('data-row'),'nwc');
  assert.match(await txt('.ll-callout.is-on'),/dalam kurung/);assert.equal(await page.locator('.ll-callouts a[href^="https://www.wallstreetprep.com"]').count(),1);
  await next();

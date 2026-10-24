@@ -91,12 +91,13 @@ function bPredict(l,v){
 function bWatch(l,v,ctx){
  const w=l.watch,vid=ctx.base?.videos?.find(x=>x.id===w.video_id);
  if(!vid)return beatHead(1,'Video tidak ditemukan','Referensi video hilang dari data Career Prep.');
- const q='?rel=0'+(w.segment_verified&&Number.isFinite(w.start)?'&start='+Math.floor(w.start):'')+(w.segment_verified&&Number.isFinite(w.end)?'&end='+Math.floor(w.end):'');
+ const ranged=(w.segment_verified||w.segment_basis==='publisher_chapters');
+ const q='?rel=0'+(ranged&&Number.isFinite(w.start)?'&start='+Math.floor(w.start):'')+(ranged&&Number.isFinite(w.end)?'&end='+Math.floor(w.end):'');
  const player=v.playing?'<div class="ll-player"><iframe src="https://www.youtube-nocookie.com/embed/'+h(vid.video_id)+q+'" title="'+h(vid.title)+'" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" loading="lazy"></iframe></div>':
   '<div class="ll-poster"><strong>'+h(vid.title)+'</strong><span>'+h(vid.channel)+' · '+h(vid.duration)+'</span>'+btn('▶ Putar di sini','play','','career-btn is-current')+'</div>';
  return beatHead(1,'Tonton, dengan tiga hal yang dicari','Satu video, tiga pertanyaan. Catat jawabannya sambil nonton.')+
   '<div class="ll-watch">'+player+'<div><ol class="ll-prompts">'+w.watch_for.map(x=>'<li>'+h(x)+'</li>').join('')+'</ol>'+
-  '<p class="ll-note">'+(w.segment_verified?'Segmen terverifikasi: '+h(w.start)+'s sampai '+h(w.end)+'s.':'<strong>Segmen belum diverifikasi.</strong> '+h(w.note))+'</p>'+
+  '<p class="ll-note">'+(w.segment_verified?'Segmen terverifikasi: '+h(w.start)+'s sampai '+h(w.end)+'s.':w.segment_basis==='publisher_chapters'?'<strong>Segmen: '+h(w.segment_label||'')+'.</strong> '+h(w.note):'<strong>Segmen belum diverifikasi.</strong> '+h(w.note))+'</p>'+
   '<a class="career-btn" href="'+h(vid.url)+'" target="_blank" rel="noopener noreferrer">Buka di YouTube ↗</a></div></div>';
 }
 function wfModel(l){const s=l.see_it;return V().waterfallModel(s.steps.map(x=>({id:x.id,label:x.label,value:x.value,kind:x.kind})))}
@@ -115,11 +116,12 @@ function bSee(l,v){
 function bPro(l,v){
  const p=l.pro_layout,hl=v.callout?p.callouts.find(c=>c.n===v.callout)?.rows||[]:[];
  return beatHead(3,p.title,'Angka yang sama, dalam format yang dipakai analis. Klik catatan untuk melihat barisnya.')+
-  '<div class="ll-pro"><div class="ll-sheet">'+V().bridgeTable(p.rows,{highlight:hl,check:p.check})+'<p class="ll-note"><span class="ll-blue">Biru</span> = input, hitam = rumus. '+h(p.convention)+'</p></div>'+
+  '<div class="ll-pro"><div class="ll-sheet">'+V().bridgeTable(p.rows,{highlight:hl,check:p.check,decimals:p.decimals??1})+'<p class="ll-note"><span class="ll-blue">Biru</span> = input, hitam = rumus. '+h(p.convention)+'</p></div>'+
   '<div class="ll-callouts"><ul>'+p.callouts.map(c=>'<li><button type="button" class="ll-callout'+(v.callout===c.n?' is-on':'')+'" data-lesson="callout" data-n="'+h(c.n)+'" aria-pressed="'+(v.callout===c.n)+'"><span class="bridge-badge">'+h(c.n)+'</span> '+h(c.point)+'</button></li>').join('')+'</ul>'+
   '<a class="career-btn" href="'+h(p.original.url)+'" target="_blank" rel="noopener noreferrer">'+h(p.original.label)+' ↗</a></div></div>';
 }
 /* A read-only grid. Cells that start with "=" show their computed value and are drawn black; plain numbers are inputs (blue). */
+const show=v=>typeof v==='number'&&Number.isFinite(v)?V().fmt(v,2):String(v);
 function gridHtml(g,{inputCell=null,inputHtml='',cols}={}){
  const cells={};g.rows.forEach(r=>r.cells.forEach((c,i)=>{if(c!=null&&c!=='?')cells[String.fromCharCode(66+i)+r.n]=c}));
  const sheet=G().createSheet(cells),letters=g.columns.map((_,i)=>String.fromCharCode(66+i));
@@ -128,8 +130,8 @@ function gridHtml(g,{inputCell=null,inputHtml='',cols}={}){
    const ref=letters[i]+r.n;
    if(c==='?'&&ref===inputCell)return '<td class="is-target">'+inputHtml+'</td>';
    if(c==null)return '<td></td>';
-   if(typeof c==='string'&&c.startsWith('=')){let val='';try{val=G().evaluate(c.slice(1),sheet).value}catch{val='#'}return '<td class="is-formula" title="'+h(c)+'">'+h(val)+'</td>'}
-   return '<td class="is-input">'+h(c)+'</td>'}).join('')+'</tr>').join('')+'</tbody></table>';
+   if(typeof c==='string'&&c.startsWith('=')){let val='';try{val=G().evaluate(c.slice(1),sheet).value}catch{val='#'}return '<td class="is-formula" title="'+h(c)+'">'+h(show(val))+'</td>'}
+   return '<td class="is-input">'+h(show(c))+'</td>'}).join('')+'</tr>').join('')+'</tbody></table>';
 }
 function bWorked(l,v){
  const w=l.worked,show=Math.min(w.steps.length,v.worked+1);
@@ -155,14 +157,14 @@ function rungShell(l,v,r,i,inner){
    (st.attempts>0&&!st.ok&&!st.revealed?btn('Lihat jawaban','reveal','data-rung="'+h(r.rung)+'"'):'')+'</div>'+
    (hints?'<ul class="ll-hints">'+hints+'</ul>':'')+feedbackFor(r,st.res)+(st.revealed?'<p class="ll-fb is-warn">Jawaban dibuka: <strong>'+h(String(r.expect.value).replace('.',','))+' '+h(r.unit)+'</strong>. Ini dicatat sebagai dibantu.</p>':''))+'</section>';
 }
-const numInput=(r,st)=>'<label class="ll-input"><span class="sr-only">Jawaban dalam '+h(r.unit)+'</span><input type="text" inputmode="decimal" autocomplete="off" data-lesson-input="'+h(r.rung)+'" value="'+h(st.raw)+'" placeholder="Jawaban ('+h(r.unit)+')"></label>';
+const numInput=(r,st)=>'<label class="ll-input"><span class="sr-only">Jawaban dalam '+h(r.unit)+'</span><input type="text" inputmode="decimal" autocomplete="off" data-lesson-input="'+h(r.rung)+'" value="'+h(st.raw)+'" placeholder="Jawaban ('+h(r.unit)+', tanpa pemisah ribuan)"></label>';
 function bLadder(l,v){
  const rungs=l.ladder.map((r,i)=>{
   const st=v.rungs[r.rung];let inner='';
   if(r.rung==='complete')inner=gridHtml(r.grid,{inputCell:r.target,inputHtml:'<input type="text" class="ll-cell" autocomplete="off" aria-label="Sel '+h(r.target)+'" data-lesson-input="'+h(r.rung)+'" value="'+h(st.raw)+'" placeholder="=…">'});
   else if(r.rung==='red_pen'){
    const rows=r.artefact.rows,fb=v.red.picked&&v.red.picked!==r.flaw_row?r.row_feedback[v.red.picked]:'';
-   inner='<table class="bridge-table ll-red"><tbody>'+rows.map(x=>'<tr class="'+(x.total?'is-total':'')+(v.red.picked===x.id?' is-picked':'')+'"><th scope="row"><button type="button" class="ll-rowpick" data-lesson="pick-row" data-id="'+h(x.id)+'" aria-pressed="'+(v.red.picked===x.id)+'">'+h(x.label)+'</button></th><td>'+(x.value<0?'('+Math.abs(x.value).toFixed(1)+')':x.value.toFixed(1))+'</td></tr>').join('')+'</tbody></table>'+
+   inner='<table class="bridge-table ll-red"><tbody>'+rows.map(x=>'<tr class="'+(x.total?'is-total':'')+(v.red.picked===x.id?' is-picked':'')+'"><th scope="row"><button type="button" class="ll-rowpick" data-lesson="pick-row" data-id="'+h(x.id)+'" aria-pressed="'+(v.red.picked===x.id)+'">'+h(x.label)+'</button></th><td>'+(x.text!=null?h(x.text):V().bracket(x.value,r.artefact.decimals??1))+'</td></tr>').join('')+'</tbody></table>'+
     (v.red.found?'<p class="ll-fb is-ok" role="status">'+h(r.found_feedback)+'</p>'+numInput(r,st):(fb?'<p class="ll-fb is-bad" role="status">'+h(fb)+'</p>':'<p class="ll-note">Klik baris yang menurutmu salah.</p>'));
   }else inner=numInput(r,st);
   if(r.rung==='red_pen'&&!v.red.found)return rungShellNoCheck(l,v,r,i,inner);
@@ -236,7 +238,7 @@ async function action(e){
  else if(a==='defend-check'){if(n>=0&&n<3)v.defend.checks[n]=!v.defend.checks[n]}
  else if(a==='flip'){v.flipped[b.dataset.id]=!v.flipped[b.dataset.id]}
  else if(a==='cards'){const added=root.SELFReview?.add?.(l.lock_in.cards,l.id);v.carded=true;void added}
- persist(l,v);rerender();
+ persist(l,v);try{root.localStorage?.setItem('self.study.track.'+(S.owner||'anon'),l.track)}catch{}rerender();
  Promise.resolve().then(()=>{const t=root.document?.getElementById('ll-beat-h');if(t&&['beat','prev','next'].includes(a))t.parentElement?.scrollIntoView?.({block:'nearest'})});
  return true;
 }

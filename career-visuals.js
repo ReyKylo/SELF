@@ -4,8 +4,10 @@
 'use strict';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const round=(v,d=2)=>{const f=Math.pow(10,d);return Math.round((v+Number.EPSILON)*f)/f};
-const fmt=(v,d=2)=>{const r=round(v,d);return (r<0?'−':'')+String(Math.abs(r))};
-const fmtSigned=(v,d=2)=>{const r=round(v,d);return r<0?'−'+Math.abs(r):'+'+r};
+const decOf=r=>(String(Math.abs(r)).split('.')[1]||'').length;
+const group=(n,dec)=>{const s=Math.abs(n).toFixed(dec),[i,f]=s.split('.');return i.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+(f?','+f:'')};
+const fmt=(v,d=2)=>{const r=round(v,d);return (r<0?'−':'')+group(r,decOf(r))};
+const fmtSigned=(v,d=2)=>{const r=round(v,d);return (r<0?'−':'+')+group(r,decOf(r))};
 const TOL=1e-9;
 
 /* steps: [{id,label,value,kind:'total'|'delta',term?,caption?}]. The first step must be a total. A later total is a checkpoint: it has to equal the running sum. */
@@ -61,14 +63,14 @@ function waterfallTable(model,unit=''){
  return '<table class="wf-table"><thead><tr><th scope="col">Langkah</th><th scope="col">Nilai'+(unit?' ('+esc(unit)+')':'')+'</th><th scope="col">Saldo</th></tr></thead><tbody>'+
   model.bars.map(b=>{run=b.to;return '<tr class="'+(b.kind==='total'?'is-total':'')+'"><th scope="row">'+esc(b.label)+'</th><td>'+esc(b.valueText)+'</td><td>'+fmt(b.to)+'</td></tr>'}).join('')+'</tbody></table>';
 }
-const bracket=v=>v<0?'('+Math.abs(v).toFixed(1)+')':v.toFixed(1);
+const bracket=(v,dec=1)=>v<0?'('+group(v,dec)+')':group(v,dec);
 /* Model-format bridge: rows are {id,label,value|null,input?,total?} . Convention: blue = typed input, black = formula, a check row at the bottom. */
-function bridgeTable(rows,{highlight=[],check=null}={}){
+function bridgeTable(rows,{highlight=[],check=null,decimals=1}={}){
  return '<table class="bridge-table"><tbody>'+rows.map(r=>'<tr data-row="'+esc(r.id)+'" class="'+[r.total?'is-total':'',highlight.includes(r.id)?'is-hl':''].join(' ').trim()+'"><th scope="row">'+esc(r.label)+(r.badge?' <span class="bridge-badge" aria-label="Catatan '+esc(r.badge)+'">'+esc(r.badge)+'</span>':'')+'</th><td class="'+(r.input?'is-input':'')+'">'+
-  (r.value==null?'':bracket(r.value))+'</td></tr>').join('')+
+  (r.text!=null?esc(r.text):r.value==null?'':bracket(r.value,decimals))+'</td></tr>').join('')+
   (check?'<tr class="is-check"><th scope="row">'+esc(check.label)+'</th><td>'+esc(check.value)+'</td></tr>':'')+'</tbody></table>';
 }
-const api={waterfallModel,describeWaterfall,renderWaterfall,waterfallTable,bridgeTable,fmt,fmtSigned,round,esc};
+const api={bracket,group,waterfallModel,describeWaterfall,renderWaterfall,waterfallTable,bridgeTable,fmt,fmtSigned,round,esc};
 root.SELFVisuals=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

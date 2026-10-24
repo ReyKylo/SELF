@@ -83,5 +83,5 @@ function action(e){
 }
 function input(e){if(e.target?.id!=='teaching-numeric')return false;st.answer=e.target.value;st.check=null;return true}
 function fromTrack(track){const x=st.data?.lessons.find(x=>x.track===track);st.selected=x?.id||({PE:'PE-L01',VC:'VC-L01',Consulting:'CO-L01'}[track]||'PE-L01');st.answer='';st.check=null;st.hints=0;st.transferChoice=null;st.transferChecked=false;st.trackFilter=track}
-window.SELFCareerTeaching={init(api){host=api;window.SELFLessonLoop?.init?.(api)},render,action,input,reset,fromTrack,validate,state:st};
+window.SELFCareerTeaching={select(id){st.selected=id;st.answer='';st.check=null;st.hints=0;st.transferChoice=null;st.transferChecked=false},init(api){host=api;window.SELFLessonLoop?.init?.(api)},render,action,input,reset,fromTrack,validate,state:st};
 })();

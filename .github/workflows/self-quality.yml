@@ -30,6 +30,7 @@ jobs:
           node --check career-visuals.js
           node --check career-review.js
           node --check career-lesson-loop.js
+          node --check career-nextup.js
           node --check data-export.js
           node --check work-tools.js
           node --check studio-recipes.js
@@ -70,6 +71,10 @@ jobs:
         run: node tests/smoke_career_grid.cjs
       - name: Lesson Loop v2 content recomputed from the case exhibits
         run: node tests/smoke_lessons_v2.cjs
+      - name: Lesson Loop v2, five more lessons recomputed from the exhibits
+        run: node tests/smoke_lessons_v2_more.cjs
+      - name: Next up picker
+        run: node tests/smoke_nextup.cjs
       - name: Review queue spaced recall
         run: node tests/smoke_review.cjs
       - name: Export CSV escaping and backup
