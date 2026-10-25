@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SELF Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one ruled ledger page per day. Index tabs on top, a red margin rule, entries on ruled lines, marginalia on the right. */
+:root{
+  --paper:#f2f5ef; --rule:#d6e2d3; --ink:#18241d; --ink-soft:#4d5d53; --ink-faint:#7f8f84;
+  --margin:#b4433c; --accent:#2341a0; --accent-soft:#e3e8f7; --raise:#fbfcf9; --done:#8d9a90;
+  --ok:#1f7a55; --warn:#9a6212;
+  --display:'Literata',Georgia,'Times New Roman',serif;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  --line:2.6rem; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#12171a; --rule:#1f292d; --ink:#e7ece6; --ink-soft:#a9b5ad; --ink-faint:#748179;
+  --margin:#c7625a; --accent:#9db2ff; --accent-soft:#1d2643; --raise:#171e22; --done:#66736b;
+  --ok:#62c99b; --warn:#e2ad5a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12171a; --rule:#1f292d; --ink:#e7ece6; --ink-soft:#a9b5ad; --ink-faint:#748179;
+  --margin:#c7625a; --accent:#9db2ff; --accent-soft:#1d2643; --raise:#171e22; --done:#66736b;
+  --ok:#62c99b; --warn:#e2ad5a; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+.wrap{max-width:1180px;margin:0 auto;padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Index tabs: like the cut tabs on a bound ledger */
+.index{display:flex;align-items:flex-end;gap:4px;border-bottom:2px solid var(--ink);padding-top:18px;overflow-x:auto}
+.brand{font-family:var(--mono);font-weight:600;letter-spacing:.22em;font-size:.8rem;margin-right:18px;padding-bottom:10px;white-space:nowrap}
+.tab{border:1.5px solid var(--ink);border-bottom:0;background:transparent;padding:8px 16px 7px;border-radius:8px 8px 0 0;font-weight:700;font-size:.92rem;cursor:pointer;white-space:nowrap;min-height:40px}
+.tab[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.tab:hover:not([aria-current="page"]){background:var(--accent-soft)}
+.spacer{flex:1}
+.tool{border:0;background:transparent;padding:8px 10px;cursor:pointer;font-family:var(--mono);font-size:.8rem;color:var(--ink-soft);white-space:nowrap;min-height:40px}
+.tool kbd{border:1px solid var(--rule);border-radius:4px;padding:1px 5px;background:var(--raise)}
+
+/* Masthead */
+.mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;padding:34px 0 18px}
+.mast h1{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,7vw,4.6rem);line-height:.95;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.mast .date{font-family:var(--mono);font-size:.9rem;color:var(--ink-soft);margin-top:10px;letter-spacing:.04em}
+.tally{font-family:var(--mono);font-size:.82rem;border:1.5px solid var(--ink);background:var(--raise);min-width:250px}
+.tally div{display:flex;justify-content:space-between;gap:20px;padding:6px 12px;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
+.tally div:last-child{border-bottom:0;border-top:2px double var(--ink);font-weight:600}
+.tally .lbl{color:var(--ink-soft)}
+
+/* Week strip */
+.strip{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;margin:0 0 26px}
+.day{border:0;background:transparent;padding:8px 2px;text-align:center;cursor:pointer;border-top:3px solid transparent;font-family:var(--mono);font-size:.74rem;color:var(--ink-soft);min-height:56px}
+.day b{display:block;font-size:1rem;color:var(--ink)}
+.day .ticks{display:block;height:6px;margin-top:4px;letter-spacing:1px;color:var(--accent);font-size:.7rem;line-height:6px}
+.day.today{border-top-color:var(--margin)}
+.day.today b{color:var(--margin)}
+.day:hover{background:var(--accent-soft)}
+
+/* Ledger page */
+.page{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px}
+.sheet{position:relative;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--line) - 1px),var(--rule) calc(var(--line) - 1px),var(--rule) var(--line));padding-left:84px;min-width:0}
+.sheet::before,.sheet::after{content:"";position:absolute;top:0;bottom:0;width:1.5px;background:var(--margin);opacity:.75}
+.sheet::before{left:66px}.sheet::after{left:70px}
+
+.capture{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-height:var(--line);margin-bottom:var(--line)}
+.capture label{position:absolute;left:0;width:62px;font-family:var(--mono);font-size:.7rem;color:var(--margin);text-align:right;letter-spacing:.08em}
+.capture input{flex:1 1 280px;min-width:0;border:0;border-bottom:2px solid var(--ink);background:transparent;padding:6px 2px;font-family:var(--display);font-size:1.25rem;outline:none}
+.capture input:focus{border-bottom-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;flex-basis:100%;min-height:28px}
+.chip{font-family:var(--mono);font-size:.74rem;padding:3px 8px;border:1px solid var(--ink-faint);border-radius:999px;color:var(--ink-soft);background:var(--raise)}
+.chip.k{border-color:var(--accent);color:var(--accent)}
+.hint{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint)}
+
+.sect{position:relative;margin-top:var(--line)}
+.sect h2{margin:0;height:var(--line);display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:1.15rem;font-weight:600}
+.sect h2 small{font-family:var(--mono);font-weight:400;font-size:.74rem;color:var(--ink-faint)}
+.sect .gut{position:absolute;left:-84px;width:60px;text-align:right;font-family:var(--mono);font-size:.7rem;color:var(--margin);top:calc(var(--line)/2 - .5em);letter-spacing:.06em}
+.entry{position:relative;display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:8px;min-height:var(--line);cursor:pointer;border-radius:4px}
+.entry:hover{background:color-mix(in srgb,var(--accent-soft) 60%,transparent)}
+.entry.sel{background:var(--accent-soft)}
+.entry .time{position:absolute;left:-84px;width:60px;text-align:right;font-family:var(--mono);font-size:.76rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.sig{width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;font-size:1.05rem;cursor:pointer;color:var(--ink);border-radius:50%}
+.sig:hover{background:var(--raise)}
+.txt{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.txt .meta{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint);margin-left:8px}
+.tag{font-family:var(--mono);font-size:.72rem;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.tag.over{color:var(--margin);border:1px solid var(--margin)}
+.tag.hi{color:var(--paper);background:var(--ink)}
+.tag.ev{color:var(--accent);border:1px solid var(--accent)}
+.entry.done .txt{text-decoration:line-through;text-decoration-color:var(--margin);color:var(--done)}
+.carry{border:1px dashed var(--ink-faint);background:transparent;font-family:var(--mono);font-size:.72rem;padding:3px 8px;border-radius:3px;cursor:pointer;color:var(--ink-soft);min-height:28px}
+.carry:hover{border-style:solid;color:var(--ink)}
+
+/* Marginalia */
+.margin{position:sticky;top:16px;align-self:start;border-left:1.5px solid var(--ink);padding:4px 0 4px 20px;min-width:0}
+.margin .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;color:var(--margin);text-transform:uppercase}
+.margin h3{font-family:var(--display);font-size:1.5rem;line-height:1.15;margin:8px 0 14px;text-wrap:balance}
+.kv{display:grid;grid-template-columns:96px minmax(0,1fr);gap:6px 10px;font-size:.92rem;margin:0}
+.kv dt{font-family:var(--mono);font-size:.74rem;color:var(--ink-faint);padding-top:3px}
+.kv dd{margin:0}
+.bar{height:6px;background:var(--rule);margin:14px 0 6px;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.checks{list-style:none;padding:0;margin:10px 0 0;font-size:.92rem}
+.checks li{padding:5px 0;border-bottom:1px solid var(--rule);display:flex;gap:8px}
+.checks li.ok{color:var(--done);text-decoration:line-through}
+.note{font-family:var(--display);font-style:italic;color:var(--ink-soft);font-size:.98rem;margin:16px 0 0}
+.open{display:inline-flex;margin-top:18px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);padding:9px 14px;font-weight:700;cursor:pointer;min-height:40px;align-items:center}
+.legend{margin-top:28px;font-family:var(--mono);font-size:.74rem;color:var(--ink-soft);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px}
+.sample{font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);margin-top:10px}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;font-family:var(--mono);font-size:.82rem;border-radius:4px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+
+@media (max-width:900px){
+  .page{grid-template-columns:minmax(0,1fr)}
+  .margin{position:static;border-left:0;border-top:2px solid var(--ink);padding:16px 0 0}
+  .mast{grid-template-columns:minmax(0,1fr)}
+  .tally{min-width:0}
+}
+@media (max-width:560px){
+  .sheet{padding-left:46px}
+  .sheet::before{left:34px}.sheet::after{left:38px}
+  .entry .time,.sect .gut{left:-46px;width:30px;font-size:.62rem}
+  .capture label{display:none}
+  .strip{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .day:nth-child(n+6){display:none}
+  .txt .meta{display:none}
+  .tool .lab{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="index" aria-label="SELF sections">
+    <span class="brand">SELF ✳</span>
+    <button class="tab" aria-current="page">Today</button>
+    <button class="tab">Spaces</button>
+    <button class="tab">Pipeline</button>
+    <button class="tab">Library</button>
+    <button class="tab">Prep</button>
+    <span class="spacer"></span>
+    <button class="tool" id="find"><kbd>/</kbd> <span class="lab">find anything</span></button>
+    <button class="tool" id="theme" aria-label="Switch theme">◐ <span class="lab">theme</span></button>
+  </nav>
+
+  <header class="mast">
+    <div>
+      <h1>Jumat.</h1>
+      <div class="date">23 OKTOBER 2026 · WEEK 43 · WIB</div>
+    </div>
+    <div class="tally" aria-label="Today's balance">
+      <div><span class="lbl">Opening balance</span><span>7</span></div>
+      <div><span class="lbl">Opened today</span><span id="t-open">+3</span></div>
+      <div><span class="lbl">Closed today</span><span id="t-closed">−2</span></div>
+      <div><span>Open balance</span><span id="t-bal">11</span></div>
+    </div>
+  </header>
+
+  <div class="strip" role="list" aria-label="Ten-day view">
+    <button class="day" role="listitem">SEN<b>19</b><span class="ticks">··</span></button>
+    <button class="day" role="listitem">SEL<b>20</b><span class="ticks">····</span></button>
+    <button class="day" role="listitem">RAB<b>21</b><span class="ticks">···</span></button>
+    <button class="day" role="listitem">KAM<b>22</b><span class="ticks">··</span></button>
+    <button class="day today" role="listitem" aria-current="date">JUM<b>23</b><span class="ticks">······</span></button>
+    <button class="day" role="listitem">SAB<b>24</b><span class="ticks">·</span></button>
+    <button class="day" role="listitem">MIN<b>25</b><span class="ticks">·</span></button>
+    <button class="day" role="listitem">SEN<b>26</b><span class="ticks">···</span></button>
+    <button class="day" role="listitem">SEL<b>27</b><span class="ticks">··</span></button>
+    <button class="day" role="listitem">RAB<b>28</b><span class="ticks"></span></button>
+  </div>
+
+  <div class="page">
+    <main class="sheet" aria-label="Today's ledger">
+      <form class="capture" id="cap" autocomplete="off">
+        <label for="cap-in">WRITE</label>
+        <input id="cap-in" value="Kirim follow-up ke Dimas besok #Career !high" aria-describedby="cap-hint">
+        <div class="chips" id="chips" aria-live="polite"></div>
+        <span class="hint" id="cap-hint">Enter to file it · #space · !high · today / besok / jumat · http link → Link</span>
+      </form>
+
+      <section class="sect" aria-labelledby="s-carry">
+        <span class="gut">FWD</span>
+        <h2 id="s-carry">Carried forward <small>overdue, still open</small></h2>
+        <div class="list" data-s="carry"></div>
+      </section>
+      <section class="sect" aria-labelledby="s-today">
+        <span class="gut">TODAY</span>
+        <h2 id="s-today">Today <small>tasks, interviews and follow-ups due</small></h2>
+        <div class="list" data-s="today"></div>
+      </section>
+      <section class="sect" aria-labelledby="s-cap">
+        <span class="gut">IN</span>
+        <h2 id="s-cap">Captured <small>inbox notes and links from today</small></h2>
+        <div class="list" data-s="cap"></div>
+      </section>
+      <section class="sect" aria-labelledby="s-ahead">
+        <span class="gut">AHEAD</span>
+        <h2 id="s-ahead">Next 7 days</h2>
+        <div class="list" data-s="ahead"></div>
+      </section>
+    </main>
+
+    <aside class="margin" id="margin" aria-live="polite"></aside>
+  </div>
+  <p class="sample">Prototype · sample data only · nothing here is saved.</p>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+'use strict';
+// Signifiers follow bullet-journal convention: • task, ○ event, ◆ follow-up, – note, ↗ link, × done
+const SIG={task:'•',event:'○',follow:'◆',note:'–',link:'↗'};
+const entries=[
+ {id:1,s:'carry',k:'task',t:'Analisa DSSA',space:'Finance',due:'Rab 21 Okt',tag:['over','2d late'],status:'In Progress',pri:'High',checks:[['Ambil laporan Q3',1],['Hitung EV/EBITDA',0],['Tulis 1-page view',0]],note:'Brought forward twice. Split it, or drop it?'},
+ {id:2,s:'carry',k:'follow',t:'Follow up Sari (Associate, sample)',space:'Career · People',due:'Last contact 19 days ago',tag:['over','19d'],status:'In conversation',pri:'—',note:'Next step logged 4 Okt: "Kirim catatan setelah coffee chat."'},
+ {id:3,s:'today',k:'event',time:'15:30',t:'Case interview · Strategy Analyst (sample firm)',space:'Career · Interview',due:'Today 15:30 · video',tag:['ev','interview'],status:'Scheduled',pri:'—',checks:[['Baca ulang SajiRasa profit bridge',1],['Siapkan 3 pertanyaan',0]],note:'Prep notes live in Interview Prep. Reflection opens after the call.'},
+ {id:4,s:'today',k:'task',t:'Aruna Supply · debt schedule tab',space:'Career Prep',due:'Today',tag:['hi','high'],status:'Planning',pri:'High',checks:[['Senior term loan',1],['Revolver draw',0],['Covenant test',0]],note:'Part of Sprint Hari 1 · PE acquisition model.'},
+ {id:5,s:'today',k:'task',t:'Kerjain tugas PPPE',space:'Kuliah',due:'Today',status:'To Do',pri:'Normal'},
+ {id:6,s:'today',k:'task',t:'Upload CV v3 (PE focus)',space:'Career · CV',due:'Today',status:'Done',pri:'Normal',done:true},
+ {id:7,s:'today',k:'task',t:'Bikin Content Planning',space:'Work',due:'Today',status:'Done',pri:'Normal',done:true},
+ {id:8,s:'cap',k:'note',time:'08:12',t:'Bandingkan DCF vs comps untuk BBCA',space:'Inbox',due:'Captured 08:12',status:'Unsorted',pri:'—',note:'Inbox note. File it to a Space or turn it into a Task.'},
+ {id:9,s:'cap',k:'link',time:'10:47',t:'docs.google.com · Aruna model v2',space:'Inbox',due:'Captured 10:47',status:'Unsorted',pri:'—'},
+ {id:10,s:'ahead',k:'task',t:'Review Research Saham',space:'Finance',due:'Min 25 Okt',status:'To Do',pri:'Low',meta:'Min 25'},
+ {id:11,s:'ahead',k:'task',t:'ArusOps memo · draft cohort section',space:'Career Prep',due:'Sel 27 Okt',status:'To Do',pri:'High',meta:'Sel 27'},
+ {id:12,s:'ahead',k:'follow',t:'Thank-you note after case interview',space:'Career · People',due:'Sab 24 Okt',status:'Suggested',pri:'—',meta:'Sab 24'}
+];
+let sel=4,opened=3;
+const $=s=>document.querySelector(s);
+const esc=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function row(e){
+  const sig=e.done?'×':SIG[e.k];
+  const tag=e.tag?`<span class="tag ${e.tag[0]}">${esc(e.tag[1])}</span>`:'';
+  const carry=e.s==='carry'?`<button class="carry" data-carry="${e.id}">→ move to today</button>`:'';
+  return `<div class="entry ${e.done?'done':''} ${sel===e.id?'sel':''}" data-id="${e.id}" tabindex="0" role="button" aria-pressed="${sel===e.id}">
+    ${e.time?`<span class="time">${e.time}</span>`:''}
+    <button class="sig" data-done="${e.id}" aria-label="${e.done?'Reopen':'Mark done'}: ${esc(e.t)}" title="${e.k}">${sig}</button>
+    <span class="txt">${esc(e.t)}<span class="meta">${esc(e.meta||e.space)}</span></span>
+    <span>${carry||tag}</span></div>`;
+}
+function render(){
+  document.querySelectorAll('.list').forEach(l=>{l.innerHTML=entries.filter(e=>e.s===l.dataset.s).map(row).join('')});
+  const e=entries.find(x=>x.id===sel);
+  if(e){
+    const c=e.checks||[];const n=c.filter(x=>x[1]).length;
+    $('#margin').innerHTML=`<div class="eyebrow">${SIG[e.k]} ${esc(e.k==='follow'?'follow-up':e.k)}</div><h3>${esc(e.t)}</h3>
+    <dl class="kv"><dt>Space</dt><dd>${esc(e.space)}</dd><dt>When</dt><dd>${esc(e.due)}</dd><dt>Status</dt><dd>${esc(e.done?'Done':e.status)}</dd><dt>Priority</dt><dd>${esc(e.pri)}</dd></dl>
+    ${c.length?`<div class="bar" aria-hidden="true"><i style="width:${n/c.length*100}%"></i></div><div class="hint">${n} of ${c.length} checked</div><ul class="checks">${c.map(x=>`<li class="${x[1]?'ok':''}">${x[1]?'×':'•'} ${esc(x[0])}</li>`).join('')}</ul>`:''}
+    ${e.note?`<p class="note">${esc(e.note)}</p>`:''}
+    <button class="open">Open full page →</button>
+    <div class="legend"><span>• task</span><span>○ interview</span><span>◆ follow-up</span><span>– note</span><span>↗ link</span><span>× done</span></div>`;
+  }
+  // Opening balance + opened − closed = open balance; reopening an item reverses its close.
+  const closed=entries.filter(e=>e.done).length;$('#t-closed').textContent='−'+closed;$('#t-open').textContent='+'+opened;
+  $('#t-bal').textContent=7+opened-closed;
+}
+// Capture grammar: the same rules a production parser would need (see blueprint)
+function parse(txt){
+  const chips=[];let kind='Note';
+  if(/https?:\/\/\S+/.test(txt))kind='Link';
+  else if(/(!high|!low|besok|today|hari ini|tomorrow|senin|selasa|rabu|kamis|jumat|sabtu|minggu|\bdue\b)/i.test(txt)||/^(kirim|bikin|kerjain|review|follow|siapkan|hubungi|call|email)\b/i.test(txt))kind='Task';
+  chips.push(['k',kind]);
+  const sp=txt.match(/#([\w-]+)/);if(sp)chips.push(['','Space: '+sp[1]]);
+  const pr=txt.match(/!(high|low|normal)/i);if(pr)chips.push(['','Priority: '+pr[1]]);
+  const d=txt.match(/\b(besok|tomorrow|today|hari ini|senin|selasa|rabu|kamis|jumat|sabtu|minggu)\b/i);
+  if(d){const m={besok:'Sab 24 Okt',tomorrow:'Sab 24 Okt',today:'Jum 23 Okt','hari ini':'Jum 23 Okt'};chips.push(['','Due: '+(m[d[1].toLowerCase()]||d[1])])}
+  const clean=txt.replace(/#[\w-]+|!(high|low|normal)/gi,'').replace(/\s+/g,' ').trim();
+  return {kind,chips,clean,space:sp?.[1],due:d?.[1]};
+}
+function chips(){const p=parse($('#cap-in').value);$('#chips').innerHTML=$('#cap-in').value.trim()?p.chips.map(c=>`<span class="chip ${c[0]}">${esc(c[1])}</span>`).join(''):''}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)}
+$('#cap-in').addEventListener('input',chips);
+$('#cap').addEventListener('submit',e=>{e.preventDefault();const v=$('#cap-in').value.trim();if(!v){$('#cap-in').focus();return}
+  const p=parse(v);const id=Date.now();
+  const k=p.kind==='Task'?'task':p.kind==='Link'?'link':'note';
+  const isToday=!p.due||/today|hari ini/i.test(p.due);
+  entries.push({id,s:k==='task'?(isToday?'today':'ahead'):'cap',k,t:p.clean,space:p.space||'Inbox',due:p.due||'Captured now',status:k==='task'?'To Do':'Unsorted',pri:(v.match(/!(\w+)/)||[])[1]||'Normal',meta:k==='task'&&!isToday?p.due:'',time:k==='task'?'':'now'});
+  if(k==='task')opened++;sel=id;$('#cap-in').value='';chips();render();toast(p.kind+' filed');});
+document.addEventListener('click',e=>{
+  const d=e.target.closest('[data-done]');if(d){const x=entries.find(y=>y.id==d.dataset.done);x.done=!x.done;render();toast(x.done?'Closed':'Reopened');return}
+  const c=e.target.closest('[data-carry]');if(c){const x=entries.find(y=>y.id==c.dataset.carry);x.s='today';x.tag=null;sel=x.id;render();toast('Moved to today');return}
+  const r=e.target.closest('.entry');if(r){sel=+r.dataset.id;render()}
+  if(e.target.closest('#theme')){const cur=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=cur==='dark'?'light':'dark'}
+  if(e.target.closest('#find')){$('#cap-in').focus()}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement!==$('#cap-in')){e.preventDefault();$('#cap-in').focus()}
+  if(e.key==='Enter'&&e.target.classList?.contains('entry')){sel=+e.target.dataset.id;render();document.querySelector(`.entry[data-id="${sel}"]`)?.focus()}
+});
+chips();render();
+})();
+</script>
+</body>
+</html>

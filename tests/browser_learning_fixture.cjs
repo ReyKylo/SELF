@@ -45,6 +45,6 @@ async function launch(options={}){
   await page.locator('[data-career="page"][data-page="learning"]:visible').first().click();
   await page.locator('.learning-sprint-intro').waitFor();
  }
- return {browser,context,page,fixture,errors,enter};
+ return {browser,context,page,fixture,errors,enter,base:localBase};
 }
 module.exports={launch,BASE};

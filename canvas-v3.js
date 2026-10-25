@@ -453,12 +453,12 @@ function canvas(){
  ui.domSnapshots=new Map(objects.map(i=>[i.id,objectMarkup(i)]));
  return '<div class="self-board-editor c3-shell" data-board-id="'+h(b.id)+'"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
  '<div class="c3-toolbar'+(ui.toolsCollapsed?' c3-toolbar-closed':'')+'" data-expanded="'+ui.toolsExpanded+'" data-collapsed="'+ui.toolsCollapsed+'" data-shapes="'+ui.shapesOpen+'" role="toolbar" aria-label="Create and edit on the board">'+dockInner()+'</div>'+ 
- '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dFailedSave?'⚠ Not saved':ui.dirty?'● Saving':'✓ Saved')+'</span>'+(ui.dFailedSave?button('d-retry','Retry','title="Retry unsaved writing"'):'')+button('undo','↶','title="Undo (Ctrl+Z)" aria-label="Undo"')+button('redo','↷','title="Redo (Ctrl+Shift+Z)" aria-label="Redo"')+button('inspector-toggle','⚙ Properties','id="c3-inspector-toggle" aria-label="'+(ui.inspectorOpen?'Close properties':'Open properties')+'" aria-expanded="'+ui.inspectorOpen+'"')+'</div></div>'+
+ '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dFailedSave?'⚠ Not saved':ui.dirty?'● Saving':'✓ Saved')+'</span>'+(ui.dFailedSave?button('d-retry','Retry','title="Retry unsaved writing"'):'')+button('undo','↶','title="Undo (Ctrl+Z)" aria-label="Undo"')+button('redo','↷','title="Redo (Ctrl+Shift+Z)" aria-label="Redo"')+button('present','▶ Present','title="Present frame by frame" aria-label="Present the frames as a walkthrough"')+button('inspector-toggle','⚙ Properties','id="c3-inspector-toggle" aria-label="'+(ui.inspectorOpen?'Close properties':'Open properties')+'" aria-expanded="'+ui.inspectorOpen+'"')+'</div></div>'+
  '<div class="c3-content '+(ui.inspectorOpen?'c3-panel-open':'c3-panel-closed')+'"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
  '<div class="c3-world" id="c3-world" style="transform:translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')">'+
  '<svg class="c3-wires" id="c3-wires" aria-label="Connected objects">'+renderWires()+'</svg>'+
  objects.map(objectMarkup).join('')+'</div>'+
- (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
+ (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="recipes">✦ Start from a recipe</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
  '<div class="c3-smart-strip"'+(ui.selected.size<2?' hidden':'')+'>'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
  '<div class="c3-bottom-tools">'+button('zoom-out','−','aria-label="Zoom out"')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋','aria-label="Zoom in"')+'<span class="c3-divider"></span>'+button('fit','⛶','aria-label="Fit all objects" title="Fit all objects"')+button('view-back','↶','id="c3-view-back" title="Previous view" aria-label="Previous view"')+button('help-toggle','?','aria-label="Show canvas shortcuts"')+'</div>'+
  '<div id="c3-floating-ui">'+floatingUI()+'</div>'+dFocusMarkup()+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F to fit</div>'+
@@ -520,9 +520,10 @@ function updateInPlace(){
  const existingModal=shell.querySelector('.c3-modal-overlay');
  if(ui.modal){
    const content=modal();
-   if(existingModal?.getAttribute('data-modal-type')!==ui.modal.type){
+   const modalKey=ui.modal.type+(ui.modal.error?'!'+ui.modal.error:'')+(['recipes','board'].includes(ui.modal.type)?'|'+(window.SELFRecipes?.status?.()||''):'');
+   if(existingModal?.getAttribute('data-modal-type')!==modalKey){
      existingModal?.remove();
-     const markup=content.replace('class="c3-modal-overlay"','class="c3-modal-overlay" data-modal-type="'+h(ui.modal.type)+'"');
+     const markup=content.replace('class="c3-modal-overlay"','class="c3-modal-overlay" data-modal-type="'+h(modalKey)+'"');
      shell.insertAdjacentHTML('beforeend',markup);
    }
  }else existingModal?.remove();
@@ -534,7 +535,8 @@ function updateInPlace(){
 }
 
 function modal(){if(!ui.modal)return '';const m=ui.modal;let content='',title='',action='';
- if(m.type==='board'){title='Create a board';action='create-board';content='<label>Board name<input name="title" class="c3-input" placeholder="My next idea" maxlength="160" required autofocus/></label><label>Space<select name="space_id" class="c3-input"><option value="">Personal Workspace</option>'+state().spaces.map(s=>'<option value="'+h(s.id)+'" '+(s.id===m.space?'selected':'')+'>'+h(s.name)+'</option>').join('')+'</select></label>';}
+ if(m.type==='board'){title='Create a board';action='create-board';content='<label>Board name<input name="title" class="c3-input" placeholder="My next idea" maxlength="160" required autofocus/></label><label>Space<select name="space_id" class="c3-input"><option value="">Personal Workspace</option>'+state().spaces.map(s=>'<option value="'+h(s.id)+'" '+(s.id===m.space?'selected':'')+'>'+h(s.name)+'</option>').join('')+'</select></label>'+recipeSelect();}
+ if(m.type==='recipes'){title='Start from a recipe';action='apply-recipe';content=recipePicker(m);}
  if(m.type==='rename'){title='Board settings';action='rename-board';content='<label>Name<input class="c3-input" name="title" required value="'+h(board()?.title)+'"/></label>';}
  if(m.type==='reference'){title='Add reference';action='add-reference';content='<p>Paste an image URL or website link. You can style the card later.</p><label>URL<input class="c3-input" type="url" name="url" placeholder="https://..." required/></label>';}
  if(m.type==='existing'){title='Reuse existing knowledge';action='add-existing';const assigned=new Set(items().map(i=>i.card_id));content='<label>Knowledge card<select name="card_id" class="c3-input">'+state().knowledgeCards.filter(c=>!assigned.has(c.id)).map(c=>'<option value="'+h(c.id)+'">'+h(c.title||'Untitled knowledge card')+'</option>').join('')+'</select></label>';}
@@ -599,7 +601,51 @@ async function makeStarter(){
  }catch(e){setBusy(false);say('Starter incomplete: '+e.message,true);await api.reload();api.render()}
 }
 
-async function newBoard(title,space){let b;await transact(async()=>{b=await api.insert('boards',{title:title.trim(),space_id:space||null})},'Board created');if(b)open(b.id)}
+/* ---- Studio recipes (data in content/studio-recipes.json, layout in studio-recipes.js) ---- */
+function recipeSelect(){
+ const R=window.SELFRecipes;if(!R||R.status()!=='ready')return '';
+ return '<label>Start from<select name="recipe_id" class="c3-input"><option value="">Blank board</option>'+R.list().filter(r=>!(r.needs||[]).length).map(r=>'<option value="'+h(r.id)+'">'+h(r.title)+' · '+h(r.track)+'</option>').join('')+'</select></label>';
+}
+function recipePicker(m){
+ const R=window.SELFRecipes;
+ if(!R||R.status()==='idle'||R.status()==='loading')return '<p>Loading recipes…</p>';
+ if(R.status()==='error')return '<p>Recipes could not be loaded: '+h(R.error())+'</p>';
+ return '<p>Each recipe is a chain of frames with prompt cards. It fills this empty board, then use Present to walk through it. Templates only, not answers.</p>'+
+  '<div class="c3-recipes" role="radiogroup" aria-label="Recipes">'+R.list().map(r=>'<label class="c3-recipe"><input type="radio" name="recipe_id" value="'+h(r.id)+'" '+(m.picked===r.id?'checked':'')+' required/><span><strong>'+h(r.title)+'</strong> <small>'+h(r.track)+'</small><em>'+h(r.summary)+'</em></span></label>').join('')+'</div>'+
+  '<fieldset class="c3-recipe-fill"><legend>For Company Map</legend><label>Company<input class="c3-input" name="company" maxlength="120" placeholder="e.g. Northstar Capital" value="'+h(m.form?.company||'')+'"/></label><label>People, one per line (Name, Role)<textarea class="c3-input" name="people" rows="3" placeholder="Sari Anindya, Associate">'+h(m.form?.people||'')+'</textarea></label></fieldset>'+(m.error?'<p class="c3-error" role="alert">'+h(m.error)+'</p>':'');
+}
+function recipeFill(o){
+ const people=String(o.people||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).slice(0,12).map(l=>{const [name,...rest]=l.split(',');return {name:name.trim(),role:rest.join(',').trim()}});
+ return {company:String(o.company||''),people};
+}
+async function applyRecipe(r,fill,form){
+ if(items().length)return say('Use an empty board for a recipe',true);
+ const x=window.SELFRecipes.expandRecipe(r,fill||{});
+ if(x.error){ui.modal={type:'recipes',picked:r.id,error:x.error,form:form||null};api.render();return}
+ setBusy(true);
+ const ids=new Map();let z=0;
+ try{
+  for(const o of x.objects){
+   const c=await api.insert('knowledge_cards',{title:o.title,summary:o.summary||'',kind:o.kind==='task'?'task':o.kind==='reference'?'link':'note'});
+   const it=await api.insert('board_items',{board_id:ui.boardId,card_id:c.id,visual_kind:o.kind,x:o.x,y:o.y,w:o.w,h:o.h,z:++z,style:{...presets[o.kind],...(o.style||{})}});
+   ids.set(o.key,it.id);
+  }
+  for(const e of x.edges)await api.insert('board_edges',{board_id:ui.boardId,source_item_id:ids.get(e.from),target_item_id:ids.get(e.to),route_type:'curved'});
+  await sync('Recipe “'+r.title+'” created. Use Present to walk through it.');
+  fitBoard();
+ }catch(e){setBusy(false);say('Recipe incomplete: '+e.message,true);await api.reload();api.render()}
+}
+async function createFromRecipe(title,recipeId,{spaceId=null,fill={}}={}){
+ await window.SELFRecipes?.load?.();
+ const r=window.SELFRecipes?.get?.(recipeId);
+ if(!r){say('Recipe not found',true);return false}
+ const x=window.SELFRecipes.expandRecipe(r,fill);
+ if(x.error){say(x.error,true);return false}
+ let b;await transact(async()=>{b=await api.insert('boards',{title:String(title||r.title).trim().slice(0,160),space_id:spaceId||null})},'Board created');
+ if(!b)return false;
+ open(b.id);await applyRecipe(r,fill);return true;
+}
+async function newBoard(title,space,recipeId=''){let b;await transact(async()=>{b=await api.insert('boards',{title:title.trim(),space_id:space||null})},'Board created');if(b){open(b.id);const r=recipeId&&window.SELFRecipes?.get?.(recipeId);if(r&&!(r.needs||[]).length)await applyRecipe(r,{})}}
 function snap(x){return ui.grid?Math.round(x/12)*12:x}
 function saveCam(){clearTimeout(ui.saveTimer);let id=ui.boardId,v={pan_x:ui.pan.x,pan_y:ui.pan.y,zoom:ui.zoom};ui.saveTimer=setTimeout(async()=>{if(id)try{await api.patch('boards',id,v)}catch(e){say('Canvas position not saved: '+e.message,true)}},550)}
 function updateCam(){let w=$('#c3-world');if(w)w.style.transform='translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')';let z=$('#c3-zoom-label');if(z)z.textContent=Math.round(ui.zoom*100)+'%';refreshNavigationUI()}
@@ -710,7 +756,7 @@ function dPreserveSelection(e){
  const button=e.target.closest?.('[data-c3="d-format"],[data-c3="d-points"],[data-c3="d-checklist"],[data-c3="d-format-option"]');
  if(button&&ui.dEditing)e.preventDefault();
 }
-function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
+function gestureStart(e){if(state().view!=='board-editor'||(e.button!==0&&e.button!==1))return;if(window.SELFPresent?.active?.())return;const vp=e.target.closest('#c3-canvas');if(!vp||ui.modal)return;
  const t=e.target;
  if(t.closest('.c3-quick-add,.c3-contextbar,.c3-minimap,.d-toolbar,.d-focus-panel'))return;
  if(t.closest('input,textarea,select,[contenteditable],.d-object-chips button,.d-object-chips a'))return;
@@ -780,6 +826,7 @@ async function gestureEnd(e){const g=ui.gesture;if(!g)return;ui.gesture=null;
  if(!g.moved){ui.tab='style';api.render();return}
  const after=positions(g.ids);await persistPositions(g.original,after,g.type==='resize'?'Size saved':'Position saved');}
 function wheel(e){
+ if(window.SELFPresent?.active?.()){e.preventDefault();return}
  // Whiteboard navigation contract: mouse wheel / vertical trackpad scroll = cursor-centered zoom.
  // Dragging empty space remains the only default way to pan.
  if(state().view!=='board-editor'||!e.target.closest('#c3-canvas'))return;
@@ -866,11 +913,14 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  }
  if(a==='open-board'){open(id);return}
  if(a==='back'){ui.boardId=null;api.navigate('boards');return}
- if(a==='new-board'){ui.modal={type:'board',space:el.dataset.space|| (state().view==='space'?state().spaceId:null)};api.render();return}
+ if(a==='new-board'){window.SELFRecipes?.load?.();ui.modal={type:'board',space:el.dataset.space|| (state().view==='space'?state().spaceId:null)};api.render();return}
  if(a==='close-modal'){ui.modal=null;api.render();return}
  if(a==='rename'){ui.modal={type:'rename'};api.render();return}
  if(a==='tool'){let k=el.dataset.kind;ui.shapesOpen=false;ui.tool=k;if(k==='image'){ui.tool='select';$('#c3-upload')?.click();api.render();return}if(k==='knowledge'||k==='sticky'||k==='text'||k==='rectangle'||k==='ellipse'||k==='diamond'||k==='frame'){await create(k);ui.tool='select';api.render()}else api.render();return}
  if(a==='starter'){await makeStarter();return}
+ if(a==='present'){window.SELFPresent?.start?.();return}
+ if(a==='recipes'){window.SELFRecipes?.load?.();ui.modal={type:'recipes',picked:null};api.render();return}
+ if(a==='recipe-pick'){if(ui.modal?.type==='recipes'){ui.modal.picked=el.dataset.id;ui.modal.error='';api.render()}return}
  if(a==='add'){await create(el.dataset.kind||'rectangle');return}
  if(a==='tab'){ui.tab=el.dataset.tab;api.render();return}
  if(a==='select-tool'){ui.tool='select';api.render();return}
@@ -893,7 +943,8 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
 }
 async function submit(e){const f=e.target;if(!f.id?.startsWith('c3-')&&f.id!=='d-popover-form')return;e.preventDefault();e.stopPropagation();const o=Object.fromEntries(new FormData(f).entries());
  if(f.id==='c3-modal-form'){const a=f.dataset.action;ui.modal=null;
- if(a==='create-board'){if(!o.title?.trim())return say('Name your board',true);await newBoard(o.title,o.space_id);return}
+ if(a==='create-board'){if(!o.title?.trim())return say('Name your board',true);await newBoard(o.title,o.space_id,o.recipe_id||'');return}
+ if(a==='apply-recipe'){const r=window.SELFRecipes?.get?.(o.recipe_id);if(!r)return say('Pick a recipe first',true);await applyRecipe(r,recipeFill(o),o);return}
  if(a==='rename-board'){await transact(()=>api.patch('boards',ui.boardId,{title:o.title.trim()}),'Board renamed');return}
  if(a==='add-reference'){const u=url(o.url);if(!u)return say('Use a valid http(s) link',true);await create('reference',null,{url:u});return}
  if(a==='add-existing'){if(!o.card_id)return;await transact(()=>api.insert('board_items',{board_id:ui.boardId,card_id:o.card_id,visual_kind:'knowledge',...centerPosition(255,170),w:255,h:170}),'Shared card placed');return}}
@@ -934,7 +985,7 @@ function input(e){if(e.target?.matches?.('[data-d-editor],#d-focus-editor')){dCa
 function change(e){const field=e.target.dataset.c3Style;if(field){updateStylePreview(field,e.target.value,e.target);void commitStyle();return}
  if(e.target.matches('[data-c3-grid]'))ui.grid=e.target.checked;
  if(e.target.id==='c3-upload'){const file=e.target.files?.[0];if(e.target.dataset.dAttach&&file){delete e.target.dataset.dAttach;void dUploadAsset(file)}else upload(file);e.target.value=''}}
-function keydown(e){if(state().view!=='board-editor')return;
+function keydown(e){if(state().view!=='board-editor'||window.SELFPresent?.active?.())return;
  if(ui.dEditing&&(e.target?.matches?.('[data-d-editor],#d-focus-editor')||e.target?.closest?.('[contenteditable=true]'))){
    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();e.stopPropagation();dEndEdit();return}
    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();dEndEdit();return}
@@ -955,7 +1006,7 @@ function keydown(e){if(state().view!=='board-editor')return;
  if(e.key.toLowerCase()==='v'){e.preventDefault();ui.tool='select';api.render()}
 }
 function dbl(e){
- if(state().view!=='board-editor')return;
+ if(state().view!=='board-editor'||window.SELFPresent?.active?.())return;
  const node=e.target.closest?.('[data-c3-item]');
  if(!node){
   if(!e.target.closest?.('#c3-canvas')||e.target.closest?.('button,input,textarea,select,.c3-minimap,.c3-bottom-tools,.c3-smart-strip,.d-toolbar,.c3-quick-add'))return;
@@ -968,19 +1019,19 @@ function dbl(e){
 function links(){const found=new Map();for(const c of state().knowledgeCards){const hits=[c.url,...(String(c.body||'')+' '+String(c.key_points||'')+' '+String(c.summary||'')).match(/https?:\/\/[^\s<>"']+/gi)||[]];for(let raw of hits){let u=url(String(raw||'').replace(/[),.;!?]+$/,''));if(u&&!found.has(u)){const i=state().boardItems.find(i=>i.card_id===c.id);const b=state().boards.find(b=>b.id===i?.board_id);found.set(u,{id:c.id,title:c.title||new URL(u).hostname,url:u,boardName:b?.title||'Knowledge'})}}}return [...found.values()]}
 
 function dropOver(e){if(state().view!=='board-editor'||!e.target.closest('#c3-canvas'))return;e.preventDefault()}
-function dropOn(e){if(state().view!=='board-editor'||!e.target.closest('#c3-canvas'))return;e.preventDefault();
+function dropOn(e){if(state().view!=='board-editor'||window.SELFPresent?.active?.()||!e.target.closest('#c3-canvas'))return;e.preventDefault();
  const f=[...(e.dataTransfer?.files||[])].find(file=>file.type.startsWith('image/'));
  if(f){upload(f);return}
  const raw=e.dataTransfer?.getData('text/uri-list')||e.dataTransfer?.getData('text/plain')||'';
  const first=String(raw).trim().split(/\s+/)[0];if(url(first))create('reference',worldPoint(e.clientX,e.clientY),{url:first,title:new URL(first).hostname});
 }
-function pasteOn(e){if(state().view!=='board-editor'||e.target.closest('input,textarea,[contenteditable=true]'))return;
+function pasteOn(e){if(state().view!=='board-editor'||window.SELFPresent?.active?.()||e.target.closest('input,textarea,[contenteditable=true]'))return;
  const file=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));
  if(file){e.preventDefault();upload(file);return}
  const raw=e.clipboardData?.getData('text/plain')||'';
  if(url(raw.trim())){e.preventDefault();create('reference',null,{url:raw.trim(),title:new URL(raw.trim()).hostname})}
 }
 
-function init(x){api=x;document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('input',input,true);document.addEventListener('pointerdown',gestureStart);document.addEventListener('pointerdown',dPreserveSelection,true);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);window.addEventListener('pointercancel',gestureCancel);window.addEventListener('blur',gestureCancel);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
-window.SELFBoards={init,open,renderLibrary:library,renderEditor:()=>{restorePending();queueMicrotask(imageResolve);return canvas()},updateInPlace,links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
+function init(x){api=x;window.SELFRecipesChanged=()=>{if(ui.modal&&['recipes','board'].includes(ui.modal.type))api.render()};document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('input',input,true);document.addEventListener('pointerdown',gestureStart);document.addEventListener('pointerdown',dPreserveSelection,true);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);window.addEventListener('pointercancel',gestureCancel);window.addEventListener('blur',gestureCancel);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
+window.SELFBoards={internals:{items,edges,updateCam,say,cardOf:i=>state().knowledgeCards.find(c=>c.id===i.card_id)||null},createFromRecipe,init,open,renderLibrary:library,renderEditor:()=>{restorePending();queueMicrotask(imageResolve);return canvas()},updateInPlace,links,spaceBoards:id=>state().boards.filter(b=>b.space_id===id),ui,geometry:{anchor,choose,wireGeometry}};
 })();

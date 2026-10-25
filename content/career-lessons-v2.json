@@ -1,0 +1,2919 @@
+{
+  "version": 2,
+  "mode": "GUIDED_PRACTICE_ONLY",
+  "released_on": "2026-10-24",
+  "description": "Lesson Loop v2: predict, watch, see it, how pros lay it out, worked example, ladder, defend, lock in. All numbers come from content/career-cases/**; tests recompute every one. Watch segments marked segment_basis=publisher_chapters use the video owner's own chapter markers and are not yet human-verified.",
+  "lessons": [
+    {
+      "id": "PE-L01",
+      "base_id": "PE-L01",
+      "track": "PE",
+      "case_id": "self-pe-flagship-01",
+      "title": "Laba naik, tapi kas hilang?",
+      "competencies": [
+        "PE-01",
+        "PE-05"
+      ],
+      "minutes": 30,
+      "source_notice": "Kasus Aruna seluruhnya SIMULATED. Format jembatan arus kas mengikuti praktik umum di model profesional; angkanya milik kasus SELF, bukan laporan perusahaan nyata.",
+      "predict": {
+        "question": "EBITDA Aruna naik dari Rp29 miliar (2024) ke Rp39 miliar (2025), naik 34%. Bagaimana arus kas operasi (CFO) 2025?",
+        "options": [
+          "Naik, mengikuti EBITDA (positif dan lebih besar dari 2024)",
+          "Tetap positif, tetapi lebih kecil dari EBITDA",
+          "Negatif: operasi justru menyerap kas"
+        ],
+        "answer_index": 2,
+        "reveal": "CFO 2025 = −Rp9,5 miliar. EBITDA Rp39 miliar habis untuk bunga, pajak, dan terutama tambahan modal kerja Rp37 miliar. Lanjut lihat ke mana tepatnya kas itu pergi."
+      },
+      "watch": {
+        "video_id": "V03",
+        "start": null,
+        "end": null,
+        "segment_verified": false,
+        "watch_for": [
+          "Di mana perubahan modal kerja masuk ke jadwal arus kas?",
+          "Kenapa pelunasan utang memakai kas, bukan EBITDA?",
+          "Apa yang dilakukan model ketika kas tidak cukup?"
+        ],
+        "note": "Waktu mulai dan selesai segmen belum diverifikasi manusia, jadi video diputar dari awal dan tidak ada timestamp karangan. Fokus ke tiga pertanyaan di samping."
+      },
+      "see_it": {
+        "unit": "Rp miliar",
+        "title": "Aruna 2025: dari EBITDA ke kas yang benar-benar bergerak",
+        "data_ref": "pe/exhibit-01-historical.csv#2025",
+        "analogy": "Bayangin toko yang jualannya laris, tapi pelanggan belum bayar dan gudang menumpuk stok. Di kertas untung; uangnya belum masuk.",
+        "analogy_limit": "Telat bayar belum tentu macet. Exhibit 02 menunjukkan Rp16 miliar dari piutang Rp75 miliar sudah lewat jatuh tempo lebih dari 90 hari, dan Rp17 miliar dari persediaan Rp80 miliar berumur di atas 180 hari. Itu alasan meminta aging, bukan langsung menyimpulkan rugi.",
+        "steps": [
+          {
+            "id": "ebitda",
+            "label": "EBITDA",
+            "kind": "total",
+            "value": 39,
+            "term": "EBITDA",
+            "caption": "Laba operasi sebelum bunga, pajak, depresiasi, dan amortisasi. Naik 34% dari 2024. Kelihatan sehat."
+          },
+          {
+            "id": "interest",
+            "label": "Bunga",
+            "kind": "delta",
+            "value": -6,
+            "term": "Bunga kas",
+            "caption": "Dibayar ke pemberi utang dalam bentuk kas."
+          },
+          {
+            "id": "tax",
+            "label": "Pajak",
+            "kind": "delta",
+            "value": -5.5,
+            "term": "Pajak kas",
+            "caption": "Yang benar-benar keluar dari rekening untuk pajak, bukan angka beban di laporan laba rugi."
+          },
+          {
+            "id": "nwc",
+            "label": "Δ NWC",
+            "kind": "delta",
+            "value": -37,
+            "term": "Operating Net Working Capital (NWC)",
+            "caption": "Yes, ini namanya Operating NWC = piutang usaha + persediaan − utang usaha. Kenaikannya mengikat kas.",
+            "parts": [
+              {
+                "label": "Piutang usaha",
+                "detail": "50 → 75",
+                "value": -25
+              },
+              {
+                "label": "Persediaan",
+                "detail": "58 → 80",
+                "value": -22
+              },
+              {
+                "label": "Utang usaha",
+                "detail": "35 → 45 (sumber kas)",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "id": "cfo",
+            "label": "CFO",
+            "kind": "total",
+            "value": -9.5,
+            "term": "Cash Flow from Operations (CFO)",
+            "caption": "Operasi saja sudah menyerap kas, sebelum satu rupiah pun untuk investasi."
+          },
+          {
+            "id": "capex",
+            "label": "Capex",
+            "kind": "delta",
+            "value": -13,
+            "term": "Capital expenditure",
+            "caption": "Peralatan dan fasilitas, juga dibayar tunai."
+          },
+          {
+            "id": "fcf",
+            "label": "FCF",
+            "kind": "total",
+            "value": -22.5,
+            "term": "Free Cash Flow (FCF)",
+            "caption": "Bisnis mengonsumsi Rp22,5 miliar kas tahun ini."
+          },
+          {
+            "id": "debt",
+            "label": "Utang baru",
+            "kind": "delta",
+            "value": 23,
+            "term": "Net debt issuance",
+            "caption": "Pinjaman menutup lubang itu. Inilah cerita sebenarnya di balik \"laba naik\"."
+          },
+          {
+            "id": "cash",
+            "label": "Δ kas",
+            "kind": "total",
+            "value": 0.5,
+            "term": "Perubahan kas",
+            "caption": "Kas bergerak dari 13,04 ke 13,54. Jembatannya cocok (tie out)."
+          }
+        ]
+      },
+      "pro_layout": {
+        "title": "Format yang dipakai di model profesional",
+        "rows": [
+          {
+            "id": "ebitda",
+            "label": "EBITDA",
+            "value": 39,
+            "input": true
+          },
+          {
+            "id": "interest",
+            "label": "Cash interest",
+            "value": -6,
+            "input": true
+          },
+          {
+            "id": "tax",
+            "label": "Cash taxes",
+            "value": -5.5,
+            "input": true,
+            "badge": "2"
+          },
+          {
+            "id": "nwc",
+            "label": "(Increase) / decrease in NWC",
+            "value": -37,
+            "badge": "1"
+          },
+          {
+            "id": "cfo",
+            "label": "Cash flow from operations",
+            "value": -9.5,
+            "total": true
+          },
+          {
+            "id": "capex",
+            "label": "Capex",
+            "value": -13,
+            "input": true
+          },
+          {
+            "id": "fcf",
+            "label": "Free cash flow",
+            "value": -22.5,
+            "total": true
+          },
+          {
+            "id": "debt",
+            "label": "Net debt issuance",
+            "value": 23,
+            "input": true
+          },
+          {
+            "id": "cash",
+            "label": "Change in cash",
+            "value": 0.5,
+            "total": true,
+            "badge": "3"
+          }
+        ],
+        "check": {
+          "label": "Check: ending cash − beginning cash − change in cash",
+          "value": "13,54 − 13,04 − 0,50 = 0,00"
+        },
+        "callouts": [
+          {
+            "n": "1",
+            "rows": [
+              "nwc"
+            ],
+            "point": "Kenaikan modal kerja ditulis sebagai (increase) dalam kurung: itu penggunaan kas, bukan tambahan. Salah tanda di sini adalah kesalahan analis junior yang paling sering."
+          },
+          {
+            "n": "2",
+            "rows": [
+              "tax"
+            ],
+            "point": "Pajak di baris ini adalah pajak kas, bukan beban pajak buku. Keduanya bisa berbeda karena timing."
+          },
+          {
+            "n": "3",
+            "rows": [
+              "cash"
+            ],
+            "point": "Baris check mengikat jembatan ke neraca (kas 13,04 → 13,54). Kalau tidak sama dengan 0,00, modelnya salah."
+          }
+        ],
+        "convention": "Biru = angka input dari laporan keuangan, hitam = rumus. Ini konvensi umum di model bank dan fund.",
+        "original": {
+          "label": "Seri LBO Wall Street Prep, bagian arus kas dan debt schedule (referensi format)",
+          "url": "https://www.wallstreetprep.com/knowledge/lbo-model/"
+        }
+      },
+      "worked": {
+        "title": "Kenaikan NWC operasi 2023 → 2024",
+        "grid": {
+          "columns": [
+            "2023",
+            "2024"
+          ],
+          "rows": [
+            {
+              "n": 5,
+              "label": "Piutang usaha",
+              "cells": [
+                34,
+                50
+              ]
+            },
+            {
+              "n": 6,
+              "label": "Persediaan",
+              "cells": [
+                45,
+                58
+              ]
+            },
+            {
+              "n": 7,
+              "label": "Utang usaha",
+              "cells": [
+                28,
+                35
+              ]
+            },
+            {
+              "n": 8,
+              "label": "NWC operasi = 5 + 6 − 7",
+              "cells": [
+                "=B5+B6-B7",
+                "=C5+C6-C7"
+              ]
+            },
+            {
+              "n": 9,
+              "label": "Kenaikan NWC = C8 − B8",
+              "cells": [
+                null,
+                "=C8-B8"
+              ]
+            }
+          ]
+        },
+        "steps": [
+          {
+            "text": "Hitung NWC operasi tiap tahun: 34 + 45 − 28 = 51 (2023) dan 50 + 58 − 35 = 73 (2024).",
+            "cell": "B8:C8"
+          },
+          {
+            "text": "Kenaikan = akhir − awal: 73 − 51 = 22.",
+            "cell": "C9",
+            "value": 22
+          },
+          {
+            "text": "Arah di arus kas: kenaikan NWC mengurangi CFO sebesar 22 (Rp22 miliar kas terikat), dengan faktor lain dianggap tetap.",
+            "cell": "CFO"
+          }
+        ]
+      },
+      "ladder": [
+        {
+          "rung": "complete",
+          "title": "Lengkapi sel",
+          "prompt": "Sekarang 2025. Isi sel C9 untuk kenaikan NWC 2025: boleh rumus (diawali =) atau angka. Model yang baik menautkan ke sel lain, bukan mengetik hasil.",
+          "grid": {
+            "columns": [
+              "2024",
+              "2025"
+            ],
+            "rows": [
+              {
+                "n": 5,
+                "label": "Piutang usaha",
+                "cells": [
+                  50,
+                  75
+                ]
+              },
+              {
+                "n": 6,
+                "label": "Persediaan",
+                "cells": [
+                  58,
+                  80
+                ]
+              },
+              {
+                "n": 7,
+                "label": "Utang usaha",
+                "cells": [
+                  35,
+                  45
+                ]
+              },
+              {
+                "n": 8,
+                "label": "NWC operasi = 5 + 6 − 7",
+                "cells": [
+                  "=B5+B6-B7",
+                  "=C5+C6-C7"
+                ]
+              },
+              {
+                "n": 9,
+                "label": "Kenaikan NWC 2025",
+                "cells": [
+                  null,
+                  "?"
+                ]
+              }
+            ]
+          },
+          "target": "C9",
+          "expect": {
+            "value": 37,
+            "tolerance": 1e-06,
+            "refs": [
+              "C5",
+              "C6",
+              "C7",
+              "B5",
+              "B6",
+              "B7"
+            ]
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 183,
+              "feedback": "Itu hasil menjumlah dua saldo (110 + 73). Perubahan = akhir − awal, bukan penjumlahan."
+            },
+            {
+              "value": -37,
+              "feedback": "Ukurannya benar, tetapi pertanyaannya meminta besar kenaikan NWC. Tanda negatif baru muncul ketika kenaikan itu masuk ke arus kas."
+            },
+            {
+              "value": 110,
+              "feedback": "110 adalah saldo NWC akhir 2025, bukan perubahannya."
+            },
+            {
+              "value": 73,
+              "feedback": "73 adalah saldo NWC 2024, bukan perubahan 2025."
+            },
+            {
+              "value": 22,
+              "feedback": "22 adalah kenaikan 2024. Untuk 2025 pakai 110 − 73."
+            }
+          ],
+          "hints": [
+            "Konsep: perubahan = angka akhir − angka awal.",
+            "Metode: baris 8 sudah menghitung NWC tiap tahun. Kurangkan 2024 dari 2025.",
+            "Jawaban: =C8-B8, yaitu 110 − 73 = 37."
+          ],
+          "hardcoded_feedback": "Angkanya benar, tetapi diketik langsung. Di model sungguhan hasilnya harus tertaut ke sel input supaya ikut berubah. Coba =C8-B8."
+        },
+        {
+          "rung": "independent",
+          "title": "Kerjakan sendiri",
+          "prompt": "Susun CFO 2024 dari: EBITDA 29, bunga kas 4, pajak kas 3,96, dan kenaikan NWC 22 (Rp miliar).",
+          "expect": {
+            "value": -0.96,
+            "tolerance": 0.011
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 43.04,
+              "feedback": "Kenaikan NWC kebalik: kamu menambahkannya. Itu penggunaan kas, jadi dikurangkan."
+            },
+            {
+              "value": 0.96,
+              "feedback": "Besarnya benar, tandanya terbalik. 29 − 4 − 3,96 − 22 hasilnya negatif."
+            },
+            {
+              "value": 3,
+              "feedback": "Pajak kas 3,96 belum dikurangkan."
+            },
+            {
+              "value": 21.04,
+              "feedback": "Kenaikan NWC 22 belum dikurangkan. Itulah yang menyerap kas."
+            }
+          ],
+          "hints": [
+            "Konsep: CFO = EBITDA − bunga kas − pajak kas − kenaikan NWC.",
+            "Metode: kurangkan tiga angka dari 29, satu per satu.",
+            "Jawaban: 29 − 4 − 3,96 − 22 = −0,96."
+          ]
+        },
+        {
+          "rung": "twist",
+          "title": "Ubah satu asumsi",
+          "prompt": "Seandainya piutang usaha tetap sebesar porsi 2023 terhadap pendapatan (34 dari 240), dan pendapatan 2025 adalah 345, berapa kas yang tidak akan tertahan di piutang 2025? Jawab dalam Rp miliar, satu desimal.",
+          "expect": {
+            "value": 26.125,
+            "tolerance": 0.15
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 48.875,
+              "feedback": "48,9 adalah piutang yang seharusnya. Pertanyaannya selisih terhadap piutang aktual 75."
+            },
+            {
+              "value": 25,
+              "feedback": "25 adalah kenaikan piutang aktual 2024 → 2025. Pertanyaan ini membandingkan dengan porsi 2023."
+            },
+            {
+              "value": 41,
+              "feedback": "Kamu memakai saldo piutang 2023 (34) tanpa menyesuaikan pertumbuhan penjualan ke 345."
+            }
+          ],
+          "hints": [
+            "Konsep: piutang \"normal\" = pendapatan 2025 × (34 / 240).",
+            "Metode: hitung piutang normal, lalu kurangkan dari 75.",
+            "Jawaban: 345 × 34 / 240 = 48,875; 75 − 48,875 = 26,125."
+          ]
+        },
+        {
+          "rung": "red_pen",
+          "title": "Pena merah",
+          "prompt": "Analis junior menyerahkan jembatan arus kas ini dan menulis CFO = +64,5. Klik baris yang salah, lalu isi CFO yang benar.",
+          "artefact": {
+            "rows": [
+              {
+                "id": "ebitda",
+                "label": "EBITDA",
+                "value": 39
+              },
+              {
+                "id": "interest",
+                "label": "Cash interest",
+                "value": -6
+              },
+              {
+                "id": "tax",
+                "label": "Cash taxes",
+                "value": -5.5
+              },
+              {
+                "id": "nwc",
+                "label": "(Increase) / decrease in NWC",
+                "value": 37
+              },
+              {
+                "id": "cfo",
+                "label": "Cash flow from operations",
+                "value": 64.5,
+                "total": true
+              }
+            ]
+          },
+          "flaw_row": "nwc",
+          "row_feedback": {
+            "ebitda": "Baris ini cocok dengan Exhibit 01: EBITDA 2025 = 39.",
+            "interest": "Cocok dengan Exhibit 01: bunga 2025 = 6, tanda negatif sudah benar.",
+            "tax": "Cocok dengan Exhibit 01: pajak 2025 = 5,5, tanda negatif sudah benar.",
+            "cfo": "Itu gejalanya, bukan penyebabnya. Cari baris input yang tandanya tidak sesuai artinya."
+          },
+          "found_feedback": "Tepat. Kenaikan NWC 37 ditambahkan padahal itu penggunaan kas. Seharusnya (37,0), dan CFO menjadi −9,5.",
+          "expect": {
+            "value": -9.5,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 64.5,
+              "feedback": "Itu angka junior tadi. Perbaiki tanda NWC dulu."
+            },
+            {
+              "value": 9.5,
+              "feedback": "Besarnya benar, tandanya terbalik: 39 − 6 − 5,5 − 37 = −9,5."
+            }
+          ],
+          "hints": [
+            "Konsep: bandingkan setiap baris dengan artinya: apakah ini menambah atau mengurangi kas?",
+            "Metode: kenaikan modal kerja mengikat kas.",
+            "Jawaban: 39 − 6 − 5,5 − 37 = −9,5."
+          ]
+        }
+      ],
+      "defend": {
+        "prompt": "Direktur: \"Laba naik, tapi CFO negatif. Tiga data apa yang lu minta sebelum kita membeli perusahaan ini?\"",
+        "model_points": [
+          "Aging piutang per pelanggan dan segmen, plus daftar sengketa (Rp16 miliar sudah lewat 90 hari).",
+          "Aging persediaan dan perputaran per SKU, plus cadangan obsolesensi (Rp17 miliar berumur di atas 180 hari).",
+          "Termin pembayaran pemasok: apakah utang usaha ditahan untuk mempercantik kas?"
+        ],
+        "note": "Tulis jawabanmu dulu, baru buka poin model. Jawaban hanya disimpan di perangkat ini."
+      },
+      "lock_in": {
+        "build_output": "Tambahkan working-capital schedule 2023–2025 dan bridge EBITDA→CFO ke workbook Aruna.",
+        "cards": [
+          {
+            "id": "PE-L01-c1",
+            "front": "Di mana kenaikan NWC masuk ke CFO, dan dengan tanda apa?",
+            "back": "Dikurangkan: uang yang terikat di piutang dan persediaan adalah penggunaan kas."
+          },
+          {
+            "id": "PE-L01-c2",
+            "front": "Kenapa EBITDA Rp39 miliar bisa bersamaan dengan CFO −Rp9,5 miliar?",
+            "back": "Bunga 6, pajak kas 5,5, dan tambahan NWC 37 menyerap seluruhnya."
+          },
+          {
+            "id": "PE-L01-c3",
+            "front": "Tiga data yang diminta ketika konversi kas memburuk?",
+            "back": "Aging piutang, aging persediaan, dan termin pemasok."
+          }
+        ]
+      }
+    },
+    {
+      "id": "PE-L02",
+      "base_id": "PE-L02",
+      "track": "PE",
+      "case_id": "self-pe-flagship-01",
+      "title": "Dari mana uang akuisisi datang?",
+      "competencies": [
+        "PE-02",
+        "PE-04"
+      ],
+      "minutes": 30,
+      "source_notice": "Kasus Aruna seluruhnya SIMULATED. Format Sources & Uses mengikuti praktik umum di model akuisisi; angkanya milik kasus SELF, bukan transaksi nyata.",
+      "predict": {
+        "question": "Aruna ditawar di Rp273 miliar (7,0× EBITDA 2025 Rp39 miliar). Utang lama Rp80 miliar, kas di target Rp13,54 miliar. Berapa uang sponsor (equity) yang harus disetor, kalau lender memberi utang baru Rp130 miliar?",
+        "options": [
+          "Rp273 miliar: sponsor membayar penuh harga perusahaan",
+          "Sekitar Rp160 miliar: sisanya dari utang baru dan sedikit kas target",
+          "Nol: seluruhnya bisa dibiayai utang"
+        ],
+        "answer_index": 1,
+        "reveal": "Sponsor equity = Rp160 miliar. Harga (EV) bukan cek ekuitas: yang dibayar sponsor adalah kebutuhan dana total dikurangi utang baru dan kas target yang boleh dipakai."
+      },
+      "watch": {
+        "video_id": "V02",
+        "start": null,
+        "end": null,
+        "segment_verified": false,
+        "watch_for": [
+          "Baris apa saja yang masuk ke sisi Uses?",
+          "Mana angka yang jadi input dan mana yang jadi plug (penyeimbang)?",
+          "Kenapa Sources dan Uses harus sama besar?"
+        ],
+        "note": "Video ini belum punya penanda bab dari pemiliknya, jadi diputar dari awal dan tidak ada timestamp karangan. Fokus ke tiga pertanyaan di samping."
+      },
+      "see_it": {
+        "unit": "Rp miliar",
+        "title": "Aruna: dari harga perusahaan ke cek sponsor",
+        "data_ref": "pe/exhibit-03-deal-terms.csv",
+        "analogy": "Seperti membeli rumah: nota belanja harus tertutup oleh KPR, tabungan sendiri, dan dana lain. Yang dibayar dari kantong sendiri adalah sisanya.",
+        "analogy_limit": "Harga rumah (EV) bukan uang yang langsung diterima pemilik: utang lama harus dilunasi dan kas yang ada ikut diperhitungkan. Kas tidak boleh dipakai habis, ada minimum cash Rp12 miliar sebagai lantai operasional.",
+        "steps": [
+          {
+            "id": "ev",
+            "label": "EV",
+            "kind": "total",
+            "value": 273,
+            "term": "Enterprise Value (EV)",
+            "caption": "Harga perusahaan seluruhnya: 7,0× EBITDA 2025 = Rp273 miliar. Ini harga tawar, belum cek sponsor."
+          },
+          {
+            "id": "debt",
+            "label": "Utang lama",
+            "kind": "delta",
+            "value": -80,
+            "term": "Net debt: utang",
+            "caption": "Utang lama Rp80 miliar menjadi tanggungan penjual, jadi dikurangi dari yang diterima pemegang saham."
+          },
+          {
+            "id": "cash",
+            "label": "Kas target",
+            "kind": "delta",
+            "value": 13.54,
+            "term": "Net debt: kas",
+            "caption": "Kas Rp13,54 miliar milik perusahaan ikut dibayar pembeli, jadi ditambahkan."
+          },
+          {
+            "id": "se",
+            "label": "Equity penjual",
+            "kind": "total",
+            "value": 206.54,
+            "term": "Seller equity proceeds",
+            "caption": "Uang yang diterima pemegang saham lama: 273 − 80 + 13,54 = Rp206,54 miliar."
+          },
+          {
+            "id": "refi",
+            "label": "Lunasi utang",
+            "kind": "delta",
+            "value": 80,
+            "term": "Refinancing",
+            "caption": "Sponsor tetap harus melunasi utang lama Rp80 miliar saat closing. Itu penggunaan dana."
+          },
+          {
+            "id": "fees",
+            "label": "Biaya deal",
+            "kind": "delta",
+            "value": 5,
+            "term": "Transaction fees",
+            "caption": "Biaya penasihat dan pembiayaan Rp5 miliar, dibayar tunai."
+          },
+          {
+            "id": "uses",
+            "label": "Total Uses",
+            "kind": "total",
+            "value": 291.54,
+            "term": "Total Uses of Funds",
+            "caption": "Seluruh kebutuhan dana: Rp291,54 miliar. Sources harus menyamai angka ini."
+          },
+          {
+            "id": "nd",
+            "label": "Utang baru",
+            "kind": "delta",
+            "value": -130,
+            "term": "New term debt",
+            "caption": "Lender memberi term loan Rp130 miliar (asumsi kasus, tergantung due diligence)."
+          },
+          {
+            "id": "cu",
+            "label": "Kas dipakai",
+            "kind": "delta",
+            "value": -1.54,
+            "term": "Cash from balance sheet",
+            "caption": "Hanya kas di atas minimum cash yang boleh dipakai: 13,54 − 12 = Rp1,54 miliar."
+          },
+          {
+            "id": "eq",
+            "label": "Equity sponsor",
+            "kind": "total",
+            "value": 160,
+            "term": "Sponsor equity (plug)",
+            "caption": "Sisa yang harus disetor sponsor: Rp160 miliar. Ini angka penyeimbang, bukan input."
+          }
+        ]
+      },
+      "pro_layout": {
+        "title": "Sources & Uses di model akuisisi",
+        "decimals": 2,
+        "rows": [
+          {
+            "id": "nd",
+            "label": "New term debt",
+            "value": 130,
+            "input": true
+          },
+          {
+            "id": "cu",
+            "label": "Cash from balance sheet",
+            "value": 1.54,
+            "badge": "2"
+          },
+          {
+            "id": "eq",
+            "label": "Sponsor equity",
+            "value": 160,
+            "badge": "1"
+          },
+          {
+            "id": "src",
+            "label": "Total Sources",
+            "value": 291.54,
+            "total": true
+          },
+          {
+            "id": "se",
+            "label": "Purchase of seller equity",
+            "value": 206.54
+          },
+          {
+            "id": "refi",
+            "label": "Refinance existing debt",
+            "value": 80,
+            "input": true,
+            "badge": "3"
+          },
+          {
+            "id": "fees",
+            "label": "Transaction fees",
+            "value": 5,
+            "input": true
+          },
+          {
+            "id": "uses",
+            "label": "Total Uses",
+            "value": 291.54,
+            "total": true
+          }
+        ],
+        "check": {
+          "label": "Check: Sources − Uses",
+          "value": "291,54 − 291,54 = 0,00"
+        },
+        "callouts": [
+          {
+            "n": "1",
+            "rows": [
+              "eq"
+            ],
+            "point": "Sponsor equity adalah plug: angka penyeimbang yang dihitung dari Uses dikurangi sumber lain, bukan angka yang diketik."
+          },
+          {
+            "n": "2",
+            "rows": [
+              "cu"
+            ],
+            "point": "Hanya kas di atas minimum cash yang dipakai: 13,54 − 12 = 1,54. Kas operasional tidak boleh habis."
+          },
+          {
+            "n": "3",
+            "rows": [
+              "refi",
+              "uses"
+            ],
+            "point": "Uses mencakup pelunasan utang lama dan biaya deal. Karena itu total Uses (291,54) lebih besar dari EV (273)."
+          }
+        ],
+        "convention": "Biru = input dari term sheet, hitam = rumus. Baris check harus 0,00.",
+        "original": {
+          "label": "Wall Street Prep: contoh Sources & Uses di tes pemodelan LBO (referensi format)",
+          "url": "https://www.wallstreetprep.com/knowledge/lbo-modeling-test-example-solutions/"
+        }
+      },
+      "worked": {
+        "title": "Equity sponsor pada EV Rp273 miliar",
+        "grid": {
+          "columns": [
+            "Base"
+          ],
+          "rows": [
+            {
+              "n": 5,
+              "label": "EV (7,0× EBITDA 2025)",
+              "cells": [
+                273
+              ]
+            },
+            {
+              "n": 6,
+              "label": "Utang lama",
+              "cells": [
+                80
+              ]
+            },
+            {
+              "n": 7,
+              "label": "Kas target",
+              "cells": [
+                13.54
+              ]
+            },
+            {
+              "n": 8,
+              "label": "Minimum cash",
+              "cells": [
+                12
+              ]
+            },
+            {
+              "n": 9,
+              "label": "Biaya deal",
+              "cells": [
+                5
+              ]
+            },
+            {
+              "n": 10,
+              "label": "Utang baru",
+              "cells": [
+                130
+              ]
+            },
+            {
+              "n": 11,
+              "label": "Seller equity = 5 − 6 + 7",
+              "cells": [
+                "=B5-B6+B7"
+              ]
+            },
+            {
+              "n": 12,
+              "label": "Total Uses = 11 + 6 + 9",
+              "cells": [
+                "=B11+B6+B9"
+              ]
+            },
+            {
+              "n": 13,
+              "label": "Kas dipakai = 7 − 8",
+              "cells": [
+                "=B7-B8"
+              ]
+            },
+            {
+              "n": 14,
+              "label": "Sponsor equity = 12 − 10 − 13",
+              "cells": [
+                "=B12-B10-B13"
+              ]
+            }
+          ]
+        },
+        "steps": [
+          {
+            "text": "Seller equity = EV − utang lama + kas = 273 − 80 + 13,54 = 206,54.",
+            "cell": "B11",
+            "value": 206.54
+          },
+          {
+            "text": "Total Uses = seller equity + pelunasan utang + biaya = 206,54 + 80 + 5 = 291,54.",
+            "cell": "B12",
+            "value": 291.54
+          },
+          {
+            "text": "Kas yang boleh dipakai = 13,54 − 12 = 1,54. Sponsor equity = 291,54 − 130 − 1,54 = 160. Sources dan Uses sama: Rp291,54 miliar.",
+            "cell": "B14",
+            "value": 160
+          }
+        ]
+      },
+      "ladder": [
+        {
+          "rung": "complete",
+          "title": "Lengkapi sel",
+          "prompt": "Isi sel B14: sponsor equity. Boleh rumus (diawali =) atau angka (tanpa pemisah ribuan). Model yang baik menautkannya ke sel lain.",
+          "grid": {
+            "columns": [
+              "Base"
+            ],
+            "rows": [
+              {
+                "n": 5,
+                "label": "EV (7,0× EBITDA 2025)",
+                "cells": [
+                  273
+                ]
+              },
+              {
+                "n": 6,
+                "label": "Utang lama",
+                "cells": [
+                  80
+                ]
+              },
+              {
+                "n": 7,
+                "label": "Kas target",
+                "cells": [
+                  13.54
+                ]
+              },
+              {
+                "n": 8,
+                "label": "Minimum cash",
+                "cells": [
+                  12
+                ]
+              },
+              {
+                "n": 9,
+                "label": "Biaya deal",
+                "cells": [
+                  5
+                ]
+              },
+              {
+                "n": 10,
+                "label": "Utang baru",
+                "cells": [
+                  130
+                ]
+              },
+              {
+                "n": 11,
+                "label": "Seller equity",
+                "cells": [
+                  "=B5-B6+B7"
+                ]
+              },
+              {
+                "n": 12,
+                "label": "Total Uses",
+                "cells": [
+                  "=B11+B6+B9"
+                ]
+              },
+              {
+                "n": 13,
+                "label": "Kas dipakai",
+                "cells": [
+                  "=B7-B8"
+                ]
+              },
+              {
+                "n": 14,
+                "label": "Sponsor equity",
+                "cells": [
+                  "?"
+                ]
+              }
+            ]
+          },
+          "target": "B14",
+          "expect": {
+            "value": 160,
+            "tolerance": 1e-06,
+            "refs": [
+              "B5",
+              "B10"
+            ]
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 273,
+              "feedback": "273 adalah harga perusahaan (EV), bukan cek ekuitas. Sebagian dibiayai utang baru dan kas target."
+            },
+            {
+              "value": 291.54,
+              "feedback": "291,54 adalah total Uses. Sponsor equity adalah Uses dikurangi sumber lain (utang baru dan kas yang dipakai)."
+            },
+            {
+              "value": 161.54,
+              "feedback": "Kas target di atas minimum cash (1,54) juga menjadi sumber dana, jadi equity lebih kecil dari 161,54."
+            }
+          ],
+          "hints": [
+            "Konsep: Sources harus sama dengan Uses, dan sponsor equity adalah penyeimbangnya.",
+            "Metode: dari total Uses (baris 12) kurangi utang baru dan kas yang dipakai.",
+            "Jawaban: =B12-B10-B13, yaitu 291,54 − 130 − 1,54 = 160."
+          ],
+          "hardcoded_feedback": "Angkanya benar, tetapi diketik. Di model sungguhan equity harus tertaut agar ikut berubah saat EV atau utang berubah. Coba =B12-B10-B13."
+        },
+        {
+          "rung": "independent",
+          "title": "Kerjakan sendiri",
+          "prompt": "EV turun menjadi Rp260 miliar, sedangkan utang lama, kas, biaya, minimum cash, dan utang baru tetap. Berapa sponsor equity (Rp miliar)?",
+          "expect": {
+            "value": 147,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 160,
+              "feedback": "160 adalah hasil untuk EV 273. EV baru 260 belum dimasukkan."
+            },
+            {
+              "value": 260,
+              "feedback": "260 adalah EV baru, bukan cek ekuitas sponsor."
+            },
+            {
+              "value": 278.54,
+              "feedback": "278,54 adalah total Uses yang baru. Kurangi utang baru dan kas yang dipakai."
+            }
+          ],
+          "hints": [
+            "Konsep: turunnya EV mengurangi Uses, sedangkan Sources lain tetap.",
+            "Metode: EV turun 13, jadi seller equity dan total Uses turun 13. Sponsor equity juga turun 13.",
+            "Jawaban: 160 − 13 = 147."
+          ]
+        },
+        {
+          "rung": "twist",
+          "title": "Ubah satu asumsi",
+          "prompt": "Kembali ke EV Rp273 miliar. Lender hanya mau memberi utang baru Rp110 miliar (bukan 130). Berapa sponsor equity (Rp miliar)?",
+          "expect": {
+            "value": 180,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 160,
+              "feedback": "160 adalah hasil dengan utang 130. Utangnya sekarang 110."
+            },
+            {
+              "value": 20,
+              "feedback": "20 hanya selisih utang. Pertanyaannya meminta total sponsor equity, bukan tambahannya."
+            }
+          ],
+          "hints": [
+            "Konsep: utang yang berkurang harus digantikan oleh equity, rupiah demi rupiah.",
+            "Metode: equity naik sebesar penurunan utang: 130 − 110 = 20.",
+            "Jawaban: 160 + 20 = 180."
+          ]
+        },
+        {
+          "rung": "red_pen",
+          "title": "Pena merah",
+          "prompt": "Analis junior menyerahkan Sources & Uses ini dan menulis sponsor equity = 148. Klik baris yang salah, lalu isi sponsor equity yang benar.",
+          "artefact": {
+            "decimals": 2,
+            "rows": [
+              {
+                "id": "se",
+                "label": "Purchase of seller equity",
+                "value": 206.54
+              },
+              {
+                "id": "refi",
+                "label": "Refinance existing debt",
+                "value": 80
+              },
+              {
+                "id": "fees",
+                "label": "Transaction fees",
+                "value": 5
+              },
+              {
+                "id": "uses",
+                "label": "Total Uses",
+                "value": 291.54,
+                "total": true
+              },
+              {
+                "id": "nd",
+                "label": "New term debt",
+                "value": 130
+              },
+              {
+                "id": "cash",
+                "label": "Cash from balance sheet",
+                "value": 13.54
+              },
+              {
+                "id": "eq",
+                "label": "Sponsor equity (plug)",
+                "value": 148
+              },
+              {
+                "id": "src",
+                "label": "Total Sources",
+                "value": 291.54,
+                "total": true
+              }
+            ]
+          },
+          "flaw_row": "cash",
+          "row_feedback": {
+            "se": "Cocok dengan Exhibit 03: 273 − 80 + 13,54 = 206,54.",
+            "refi": "Cocok: utang lama Rp80 miliar dilunasi saat closing.",
+            "fees": "Cocok dengan Exhibit 03: biaya deal Rp5 miliar.",
+            "uses": "Totalnya benar: 206,54 + 80 + 5 = 291,54.",
+            "nd": "Cocok dengan Exhibit 03: term loan Rp130 miliar.",
+            "eq": "Itu gejalanya (equity jadi terlalu kecil), bukan penyebabnya. Cari input yang tidak sesuai aturan kasus.",
+            "src": "Totalnya sama dengan Uses, tetapi itu karena equity dipaksa menyeimbangkan."
+          },
+          "found_feedback": "Tepat. Seluruh kas 13,54 dipakai, padahal minimum cash Rp12 miliar harus tersisa. Kas yang boleh dipakai hanya 1,54, jadi sponsor equity seharusnya 160.",
+          "expect": {
+            "value": 160,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp miliar",
+          "misconceptions": [
+            {
+              "value": 148,
+              "feedback": "Itu angka junior tadi. Perbaiki dulu kas yang dipakai."
+            },
+            {
+              "value": 161.54,
+              "feedback": "Kas dipakai 1,54 sudah benar, tetapi total Uses 291,54 dikurangi 130 dan 1,54 menghasilkan 160, bukan 161,54."
+            }
+          ],
+          "hints": [
+            "Konsep: bandingkan setiap input dengan aturan kasus. Ada batas pemakaian kas.",
+            "Metode: kas yang boleh dipakai = kas target − minimum cash.",
+            "Jawaban: 291,54 − 130 − 1,54 = 160."
+          ]
+        }
+      ],
+      "defend": {
+        "prompt": "Direktur: \"Perusahaan punya kas Rp13,54 miliar. Kenapa kita tidak pakai seluruhnya untuk menutup transaksi?\"",
+        "model_points": [
+          "Minimum cash Rp12 miliar adalah lantai operasional yang disyaratkan di closing dan sepanjang masa pinjaman.",
+          "Memakai seluruh kas membuat bisnis kehabisan likuiditas hari pertama: gaji, pemasok, dan bunga tetap harus dibayar.",
+          "Revolver Rp25 miliar adalah cadangan likuiditas untuk stres, bukan pengganti kas operasional, dan ketersediaannya masih bergantung due diligence."
+        ],
+        "note": "Tulis jawabanmu dulu, baru buka poin model. Jawaban hanya disimpan di perangkat ini."
+      },
+      "lock_in": {
+        "build_output": "Buat transaction Sources & Uses dan EV-to-equity bridge dengan input EV yang bisa diubah.",
+        "cards": [
+          {
+            "id": "PE-L02-c1",
+            "front": "Sponsor equity di Sources & Uses itu input atau plug?",
+            "back": "Plug: Total Uses dikurangi utang baru dan kas yang dipakai."
+          },
+          {
+            "id": "PE-L02-c2",
+            "front": "Kenapa total Uses (291,54) lebih besar dari EV (273)?",
+            "back": "Uses juga mencakup pelunasan utang lama (80) dan biaya deal (5), sedangkan kas target mengurangi seller equity."
+          },
+          {
+            "id": "PE-L02-c3",
+            "front": "Berapa kas target yang boleh dipakai?",
+            "back": "Hanya kas di atas minimum cash: 13,54 − 12 = 1,54."
+          }
+        ]
+      }
+    },
+    {
+      "id": "VC-L01",
+      "base_id": "VC-L01",
+      "track": "VC",
+      "case_id": "self-vc-saas-retention-trap-01",
+      "title": "Kontrak belum berarti revenue berjalan",
+      "competencies": [
+        "VC-03"
+      ],
+      "minutes": 25,
+      "source_notice": "Kasus ArusOps seluruhnya SIMULATED. Format tabel traction mengikuti praktik umum investor update; angkanya milik kasus SELF, bukan startup nyata.",
+      "predict": {
+        "question": "Founder ArusOps menyebut ARR-nya US$4,74 juta. Data September: live MRR US$295.170 dan kontrak sudah ditandatangani tetapi belum live senilai ARR US$1,2 juta. Mana yang paling tepat disebut live ARR untuk underwriting?",
+        "options": [
+          "US$4,74 juta: semua kontrak yang sudah ditandatangani",
+          "US$3,54 juta: live MRR dikali 12; kontrak belum live dipisah",
+          "US$1,2 juta: hanya yang baru ditandatangani"
+        ],
+        "answer_index": 1,
+        "reveal": "Live ARR = 12 × live MRR = US$3.542.040. Kontrak yang belum live (US$1,2 juta) ditampilkan terpisah sebagai pipeline, bukan dijumlahkan."
+      },
+      "watch": {
+        "video_id": "V06",
+        "start": 433,
+        "end": 557,
+        "segment_verified": false,
+        "segment_basis": "publisher_chapters",
+        "segment_label": "Investor Update Metrics (07:13 sampai 09:17)",
+        "watch_for": [
+          "Metrik apa yang dilaporkan founder ke investor, dan bagaimana definisinya dijaga konsisten?",
+          "Kenapa investor menanyakan definisi, bukan cuma angkanya?",
+          "Apa bedanya angka yang sudah terjadi dengan angka yang masih diharapkan?"
+        ],
+        "note": "Awal dan akhir segmen mengikuti penanda bab dari deskripsi YouTube milik pemilik video. Belum ditonton dan diverifikasi manusia."
+      },
+      "see_it": {
+        "unit": "US$ juta",
+        "title": "ArusOps September 2026: dari \"ARR kontrak\" ke live ARR",
+        "data_ref": "vc/monthly-traction.csv#2026-09",
+        "analogy": "Restoran sudah menerima 100 reservasi untuk bulan depan, tetapi baru 70 tamu yang datang hari ini. Reservasi belum makanan yang terjual.",
+        "analogy_limit": "MRR adalah metrik run-rate, bukan uang yang sudah masuk atau pendapatan yang sudah diaudit. Reservasi hanyalah analogi, bukan standar akuntansi SaaS.",
+        "steps": [
+          {
+            "id": "head",
+            "label": "ARR \"kontrak\"",
+            "kind": "total",
+            "value": 4.74204,
+            "term": "Contracted ARR (CARR)",
+            "caption": "Live ARR ditambah kontrak yang sudah ditandatangani tetapi belum live: US$4,74 juta. Inilah angka yang sering muncul di pitch."
+          },
+          {
+            "id": "book",
+            "label": "Belum live",
+            "kind": "delta",
+            "value": -1.2,
+            "term": "Booked-not-live ARR",
+            "caption": "Kontrak sudah ditandatangani, pelanggan belum live: US$1,2 juta. Ini pipeline, belum pendapatan berulang yang berjalan."
+          },
+          {
+            "id": "live",
+            "label": "Live ARR",
+            "kind": "total",
+            "value": 3.54204,
+            "term": "Live ARR = 12 × live MRR",
+            "caption": "295.170 × 12 = US$3.542.040. Hanya akun yang sudah live pada tanggal itu."
+          }
+        ]
+      },
+      "pro_layout": {
+        "title": "Tabel traction di investor update",
+        "decimals": 0,
+        "rows": [
+          {
+            "id": "mrr",
+            "label": "Live MRR (Sep 2026)",
+            "value": 295170,
+            "input": true,
+            "badge": "1"
+          },
+          {
+            "id": "arr",
+            "label": "Live ARR = MRR × 12",
+            "value": 3542040,
+            "total": true
+          },
+          {
+            "id": "book",
+            "label": "Memo: booked-not-live ARR",
+            "value": 1200000,
+            "input": true,
+            "badge": "2"
+          },
+          {
+            "id": "carr",
+            "label": "Memo: contracted ARR",
+            "value": 4742040
+          },
+          {
+            "id": "setup",
+            "label": "Memo: setup fee satu kali (tidak berulang)",
+            "value": 7400,
+            "input": true,
+            "badge": "3"
+          }
+        ],
+        "check": {
+          "label": "Check: live ARR ÷ 12 = live MRR",
+          "value": "3.542.040 ÷ 12 = 295.170"
+        },
+        "callouts": [
+          {
+            "n": "1",
+            "rows": [
+              "mrr",
+              "arr"
+            ],
+            "point": "MRR hanya menghitung akun yang sudah live pada tanggal itu. ARR adalah 12 × MRR itu."
+          },
+          {
+            "n": "2",
+            "rows": [
+              "book",
+              "carr"
+            ],
+            "point": "Kontrak belum live ditampilkan di bawah garis sebagai memo. Jangan dijumlahkan ke live ARR."
+          },
+          {
+            "n": "3",
+            "rows": [
+              "setup"
+            ],
+            "point": "Setup fee satu kali bukan pendapatan berulang, jadi tidak masuk MRR maupun ARR."
+          }
+        ],
+        "convention": "Biru = angka dari sistem billing, hitam = rumus. Memo ditulis terpisah supaya tidak tercampur.",
+        "original": {
+          "label": "Bessemer Venture Partners: memo Shopify, bagian retensi dan akuisisi (referensi gaya laporan)",
+          "url": "https://www.bvp.com/memos/shopify"
+        }
+      },
+      "worked": {
+        "title": "Annualisasi live MRR",
+        "grid": {
+          "columns": [
+            "Agu 2026",
+            "Sep 2026"
+          ],
+          "rows": [
+            {
+              "n": 5,
+              "label": "Live MRR (US$)",
+              "cells": [
+                247673,
+                295170
+              ]
+            },
+            {
+              "n": 6,
+              "label": "Live ARR = 5 × 12",
+              "cells": [
+                "=B5*12",
+                "=C5*12"
+              ]
+            },
+            {
+              "n": 7,
+              "label": "Booked-not-live ARR",
+              "cells": [
+                1130000,
+                1200000
+              ]
+            },
+            {
+              "n": 8,
+              "label": "Contracted ARR = 6 + 7",
+              "cells": [
+                "=B6+B7",
+                "=C6+C7"
+              ]
+            }
+          ]
+        },
+        "steps": [
+          {
+            "text": "Live ARR = live MRR × 12: 295.170 × 12 = 3.542.040 (Agustus: 247.673 × 12 = 2.972.076).",
+            "cell": "C6",
+            "value": 3542040
+          },
+          {
+            "text": "Booked-not-live (1.200.000) tetap di baris terpisah. Contracted ARR 4.742.040 adalah live ARR ditambah pipeline, bukan live ARR.",
+            "cell": "C8",
+            "value": 4742040
+          }
+        ]
+      },
+      "ladder": [
+        {
+          "rung": "complete",
+          "title": "Lengkapi sel",
+          "prompt": "Isi sel B7: live ARR Juli 2026 (angka tanpa pemisah ribuan, atau rumus). Tautkan ke live MRR di B5.",
+          "grid": {
+            "columns": [
+              "Jul 2026",
+              "Agu 2026"
+            ],
+            "rows": [
+              {
+                "n": 5,
+                "label": "Live MRR (US$)",
+                "cells": [
+                  208190,
+                  247673
+                ]
+              },
+              {
+                "n": 6,
+                "label": "Booked-not-live ARR",
+                "cells": [
+                  1040000,
+                  1130000
+                ]
+              },
+              {
+                "n": 7,
+                "label": "Live ARR",
+                "cells": [
+                  "?",
+                  "=C5*12"
+                ]
+              }
+            ]
+          },
+          "target": "B7",
+          "expect": {
+            "value": 2498280,
+            "tolerance": 0.01,
+            "refs": [
+              "B5"
+            ]
+          },
+          "unit": "US$",
+          "misconceptions": [
+            {
+              "value": 208190,
+              "feedback": "208.190 adalah MRR bulanan. Live ARR adalah MRR dikali 12."
+            },
+            {
+              "value": 3538280,
+              "feedback": "Kamu menambahkan booked-not-live (1.040.000). Itu pipeline, tidak boleh masuk live ARR."
+            }
+          ],
+          "hints": [
+            "Konsep: ARR adalah run-rate tahunan dari MRR.",
+            "Metode: kalikan live MRR bulan itu dengan 12. Jangan sentuh baris booked.",
+            "Jawaban: =B5*12, yaitu 208.190 × 12 = 2.498.280."
+          ],
+          "hardcoded_feedback": "Angkanya benar, tetapi diketik. Tautkan ke B5 supaya ARR ikut berubah kalau MRR dikoreksi. Coba =B5*12."
+        },
+        {
+          "rung": "independent",
+          "title": "Kerjakan sendiri",
+          "prompt": "SaaS lain punya live MRR US$270.000 dan booked-not-live ARR US$600.000. Berapa live ARR (US$)?",
+          "expect": {
+            "value": 3240000,
+            "tolerance": 0.01
+          },
+          "unit": "US$",
+          "misconceptions": [
+            {
+              "value": 3840000,
+              "feedback": "Kamu menambahkan booked-not-live US$600.000. Itu tidak masuk live ARR."
+            },
+            {
+              "value": 270000,
+              "feedback": "270.000 adalah MRR. Live ARR adalah MRR × 12."
+            },
+            {
+              "value": 600000,
+              "feedback": "600.000 adalah kontrak belum live, bukan live ARR."
+            }
+          ],
+          "hints": [
+            "Konsep: hanya akun yang sudah live dihitung.",
+            "Metode: 12 × live MRR. Abaikan booked-not-live.",
+            "Jawaban: 270.000 × 12 = 3.240.000."
+          ]
+        },
+        {
+          "rung": "twist",
+          "title": "Ubah satu asumsi",
+          "prompt": "Seandainya 25% dari booked-not-live September (US$1.200.000) batal go-live, berapa contracted ARR (live ARR + booked-not-live) sesudahnya? Jawab dalam US$.",
+          "expect": {
+            "value": 4442040,
+            "tolerance": 0.5
+          },
+          "unit": "US$",
+          "misconceptions": [
+            {
+              "value": 3542040,
+              "feedback": "3.542.040 adalah live ARR, dan memang tidak berubah. Yang ditanya contracted ARR (live + sisa booked)."
+            },
+            {
+              "value": 4742040,
+              "feedback": "4.742.040 adalah sebelum pembatalan. Kurangi 25% dari booked: 300.000."
+            },
+            {
+              "value": 3242040,
+              "feedback": "Pembatalan mengurangi booked-not-live, bukan live ARR. Live ARR September tetap 3.542.040."
+            }
+          ],
+          "hints": [
+            "Konsep: pembatalan hanya memengaruhi kontrak yang belum live.",
+            "Metode: booked tersisa = 75% × 1.200.000 = 900.000. Tambahkan ke live ARR.",
+            "Jawaban: 3.542.040 + 900.000 = 4.442.040."
+          ]
+        },
+        {
+          "rung": "red_pen",
+          "title": "Pena merah",
+          "prompt": "Analis junior menulis ARR September = US$4.742.040 di slide traction. Klik baris yang salah, lalu isi live ARR yang benar (US$).",
+          "artefact": {
+            "decimals": 0,
+            "rows": [
+              {
+                "id": "mrr",
+                "label": "Live MRR (Sep 2026)",
+                "value": 295170
+              },
+              {
+                "id": "book",
+                "label": "Booked-not-live ARR",
+                "value": 1200000
+              },
+              {
+                "id": "arr",
+                "label": "\"ARR\" (live MRR × 12 + booked)",
+                "value": 4742040,
+                "total": true
+              }
+            ]
+          },
+          "flaw_row": "arr",
+          "row_feedback": {
+            "mrr": "Cocok dengan monthly-traction.csv: live MRR September = 295.170.",
+            "book": "Cocok dengan monthly-traction.csv: booked-not-live ARR = 1.200.000."
+          },
+          "found_feedback": "Tepat. Baris ARR menjumlahkan kontrak belum live. Live ARR hanya 12 × live MRR = 3.542.040; booked tetap memo terpisah.",
+          "expect": {
+            "value": 3542040,
+            "tolerance": 0.5
+          },
+          "unit": "US$",
+          "misconceptions": [
+            {
+              "value": 4742040,
+              "feedback": "Itu angka junior tadi. Keluarkan booked-not-live."
+            },
+            {
+              "value": 295170,
+              "feedback": "295.170 adalah MRR. Live ARR adalah MRR × 12."
+            }
+          ],
+          "hints": [
+            "Konsep: ARR yang diklaim harus berasal dari akun yang sudah live.",
+            "Metode: ambil live MRR dan kalikan 12.",
+            "Jawaban: 295.170 × 12 = 3.542.040."
+          ]
+        }
+      ],
+      "defend": {
+        "prompt": "Direktur: \"Seandainya 25% kontrak backlog batal go-live, apakah live ARR September berubah?\"",
+        "model_points": [
+          "Tidak: live ARR September dihitung dari akun yang sudah live pada tanggal itu, jadi tetap US$3.542.040.",
+          "Yang berubah adalah booked-not-live: turun US$300.000 menjadi US$900.000, dan contracted ARR menjadi US$4.442.040.",
+          "Pertanyaan lanjutan: kenapa go-live tertunda, kapasitas onboarding, klausul pembatalan, dan histori konversi booked menjadi live."
+        ],
+        "note": "Tulis jawabanmu dulu, baru buka poin model. Jawaban hanya disimpan di perangkat ini."
+      },
+      "lock_in": {
+        "build_output": "Pisahkan live MRR/ARR dan booked-not-live pipeline di traction sheet; jangan double-count setup fee.",
+        "cards": [
+          {
+            "id": "VC-L01-c1",
+            "front": "Bagaimana menghitung live ARR?",
+            "back": "12 × live MRR dari akun yang sudah live pada tanggal itu."
+          },
+          {
+            "id": "VC-L01-c2",
+            "front": "Di mana kontrak yang sudah ditandatangani tetapi belum live ditampilkan?",
+            "back": "Sebagai memo/pipeline terpisah (booked-not-live), tidak dijumlahkan ke live ARR."
+          },
+          {
+            "id": "VC-L01-c3",
+            "front": "Apakah setup fee satu kali masuk MRR?",
+            "back": "Tidak: bukan pendapatan berulang."
+          }
+        ]
+      }
+    },
+    {
+      "id": "VC-L02",
+      "base_id": "VC-L02",
+      "track": "VC",
+      "case_id": "self-vc-saas-retention-trap-01",
+      "title": "Pelanggan lama bertahan atau belanja lebih?",
+      "competencies": [
+        "VC-04",
+        "VC-05"
+      ],
+      "minutes": 30,
+      "source_notice": "Kasus ArusOps seluruhnya SIMULATED. Format tabel traction mengikuti praktik umum investor update; angkanya milik kasus SELF, bukan startup nyata.",
+      "predict": {
+        "question": "MRR ArusOps naik 19% di September (US$247.673 ke US$295.170). Bagaimana Net Revenue Retention (NRR) dari pelanggan lama saja?",
+        "options": [
+          "Di atas 100%: MRR kan naik 19%",
+          "Di bawah 100%: kenaikan MRR berasal dari pelanggan baru",
+          "Tepat 100%"
+        ],
+        "answer_index": 1,
+        "reveal": "NRR September = 98,64%. Pelanggan lama justru menyusut bersih; kenaikan MRR 19% datang dari pelanggan baru (US$50.860)."
+      },
+      "watch": {
+        "video_id": "V08",
+        "start": 43,
+        "end": 321,
+        "segment_verified": false,
+        "segment_basis": "publisher_chapters",
+        "segment_label": "Cohort Retention dan Key Insight (00:43 sampai 05:21)",
+        "watch_for": [
+          "Bagaimana kurva retensi cohort dibaca, dan kapan ia mendatar?",
+          "Kenapa cohort dibandingkan pada umur yang sama?",
+          "Apa yang terlihat kalau semua pelanggan dicampur jadi satu angka?"
+        ],
+        "note": "Awal dan akhir segmen mengikuti penanda bab dari deskripsi YouTube milik pemilik video. Belum ditonton dan diverifikasi manusia."
+      },
+      "see_it": {
+        "unit": "US$ ribu",
+        "title": "ArusOps September 2026: dari MRR awal pelanggan lama ke live MRR",
+        "data_ref": "vc/monthly-traction.csv#2026-09",
+        "analogy": "Klub langganan: ada member lama yang berhenti, ada yang downgrade, dan ada yang upgrade. Berapa iuran yang tersisa dari kelompok member lama saja?",
+        "analogy_limit": "NRR tinggi belum membuktikan semua pelanggan puas, CAC sehat, atau usaha menghasilkan laba. NRR juga bisa naik karena segelintir pelanggan besar.",
+        "steps": [
+          {
+            "id": "open",
+            "label": "MRR awal",
+            "kind": "total",
+            "value": 247.673,
+            "term": "Opening MRR (pelanggan lama)",
+            "caption": "MRR bulan lalu dari kelompok pelanggan yang sama: US$247.673. Ini penyebut NRR dan GRR."
+          },
+          {
+            "id": "churn",
+            "label": "Churn+turun",
+            "kind": "delta",
+            "value": -11.482,
+            "term": "Churn dan contraction",
+            "caption": "Pelanggan yang berhenti atau mengecilkan paket: −US$11.482."
+          },
+          {
+            "id": "ret",
+            "label": "Gross retained",
+            "kind": "total",
+            "value": 236.191,
+            "term": "Gross retained MRR",
+            "caption": "Yang tersisa sebelum ekspansi: US$236.191. GRR = 236.191 ÷ 247.673 = 95,36%."
+          },
+          {
+            "id": "exp",
+            "label": "Ekspansi",
+            "kind": "delta",
+            "value": 8.119,
+            "term": "Expansion MRR",
+            "caption": "Pelanggan lama yang upgrade atau menambah pemakaian: +US$8.119."
+          },
+          {
+            "id": "close",
+            "label": "MRR akhir",
+            "kind": "total",
+            "value": 244.31,
+            "term": "Net Revenue Retention (NRR)",
+            "caption": "Closing MRR pelanggan lama US$244.310. NRR = 244.310 ÷ 247.673 = 98,64%: di bawah 100%."
+          },
+          {
+            "id": "new",
+            "label": "Pelanggan baru",
+            "kind": "delta",
+            "value": 50.86,
+            "term": "New logo MRR (di luar NRR)",
+            "caption": "Pelanggan baru +US$50.860 menaikkan live MRR, tetapi tidak ikut dalam NRR maupun GRR."
+          },
+          {
+            "id": "live",
+            "label": "Live MRR",
+            "kind": "total",
+            "value": 295.17,
+            "term": "Live MRR",
+            "caption": "US$295.170: itulah kenapa MRR naik 19% padahal pelanggan lama menyusut."
+          }
+        ]
+      },
+      "pro_layout": {
+        "title": "Jembatan retensi di investor update",
+        "decimals": 0,
+        "rows": [
+          {
+            "id": "open",
+            "label": "Opening MRR (pelanggan lama)",
+            "value": 247673,
+            "input": true,
+            "badge": "1"
+          },
+          {
+            "id": "churn",
+            "label": "Churn dan contraction",
+            "value": -11482
+          },
+          {
+            "id": "ret",
+            "label": "Gross retained MRR",
+            "value": 236191,
+            "total": true
+          },
+          {
+            "id": "exp",
+            "label": "Expansion MRR",
+            "value": 8119,
+            "input": true
+          },
+          {
+            "id": "close",
+            "label": "Closing MRR (pelanggan lama)",
+            "value": 244310,
+            "total": true
+          },
+          {
+            "id": "grr",
+            "label": "GRR = retained ÷ opening",
+            "text": "95,4%",
+            "badge": "3"
+          },
+          {
+            "id": "nrr",
+            "label": "NRR = closing ÷ opening",
+            "text": "98,6%"
+          },
+          {
+            "id": "new",
+            "label": "Memo: new logo MRR (di luar NRR)",
+            "value": 50860,
+            "input": true,
+            "badge": "2"
+          }
+        ],
+        "check": {
+          "label": "Check: closing + new logo = live MRR",
+          "value": "244.310 + 50.860 = 295.170"
+        },
+        "callouts": [
+          {
+            "n": "1",
+            "rows": [
+              "open",
+              "grr",
+              "nrr"
+            ],
+            "point": "Penyebutnya selalu MRR awal dari kelompok pelanggan yang sama, bukan MRR total saat ini."
+          },
+          {
+            "n": "2",
+            "rows": [
+              "new"
+            ],
+            "point": "Pelanggan baru dikeluarkan dari NRR dan ditulis sebagai memo. Mencampurnya adalah salah kaprah paling umum."
+          },
+          {
+            "n": "3",
+            "rows": [
+              "grr"
+            ],
+            "point": "GRR tidak pernah melebihi 100% karena tidak menghitung ekspansi. NRR boleh melebihi 100%."
+          }
+        ],
+        "convention": "Biru = angka dari data billing, hitam = rumus. Persentase dihitung dari baris di atasnya.",
+        "original": {
+          "label": "Bessemer Venture Partners: memo PagerDuty, MRR expansion by cohorts (referensi format)",
+          "url": "https://www.bvp.com/memos/pagerduty"
+        }
+      },
+      "worked": {
+        "title": "NRR dan GRR pelanggan lama, Agustus 2026",
+        "grid": {
+          "columns": [
+            "Agu 2026"
+          ],
+          "rows": [
+            {
+              "n": 5,
+              "label": "Opening MRR (pelanggan lama)",
+              "cells": [
+                208190
+              ]
+            },
+            {
+              "n": 6,
+              "label": "Gross retained MRR",
+              "cells": [
+                196757
+              ]
+            },
+            {
+              "n": 7,
+              "label": "Expansion MRR",
+              "cells": [
+                6616
+              ]
+            },
+            {
+              "n": 8,
+              "label": "Closing MRR = 6 + 7",
+              "cells": [
+                "=B6+B7"
+              ]
+            },
+            {
+              "n": 9,
+              "label": "GRR % = 6 ÷ 5 × 100",
+              "cells": [
+                "=B6/B5*100"
+              ]
+            },
+            {
+              "n": 10,
+              "label": "NRR % = 8 ÷ 5 × 100",
+              "cells": [
+                "=B8/B5*100"
+              ]
+            }
+          ]
+        },
+        "steps": [
+          {
+            "text": "Closing MRR pelanggan lama = retained + ekspansi = 196.757 + 6.616 = 203.373.",
+            "cell": "B8",
+            "value": 203373
+          },
+          {
+            "text": "GRR = 196.757 ÷ 208.190 = 94,51%; NRR = 203.373 ÷ 208.190 = 97,69%.",
+            "cell": "B10",
+            "value": 97.686248
+          }
+        ]
+      },
+      "ladder": [
+        {
+          "rung": "complete",
+          "title": "Lengkapi sel",
+          "prompt": "Isi sel B8: closing MRR pelanggan lama September (angka tanpa pemisah ribuan, atau rumus).",
+          "grid": {
+            "columns": [
+              "Sep 2026"
+            ],
+            "rows": [
+              {
+                "n": 5,
+                "label": "Opening MRR (pelanggan lama)",
+                "cells": [
+                  247673
+                ]
+              },
+              {
+                "n": 6,
+                "label": "Gross retained MRR",
+                "cells": [
+                  236191
+                ]
+              },
+              {
+                "n": 7,
+                "label": "Expansion MRR",
+                "cells": [
+                  8119
+                ]
+              },
+              {
+                "n": 8,
+                "label": "Closing MRR = 6 + 7",
+                "cells": [
+                  "?"
+                ]
+              }
+            ]
+          },
+          "target": "B8",
+          "expect": {
+            "value": 244310,
+            "tolerance": 0.01,
+            "refs": [
+              "B6",
+              "B7"
+            ]
+          },
+          "unit": "US$",
+          "misconceptions": [
+            {
+              "value": 255792,
+              "feedback": "Kamu menambahkan ekspansi ke MRR awal dan melewatkan churn. Mulai dari gross retained."
+            },
+            {
+              "value": 236191,
+              "feedback": "236.191 adalah gross retained: belum menambahkan ekspansi."
+            },
+            {
+              "value": 295170,
+              "feedback": "295.170 adalah live MRR, termasuk pelanggan baru. NRR hanya menghitung pelanggan lama."
+            }
+          ],
+          "hints": [
+            "Konsep: closing MRR pelanggan lama = yang bertahan + ekspansi mereka.",
+            "Metode: gross retained (baris 6) ditambah expansion (baris 7).",
+            "Jawaban: =B6+B7, yaitu 236.191 + 8.119 = 244.310."
+          ],
+          "hardcoded_feedback": "Angkanya benar, tetapi diketik. Tautkan ke B6 dan B7 supaya konsisten saat data dikoreksi. Coba =B6+B7."
+        },
+        {
+          "rung": "independent",
+          "title": "Kerjakan sendiri",
+          "prompt": "Awal bulan, cohort lama membayar US$80.000. Churn US$4.000, contraction US$2.000, expansion US$9.000. Berapa NRR dalam % (dua desimal)?",
+          "expect": {
+            "value": 103.75,
+            "tolerance": 0.011
+          },
+          "unit": "%",
+          "misconceptions": [
+            {
+              "value": 92.5,
+              "feedback": "92,5% adalah GRR (belum menghitung ekspansi). NRR memasukkan ekspansi."
+            },
+            {
+              "value": 111.25,
+              "feedback": "Kamu menambahkan ekspansi tanpa mengurangi churn dan contraction."
+            },
+            {
+              "value": 81.25,
+              "feedback": "Ekspansi kebalik: kamu mengurangkannya. Ekspansi menambah MRR."
+            }
+          ],
+          "hints": [
+            "Konsep: NRR = closing MRR pelanggan lama ÷ opening MRR pelanggan yang sama.",
+            "Metode: closing = 80.000 − 4.000 − 2.000 + 9.000, lalu bagi 80.000.",
+            "Jawaban: 83.000 ÷ 80.000 = 103,75%."
+          ]
+        },
+        {
+          "rung": "twist",
+          "title": "Ubah satu asumsi",
+          "prompt": "Seandainya September tanpa ekspansi sama sekali, berapa NRR pelanggan lama (%, dua desimal)?",
+          "expect": {
+            "value": 95.364,
+            "tolerance": 0.02
+          },
+          "unit": "%",
+          "misconceptions": [
+            {
+              "value": 98.64,
+              "feedback": "98,64% adalah NRR aktual dengan ekspansi 8.119. Pertanyaannya tanpa ekspansi."
+            }
+          ],
+          "hints": [
+            "Konsep: tanpa ekspansi, NRR dan GRR sama.",
+            "Metode: closing = gross retained saja.",
+            "Jawaban: 236.191 ÷ 247.673 = 95,36%."
+          ]
+        },
+        {
+          "rung": "red_pen",
+          "title": "Pena merah",
+          "prompt": "Analis junior menghitung NRR September = 119,2% (295.170 ÷ 247.673). Klik baris yang salah, lalu isi NRR yang benar (%).",
+          "artefact": {
+            "decimals": 0,
+            "rows": [
+              {
+                "id": "live",
+                "label": "MRR akhir (semua pelanggan)",
+                "value": 295170
+              },
+              {
+                "id": "open",
+                "label": "MRR awal (pelanggan lama)",
+                "value": 247673
+              },
+              {
+                "id": "nrr",
+                "label": "NRR (%)",
+                "text": "119,2%",
+                "total": true
+              }
+            ]
+          },
+          "flaw_row": "live",
+          "row_feedback": {
+            "open": "Cocok dengan monthly-traction.csv: opening MRR pelanggan lama = 247.673.",
+            "nrr": "Itu gejalanya (NRR di atas 100% padahal pelanggan lama menyusut). Cari baris yang salah masukan."
+          },
+          "found_feedback": "Tepat. Pembilang memakai live MRR, termasuk pelanggan baru (50.860). NRR memakai closing MRR pelanggan lama: 244.310 ÷ 247.673 = 98,64%.",
+          "expect": {
+            "value": 98.64,
+            "tolerance": 0.011
+          },
+          "unit": "%",
+          "misconceptions": [
+            {
+              "value": 119.2,
+              "feedback": "Itu angka junior tadi. Keluarkan pelanggan baru dari pembilang."
+            },
+            {
+              "value": 95.36,
+              "feedback": "95,36% adalah GRR. NRR memasukkan ekspansi."
+            }
+          ],
+          "hints": [
+            "Konsep: pembilang dan penyebut harus dari kelompok pelanggan yang sama.",
+            "Metode: pakai closing MRR pelanggan lama (244.310).",
+            "Jawaban: 244.310 ÷ 247.673 = 98,64%."
+          ]
+        }
+      ],
+      "defend": {
+        "prompt": "Direktur: \"NRR 103,75% tetapi banyak pelanggan kecil berhenti. Apakah investasinya otomatis bagus?\"",
+        "model_points": [
+          "Belum: NRR di atas 100% bisa muncul dari ekspansi segelintir pelanggan besar yang menutupi churn logo. Lihat logo retention per segmen.",
+          "Datanya menunjukkan pola itu: cohort SMB Oktober 2025 turun dari 35 menjadi 16 logo pada umur 11 bulan, sedangkan cohort MID tetap 3 logo.",
+          "Bandingkan cohort pada umur yang sama, cek konsentrasi pelanggan besar, serta CAC dan payback sebelum menyimpulkan."
+        ],
+        "note": "Tulis jawabanmu dulu, baru buka poin model. Jawaban hanya disimpan di perangkat ini."
+      },
+      "lock_in": {
+        "build_output": "Bangun bridge GRR dan NRR, serta tabel retention berdasarkan usia cohort yang sama.",
+        "cards": [
+          {
+            "id": "VC-L02-c1",
+            "front": "Apa pembilang dan penyebut NRR?",
+            "back": "Closing MRR pelanggan lama dibagi opening MRR kelompok yang sama; pelanggan baru dikeluarkan."
+          },
+          {
+            "id": "VC-L02-c2",
+            "front": "Apa bedanya GRR dan NRR?",
+            "back": "GRR tidak menghitung ekspansi (maksimum 100%); NRR menghitungnya (bisa lebih dari 100%)."
+          },
+          {
+            "id": "VC-L02-c3",
+            "front": "Kenapa NRR di atas 100% belum tentu sehat?",
+            "back": "Ekspansi segelintir pelanggan besar bisa menutupi hilangnya banyak logo kecil."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CO-L01",
+      "base_id": "CO-L01",
+      "track": "Consulting",
+      "case_id": "self-consulting-turnaround-01",
+      "title": "Kenapa profit jatuh padahal penjualan besar?",
+      "competencies": [
+        "CO-01",
+        "CO-04",
+        "CO-05"
+      ],
+      "minutes": 30,
+      "source_notice": "Kasus SajiRasa seluruhnya SIMULATED. Angka 2026 adalah annualized run-rate per 1 Oktober 2026, bukan laporan FY2026 yang diaudit. Format jembatan mengikuti praktik umum konsultan; angkanya milik kasus SELF.",
+      "predict": {
+        "question": "Pendapatan SajiRasa hanya turun 2% (Rp77.000 juta di 2025 ke Rp75.400 juta di run-rate 2026), tetapi profit operasi dari +Rp7.000 juta menjadi −Rp1.400 juta. Penyebab terbesar?",
+        "options": [
+          "Volume penjualan turun banyak",
+          "Biaya variabel per unit naik",
+          "Harga jual turun"
+        ],
+        "answer_index": 1,
+        "reveal": "Biaya variabel per unit menyumbang −Rp6.000 juta dari total penurunan Rp8.400 juta. Volume bersih hampir netral (−200), harga −1.300, dan biaya tetap −900."
+      },
+      "watch": {
+        "video_id": "V09",
+        "start": 47,
+        "end": 980,
+        "segment_verified": false,
+        "segment_basis": "publisher_chapters",
+        "segment_label": "Case question sampai What really caused the profitability decrease (00:47 sampai 16:20)",
+        "watch_for": [
+          "Bagaimana kandidat membongkar profit menjadi pendapatan dan biaya sebelum mencari sebab?",
+          "Pertanyaan apa yang diajukan untuk memisahkan harga, volume, dan biaya?",
+          "Apa penyebab sebenarnya di akhir, dan apa bedanya dengan hipotesis awal?"
+        ],
+        "note": "Awal dan akhir segmen mengikuti penanda bab dari deskripsi YouTube milik pemilik video. Belum ditonton dan diverifikasi manusia."
+      },
+      "see_it": {
+        "unit": "Rp juta",
+        "title": "SajiRasa: dari profit 2025 ke run-rate 2026",
+        "data_ref": "consulting/01-historical.csv + 02-segment-economics.csv",
+        "analogy": "Ember yang dulu terisi banyak sekarang bocor. Sebelum menambal, ukur dulu berapa yang hilang dan dari lubang mana.",
+        "analogy_limit": "Bridge menunjukkan seberapa besar tiap driver berkontribusi, bukan mengapa harga bahan naik atau pelanggan berubah. Itu masih hipotesis sampai diuji dengan data tambahan.",
+        "steps": [
+          {
+            "id": "p25",
+            "label": "Profit 2025",
+            "kind": "total",
+            "value": 7000,
+            "term": "Case operating profit FY2025",
+            "caption": "Pendapatan 77.000 − biaya variabel 50.300 − biaya tetap 19.700 = Rp7.000 juta."
+          },
+          {
+            "id": "vol",
+            "label": "Volume",
+            "kind": "delta",
+            "value": -200,
+            "term": "Efek volume",
+            "caption": "Selisih volume × margin 2025, dihitung per produk-saluran lalu dijumlah: Core naik (+1.800), Premium turun (−2.000). Bersih −200."
+          },
+          {
+            "id": "price",
+            "label": "Harga",
+            "kind": "delta",
+            "value": -1300,
+            "term": "Efek harga",
+            "caption": "Volume 2026 × selisih harga. Harga Core turun Rp1 ribu per pack di kedua saluran; Premium naik sedikit. Bersih −1.300."
+          },
+          {
+            "id": "cost",
+            "label": "Biaya unit",
+            "kind": "delta",
+            "value": -6000,
+            "term": "Efek biaya variabel per unit",
+            "caption": "Biaya variabel per pack naik Rp2 ribu di keempat lini. Volume 2026 × kenaikan itu = −6.000. Inilah driver terbesar."
+          },
+          {
+            "id": "fixed",
+            "label": "Biaya tetap",
+            "kind": "delta",
+            "value": -900,
+            "term": "Efek biaya tetap",
+            "caption": "Biaya tetap naik dari 19.700 ke 20.600: −900."
+          },
+          {
+            "id": "p26",
+            "label": "Run-rate 2026",
+            "kind": "total",
+            "value": -1400,
+            "term": "Annualized run-rate (bukan FY2026 audited)",
+            "caption": "−Rp1.400 juta per 1 Oktober 2026. Ini estimasi tahunan, bukan laporan yang diaudit."
+          }
+        ]
+      },
+      "pro_layout": {
+        "title": "Profit bridge di slide konsultan",
+        "decimals": 0,
+        "rows": [
+          {
+            "id": "p25",
+            "label": "Case operating profit FY2025",
+            "value": 7000,
+            "input": true
+          },
+          {
+            "id": "vol",
+            "label": "Volume",
+            "value": -200,
+            "badge": "1"
+          },
+          {
+            "id": "price",
+            "label": "Harga",
+            "value": -1300
+          },
+          {
+            "id": "cost",
+            "label": "Biaya variabel per unit",
+            "value": -6000
+          },
+          {
+            "id": "fixed",
+            "label": "Biaya tetap",
+            "value": -900
+          },
+          {
+            "id": "p26",
+            "label": "Run-rate 2026 (annualized)",
+            "value": -1400,
+            "total": true,
+            "badge": "2"
+          }
+        ],
+        "check": {
+          "label": "Check: jumlah driver = perubahan profit",
+          "value": "−8.400 = −1.400 − 7.000"
+        },
+        "callouts": [
+          {
+            "n": "1",
+            "rows": [
+              "vol",
+              "price",
+              "cost"
+            ],
+            "point": "Setiap driver dihitung per produk dan saluran, lalu dijumlah. Menghitung dari total sekaligus menyembunyikan efek mix."
+          },
+          {
+            "n": "2",
+            "rows": [
+              "p26"
+            ],
+            "point": "Angka 2026 adalah annualized run-rate per 1 Oktober, bukan FY2026 yang diaudit. Label ini harus ikut tampil di slide."
+          },
+          {
+            "n": "3",
+            "rows": [
+              "cost"
+            ],
+            "point": "Bridge menjawab \"berapa besar\", bukan \"kenapa\". Penyebab kenaikan biaya masih hipotesis yang harus diuji."
+          }
+        ],
+        "convention": "Biru = angka sumber, hitam = rumus. Baris total harus rekonsiliasi dengan perubahan profit.",
+        "original": {
+          "label": "McKinsey: contoh interview kasus profitabilitas (referensi struktur)",
+          "url": "https://www.mckinsey.com/careers/interviewing/electrolight"
+        }
+      },
+      "worked": {
+        "title": "Kontribusi Core Retail 2025 dan 2026",
+        "grid": {
+          "columns": [
+            "2025",
+            "2026"
+          ],
+          "rows": [
+            {
+              "n": 5,
+              "label": "Volume (ribu pack)",
+              "cells": [
+                1200,
+                1300
+              ]
+            },
+            {
+              "n": 6,
+              "label": "Harga (Rp ribu/pack)",
+              "cells": [
+                24,
+                23
+              ]
+            },
+            {
+              "n": 7,
+              "label": "Biaya variabel (Rp ribu/pack)",
+              "cells": [
+                15,
+                17
+              ]
+            },
+            {
+              "n": 8,
+              "label": "Kontribusi (Rp juta) = 5 × (6 − 7)",
+              "cells": [
+                "=B5*(B6-B7)",
+                "=C5*(C6-C7)"
+              ]
+            },
+            {
+              "n": 9,
+              "label": "Perubahan kontribusi = C8 − B8",
+              "cells": [
+                null,
+                "=C8-B8"
+              ]
+            }
+          ]
+        },
+        "steps": [
+          {
+            "text": "Kontribusi = volume × (harga − biaya variabel): 1.200 × (24 − 15) = 10.800 dan 1.300 × (23 − 17) = 7.800.",
+            "cell": "B8:C8"
+          },
+          {
+            "text": "Perubahan = 7.800 − 10.800 = −3.000. Dari situ: volume +900, harga −1.300, biaya −2.600.",
+            "cell": "C9",
+            "value": -3000
+          }
+        ]
+      },
+      "ladder": [
+        {
+          "rung": "complete",
+          "title": "Lengkapi sel",
+          "prompt": "Isi sel C8: kontribusi Core B2B 2026 (Rp juta). Pakai rumus yang menaut ke volume, harga, dan biaya di kolom C.",
+          "grid": {
+            "columns": [
+              "2025",
+              "2026"
+            ],
+            "rows": [
+              {
+                "n": 5,
+                "label": "Volume (ribu pack)",
+                "cells": [
+                  900,
+                  1050
+                ]
+              },
+              {
+                "n": 6,
+                "label": "Harga (Rp ribu/pack)",
+                "cells": [
+                  20,
+                  19
+                ]
+              },
+              {
+                "n": 7,
+                "label": "Biaya variabel (Rp ribu/pack)",
+                "cells": [
+                  14,
+                  16
+                ]
+              },
+              {
+                "n": 8,
+                "label": "Kontribusi (Rp juta)",
+                "cells": [
+                  "=B5*(B6-B7)",
+                  "?"
+                ]
+              }
+            ]
+          },
+          "target": "C8",
+          "expect": {
+            "value": 3150,
+            "tolerance": 1e-06,
+            "refs": [
+              "C5",
+              "C6",
+              "C7"
+            ]
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 5400,
+              "feedback": "5.400 adalah kontribusi 2025. Kolom C adalah 2026."
+            },
+            {
+              "value": 19950,
+              "feedback": "19.950 adalah pendapatan (volume × harga). Kurangi biaya variabel dulu."
+            },
+            {
+              "value": -2250,
+              "feedback": "−2.250 adalah perubahan kontribusi. Yang diminta kontribusi 2026."
+            }
+          ],
+          "hints": [
+            "Konsep: kontribusi = volume × (harga − biaya variabel).",
+            "Metode: pakai angka kolom C: volume 1.050, harga 19, biaya 16.",
+            "Jawaban: =C5*(C6-C7), yaitu 1.050 × 3 = 3.150."
+          ],
+          "hardcoded_feedback": "Angkanya benar, tetapi diketik. Tautkan ke C5, C6, dan C7 supaya ikut berubah saat asumsi berubah. Coba =C5*(C6-C7)."
+        },
+        {
+          "rung": "independent",
+          "title": "Kerjakan sendiri",
+          "prompt": "Hitung efek harga Premium Retail: volume 2026 (400 ribu pack) × selisih harga 2026 dan 2025 (42 dan 40 Rp ribu per pack). Jawab dalam Rp juta.",
+          "expect": {
+            "value": 800,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 2,
+              "feedback": "2 adalah selisih harga per pack. Kalikan dengan volume 2026 (400 ribu pack)."
+            },
+            {
+              "value": 1000,
+              "feedback": "Kamu memakai volume 2025 (500). Efek harga memakai volume 2026."
+            },
+            {
+              "value": 16800,
+              "feedback": "16.800 adalah pendapatan 2026, bukan efek harga."
+            }
+          ],
+          "hints": [
+            "Konsep: efek harga = volume 2026 × (harga 2026 − harga 2025).",
+            "Metode: 400 × (42 − 40).",
+            "Jawaban: 400 × 2 = 800."
+          ]
+        },
+        {
+          "rung": "twist",
+          "title": "Ubah satu asumsi",
+          "prompt": "Seandainya biaya variabel Core Retail 2026 tetap Rp15 ribu per pack (tidak naik ke 17), berapa profit run-rate 2026 dalam Rp juta?",
+          "expect": {
+            "value": 1200,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 2600,
+              "feedback": "2.600 adalah penghematan biaya, bukan profit. Tambahkan ke profit run-rate −1.400."
+            },
+            {
+              "value": -1400,
+              "feedback": "−1.400 adalah profit yang sebenarnya. Dengan biaya Core Retail tidak naik, profitnya lebih tinggi."
+            }
+          ],
+          "hints": [
+            "Konsep: kenaikan biaya Core Retail adalah bagian dari efek biaya −6.000.",
+            "Metode: penghematan = volume 2026 (1.300) × kenaikan biaya (2).",
+            "Jawaban: −1.400 + 2.600 = 1.200."
+          ]
+        },
+        {
+          "rung": "red_pen",
+          "title": "Pena merah",
+          "prompt": "Analis junior menyerahkan bridge ini dan menulis profit 2026 = +400. Klik baris yang salah, lalu isi profit run-rate 2026 yang benar (Rp juta).",
+          "artefact": {
+            "decimals": 0,
+            "rows": [
+              {
+                "id": "p25",
+                "label": "Case operating profit FY2025",
+                "value": 7000
+              },
+              {
+                "id": "vol",
+                "label": "Volume",
+                "value": -200
+              },
+              {
+                "id": "price",
+                "label": "Harga",
+                "value": -1300
+              },
+              {
+                "id": "cost",
+                "label": "Biaya variabel per unit",
+                "value": -6000
+              },
+              {
+                "id": "fixed",
+                "label": "Biaya tetap",
+                "value": 900
+              },
+              {
+                "id": "p26",
+                "label": "Profit 2026 (junior)",
+                "value": 400,
+                "total": true
+              }
+            ]
+          },
+          "flaw_row": "fixed",
+          "row_feedback": {
+            "p25": "Cocok dengan Exhibit 01: profit FY2025 = 7.000.",
+            "vol": "Cocok dengan hitungan per produk-saluran: −200.",
+            "price": "Cocok: −1.300.",
+            "cost": "Cocok: −6.000.",
+            "p26": "Itu gejalanya (profit tampak positif). Cari baris yang tandanya tidak sesuai arti: apakah biaya naik atau turun?"
+          },
+          "found_feedback": "Tepat. Biaya tetap naik (19.700 ke 20.600), jadi efeknya −900, bukan +900. Profit run-rate 2026 menjadi −1.400.",
+          "expect": {
+            "value": -1400,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 400,
+              "feedback": "Itu angka junior tadi. Balik tanda biaya tetap."
+            },
+            {
+              "value": 1400,
+              "feedback": "Besarnya benar, tandanya terbalik: 7.000 − 200 − 1.300 − 6.000 − 900 = −1.400."
+            }
+          ],
+          "hints": [
+            "Konsep: kenaikan biaya mengurangi profit.",
+            "Metode: biaya tetap naik 900, jadi dikurangkan.",
+            "Jawaban: 7.000 − 200 − 1.300 − 6.000 − 900 = −1.400."
+          ]
+        }
+      ],
+      "defend": {
+        "prompt": "Direktur: \"Apakah kita sudah tahu penyebab penurunan profit, atau baru mengukur kontribusinya?\"",
+        "model_points": [
+          "Baru mengukur: bridge menunjukkan biaya variabel per unit sebagai driver terbesar (−6.000), tetapi bukan mengapa biayanya naik.",
+          "Datanya memberi petunjuk, bukan bukti: biaya variabel naik Rp2 ribu per pack di keempat lini, jadi hipotesisnya biaya bahan atau pemasok. Perlu data pembelian dan resep untuk menguji.",
+          "Harga Core turun di kedua saluran (−1.300): periksa apakah itu promosi atau tekanan pasar sebelum menyimpulkan."
+        ],
+        "note": "Tulis jawabanmu dulu, baru buka poin model. Jawaban hanya disimpan di perangkat ini."
+      },
+      "lock_in": {
+        "build_output": "Bangun bridge FY2025→2026 annualized dengan volume, price, unit cost dan overhead; angka total wajib reconcile.",
+        "cards": [
+          {
+            "id": "CO-L01-c1",
+            "front": "Bagaimana menghitung efek volume, harga, dan biaya di profit bridge?",
+            "back": "Per produk-saluran: volume = Δvolume × margin lama; harga = volume baru × Δharga; biaya = −volume baru × Δbiaya. Lalu dijumlah."
+          },
+          {
+            "id": "CO-L01-c2",
+            "front": "Apa bedanya profit bridge dengan root cause?",
+            "back": "Bridge mengukur kontribusi driver; root cause butuh bukti tambahan yang menguji hipotesis."
+          },
+          {
+            "id": "CO-L01-c3",
+            "front": "Apa status angka 2026 di kasus SajiRasa?",
+            "back": "Annualized run-rate per 1 Oktober 2026, bukan FY2026 yang diaudit."
+          }
+        ]
+      }
+    },
+    {
+      "id": "CO-L02",
+      "base_id": "CO-L02",
+      "track": "Consulting",
+      "case_id": "self-consulting-turnaround-01",
+      "title": "Dua ide bagus belum tentu bisa dijumlahkan",
+      "competencies": [
+        "CO-06",
+        "CO-07",
+        "CO-08"
+      ],
+      "minutes": 30,
+      "source_notice": "Kasus SajiRasa seluruhnya SIMULATED. Angka 2026 adalah annualized run-rate per 1 Oktober 2026, bukan laporan FY2026 yang diaudit. Format jembatan mengikuti praktik umum konsultan; angkanya milik kasus SELF.",
+      "predict": {
+        "question": "Inisiatif A (procurement) bernilai bersih Rp2.332 juta per tahun, dan C (reset kontrak B2B) Rp1.750 juta. Kalau keduanya dijalankan bersamaan, berapa total manfaatnya?",
+        "options": [
+          "Rp4.082 juta: dijumlahkan",
+          "Lebih kecil dari Rp4.082 juta karena ada overlap",
+          "Lebih besar karena ada sinergi"
+        ],
+        "answer_index": 1,
+        "reveal": "Manfaat gabungan A + C = Rp3.914 juta. C mengeluarkan 150 ribu pack Core B2B yang tadinya ikut mendapat penghematan A, jadi Rp168 juta tidak boleh dihitung dua kali."
+      },
+      "watch": {
+        "video_id": "V10",
+        "start": 195,
+        "end": 296,
+        "segment_verified": false,
+        "segment_basis": "publisher_chapters",
+        "segment_label": "Message/action titles (03:15 sampai 04:56)",
+        "watch_for": [
+          "Bagaimana judul slide menyatakan kesimpulan, bukan topik?",
+          "Angka apa yang wajib ada di judul sebuah rekomendasi?",
+          "Bagaimana satu slide menunjukkan dampak gabungan dengan jujur?"
+        ],
+        "note": "Awal dan akhir segmen mengikuti penanda bab dari deskripsi YouTube milik pemilik video. Belum ditonton dan diverifikasi manusia; durasi penuh video juga belum diverifikasi."
+      },
+      "see_it": {
+        "unit": "Rp juta",
+        "title": "SajiRasa: dari dua inisiatif ke manfaat gabungan",
+        "data_ref": "consulting/04-initiatives.csv",
+        "analogy": "Toko menghemat listrik untuk 10 ruangan, lalu menutup dua ruangan. Jangan tetap menghitung penghematan lampu untuk ruangan yang sudah tutup.",
+        "analogy_limit": "Overlap bisa mengurangi atau menambah manfaat. Jangan memakai potongan persen rata tanpa mekanisme bisnis yang jelas.",
+        "steps": [
+          {
+            "id": "a",
+            "label": "A bersih",
+            "kind": "total",
+            "value": 2332,
+            "term": "Inisiatif A: procurement",
+            "caption": "2.350 ribu pack Core × 80% eligible × Rp1,4 ribu = 2.632, dikurangi biaya rutin 300 = Rp2.332 juta."
+          },
+          {
+            "id": "c",
+            "label": "+ C bersih",
+            "kind": "delta",
+            "value": 1750,
+            "term": "Inisiatif C: reset kontrak B2B",
+            "caption": "(1.050 − 150) × Rp2 ribu uplift − 150 × margin 3 + 600 hemat rute − 200 biaya rutin = Rp1.750 juta."
+          },
+          {
+            "id": "raw",
+            "label": "Dijumlah mentah",
+            "kind": "total",
+            "value": 4082,
+            "term": "Penjumlahan mentah (stand-alone)",
+            "caption": "2.332 + 1.750 = 4.082. Ini yang akan tampak di slide kalau overlap diabaikan."
+          },
+          {
+            "id": "ov",
+            "label": "Overlap",
+            "kind": "delta",
+            "value": -168,
+            "term": "Initiative overlap / double counting",
+            "caption": "C mengeluarkan 150 ribu pack Core B2B. Pack itu tadinya mendapat penghematan A: 150 × 1,4 × 80% = Rp168 juta yang hilang."
+          },
+          {
+            "id": "ac",
+            "label": "A + C gabungan",
+            "kind": "total",
+            "value": 3914,
+            "term": "Manfaat inkremental gabungan",
+            "caption": "Rp3.914 juta per tahun, dihitung setelah interaksi."
+          }
+        ]
+      },
+      "pro_layout": {
+        "title": "Slide dampak inisiatif dengan overlap eksplisit",
+        "decimals": 0,
+        "rows": [
+          {
+            "id": "a",
+            "label": "A: procurement (bersih)",
+            "value": 2332,
+            "input": true
+          },
+          {
+            "id": "c",
+            "label": "C: reset kontrak B2B (bersih)",
+            "value": 1750,
+            "input": true
+          },
+          {
+            "id": "raw",
+            "label": "Penjumlahan stand-alone",
+            "value": 4082,
+            "total": true
+          },
+          {
+            "id": "ov",
+            "label": "Dikurangi overlap A dan C",
+            "value": -168,
+            "badge": "1"
+          },
+          {
+            "id": "ac",
+            "label": "Manfaat gabungan A + C",
+            "value": 3914,
+            "total": true,
+            "badge": "2"
+          }
+        ],
+        "check": {
+          "label": "Check: 2.332 + 1.750 − 168",
+          "value": "3.914"
+        },
+        "callouts": [
+          {
+            "n": "1",
+            "rows": [
+              "ov"
+            ],
+            "point": "Overlap muncul karena C mengubah basis volume yang dipakai A. Ia ditampilkan sebagai baris sendiri, bukan potongan persen rata."
+          },
+          {
+            "n": "2",
+            "rows": [
+              "ac"
+            ],
+            "point": "Angka yang dipakai di judul slide adalah manfaat gabungan setelah interaksi, bukan penjumlahan mentah."
+          },
+          {
+            "n": "3",
+            "rows": [
+              "a",
+              "c"
+            ],
+            "point": "Biaya satu kali (eksekusi 500 + 250, capex 800 + 100) dan slot eksekusi (4 + 3) dibahas terpisah dari manfaat tahunan."
+          }
+        ],
+        "convention": "Biru = angka dari Exhibit 04, hitam = rumus. Overlap selalu baris eksplisit.",
+        "original": {
+          "label": "Oliver Wyman: contoh kasus interview dengan pertanyaan dampak profitabilitas (referensi struktur)",
+          "url": "https://www.oliverwyman.com/careers/entry-level/interview-preparation/supermarket-pharmacy-case-interview.html"
+        }
+      },
+      "worked": {
+        "title": "Manfaat bersih inisiatif A",
+        "grid": {
+          "columns": [
+            "Base"
+          ],
+          "rows": [
+            {
+              "n": 5,
+              "label": "Pack Core Retail 2026 (ribu)",
+              "cells": [
+                1300
+              ]
+            },
+            {
+              "n": 6,
+              "label": "Pack Core B2B 2026 (ribu)",
+              "cells": [
+                1050
+              ]
+            },
+            {
+              "n": 7,
+              "label": "Share eligible",
+              "cells": [
+                0.8
+              ]
+            },
+            {
+              "n": 8,
+              "label": "Hemat per pack (Rp ribu)",
+              "cells": [
+                1.4
+              ]
+            },
+            {
+              "n": 9,
+              "label": "Hemat kotor = (5 + 6) × 7 × 8",
+              "cells": [
+                "=(B5+B6)*B7*B8"
+              ]
+            },
+            {
+              "n": 10,
+              "label": "Biaya rutin (Rp juta)",
+              "cells": [
+                300
+              ]
+            },
+            {
+              "n": 11,
+              "label": "Manfaat bersih A = 9 − 10",
+              "cells": [
+                "=B9-B10"
+              ]
+            }
+          ]
+        },
+        "steps": [
+          {
+            "text": "Pack Core 2026 = 1.300 + 1.050 = 2.350 ribu. Hemat kotor = 2.350 × 0,8 × 1,4 = 2.632.",
+            "cell": "B9",
+            "value": 2632
+          },
+          {
+            "text": "Manfaat bersih = 2.632 − 300 = 2.332 (Rp juta per tahun).",
+            "cell": "B11",
+            "value": 2332
+          }
+        ]
+      },
+      "ladder": [
+        {
+          "rung": "complete",
+          "title": "Lengkapi sel",
+          "prompt": "Isi sel B11: manfaat bersih inisiatif C (Rp juta). Pakai rumus yang menaut ke semua input.",
+          "grid": {
+            "columns": [
+              "Base"
+            ],
+            "rows": [
+              {
+                "n": 5,
+                "label": "Volume Core B2B 2026 (ribu pack)",
+                "cells": [
+                  1050
+                ]
+              },
+              {
+                "n": 6,
+                "label": "Pack dikeluarkan (ribu)",
+                "cells": [
+                  150
+                ]
+              },
+              {
+                "n": 7,
+                "label": "Uplift harga sisa (Rp ribu/pack)",
+                "cells": [
+                  2
+                ]
+              },
+              {
+                "n": 8,
+                "label": "Margin Core B2B (Rp ribu/pack)",
+                "cells": [
+                  3
+                ]
+              },
+              {
+                "n": 9,
+                "label": "Hemat rute (Rp juta)",
+                "cells": [
+                  600
+                ]
+              },
+              {
+                "n": 10,
+                "label": "Biaya rutin (Rp juta)",
+                "cells": [
+                  200
+                ]
+              },
+              {
+                "n": 11,
+                "label": "Manfaat bersih C",
+                "cells": [
+                  "?"
+                ]
+              }
+            ]
+          },
+          "target": "B11",
+          "expect": {
+            "value": 1750,
+            "tolerance": 1e-06,
+            "refs": [
+              "B5",
+              "B6",
+              "B7",
+              "B8",
+              "B9",
+              "B10"
+            ]
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 1950,
+              "feedback": "Biaya rutin Rp200 juta belum dikurangkan."
+            },
+            {
+              "value": 2500,
+              "feedback": "Kamu tidak mengeluarkan 150 ribu pack: uplift berlaku pada sisa 900, dan margin pack yang keluar (150 × 3) hilang."
+            }
+          ],
+          "hints": [
+            "Konsep: manfaat C = uplift pada sisa volume − margin volume yang keluar + hemat rute − biaya rutin.",
+            "Metode: (B5−B6)×B7 − B6×B8 + B9 − B10.",
+            "Jawaban: 900 × 2 − 150 × 3 + 600 − 200 = 1.750."
+          ],
+          "hardcoded_feedback": "Angkanya benar, tetapi diketik. Tautkan ke semua input supaya ikut berubah di skenario lain. Coba =(B5-B6)*B7-B6*B8+B9-B10."
+        },
+        {
+          "rung": "independent",
+          "title": "Kerjakan sendiri",
+          "prompt": "Seandainya C mengeluarkan 100 ribu pack Core B2B (bukan 150), dengan share eligible 80% dan hemat Rp1,4 ribu per pack, berapa penghematan A yang hilang karena overlap (Rp juta)?",
+          "expect": {
+            "value": 112,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 140,
+              "feedback": "140 belum dikalikan share eligible 80%. Hanya pack eligible yang mendapat penghematan A."
+            },
+            {
+              "value": 168,
+              "feedback": "168 adalah untuk 150 ribu pack. Soal ini 100 ribu pack."
+            }
+          ],
+          "hints": [
+            "Konsep: overlap = pack yang keluar × share eligible × hemat per pack.",
+            "Metode: 100 × 0,8 × 1,4.",
+            "Jawaban: 112."
+          ]
+        },
+        {
+          "rung": "twist",
+          "title": "Ubah satu asumsi",
+          "prompt": "Pada skenario downside (Exhibit 06): share eligible 60%, hemat Rp0,8 ribu per pack, dan C mengeluarkan 300 ribu pack. Berapa overlap A dan C (Rp juta)?",
+          "expect": {
+            "value": 144,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 168,
+              "feedback": "168 adalah overlap skenario base. Downside memakai 300 pack, eligible 60%, hemat 0,8."
+            },
+            {
+              "value": 240,
+              "feedback": "240 belum dikalikan share eligible 60%."
+            },
+            {
+              "value": 180,
+              "feedback": "180 belum dikalikan hemat per pack 0,8."
+            }
+          ],
+          "hints": [
+            "Konsep: rumus overlap sama, input skenario berbeda.",
+            "Metode: pack × eligible × hemat per pack.",
+            "Jawaban: 300 × 0,6 × 0,8 = 144."
+          ]
+        },
+        {
+          "rung": "red_pen",
+          "title": "Pena merah",
+          "prompt": "Analis junior menyerahkan tabel ini dan menulis manfaat gabungan A + C = Rp4.250 juta. Klik baris yang salah, lalu isi manfaat gabungan yang benar (Rp juta).",
+          "artefact": {
+            "decimals": 0,
+            "rows": [
+              {
+                "id": "a",
+                "label": "A: procurement (bersih)",
+                "value": 2332
+              },
+              {
+                "id": "c",
+                "label": "C: reset kontrak B2B (bersih)",
+                "value": 1750
+              },
+              {
+                "id": "ov",
+                "label": "Overlap A dan C",
+                "value": 168
+              },
+              {
+                "id": "ac",
+                "label": "Manfaat gabungan (junior)",
+                "value": 4250,
+                "total": true
+              }
+            ]
+          },
+          "flaw_row": "ov",
+          "row_feedback": {
+            "a": "Cocok dengan Exhibit 04: 2.632 − 300 = 2.332.",
+            "c": "Cocok dengan Exhibit 04: manfaat bersih C = 1.750.",
+            "ac": "Itu gejalanya (gabungan lebih besar dari penjumlahan mentah, mustahil karena overlap mengurangi). Cari baris yang tandanya salah."
+          },
+          "found_feedback": "Tepat. Overlap menghilangkan manfaat yang sudah dihitung di A, jadi dikurangkan: 2.332 + 1.750 − 168 = 3.914.",
+          "expect": {
+            "value": 3914,
+            "tolerance": 1e-06
+          },
+          "unit": "Rp juta",
+          "misconceptions": [
+            {
+              "value": 4250,
+              "feedback": "Itu angka junior tadi. Overlap dikurangkan, bukan ditambahkan."
+            },
+            {
+              "value": 4082,
+              "feedback": "4.082 adalah penjumlahan mentah, belum dikurangi overlap 168."
+            }
+          ],
+          "hints": [
+            "Konsep: overlap berarti manfaat yang sama dihitung dua kali.",
+            "Metode: jumlahkan stand-alone, lalu kurangkan overlap.",
+            "Jawaban: 2.332 + 1.750 − 168 = 3.914."
+          ]
+        }
+      ],
+      "defend": {
+        "prompt": "Direktur: \"Apakah A + C masih opsi terbaik kalau C juga mengurangi kapasitas distribusi yang selama ini menghasilkan volume?\"",
+        "model_points": [
+          "Interaksinya lebih luas dari satu overlap: kalau C mengubah volume, semua manfaat berbasis volume (termasuk inisiatif lain) harus dihitung ulang dari baseline baru.",
+          "Uji kendala: A butuh 4 slot eksekusi dan C 3 slot (7 total), dengan biaya satu kali 750 dan capex 900. Bandingkan dengan batas anggaran dan kapasitas tim.",
+          "Uji sensitivitas: A + C berkisar sekitar Rp784 juta (downside) sampai Rp5.415 juta (upside) per tahun, jadi rekomendasinya bergantung pada skenario mana yang dipercaya."
+        ],
+        "note": "Tulis jawabanmu dulu, baru buka poin model. Jawaban hanya disimpan di perangkat ini."
+      },
+      "lock_in": {
+        "build_output": "Buat initiative model dengan overlap eksplisit, pembatas budget dan execution slots serta deck slide quantified impact.",
+        "cards": [
+          {
+            "id": "CO-L02-c1",
+            "front": "Kenapa manfaat dua inisiatif tidak langsung dijumlahkan?",
+            "back": "Satu inisiatif bisa mengubah basis volume inisiatif lain, sehingga manfaat yang sama terhitung dua kali."
+          },
+          {
+            "id": "CO-L02-c2",
+            "front": "Bagaimana menghitung overlap A dan C?",
+            "back": "Pack yang dikeluarkan C × share eligible × hemat per pack A (150 × 0,8 × 1,4 = 168)."
+          },
+          {
+            "id": "CO-L02-c3",
+            "front": "Bagaimana overlap ditampilkan di slide?",
+            "back": "Sebagai baris eksplisit yang dikurangkan, bukan potongan persen rata."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -69,7 +69,7 @@ async function main(){
  await new Promise(resolve=>setTimeout(resolve,12));
  assert.equal(careerUI.ready,true,'Career loads independent from SELF core app loader');
  let html=ctx.window.SELFCareer.render();
- for(const section of ['Overview','Applications','People','Companies','Opportunity Radar','CV Library','Interview Prep','Templates','Reminders'])
+ for(const section of ['Overview','Applications','Outreach','Companies','Opportunity Radar','CV Library','Interview Prep','Templates','Reminders'])
   assert(html.includes(section),'includes Career subpage: '+section);
  assert(!html.includes('Northstar Capital'),'fictional wireframe records not shipped');
  assert.equal(careerUI.applications.length,0);

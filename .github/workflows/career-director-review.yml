@@ -13,6 +13,45 @@ on:
       - 'tests/browser_director_full_app.cjs'
       - 'tests/browser_career_learning.cjs'
       - 'tests/browser_worksample.cjs'
+      - 'tests/browser_rooms.cjs'
+      - 'tests/browser_today.cjs'
+      - 'tests/browser_hunt.cjs'
+      - 'tests/browser_outreach.cjs'
+      - 'outreach.js'
+      - 'outreach.css'
+      - 'tests/browser_dossier.cjs'
+      - 'dossier.js'
+      - 'dossier.css'
+      - 'tests/browser_lesson_loop.cjs'
+      - 'career-grid.js'
+      - 'career-visuals.js'
+      - 'career-review.js'
+      - 'career-lesson-loop.js'
+      - 'career-lesson-loop.css'
+      - 'career-nextup.js'
+      - 'tests/browser_lessons_all.cjs'
+      - 'tests/browser_work_tools.cjs'
+      - 'data-export.js'
+      - 'work-tools.js'
+      - 'work-tools.css'
+      - 'tests/browser_studio.cjs'
+      - 'studio-recipes.js'
+      - 'studio-present.js'
+      - 'studio-tools.css'
+      - 'canvas-v3.js'
+      - 'content/studio-recipes.json'
+      - 'content/career-lessons-v2.json'
+      - 'career-learning.css'
+      - 'rooms.js'
+      - 'rooms.css'
+      - 'motion.js'
+      - 'motion.css'
+      - 'self-dnd.js'
+      - 'today.js'
+      - 'palette.js'
+      - 'capture-parse.js'
+      - 'tests/browser_palette.cjs'
+      - 'career-phase2.js'
       - 'tests/xlsx_fixture.cjs'
       - 'career-worksample.js'
       - 'career-workbook-check.js'
@@ -68,3 +107,23 @@ jobs:
         run: node tests/browser_career_learning.cjs
       - name: Work Sample Chromium tests in the real SELF shell
         run: node tests/browser_worksample.cjs
+      - name: Rooms shell and drag-and-drop Chromium tests
+        run: node tests/browser_rooms.cjs
+      - name: Today room Chromium tests
+        run: node tests/browser_today.cjs
+      - name: Hunt and Study rooms Chromium tests
+        run: node tests/browser_hunt.cjs
+      - name: Command palette Chromium tests
+        run: node tests/browser_palette.cjs
+      - name: Outreach board Chromium tests
+        run: node tests/browser_outreach.cjs
+      - name: Dossier and Game Day Chromium tests
+        run: node tests/browser_dossier.cjs
+      - name: Lesson Loop v2 and Daily Drill Chromium tests
+        run: node tests/browser_lesson_loop.cjs
+      - name: All six Lesson Loop v2 lessons and Next up Chromium tests
+        run: node tests/browser_lessons_all.cjs
+      - name: Work tools and Export Chromium tests
+        run: node tests/browser_work_tools.cjs
+      - name: Studio recipes and Walkthrough Chromium tests
+        run: node tests/browser_studio.cjs

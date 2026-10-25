@@ -13,6 +13,17 @@
 - Type default 16px, up to 150% scaling. Clickable targets generally around 40px or larger. Reduced-motion preference respected.
 - Clicky feel: 140–240ms hover/press feedback, hover elevation and subtle side panel animation. Functional controls always show success/error state.
 
+## Rooms shell (approved 2026-10-23)
+The user approved the Rooms direction and asked for it to be built. Spec: `docs/design/ROOMS_BUILD_SPEC.md`; reasoning: `docs/design/ROOMS_REDESIGN_BLUEPRINT.md`.
+- **Navigation:** five doors (Today, Work, Hunt, Study, Studio) replace the eight-item sidebar. Each room has at most one row of sub-navigation. Settings and Search stay reachable. `state.view` values are unchanged. `?shell=classic` restores the previous shell.
+- **Tint:** each room tints the shell with an existing SELF accent. The tint appears on the active door, the aurora wash, the room's primary buttons and its kicker. Status and priority colours stay semantic.
+- **Badges** come only from loaded data. No placeholder numbers (gate 4 below still applies).
+- **Motion:** 90 to 420 ms, transform and opacity only, entrance once per navigation (never on a data refresh), and everything off under `prefers-reduced-motion`.
+- **Drag and drop** works by mouse, touch and keyboard, saves only through the existing save functions with Undo, and never implies an order that is not stored.
+- **Today (Home in Rooms):** Quick Capture stays on top. My Priorities becomes **Three for today** (pinned or best-ranked open tasks) beside an Agenda and an Inbox triage stack; Continue Where You Left Off and the activity counts stay below. The classic shell keeps the original Home.
+- **Palette:** Ctrl/⌘ K (or `/` outside a text field) opens a command palette: go to a room or section, open a task, Space, board, person or company, or create from shorthand (`Kirim CV besok #Career !high`). It never creates a Space without an explicit command and saves nothing until Enter. The classic shell keeps Ctrl K for Search.
+- **Unchanged:** 16px base text with 100 to 150% scaling, targets around 40px or more (doors 72px; the phone bar 58px plus the safe area), designed dark and light themes.
+
 ## Acceptance gates
 1. Verify nine-screen hierarchy against user reference before announcing visual parity; screenshot actual running browser desktop/mobile, not a generated mockup.
 2. Verify Add/Edit/Delete Task, checklist, notes, status, space, link auto capture, dark/light toggle and text scaling with real state changes.

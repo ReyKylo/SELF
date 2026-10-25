@@ -1,0 +1,26 @@
+/* My Work: saved views, selection and bulk actions; Settings › Your data. */
+.work-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px}
+.view-pills{display:flex;flex-wrap:wrap;gap:6px}
+.view-pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--card2);overflow:hidden}
+.view-apply{border:0;background:transparent;color:var(--text);padding:0 12px;min-height:38px;font-size:.82em;font-weight:700}
+.view-apply:hover{background:var(--hover)}
+.view-remove{border:0;border-left:1px solid var(--line);background:transparent;color:var(--muted);width:34px;min-height:38px;font-size:1.1em}
+.view-remove:hover{background:var(--hover);color:var(--red)}
+.view-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.view-form .field{min-width:180px;padding:9px 12px}.view-error{color:var(--red);font-size:.8em}
+.work-select{margin-right:10px;border-radius:5px}
+.work-row.is-selected,.kanban-task.is-selected{background:var(--blueSoft);border-color:var(--blue)}
+.kanban-card-head .work-select{flex:0 0 auto;margin:2px 8px 0 0}
+.bulk-dock{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:35;display:flex;flex-direction:column;gap:8px;align-items:center;max-width:calc(100vw - 24px)}
+.bulk-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 14px;border:1px solid var(--line);border-radius:16px;background:var(--side);box-shadow:var(--shadow);font-size:.84em}
+.bulk-bar.is-empty{color:var(--muted)}
+.bulk-bar label{display:inline-flex;gap:6px;align-items:center;color:var(--muted);font-weight:600}
+.bulk-bar select,.bulk-bar input[type=date]{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:8px;padding:7px 8px;min-height:38px}
+.soft-btn.danger,.primary-btn.danger{color:var(--red)}.primary-btn.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.bulk-undo{display:flex;gap:10px;align-items:center;padding:8px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow);font-size:.82em}
+.bulk-confirm{position:fixed;inset:0;z-index:50;background:#000a;display:grid;place-items:center;padding:16px}
+.bulk-confirm-card{width:min(440px,100%);background:var(--side);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.bulk-confirm-card h3{margin:0 0 6px}.bulk-confirm-card p{color:var(--muted);font-size:.88em;margin:0 0 10px}.bulk-confirm-card ul{margin:0 0 14px;padding-left:18px;font-size:.86em}
+.bulk-confirm-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.export-row{align-items:flex-start}.export-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.export-note{margin:10px 0 0;font-size:.8em;color:var(--muted);min-height:1.4em}
+@media (max-width:760px){.bulk-dock{left:12px;right:12px;transform:none;max-width:none;bottom:calc(76px + env(safe-area-inset-bottom,0px));align-items:stretch}}
+.bulk-spacer{height:150px}

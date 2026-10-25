@@ -94,6 +94,10 @@ python3 tools/build_cloudflare.py
 ```
 A passing smoke test isn't a browser screenshot or live deployment verification. Visual and real-device checks remain required before signing off the visual contract.
 
+## Rooms shell (design upgrade)
+SELF opens in the **Rooms** shell: five doors (Today, Work, Hunt, Study, Studio) on the left, or at the bottom on phones. Append `?shell=classic` to the URL for the previous sidebar; no data is affected. The Work board and the Applications pipeline drag by mouse, touch (grip or long press) and keyboard (Space, arrows, Space). Alt+1 to Alt+5 switch rooms, and Ctrl/⌘ K opens a palette to jump anywhere or create from shorthand such as `Kirim CV besok #Career !high` (classic shell: Ctrl K still opens Search).
+Plans: `docs/design/ROOMS_BUILD_SPEC.md` (status table at the top), `docs/design/ROOMS_REDESIGN_BLUEPRINT.md`, `docs/design/SELF_PRODUCT_UPGRADE_PLAN.md`. Extra checks: `node tests/smoke_rooms.cjs`, `node tests/smoke_dnd.cjs`, and the Chromium test `node tests/browser_rooms.cjs` (needs Playwright; set `SELF_QA_CHROMIUM` if necessary).
+
 ## Design contract
 Read `docs/DESIGN_CONTRACT.md`. Wireframe V2 is the visual baseline, not disposable inspiration.
 

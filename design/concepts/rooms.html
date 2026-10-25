@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SELF Rooms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a door rail of five rooms (left on desktop, bottom on phone). Each room is tinted with an existing SELF accent and has its own layout. Focus mode takes over the whole screen. */
+:root{
+  --bg:#0d141d; --side:#0a1018; --card:#151f2b; --card2:#1a2633; --line:#263445; --text:#f2f5f9; --muted:#a0adbd; --faint:#6f7f92;
+  --today:#428cff; --work:#3fc5d2; --hunt:#3dce9e; --study:#ad92fa; --studio:#f0b862; --danger:#f68e94;
+  --room:var(--today);
+  --display:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;
+  --body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'DM Mono',ui-monospace,Menlo,monospace; color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f3f5f8; --side:#ffffff; --card:#ffffff; --card2:#f6f8fb; --line:#dfe4ec; --text:#152033; --muted:#58677d; --faint:#8592a5;
+  --today:#2369e0; --work:#0f8e9b; --hunt:#16855f; --study:#7552c8; --studio:#a8650c; --danger:#c3484f; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f3f5f8; --side:#ffffff; --card:#ffffff; --card2:#f6f8fb; --line:#dfe4ec; --text:#152033; --muted:#58677d; --faint:#8592a5;
+  --today:#2369e0; --work:#0f8e9b; --hunt:#16855f; --study:#7552c8; --studio:#a8650c; --danger:#c3484f; color-scheme:light}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--room);outline-offset:2px}
+.shell{display:grid;grid-template-columns:112px minmax(0,1fr);height:100%}
+
+/* Door rail */
+.rail{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:18px 10px;padding-left:max(10px,env(safe-area-inset-left,0px))}
+.mark{display:grid;place-items:center;width:40px;height:40px;margin:0 auto 14px;border-radius:12px;background:linear-gradient(135deg,var(--today),var(--study));color:#fff;font-weight:800}
+.door{position:relative;border:0;background:transparent;border-radius:16px;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:var(--muted);min-height:72px;transition:background .16s,color .16s,transform .16s}
+.door svg{width:24px;height:24px}
+.door span{font-size:.8rem;font-weight:700}
+.door small{font-family:var(--mono);font-size:.66rem;color:var(--faint)}
+.door:hover{background:var(--card);color:var(--text)}
+.door:active{transform:scale(.96)}
+.door[aria-current="page"]{background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--text)}
+.door[aria-current="page"] svg{color:var(--c)}
+.door[aria-current="page"]::before{content:"";position:absolute;left:-10px;top:18px;bottom:18px;width:4px;border-radius:0 4px 4px 0;background:var(--c)}
+.rail .sp{flex:1}
+.rail .util{min-height:48px}
+
+/* Room */
+.room{overflow:auto;min-width:0;background:radial-gradient(1200px 380px at 70% -120px,color-mix(in srgb,var(--room) 16%,transparent),transparent 70%),var(--bg)}
+.inner{max-width:1240px;margin:0 auto;padding-block:26px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;gap:12px;align-items:center;margin-bottom:28px}
+.k{flex:1;display:flex;align-items:center;gap:10px;max-width:520px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:0 14px;min-height:44px;color:var(--faint);cursor:pointer;text-align:left}
+.k kbd{margin-left:auto;font-family:var(--mono);font-size:.74rem;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.top .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:0 16px;min-height:44px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform .14s,background .14s}
+.btn:hover{background:var(--card2)}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--room);border-color:transparent;color:#fff}
+:root[data-theme="light"] .btn.pri{color:#fff}
+.save{font-family:var(--mono);font-size:.78rem;color:var(--hunt)}
+
+.title{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:26px}
+.title h1{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,6vw,4.4rem);line-height:.92;margin:0;letter-spacing:-.035em}
+.title h1 em{font-style:normal;color:var(--room)}
+.title p{margin:0 0 6px;color:var(--muted);max-width:46ch}
+.subnav{display:flex;gap:6px;flex-wrap:wrap;margin:-8px 0 24px}
+.subnav button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:0 14px;min-height:40px;font-weight:600;color:var(--muted);cursor:pointer}
+.subnav button[aria-pressed="true"]{background:color-mix(in srgb,var(--room) 16%,transparent);border-color:var(--room);color:var(--text)}
+
+.grid{display:grid;gap:18px}
+.g-today{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0}
+.card h2{font-family:var(--display);font-size:1.3rem;margin:0 0 4px;letter-spacing:-.01em}
+.card .sub{color:var(--faint);font-size:.88rem;margin:0 0 16px}
+.label{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+
+/* Today: three for today */
+.three{display:grid;gap:10px}
+.big{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;cursor:pointer;transition:border-color .16s,transform .16s}
+.big:hover{border-color:var(--room);transform:translateY(-1px)}
+.num{font-family:var(--display);font-size:2rem;font-weight:800;color:var(--room);line-height:1;text-align:center}
+.big strong{display:block;font-size:1.08rem}
+.big small{color:var(--muted)}
+.focusbtn{border:0;background:var(--room);color:#fff;border-radius:10px;min-height:40px;padding:0 12px;font-weight:700;cursor:pointer}
+.add3{border:1.5px dashed var(--line);border-radius:16px;min-height:60px;background:transparent;color:var(--faint);cursor:pointer}
+.agenda{list-style:none;margin:0;padding:0;position:relative}
+.agenda::before{content:"";position:absolute;left:58px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.agenda li{display:grid;grid-template-columns:48px 22px minmax(0,1fr);gap:8px;align-items:start;padding:8px 0}
+.agenda time{font-family:var(--mono);font-size:.8rem;color:var(--muted);text-align:right;padding-top:2px}
+.agenda .dot{width:12px;height:12px;border-radius:50%;margin:5px 0 0 4px;background:var(--c,var(--today));box-shadow:0 0 0 4px var(--card)}
+.agenda strong{display:block;font-size:.98rem}
+.agenda small{color:var(--muted)}
+.triage{margin-top:18px}
+.stack{position:relative;height:150px}
+.cap{position:absolute;inset:0;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;transition:transform .25s,opacity .25s}
+.cap:nth-child(2){transform:translateY(8px) scale(.97);opacity:.6;z-index:-1}
+.cap:nth-child(3){transform:translateY(16px) scale(.94);opacity:.3;z-index:-2}
+.cap .acts{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap}
+.cap .acts button{border:1px solid var(--line);background:var(--card);border-radius:10px;min-height:40px;padding:0 12px;cursor:pointer;font-weight:600;font-size:.88rem}
+.cap .acts button:first-child{background:var(--room);color:#fff;border-color:transparent}
+.empty{color:var(--faint);padding:30px 0;text-align:center}
+
+/* Hunt */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.kpi b{font-family:var(--display);font-size:2rem;display:block;line-height:1}
+.kpi small{color:var(--muted);font-size:.82rem}
+.kpi .cv{font-family:var(--mono);font-size:.72rem;color:var(--room)}
+.g-hunt{grid-template-columns:minmax(0,1fr) 300px}
+.lanes{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.lane{background:var(--card2);border-radius:16px;padding:12px;min-height:280px}
+.lane h3{margin:0 0 10px;font-size:.86rem;display:flex;justify-content:space-between;color:var(--muted)}
+.app{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;cursor:grab}
+.app strong{display:block;font-size:.95rem;line-height:1.3}
+.app small{color:var(--muted);font-size:.8rem}
+.app .meta{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:.68rem;border-radius:6px;padding:2px 6px;background:color-mix(in srgb,var(--c,var(--room)) 16%,transparent);color:var(--text)}
+.touch{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.touch:last-child{border-bottom:0}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--card2);font-weight:700}
+.touch small{display:block;color:var(--muted);font-size:.8rem}
+.days{font-family:var(--mono);font-size:.78rem}
+.days.late{color:var(--danger)}
+
+/* Study */
+.path{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;position:relative;margin-bottom:18px}
+.stop{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;position:relative}
+.stop.cur{border-color:var(--room);box-shadow:0 0 0 4px color-mix(in srgb,var(--room) 18%,transparent)}
+.stop .label{color:var(--room)}
+.stop h3{font-family:var(--display);font-size:1.3rem;margin:6px 0}
+.stop p{margin:0;color:var(--muted);font-size:.9rem}
+.prog{height:6px;border-radius:6px;background:var(--card2);margin-top:14px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--room)}
+.g-study{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mode h2{display:flex;gap:10px;align-items:center}
+.mode ul{list-style:none;margin:0;padding:0}
+.mode li{padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.mode li:last-child{border-bottom:0}
+.mode li small{color:var(--faint);font-family:var(--mono);font-size:.74rem}
+
+/* Studio + Work */
+.boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.board{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .16s}
+.board:hover{transform:translateY(-2px)}
+.thumb{height:120px;background:var(--card2);position:relative}
+.thumb i{position:absolute;border-radius:6px;background:color-mix(in srgb,var(--c) 55%,transparent)}
+.board div.b{padding:12px 14px}
+.board small{color:var(--muted)}
+.table{width:100%;border-collapse:collapse}
+.table th{text-align:left;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:var(--faint);font-weight:500;padding:10px;border-bottom:1px solid var(--line)}
+.table td{padding:12px 10px;border-bottom:1px solid var(--line)}
+.tw{overflow-x:auto}
+.badge{font-size:.78rem;font-weight:700;border-radius:8px;padding:3px 8px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--text);white-space:nowrap}
+
+/* Focus mode */
+.focus{position:fixed;inset:0;z-index:20;background:var(--bg);display:grid;grid-template-columns:minmax(0,1fr) 340px;padding-block:max(28px,env(safe-area-inset-top,0px)) 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));gap:32px;overflow:auto}
+.focus .main{max-width:720px;margin:0 auto;width:100%}
+.focus .crumb{font-family:var(--mono);font-size:.78rem;color:var(--faint)}
+.focus h1{font-family:var(--display);font-size:clamp(2rem,5vw,3.4rem);line-height:1;letter-spacing:-.03em;margin:14px 0 20px}
+.props{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.fcheck{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:1.08rem;cursor:pointer}
+.fcheck input{width:22px;height:22px;accent-color:var(--room)}
+.focus textarea{width:100%;min-height:150px;margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);font:inherit}
+.side{border-left:1px solid var(--line);padding-left:28px;display:flex;flex-direction:column;gap:16px}
+.timer{font-family:var(--display);font-size:4.4rem;font-weight:800;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.next{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+
+/* Palette */
+.pal{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--bg) 70%,transparent);display:flex;justify-content:center;align-items:flex-start;padding:12vh 16px 16px}
+.pal .box{width:100%;max-width:600px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 80px #0006;overflow:hidden}
+.pal input{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:18px;font-size:1.1rem;outline:none}
+.pal ul{list-style:none;margin:0;padding:8px;max-height:50vh;overflow:auto}
+.pal li{padding:10px 12px;border-radius:10px;display:flex;justify-content:space-between;gap:10px;cursor:pointer}
+.pal li.on,.pal li:hover{background:var(--card2)}
+.pal li small{color:var(--faint)}
+.sample{font-family:var(--mono);font-size:.72rem;color:var(--faint);margin-top:24px}
+
+.anim{animation:in .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:.4;transform:translateX(18px)}to{opacity:1;transform:none}}
+
+@media (max-width:980px){
+  .g-today,.g-hunt,.g-study{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .path{grid-template-columns:minmax(0,1fr)}
+  .focus{grid-template-columns:minmax(0,1fr)}
+  .side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:20px}
+}
+@media (max-width:700px){
+  .shell{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .rail{flex-direction:row;order:2;border-right:0;border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));gap:2px}
+  .mark,.rail .sp,.rail .util{display:none}
+  .door{flex:1;min-height:58px;padding:8px 2px}
+  .door small{display:none}
+  .door[aria-current="page"]::before{left:20%;right:20%;top:-6px;bottom:auto;width:auto;height:3px;border-radius:0 0 3px 3px}
+  .top .k span.t,.top .k kbd{display:none}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .save{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="rail" aria-label="Rooms" id="rail"></nav>
+  <main class="room" id="room" aria-live="polite"></main>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const I={
+ today:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.3 11.3 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+ work:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h4M8 16h8"/>',
+ hunt:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>',
+ study:'<path d="m2 9 10-5 10 5-10 5z"/><path d="M6 11v5c4 3 8 3 12 0v-5"/>',
+ studio:'<rect x="3" y="3" width="8" height="8" rx="2"/><circle cx="17" cy="17" r="4"/><path d="M11 7h3a3 3 0 0 1 3 3v3"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>', theme:'<path d="M20.5 14.6A9 9 0 1 1 9.4 3.5a7 7 0 0 0 11.1 11.1z"/>', settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M2 12h3m14 0h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>'
+};
+const ic=(n,s=24)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+const ROOMS=[
+ ['today','Today','4 due','Choose three. Clear the inbox. See what is coming.'],
+ ['work','Work','11 open','Every task across your Spaces, plus links.'],
+ ['hunt','Hunt','2 interviews','Your pipeline, people and companies.'],
+ ['study','Study','Hari 1','Career Prep: build, learn, get challenged.'],
+ ['studio','Studio','6 boards','Whiteboards for thinking out loud.']
+];
+let room='today',sub={work:'tasks',hunt:'pipeline',study:'build'};
+let three=[
+ {t:'Aruna Supply · debt schedule tab',s:'Career Prep · Hari 1',d:'Today',ck:[['Senior term loan',1],['Revolver draw',0],['Covenant test',0]]},
+ {t:'Case interview prep · Strategy Analyst',s:'Hunt · interview 15:30',d:'Today 15:00',ck:[['Re-read SajiRasa bridge',1],['Three questions for them',0]]},
+ {t:'Analisa DSSA',s:'Finance · 2 days late',d:'Overdue',ck:[['Q3 report',1],['EV/EBITDA',0],['One-page view',0]]}
+];
+let caps=[['Note','Bandingkan DCF vs comps untuk BBCA','08:12'],['Link','docs.google.com · Aruna model v2','10:47'],['Note','Ide: board untuk cohort retention ArusOps','11:30']];
+function rail(){
+  $('#rail').innerHTML=`<div class="mark" aria-hidden="true">✳</div>`+ROOMS.map(([id,l,n])=>`<button class="door" data-room="${id}" style="--c:var(--${id})" aria-current="${room===id?'page':'false'}">${ic(id)}<span>${l}</span><small>${n}</small></button>`).join('')+
+  `<span class="sp"></span><button class="door util" data-act="theme" aria-label="Switch theme">${ic('theme',20)}</button><button class="door util" aria-label="Settings">${ic('settings',20)}</button>`;
+}
+function top(){return `<div class="top"><button class="k" data-act="pal">${ic('search',18)}<span class="t">Jump, find or create…</span><kbd>Ctrl K</kbd></button><span class="sp"></span><span class="save">✓ Saved</span><button class="btn pri" data-act="pal">+ New</button></div>`}
+function head(id){const r=ROOMS.find(x=>x[0]===id);return `<div class="title"><h1>${r[1]}<em>.</em></h1><p>${r[3]}</p></div>`}
+function subnav(id,items){return `<div class="subnav" role="group" aria-label="${id} sections">${items.map(([k,l])=>`<button aria-pressed="${sub[id]===k}" data-sub="${id}:${k}">${l}</button>`).join('')}</div>`}
+const R={
+today(){
+  return head('today')+`<div class="grid g-today">
+  <section class="card"><div class="label">Jumat · 23 Oktober</div><h2>Three for today</h2><p class="sub">Picked from overdue, due today and high priority. Swap any of them.</p>
+   <div class="three">${three.map((x,i)=>`<div class="big" data-focus="${i}" tabindex="0" role="button" aria-label="Open ${esc(x.t)} in focus mode"><span class="num">${i+1}</span><span><strong>${esc(x.t)}</strong><small>${esc(x.s)} · ${x.ck.filter(c=>c[1]).length}/${x.ck.length}</small></span><button class="focusbtn" data-focus="${i}">Focus</button></div>`).join('')}
+   <button class="add3">+ 8 more open today · see all in Work</button></div></section>
+  <div class="grid">
+  <section class="card"><h2>Agenda</h2><p class="sub">Interviews, follow-ups and due dates on one line.</p>
+   <ul class="agenda">
+    <li><time>09:00</time><span class="dot" style="--c:var(--today)"></span><span><strong>Aruna Supply · debt schedule</strong><small>Task · due today</small></span></li>
+    <li><time>15:30</time><span class="dot" style="--c:var(--hunt)"></span><span><strong>Case interview · Strategy Analyst</strong><small>Interview · video · sample firm</small></span></li>
+    <li><time>—</time><span class="dot" style="--c:var(--danger)"></span><span><strong>Follow up Sari</strong><small>Person · last touch 19 days ago</small></span></li>
+    <li><time>Sab</time><span class="dot" style="--c:var(--hunt)"></span><span><strong>Thank-you note after interview</strong><small>Suggested from interview stage</small></span></li>
+   </ul></section>
+  <section class="card triage"><h2>Inbox · ${caps.length} to sort</h2><p class="sub">One capture at a time. Decide, then the next one slides up.</p>
+   <div class="stack">${caps.length?caps.slice(0,3).map((c,i)=>`<div class="cap"><span class="label">${c[0]} · ${c[2]}</span><strong>${esc(c[1])}</strong>${i===0?`<div class="acts"><button data-tri="task">Make task</button><button data-tri="space">File to Space</button><button data-tri="keep">Keep note</button><button data-tri="del">Delete</button></div>`:''}</div>`).join(''):'<div class="empty">Inbox clear. New captures from Ctrl K land here.</div>'}</div></section>
+  </div></div>`;
+},
+work(){
+  const rows=[['Analisa DSSA','Finance','In Progress','blue','High','Rab 21 · late'],['Aruna Supply · debt schedule','Career','Planning','yellow','High','Today'],['Kerjain tugas PPPE','Kuliah','To Do','faint','Normal','Today'],['Review Research Saham','Finance','To Do','faint','Low','Min 25'],['ArusOps memo · cohort section','Career','To Do','faint','High','Sel 27'],['Rapihin board Money Flow','Finance','Review','study','Normal','Kam 29']];
+  return head('work')+subnav('work',[['tasks','Tasks'],['spaces','Spaces'],['links','Links'],['inbox','Inbox history']])+`<section class="card"><div class="tw"><table class="table"><thead><tr><th>TASK</th><th>SPACE</th><th>STATUS</th><th>PRIORITY</th><th>DUE</th></tr></thead><tbody>${rows.map(r=>`<tr><td><strong>${r[0]}</strong></td><td>${r[1]}</td><td><span class="badge" style="--c:var(--${r[3]==='faint'?'line':r[3]==='blue'?'today':r[3]==='yellow'?'studio':r[3]})">${r[2]}</span></td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('')}</tbody></table></div><p class="sub" style="margin:14px 0 0">List · Board · Calendar views stay exactly as today, inside this room.</p></section>`;
+},
+hunt(){
+  const lanes=[['Wishlist',[['Fintech Strategy','sample co.','2d']]],['Applied',[['VC Associate','sample fund','6d · CV v3'],['Investment Analyst','sample firm','21d · no reply']]],['Interviewing',[['Analyst, PE','sample sponsor','case round'],['Strategy Analyst','sample advisory','today 15:30']]],['Offer',[]]];
+  return head('hunt')+subnav('hunt',[['pipeline','Pipeline'],['people','People'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['kit','CVs & templates']])+
+  `<div class="kpis">${[['7','Wishlist',''],['4','Applied','57% of wishlist'],['2','Interviewing','50% of applied'],['0','Offer',''],['3','Closed','']].map(k=>`<div class="kpi"><b>${k[0]}</b><small>${k[1]}</small><div class="cv">${k[2]}</div></div>`).join('')}</div>
+  <div class="grid g-hunt"><section class="card"><h2>Pipeline</h2><p class="sub">Drag a card to change stage. The stage menu on each card works by keyboard too.</p><div class="lanes">${lanes.map(([l,a])=>`<div class="lane"><h3><span>${l}</span><span>${a.length}</span></h3>${a.map(x=>`<div class="app"><strong>${x[0]}</strong><small>${x[1]}</small><div class="meta"><span class="chip">${x[2]}</span></div></div>`).join('')||'<div class="empty" style="padding:16px 0">Nothing here yet</div>'}</div>`).join('')}</div></section>
+  <section class="card"><h2>Needs a touch</h2><p class="sub">From last contact and the next step you logged.</p>${[['S','Sari','Associate · next: send coffee-chat notes',19],['R','Rara','Partner · next: intro via Dimas',34],['D','Dimas','Analyst · next: ask about referral',12]].map(p=>`<div class="touch"><span class="av">${p[0]}</span><span><strong>${p[1]}</strong><small>${p[2]}</small></span><span class="days ${p[3]>14?'late':''}">${p[3]}d</span></div>`).join('')}</section></div>`;
+},
+study(){
+  return head('study')+subnav('study',[['build','Build'],['learn','Learn'],['test','Get challenged']])+
+  `<div class="path">${[['Hari 1 · PE','Acquisition model','Aruna Supply · LBO, debt, exit sensitivity',35,1],['Hari 2 · VC','Investment memo','ArusOps · cohorts, runway, dilution',0,0],['Hari 3 · Consulting','Profitability deck','SajiRasa · profit bridge, initiatives',0,0]].map(s=>`<div class="stop ${s[4]?'cur':''}"><span class="label">${s[0]}</span><h3>${s[1]}</h3><p>${s[2]}</p><div class="prog" aria-label="${s[3]}% of checklist"><i style="width:${s[3]}%"></i></div></div>`).join('')}</div>
+  <div class="grid g-study">
+   <section class="card mode"><h2>Build</h2><p class="sub">Make the work product.</p><ul><li>Sprint 3 hari <small>3 projects</small></li><li>Analyst Lab · PE <small>projection · sensitivity</small></li><li>Analyst Lab · VC <small>waterfall</small></li><li>Analyst Lab · Consulting <small>bridge</small></li></ul></section>
+   <section class="card mode"><h2>Learn</h2><p class="sub">See how experts did it.</p><ul><li>Guided Masterclass <small>lessons</small></li><li>Expert Evidence <small>12 panels</small></li><li>YouTube <small>9 videos</small></li><li>Sources <small>41 audited</small></li></ul></section>
+   <section class="card mode"><h2>Get challenged</h2><p class="sub">Defend your answer.</p><ul><li>Director Review <small>5 challenges / track</small></li><li>Blind assessment <small>no answer reveal</small></li></ul></section>
+  </div>`;
+},
+studio(){
+  const b=[['Money Flow','Finance · 2h ago','today'],['Aruna Supply model map','Career · 1d','hunt'],['Valuation','Finance · 1d','study'],['Makro Ekonomi','Kuliah · 3d','studio'],['Content Planning','Work · 5d','work'],['ArusOps cohorts','Career · 1w','study']];
+  return head('studio')+`<div class="boards">${b.map(x=>`<div class="board" style="--c:var(--${x[2]})"><div class="thumb"><i style="left:14%;top:18%;width:30%;height:22%"></i><i style="left:56%;top:22%;width:28%;height:20%"></i><i style="left:34%;top:58%;width:34%;height:24%"></i></div><div class="b"><strong>${x[0]}</strong><br><small>${x[1]}</small></div></div>`).join('')}<div class="board" style="display:grid;place-items:center;min-height:180px;border-style:dashed"><strong>+ New board</strong></div></div><p class="sub" style="margin-top:16px">The Concept D editor opens full screen from here, unchanged.</p>`;
+}};
+function draw(anim){
+  document.documentElement.style.setProperty('--room',`var(--${room})`);
+  rail();
+  $('#room').innerHTML=`<div class="inner ${anim?'anim':''}">${top()}${R[room]()}<p class="sample">Prototype · sample data · nothing is saved.</p></div>`;
+}
+function focusMode(i){
+  const x=three[i];const el=document.createElement('div');el.className='focus';el.id='focus';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-label','Focus mode');
+  el.innerHTML=`<div class="main"><div class="crumb">FOCUS · ${esc(x.s)} · press Esc to leave</div><h1>${esc(x.t)}</h1>
+   <div class="props"><span class="badge" style="--c:var(--studio)">Planning</span><span class="badge" style="--c:var(--danger)">High</span><span class="badge" style="--c:var(--line)">${esc(x.d)}</span></div>
+   ${x.ck.map((c,j)=>`<label class="fcheck"><input type="checkbox" id="fc${j}" ${c[1]?'checked':''}> ${esc(c[0])}</label>`).join('')}
+   <textarea id="fnotes" aria-label="Notes">Notes save to the same task. Links pasted here land in My Links.</textarea></div>
+  <aside class="side"><div class="label">Timer · stays on this device</div><div class="timer" id="tm">25:00</div><div style="display:flex;gap:8px"><button class="btn pri" data-act="start">Start</button><button class="btn" data-act="leave">Leave focus</button></div>
+   <div class="label">Next up</div>${three.filter((_,j)=>j!==i).map(n=>`<div class="next"><strong>${esc(n.t)}</strong><br><small style="color:var(--muted)">${esc(n.s)}</small></div>`).join('')}</aside>`;
+  document.body.appendChild(el);el.querySelector('input')?.focus();
+}
+let tick=null,left=1500;
+function pal(){
+  const items=[['Go to Today','room'],['Go to Hunt','room'],['Go to Study','room'],['New task…','create'],['New note to inbox…','create'],['Aruna Supply · debt schedule','task'],['Sari · Associate','person'],['Money Flow','board']];
+  const el=document.createElement('div');el.className='pal';el.id='pal';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-label','Command palette');
+  el.innerHTML=`<div class="box"><input id="pin" placeholder="Type to jump, find or create" aria-label="Command"><ul id="pl"></ul></div>`;
+  document.body.appendChild(el);
+  const draw=q=>{const f=items.filter(x=>x[0].toLowerCase().includes(q.toLowerCase()));$('#pl').innerHTML=(q&&!f.length?[[`Create task “${q}”`,'create']]:f).map((x,i)=>`<li class="${i===0?'on':''}" data-p="${esc(x[0])}"><span>${esc(x[0])}</span><small>${x[1]}</small></li>`).join('')};
+  draw('');$('#pin').focus();$('#pin').addEventListener('input',e=>draw(e.target.value));
+}
+function closeAll(){$('#pal')?.remove();if($('#focus')){$('#focus').remove();clearInterval(tick);tick=null;left=1500}}
+document.addEventListener('click',e=>{
+  const d=e.target.closest('[data-room]');if(d){room=d.dataset.room;draw(true);return}
+  const s=e.target.closest('[data-sub]');if(s){const [r,k]=s.dataset.sub.split(':');sub[r]=k;draw();return}
+  const f=e.target.closest('[data-focus]');if(f){focusMode(+f.dataset.focus);return}
+  const t=e.target.closest('[data-tri]');if(t){caps.shift();draw();return}
+  const a=e.target.closest('[data-act]');if(a){const v=a.dataset.act;
+    if(v==='theme'){const cur=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=cur==='dark'?'light':'dark'}
+    if(v==='pal')pal();
+    if(v==='leave')closeAll();
+    if(v==='start'&&!tick){tick=setInterval(()=>{left=Math.max(0,left-1);const el=$('#tm');if(el)el.textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0')},1000);a.textContent='Running'}
+    return}
+  const p=e.target.closest('[data-p]');if(p){const v=p.dataset.p;closeAll();const m=v.match(/^Go to (\w+)/);if(m){room=m[1].toLowerCase();draw(true)}return}
+  if(e.target.id==='pal')closeAll();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeAll();return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();if(!$('#pal'))pal();return}
+  if(e.key==='Enter'&&e.target.classList?.contains('big')){focusMode(+e.target.dataset.focus);return}
+  if(e.key==='Enter'&&e.target.id==='pin'){$('#pl li.on')?.click()}
+});
+draw();
+})();
+</script>
+</body>
+</html>

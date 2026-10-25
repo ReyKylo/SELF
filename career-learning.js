@@ -3,6 +3,8 @@
 'use strict';
 const CONTENT_URL='./content/career-learning.json';
 const TABS=[['sprint','Sprint 3 hari'],['masterclass','Guided Masterclass'],['analystlab','Analyst Lab · PE'],['vclab','Analyst Lab · VC'],['consultlab','Analyst Lab · Consulting'],['director','Director Review'],['worksample','Work Sample'],['evidence','Expert Evidence'],['videos','YouTube'],['sources','Sumber']];
+/* The ten sections read as three verbs. Every tab stays visible and keeps its data-tab id. */
+const TAB_GROUPS=[['Build',['sprint','analystlab','vclab','consultlab']],['Learn',['masterclass','evidence','videos','sources']],['Get challenged',['director','worksample']]];
 const TRACKS=[['all','Semua bidang'],['PE','Private Equity'],['VC','Venture Capital'],['Consulting','Consulting']];
 const ui={tab:'sprint',track:'all',query:'',type:'all',panel:'PE01',video:null,day:'PE',backPanel:null,backContext:null,
  loading:false,error:'',data:null,owner:null,generation:0,busy:false,taskError:'',playing:false,start:0,workspace:null};
@@ -185,9 +187,11 @@ function sprint(){
 }
 function render(){
  ensureOwner();if(!ui.data&&!ui.loading&&!ui.error)Promise.resolve().then(load);
- const tabs='<div class="learning-tabs" aria-label="Career Prep sections">'+TABS.map(([key,label])=>'<button type="button" data-learning="tab" data-tab="'+key+'" class="'+(ui.tab===key?'active':'')+'" aria-pressed="'+(ui.tab===key)+'">'+label+'</button>').join('')+'</div>';
+ const labels=Object.fromEntries(TABS),grouped=new Set(TAB_GROUPS.flatMap(g=>g[1])),orphans=TABS.map(t=>t[0]).filter(k=>!grouped.has(k));
+ const tabButton=key=>'<button type="button" data-learning="tab" data-tab="'+key+'" class="'+(ui.tab===key?'active':'')+'" aria-pressed="'+(ui.tab===key)+'">'+labels[key]+'</button>';
+ const tabs='<div class="learning-tabs" aria-label="Career Prep sections">'+TAB_GROUPS.map(([name,keys],i)=>'<div class="learning-tab-group" role="group" aria-label="'+name+'"><span class="learning-tab-label">'+name+'</span>'+keys.concat(i===TAB_GROUPS.length-1?orphans:[]).filter(k=>labels[k]).map(tabButton).join('')+'</div>').join('')+'</div>';
  let body=ui.error?'<div class="learning-empty" role="alert"><h2>Materi belum terbuka.</h2><p>'+h(ui.error)+'</p>'+button('Coba lagi','retry')+'</div>':!ui.data?'<div class="learning-empty" role="status"><h2>Membuka materi…</h2><p>Memuat contoh expert dan urutan latihan.</p></div>':ui.tab==='sprint'?sprint():ui.tab==='masterclass'?(window.SELFCareerTeaching?.render?.(ui.data)||'<p>Guided lessons belum tersedia.</p>'):ui.tab==='analystlab'?(window.SELFCareerAnalystLab?.render?.()||'<p>Analyst Lab tidak tersedia.</p>'):ui.tab==='vclab'?(window.SELFVCAnalystLab?.render?.()||'<p>VC Analyst Lab tidak tersedia.</p>'):ui.tab==='consultlab'?(window.SELFConsultingLab?.render?.()||'<p>Consulting Lab unavailable.</p>'):ui.tab==='director'?(window.SELFDirectorReview?.render?.()||'<p>Director Review unavailable.</p>'):ui.tab==='worksample'?(window.SELFWorkSample?.render?.()||'<p>Work Sample unavailable.</p>'):ui.tab==='evidence'?evidence():ui.tab==='videos'?videos():sources();
- return '<section class="learning-workspace">'+tabs+body+'</section>';
+ return '<section class="learning-workspace">'+(window.SELFNextUp?.card?.()||'')+tabs+body+'</section>';
 }
 async function taskId(owner,id){
  const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('SELF:learning:v1:'+owner+':'+id)));bytes[6]=(bytes[6]&15)|128;bytes[8]=(bytes[8]&63)|128;
@@ -271,5 +275,5 @@ function openDirector(track){
  if(switched===false)host?.notify?.('Director Review dibuka di kasus yang sedang dikerjakan. Reset atau selesaikan dulu untuk berpindah ke '+track+'.');
  return true;
 }
-window.SELFCareerLearning={init(api){host=api.host;core=api.career;window.SELFCareerPortfolio?.init?.(host);window.SELFCareerTeaching?.init?.(host);window.SELFCareerAnalystLab?.init?.(host);window.SELFVCAnalystLab?.init?.(host);window.SELFConsultingLab?.init?.(host);window.SELFDirectorReview?.init?.(host);window.SELFWorkSample?.init?.(host)},render,action,input,change,reset,load,ui,taskId,openPortfolio,openDirector};
+window.SELFCareerLearning={openLesson(id){ui.tab='masterclass';window.SELFCareerTeaching?.select?.(id);redraw()},init(api){host=api.host;core=api.career;window.SELFCareerPortfolio?.init?.(host);window.SELFCareerTeaching?.init?.(host);window.SELFCareerAnalystLab?.init?.(host);window.SELFVCAnalystLab?.init?.(host);window.SELFConsultingLab?.init?.(host);window.SELFDirectorReview?.init?.(host);window.SELFWorkSample?.init?.(host)},render,action,input,change,reset,load,ui,taskId,openPortfolio,openDirector};
 })();
