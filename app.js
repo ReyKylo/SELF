@@ -451,7 +451,7 @@ async function removePortfolioFile(path){
 
 window.SELFCareer?.init?.({state:()=>state,rooms:useRooms,render,navigate:go,request,insert,patch,del,notify:toast,icon:ic,newTask:()=>{state.newTaskSpace='';state.modal='task';render()},openTask:id=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},reloadCore:loadAll,uploadDocument:uploadCareerDocument,signDocument:signCareerDocument,validateDocument:validateCareerDocument,uploadPortfolioFile,signPortfolioFile,removePortfolioFile,reloadCareer:()=>window.SELFCareer?.reload?.()});
 window.SELFBoards?.init?.({state:()=>state,render,navigate:go,uploadImage:uploadBoardImage,signImage:signBoardImage,openTask:(id)=>{window.SELFBoards.ui.selected?.clear?.();state.taskId=id;state.panelTab='overview';state.pageId=null;render()},insert,patch,patchSimple,del,reload:loadAll,notify:toast});
-window.SELFPalette?.init?.({views:()=>window.SELFWork?.views?.()||[],applyView:id=>window.SELFWork?.applySaved?.(id),state:()=>state,enabled:useRooms,today,go,goRoom,toggleTheme:()=>changeTheme(),insert,mutate,
+window.SELFPalette?.init?.({views:()=>window.SELFWork?.views?.()||[],applyView:id=>window.SELFWork?.applySaved?.(id),state:()=>state,enabled:useRooms,today,go,goRoom,toggleTheme:()=>changeTheme(),insert,mutate,track:text=>window.SELFTrackerUI?.quickAdd?.(text),
  careerUi:()=>window.SELFCareer?.ui,spaceName:id=>spaceOf(id)?.name||'',statusName:s=>statusOf(s)[1],
  openTask:id=>{state.taskId=id;state.panelTab='overview';state.pageId=null;render()},
  openSpace:id=>{state.spaceId=id;state.spaceTab='tasks';go('space')},

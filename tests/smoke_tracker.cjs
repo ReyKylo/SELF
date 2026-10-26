@@ -128,4 +128,36 @@ t('vocabulary',()=>{
  assert.equal(T.sourceLabel('linkedin_jobs'),'LinkedIn Jobs');assert.equal(T.statusLabel('waiting'),'Waiting');assert.equal(T.kindLabel('person'),'Person');
  assert.equal(T.INDUSTRIES.length,10);assert.equal(T.STALE_DAYS,14);
 });
+/* ---- T4: Today agenda and the command palette use the Tracker through the SELFTracker global ---- */
+t('Today agenda lists due Tracker rows and counts Inbox and Stale',()=>{
+ globalThis.SELFTracker=T;
+ const Today=require('../today.js');
+ const row=(id,o)=>({id,status:'active',title:id,last_activity_at:'2026-10-25T00:00:00Z',created_at:'2026-10-01T00:00:00Z',...o});
+ const career={tracks:[row('Due now',{next_due:TODAY,next_step:'Send CV'}),row('Late',{next_due:'2026-10-23',next_step:'Chase'}),row('Fresh inbox',{status:'inbox'}),row('Old one',{last_activity_at:'2026-09-01T00:00:00Z'}),row('Done',{status:'done',next_due:TODAY})],staleDays:14,people:[],applications:[],companies:[],interviews:[],touchpoints:[]};
+ const ag=Today.buildAgenda({tasks:[],day:TODAY,now:Date.parse('2026-10-26T03:00:00Z'),career});
+ const tr=ag.items.filter(i=>i.kind==='track');
+ assert.deepEqual(tr.map(i=>i.title),['Late','Due now'],'overdue first, done rows excluded');
+ assert.equal(tr[0].time,'3d late');assert.equal(tr[1].time,'Due');assert.deepEqual(tr[0].open,{action:'open-career',page:'tracker',view:'today'});
+ assert.equal(ag.items.filter(i=>i.kind==='track').length,2);
+ delete globalThis.SELFTracker;
+ const without=Today.buildAgenda({tasks:[],day:TODAY,now:Date.parse('2026-10-26T03:00:00Z'),career});
+ assert.equal(without.items.filter(i=>i.kind==='track').length,0,'no Tracker module, no Tracker rows, no crash');
+ const noTracks=Today.buildAgenda({tasks:[],day:TODAY,now:Date.parse('2026-10-26T03:00:00Z'),career:{...career,tracks:undefined}});
+ assert.equal(noTracks.items.length,0);
+ globalThis.SELFTracker=T;
+});
+t('palette offers Track in Career only when the Tracker is available',()=>{
+ globalThis.SELFTracker=T;
+ const P=require('../palette.js');
+ const ctx={tasks:[],spaces:[],boards:[],links:[],people:[],companies:[],capture:null};
+ const find=(c,q)=>P.buildItems(c,q).filter(i=>i.run.type==='track');
+ assert.equal(find(ctx,'https://www.jobstreet.co.id/id/job/1').length,0,'off without canTrack');
+ const on={...ctx,canTrack:true};
+ let it=find(on,'https://www.jobstreet.co.id/id/job/1');
+ assert.equal(it.length,1);assert.match(it[0].label,/^Track in Career: /);assert.equal(it[0].hint,'Hunt Inbox · Jobstreet');assert.equal(it[0].run.text,'https://www.jobstreet.co.id/id/job/1');
+ it=find(on,'https://a.example/x https://www.jobstreet.co.id/id/job/1');assert.equal(it[0].label,'Track 2 links in Career');
+ it=find(on,'tanya kak Sari soal PE');assert.match(it[0].label,/^Track in Career as a note/);
+ assert.equal(find(on,'hunt').length,0,'a single word is not offered as a note');
+ assert.equal(find(on,'x').length,0);
+});
 console.log('PASS Tracker helpers: '+n+' groups (urls, sources, capture, duplicates, views, ageing, ordering, industry, vocabulary).');

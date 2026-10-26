@@ -120,13 +120,76 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await row('Analyst Intern').locator('.tracker-more').click();await page.locator('.tracker-menu [data-tracker="reopen"]').click();await settle();
  assert.match(await row('Analyst Intern').locator('.tracker-dot').getAttribute('class'),/s-active/);
 
+ /* 10b. Bridges: a LinkedIn profile row goes to Outreach once; a job row goes to the Pipeline */
+ writes.length=0;await tab('inbox').click();
+ await capture('https://id.linkedin.com/in/budi-santoso-8a1b2c3/?originalSubdomain=id');
+ assert.match(await row('Budi Santoso').innerText(),/LinkedIn/);
+ await row('Budi Santoso').locator('.tracker-main').click();await page.locator('.tracker-drawer').waitFor();
+ assert.equal(await page.locator('.tracker-bridge [data-tracker="to-app"]').count(),0,'a person row has no Pipeline button');
+ writes.length=0;await page.locator('[data-tracker="to-outreach"]').click();await settle();
+ const person=writes.find(w=>w.table==='career_people'&&w.m==='POST');
+ assert.equal(person.body.full_name,'Budi Santoso');assert.equal(person.body.profile_url,'https://www.linkedin.com/in/budi-santoso-8a1b2c3/');assert.equal(person.body.relationship_stage,'new');
+ const linked=writes.find(w=>w.table==='career_tracks'&&w.m==='PATCH');assert.ok(linked.body.person_id);assert.equal(linked.body.status,'active');
+ assert.equal(writes.find(w=>w.table==='career_track_events'&&w.m==='POST').body.kind,'linked');
+ assert.equal(await page.locator('.tracker-drawer').count(),1,'the drawer stays open and now shows where it went');
+ assert.equal(await page.locator('[data-tracker="to-outreach"]').count(),0,'sent once');
+ assert.match(await page.locator('[data-tracker="goto"]').innerText(),/In Outreach/);
+ await page.locator('[data-tracker="goto"]').click();await page.locator('.outreach').waitFor();
+ assert.equal(await page.locator('.career-pill.active').innerText(),'Outreach');
+ await page.locator('.career-pill[data-page="tracker"]').click();await page.locator('.tracker').waitFor();
+
+ await tab('all').click();writes.length=0;
+ await row('careers.sample.example').locator('.tracker-main').click();await page.locator('.tracker-drawer').waitFor();
+ await page.locator('.tracker-drawer [name="title"]').fill('Analyst, Sample Capital');await page.locator('[data-tracker="save"]').click();await settle();
+ await row('Analyst, Sample Capital').locator('.tracker-main').click();await page.locator('.tracker-drawer').waitFor();
+ writes.length=0;await page.locator('[data-tracker="to-app"][data-stage="applied"]').click();await settle();
+ const app=writes.find(w=>w.table==='career_applications'&&w.m==='POST');
+ assert.equal(app.body.company_id,cid,'reuses the matched company');assert.equal(app.body.role_title,'Analyst, Sample Capital');assert.equal(app.body.hiring_stage,'applied');assert.equal(app.body.applied_at,today);assert.equal(app.body.source_url,'https://careers.sample.example/analyst');
+ assert.equal(writes.filter(w=>w.table==='career_companies').length,0,'no duplicate company');
+ assert.equal(writes.find(w=>w.table==='career_tracks'&&w.m==='PATCH').body.status,'waiting');
+ assert.match(await page.locator('[data-tracker="goto"]').innerText(),/In Pipeline/);
+ await page.keyboard.press('Escape');
+
+ /* a job with a new company creates the company once, as a wishlist item */
+ await tab('inbox').click();await capture('https://www.jobstreet.co.id/id/job/777');
+ await row('jobstreet.co.id/id/job/777').locator('.tracker-main').click();await page.locator('.tracker-drawer').waitFor();
+ writes.length=0;await page.locator('[data-tracker="to-app"][data-stage="wishlist"]').click();await settle();
+ assert.match(await page.locator('.toast').innerText(),/Add the company name first/);assert.equal(writes.filter(w=>w.table==='career_applications').length,0,'no company, no Pipeline row');
+ await page.locator('.tracker-drawer [name="company_name"]').fill('Brand New Co');await page.locator('[data-tracker="save"]').click();await settle();
+ await row('jobstreet.co.id/id/job/777').locator('.tracker-main').click();await page.locator('.tracker-drawer').waitFor();writes.length=0;
+ await page.locator('[data-tracker="to-app"][data-stage="wishlist"]').click();await settle();
+ assert.equal(writes.filter(w=>w.table==='career_companies'&&w.m==='POST').length,1);
+ assert.equal(writes.find(w=>w.table==='career_applications').body.hiring_stage,'wishlist');assert.equal(writes.find(w=>w.table==='career_applications').body.applied_at,null);
+ await page.keyboard.press('Escape');
+
+ /* 10c. Today shows what is due, plus Inbox and Stale counts; Tracker rows link back to the right view */
+ await tab('all').click();await row('Analyst Intern').locator('.tracker-main').click();await page.locator('.tracker-drawer').waitFor();
+ await page.locator('.tracker-drawer [name="next_step"]').fill('Send CV again');await page.locator('.tracker-drawer [name="next_due"]').fill(today);
+ await page.locator('[data-tracker="save"]').click();await settle();
+ await page.locator('.rooms-rail .door[data-room="today"]').click();await page.locator('.today-agenda').waitFor();
+ const item=page.locator('.agenda-item',{hasText:'Analyst Intern'});assert.equal(await item.count(),1);assert.match(await item.innerText(),/Tracker · Send CV again/);
+ assert.match(await page.locator('.agenda-track').innerText(),/1 due/);
+ await page.locator('.agenda-track button',{hasText:'due'}).click();await page.locator('.tracker').waitFor();
+ assert.equal(await page.locator('.tracker-tab.on').getAttribute('data-value'),'today');assert.equal(await page.locator('.career-pill.active').innerText(),'Tracker');
+
+ /* 10d. Command palette: Track in Career files a link from any room */
+ await page.locator('.rooms-rail .door[data-room="today"]').click();await page.locator('.today-agenda').waitFor();
+ writes.length=0;await page.keyboard.press('Control+k');await page.locator('#pal-input').fill('https://glints.com/id/opportunities/jobs/abc?utm_source=x');
+ const opt=page.locator('.pal-item',{hasText:'Track in Career'});assert.equal(await opt.count(),1);assert.match(await opt.innerText(),/Glints/);
+ await opt.click();await settle();
+ const palPost=writes.find(w=>w.table==='career_tracks'&&w.m==='POST');assert.equal(palPost.body.url,'https://glints.com/id/opportunities/jobs/abc');assert.equal(palPost.body.source,'glints');assert.equal(palPost.body.status,'inbox');
+ assert.equal(await page.locator('.pal').count(),0,'palette closes');
+ await page.locator('.rooms-rail .door[data-room="hunt"]').click();await page.locator('.tracker').waitFor();
+ await tab('all').click();assert.equal(await row('glints.com/id/opportunities/jobs/abc').count(),1);
+ await tab('inbox').click();
+
  /* 11. Delete is delayed: Undo sends no DELETE; letting the window pass sends exactly one */
  writes.length=0;await tab('all').click();const n0=await page.locator('.tracker-row').count();
- await row('careers.sample.example').locator('.tracker-more').click();await page.locator('.tracker-menu [data-tracker="delete"]').click();
+ await row('Analyst, Sample Capital').locator('.tracker-more').click();await page.locator('.tracker-menu [data-tracker="delete"]').click();
  assert.equal(await page.locator('.tracker-row').count(),n0-1);assert.match(await page.locator('.outreach-undo').innerText(),/Deleted/);
  await page.locator('[data-tracker="undo-delete"]').click();assert.equal(await page.locator('.tracker-row').count(),n0);
  await page.waitForTimeout(500);assert.equal(writes.filter(w=>w.m==='DELETE').length,0,'Undo sent no request');
- await row('careers.sample.example').locator('.tracker-more').click();await page.locator('.tracker-menu [data-tracker="delete"]').click();
+ await row('Analyst, Sample Capital').locator('.tracker-more').click();await page.locator('.tracker-menu [data-tracker="delete"]').click();
  await page.waitForTimeout(10600);
  assert.equal(writes.filter(w=>w.m==='DELETE').length,1);assert.equal(writes.find(w=>w.m==='DELETE').table,'career_tracks');
  assert.equal(await page.locator('.tracker-row').count(),n0-1);
@@ -149,6 +212,6 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await page.keyboard.press('Escape');
 
  await x.browser.close();
- console.log('PASS Tracker browser: capture, duplicates, company match, industry filter, drawer + log, next step, Touched it, drop, done, reopen, delayed delete + Undo, stale, 390px.');
+ console.log('PASS Tracker browser: capture, duplicates, company match, industry filter, drawer + log, next step, Touched it, drop, done, reopen, Send to Outreach, Pipeline bridge, Today agenda, palette Track in Career, delayed delete + Undo, stale, 390px.');
  
 })().catch(err=>{console.error(err);process.exit(1)});

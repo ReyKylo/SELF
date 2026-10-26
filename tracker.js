@@ -333,8 +333,15 @@ function drawerHtml(){
   '<div class="tracker-drawer-actions"><button type="button" class="career-btn career-primary" data-tracker="save"'+(S.busy?' disabled':'')+'>Save</button>'+
    '<button type="button" class="career-btn" data-tracker="touched" data-id="'+h(r.id)+'">Touched it</button>'+
    (r.status==='done'||r.status==='dropped'?'<button type="button" class="career-btn" data-tracker="reopen" data-id="'+h(r.id)+'">Reopen</button>':'<button type="button" class="career-btn" data-tracker="close-done" data-id="'+h(r.id)+'">Mark done…</button><button type="button" class="career-btn" data-tracker="close-drop" data-id="'+h(r.id)+'">Drop…</button>')+
-   '<button type="button" class="career-btn career-danger" data-tracker="delete" data-id="'+h(r.id)+'">Delete</button></div>'+
+   '<button type="button" class="career-btn career-danger" data-tracker="delete" data-id="'+h(r.id)+'">Delete</button></div>'+bridgeHtml(r)+
   '<section class="tracker-log" aria-label="Activity"><strong>Activity</strong>'+(evs?(evs.length?'<ul>'+evs.map(e=>'<li><time>'+h(String(e.created_at).slice(0,10))+'</time> '+h(e.summary)+'</li>').join('')+'</ul>':'<p class="tracker-hint">Nothing logged yet.</p>'):'<p class="tracker-hint">Loading…</p>')+'</section></aside>';
+}
+function bridgeHtml(r){
+ const btn=(a,l,extra='')=>'<button type="button" class="career-btn" data-tracker="'+a+'" data-id="'+h(r.id)+'" '+extra+'>'+l+'</button>';
+ const parts=[];
+ if(r.kind==='person')parts.push(r.person_id?btn('goto','In Outreach ↗','data-page="people"'):btn('to-outreach','Send to Outreach'));
+ if(r.kind==='job')parts.push(r.application_id?btn('goto','In Pipeline ↗','data-page="applications"'):btn('to-app','Applied → Pipeline','data-stage="applied"')+btn('to-app','Save to Pipeline (wishlist)','data-stage="wishlist"'));
+ return parts.length?'<div class="tracker-bridge" role="group" aria-label="Send elsewhere"><strong>Send elsewhere</strong><div class="tracker-drawer-actions">'+parts.join('')+'</div></div>':'';
 }
 function closePanel(c){
  const drop=c.type==='drop',opts=drop?DROP_REASONS:OUTCOMES;
@@ -363,8 +370,8 @@ function matchCompany(guess,url){
  const host0=(()=>{try{return registrable(new URL(url).hostname)}catch{return ''}})();
  return companies().find(c=>(key&&normName(c.name)===key)||(host0&&c.website&&(()=>{try{return registrable(new URL(c.website).hostname)===host0}catch{return false}})()))||null;
 }
-async function add(){
- const text=S.capture;if(!text.trim()||S.busy)return;
+async function add(text=S.capture){
+ if(!text.trim()||S.busy)return;
  const items=parseDrop(text);if(!items.length)return;
  S.busy=true;host.render();
  const fresh=[],dupes=[];
@@ -394,6 +401,13 @@ async function add(){
  host.render();
  if(S.highlight)Promise.resolve().then(()=>document.querySelector('.tracker-row.hl')?.scrollIntoView?.({block:'center'}));
 }
+/* Used by the command palette from any room: loads the rows if this session has not yet, then files the text in the Inbox. */
+async function quickAdd(text){
+ const owner=host?.state?.()?.user?.id;if(!owner)return;
+ try{if(!S.ready||S.owner!==owner)await load(owner)}catch(err){host.notify('Tracker could not load: '+(err?.message||err),true);return}
+ await add(text);
+}
+function setView(v){if(VIEWS.includes(v)){S.view=v;S.highlight=null;saveFilters()}}
 async function guarded(fn){
  if(S.busy)return;S.busy=true;
  try{await fn()}catch(err){host.notify('Not saved: '+(err?.message||err),true)}
@@ -438,6 +452,41 @@ async function closeRow(id,type,reason){
   await save(id,{status:drop?'dropped':'done',close_reason:txt,next_step:'',next_due:null},'status',(drop?'Dropped':'Done')+(txt?': '+txt:''));
   S.closing=null;S.drawer=null;S.draft=null;S.menu=null;
  });
+}
+/* ---- bridges to Outreach and the Pipeline (spec §3.4) ---- */
+const reloadCareer=async()=>{try{await core.reload()}catch{}};
+async function sendToOutreach(id){
+ const r=rowOf(id);if(!r)return;
+ await guarded(async()=>{
+  const O=outreach(),slug=O&&r.url?O.slugOf(r.url):null;
+  const people=core?.ui.people||[];
+  let person=slug?people.find(p=>O.slugOf(p.profile_url)===slug):null,created=false;
+  if(!person){
+   const co=r.company_id?companies().find(c=>c.id===r.company_id):(r.company_name?companies().find(c=>normName(c.name)===normName(r.company_name)):null);
+   const mail=r.url&&r.url.startsWith('mailto:')?r.url.slice(7):'';
+   person=await host.insert('career_people',{full_name:(r.title||(slug&&O.nameFromSlug(slug))||'Unnamed contact').trim().slice(0,160)||'Unnamed contact',role_title:'',company_id:co?co.id:null,email:mail,profile_url:slug?O.profileUrl(slug):null,relationship_stage:'new',notes:'Added from Tracker.'});
+   created=true;
+  }
+  const patch={person_id:person.id,kind:'person'};if(r.status==='inbox')patch.status='active';
+  await save(id,patch,'linked',created?'Sent to Outreach (Found)':'Linked to existing Outreach contact '+person.full_name);
+  host.notify(created?'Added to Outreach · Found':'Already in Outreach: linked');
+ });
+ await reloadCareer();host.render();
+}
+async function makeApplication(id,stage){
+ const r=rowOf(id);if(!r)return;
+ if(!r.company_name.trim()&&!r.company_id){host.notify('Add the company name first.',true);openDrawer(id);Promise.resolve().then(()=>document.querySelector('.tracker-drawer [name="company_name"]')?.focus());return}
+ await guarded(async()=>{
+  let co=r.company_id?companies().find(c=>c.id===r.company_id):companies().find(c=>normName(c.name)===normName(r.company_name));
+  if(!co)co=await host.insert('career_companies',{name:r.company_name.trim().slice(0,160),industry:r.industry||'',location:r.location||''});
+  const applied=stage==='applied';
+  const app=await host.insert('career_applications',{company_id:co.id,role_title:(r.title||'Role').trim().slice(0,200)||'Role',hiring_stage:applied?'applied':'wishlist',source_url:r.url&&/^https?:\/\//i.test(r.url)?r.url:null,applied_at:applied?today():null,notes:''});
+  const patch={application_id:app.id,company_id:co.id,company_name:co.name,kind:'job'};
+  if(applied)patch.status='waiting';else if(r.status==='inbox')patch.status='active';
+  await save(id,patch,'linked',applied?'Added to Pipeline as Applied':'Saved to Pipeline as Wishlist');
+  host.notify(applied?'Added to Pipeline · Applied':'Saved to Pipeline · Wishlist');
+ });
+ await reloadCareer();host.render();
 }
 async function openDrawer(id,closing){
  if(!rowOf(id))return;
@@ -489,6 +538,9 @@ async function action(e){
  else if(a==='close-pick'&&S.closing)await closeRow(S.closing.id,S.closing.type,b.dataset.value);
  else if(a==='close-text'&&S.closing){const t=document.querySelector('[data-tracker-close-text]')?.value||'';await closeRow(S.closing.id,S.closing.type,t)}
  else if(a==='close-cancel'){S.closing=null;host.render()}
+ else if(a==='to-outreach')await sendToOutreach(id);
+ else if(a==='to-app')await makeApplication(id,b.dataset.stage);
+ else if(a==='goto'){S.drawer=null;S.draft=null;core.setPage(b.dataset.page)}
  else if(a==='delete')startDelete(id);
  else if(a==='undo-delete')undoDelete();
  return true;
@@ -519,5 +571,5 @@ function keydown(e){
 }
 root.document.addEventListener('click',e=>{if(S.menu&&!e.target.closest?.('.tracker-menu,.tracker-more')){S.menu=null;host?.render?.()}},true);
 
-root.SELFTrackerUI={init,reset,load,render,action,input,change,keydown,beforeNavigate,flushDelete,state:S};
+root.SELFTrackerUI={init,reset,load,render,action,input,change,keydown,beforeNavigate,flushDelete,quickAdd,setView,state:S};
 })(typeof window!=='undefined'?window:globalThis);
