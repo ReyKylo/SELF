@@ -78,6 +78,7 @@ let host=null,core=null,panelsPromise=null,tick=null;
 const S={company:null,gameday:null,timer:{start:null,acc:0},reflection:null,notesDraft:null,busy:false};
 const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const store={get(k,d=null){try{const v=root.localStorage?.getItem('self.dossier.'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{root.localStorage?.setItem('self.dossier.'+k,JSON.stringify(v))}catch{}}};
+const studyOk=()=>!!root.SELFAccess?.study?.(host?.state?.()?.user);
 const p2=()=>root.SELFCareerPhase2?.ui||{};
 const p3=()=>root.SELFCareerPhase3?.ui||{};
 const dateTxt=v=>{const t=ms(v);return t==null?'':new Date(t).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})};
@@ -140,10 +141,10 @@ function renderGameDay(){
  if(shown==='before'||shown==='during'){
   const q=S.panels&&track?questionsFor(S.panels,track):null;
   const stories=(host.state().boards||[]).filter(b=>/story/i.test(b.title||b.name||''));
-  body+='<section class="career-card"><div class="career-small-heading"><strong>Practice questions</strong>'+(track?'<span>'+h(TRACKS.find(t=>t[0]===track)[1])+'</span>':'')+'</div>'+
+  body+=(!studyOk()?'':'<section class="career-card"><div class="career-small-heading"><strong>Practice questions</strong>'+(track?'<span>'+h(TRACKS.find(t=>t[0]===track)[1])+'</span>':'')+'</div>'+
    (track?'':'<p class="career-soft-empty">Pick the track of this interview once. It is saved in the prep notes as a "Track:" line.</p><div class="dossier-pills">'+TRACKS.map(t=>btn(h(t[1]),'set-track','data-track="'+t[0]+'"')).join('')+'</div>')+
    (track&&q?'<p class="dossier-open"><em>'+h(q.opening)+'</em></p><ol class="dossier-questions">'+q.challenges.map(c=>'<li>'+h(c.prompt)+'</li>').join('')+'</ol><p class="career-form-hint">Practice only. Nothing here is scored.</p>':'')+
-   (track&&!q?'<p class="career-soft-empty">'+(S.panelsError?'Questions could not load: '+h(S.panelsError):'Loading questions…')+'</p>':'')+'</section>'+
+   (track&&!q?'<p class="career-soft-empty">'+(S.panelsError?'Questions could not load: '+h(S.panelsError):'Loading questions…')+'</p>':'')+'</section>')+
    '<section class="career-card"><div class="career-small-heading"><strong>Stories</strong></div>'+
    (stories.length?stories.map(b=>'<button type="button" class="dossier-row" data-dossier="board" data-id="'+h(b.id)+'"><strong>'+h(b.title||b.name)+'</strong><small>Board</small></button>').join(''):'<p class="career-soft-empty">No story bank yet.</p>'+(root.SELFBoards?.createFromRecipe?btn('Create a Story Bank','story-bank'):''))+'</section>'+
    '<section class="career-card"><div class="career-small-heading"><strong>Drill timer</strong></div><div class="dossier-timer"><output data-dossier-clock aria-live="off">'+fmtClock(elapsed())+'</output>'+
@@ -169,7 +170,7 @@ function renderInterviewsStrip(){
 /* page hooks for career.js */
 function renderCompanies(){return S.company?renderDossier():null}
 function renderInterviews(){
- if(S.gameday){if(!S.panels&&!S.panelsAsked){S.panelsAsked=true;loadPanels().then(p=>{S.panels=p;host.render()})}return renderGameDay()}
+ if(S.gameday){if(studyOk()&&!S.panels&&!S.panelsAsked){S.panelsAsked=true;loadPanels().then(p=>{S.panels=p;host.render()})}return renderGameDay()}
  return renderInterviewsStrip()+(root.SELFCareerPhase2?.renderInterviews?.()||'');
 }
 function companyButton(c){return '<button type="button" class="career-btn dossier-open-btn" data-dossier="open-dossier" data-id="'+h(c.id)+'" aria-label="Open dossier for '+h(c.name)+'">Dossier</button>'}

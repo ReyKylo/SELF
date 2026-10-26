@@ -50,7 +50,7 @@ async function submit(e){
  const form=e.target,id=form?.id;
  if(!['forgot-form','reset-form','password-form'].includes(id))return false;
  e.preventDefault();if(S.busy)return true;
- const v=Object.fromEntries(new FormData(form).entries());
+ const v=host.formData?host.formData(form):Object.fromEntries(new FormData(form).entries());
  S.busy=true;say('');
  try{
   if(id==='forgot-form'){
@@ -77,6 +77,13 @@ async function submit(e){
 }
 /* Called once at start-up: a recovery link opens the "choose a new password" screen and never signs in on its own. */
 function boot(hash){
+ const q=new URLSearchParams(String(hash||'').replace(/^#/,''));
+ if(q.get('error_code')||(q.get('error')&&q.get('type')!=='recovery')){
+  const st=host.state();st.loginMode='forgot';st.session=null;
+  say(q.get('error_code')==='otp_expired'?'That reset link has expired or was already used. Request a new one.':'That link did not work. Request a new reset link.',true);
+  try{root.history?.replaceState?.(null,'',root.location.pathname+root.location.search)}catch{}
+  return true;
+ }
  const t=parseRecovery(hash);if(!t)return false;
  S.recovery=t;host.state().loginMode='reset';host.state().session=null;
  try{root.history?.replaceState?.(null,'',root.location.pathname+root.location.search)}catch{}
