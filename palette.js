@@ -62,7 +62,17 @@ function createItems(c,{altOnly=false}={}){
   spaces.push({group:'Create',label:'Create Space “'+w.name+'”',hint:'No Space has that name yet',run:{type:'create-space',name:w.name}});
  return altOnly?[...alt,...spaces]:[main,...alt,...spaces];
 }
-/* ctx: {tasks,spaces,boards,people,companies,links,statusName,spaceName,capture}  ->  [{id,group,label,hint,idx,run}] in display order */
+/* "Track in Career": files the text in the Hunt Tracker Inbox. Offered for any query with a link, and as an alternative for a sentence. Needs ctx.canTrack. */
+function trackItems(ctx,q){
+ if(!ctx.canTrack||q.length<2||!root.SELFTracker)return [];
+ const found=root.SELFTracker.parseDrop(q).filter(x=>x.url);
+ if(found.length){
+  const first=found[0];
+  return [{group:'Create',label:found.length>1?'Track '+found.length+' links in Career':'Track in Career: “'+(first.title||first.url.replace(/^https?:\/\/(www\.)?/,'')).slice(0,60)+'”',hint:'Hunt Inbox · '+root.SELFTracker.sourceLabel(first.source),run:{type:'track',text:q}}];
+ }
+ return /\s/.test(q)?[{group:'Create',label:'Track in Career as a note: “'+q.slice(0,60)+'”',hint:'Goes to the Hunt Tracker Inbox',run:{type:'track',text:q}}]:[];
+}
+/* ctx: {tasks,spaces,boards,people,companies,links,statusName,spaceName,capture,canTrack}  ->  [{id,group,label,hint,idx,run}] in display order */
 function buildItems(ctx,query){
  const q=String(query||'').trim();
  const nav=[...ROOM_ITEMS.map(([id,label,hint])=>({group:'Go to',label:'Go to '+label,hint,run:{type:'room',room:id},key:label,offset:'Go to '.length,bonus:40})),
@@ -80,12 +90,12 @@ function buildItems(ctx,query){
   add('Companies',ctx.companies||[],c=>({group:'Companies',label:c.name,hint:'Company',run:{type:'career',page:'companies'}}),3);
   add('Links',ctx.links||[],l=>({group:'Links',label:l.title||l.url,hint:l.url,run:{type:'link',url:l.url}}),3);
  }
- const c=ctx.capture,creations=createItems(c);
+ const c=ctx.capture,creations=createItems(c),track=trackItems(ctx,q);
  /* A query that names a room, section or action outright (a substring of its label) runs that command, even if it reads like a verb ("study") or has two words ("switch theme"). Otherwise a sentence, a token or a link is a capture. */
  const words=q.toLowerCase().split(/\s+/).filter(Boolean);
  const strongNav=navHits.some(h=>h.score>=1000||(q.length>=3&&words.every(w=>(h.key||h.label).toLowerCase().includes(w))));
  const createFirst=!strongNav&&!!c&&c.ok&&(c.kind!=='note'||/\s/.test(q)||/[#!]/.test(q)||c.warnings?.length);
- const ordered=createFirst?[...creations,...navHits,...records]:[...navHits,...records,...creations];
+ const ordered=createFirst?[...creations,...track,...navHits,...records]:[...navHits,...records,...creations,...track];
  const seen=new Set();
  return ordered.filter(x=>{const k=x.group+'|'+x.label+'|'+JSON.stringify(x.run);if(seen.has(k))return false;seen.add(k);return true}).slice(0,30).map((x,i)=>({...x,id:'i'+i,idx:x.idx||[]}));
 }
@@ -98,6 +108,7 @@ function context(query){
  const st=host.state(),c=host.careerUi?.()||{};
  const ctx={tasks:[...st.tasks].sort((a,b)=>(a.status==='done')-(b.status==='done')),spaces:st.spaces,boards:st.boards,links:st.links,
   people:c.ready?c.people:[],companies:c.ready?c.companies:[],views:host.views?host.views():[],spaceName:id=>host.spaceName(id),statusName:s=>host.statusName(s)};
+ ctx.canTrack=!!host.track;
  ctx.capture=query.trim()?root.SELFCapture.parseCapture(query,{today:host.today(),spaces:st.spaces}):null;
  return ctx;
 }
@@ -166,6 +177,7 @@ async function run(item){
  if(r.type==='saved-view')return host.applyView(r.id);
  if(r.type==='link'){root.open?.(r.url,'_blank','noopener,noreferrer');return}
  if(r.type==='create-space'){const name=r.name.charAt(0).toUpperCase()+r.name.slice(1,80);return host.mutate(async()=>{await host.insert('spaces',{name})},'Space “'+name+'” created. Run your capture again to file it there.')}
+ if(r.type==='track')return host.track(r.text);
  if(r.type==='create')return create(r.capture);
 }
 function create(c){

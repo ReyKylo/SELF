@@ -79,6 +79,7 @@ const host={
   if(!record)throw Error('Forbidden');
   Object.assign(record,payload);return {...record};
  },
+ async del(table,id){const i=records[table].findIndex(x=>x.id===id&&x.user_id===user.id);if(i<0)throw Error('Forbidden');records[table].splice(i,1)},
  async reloadCareer(){radar.ui.items=records.career_opportunities.filter(x=>x.user_id===user.id).map(x=>({...x}))}
 };
 radar.init({host,career:fakeCareer});
@@ -127,6 +128,11 @@ async function main(){
  const second=radar.ui.results[1];
  await button('dismiss',{url:second.job_url});
  assert(records.career_opportunities.some(x=>x.job_url===second.job_url&&x.status==='dismissed'));
+ {const dismissed=records.career_opportunities.find(x=>x.job_url===second.job_url);
+  assert.match(radar.render(),new RegExp('data-career3="delete-record" data-id="'+dismissed.id+'"'),'persisted records can be deleted');
+  const asked=confirmCalls;await button('delete-record',{id:dismissed.id});
+  assert.equal(confirmCalls,asked+1,'asks first');assert(!records.career_opportunities.some(x=>x.id===dismissed.id),'record is gone');
+  assert(!radar.ui.items.some(x=>x.id===dismissed.id),'and gone from the list');}
  await button('scan');assert.equal(feedCalls,1,'cooldown prevents repeated request');
  assert.match(radar.ui.error,/wait 15 minutes/);
  await button('manual');

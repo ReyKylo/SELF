@@ -58,6 +58,14 @@ function followUps({people=[],touchpoints=[],day}){
  return {follows,suggested};
 }
 /* Merges tasks due today or overdue, interviews in the next 7 days and follow-ups. Career data is optional. */
+/* Tracker rows that need you: due or near a deadline (Today), unsorted (Inbox) and untouched (Stale). Needs SELFTracker; without it the Tracker is simply absent from Today. */
+function trackCounts(career,day){
+ const TR=root.SELFTracker,rows=(career&&career.tracks)||[],out={today:[],inbox:0,stale:0};
+ if(!TR)return out;
+ for(const t of rows){const b=TR.bucket(t,day,career.staleDays||14);if(b.includes('today'))out.today.push(t);if(b.includes('inbox'))out.inbox++;if(b.includes('stale'))out.stale++}
+ out.today=TR.sortFor('today',out.today,day);
+ return out;
+}
 function buildAgenda({tasks=[],day,now=Date.now(),career=null}){
  const items=[];
  const open=tasks.filter(t=>t.status!=='done'&&t.due_date&&t.due_date<=day).sort((a,b)=>a.due_date.localeCompare(b.due_date)||String(a.id).localeCompare(String(b.id)));
@@ -83,6 +91,10 @@ function buildAgenda({tasks=[],day,now=Date.now(),career=null}){
   }
   const {follows,suggested}=followUps({people:career.people,touchpoints:career.touchpoints,day});
   for(const f of follows)items.push({key:'follow:'+f.person.id,kind:'follow',tone:'person',time:'Follow up',title:f.person.full_name,sub:'Next step · '+f.step,open:{action:'open-career',page:'people'}});
+  for(const t of trackCounts(career,day).today.slice(0,3)){
+   const due=root.SELFTracker.dueOf(t),late=due?daysBetween(due,day):0;
+   items.push({key:'track:'+t.id,kind:'track',tone:'hunt',time:late>0?late+'d late':'Due',title:t.title||t.company_name||String(t.url||'Tracker row').replace(/^https?:\/\/(www\.)?/,'').slice(0,60),sub:'Tracker · '+(t.next_step||'Deadline coming up'),open:{action:'open-career',page:'tracker',view:'today'}});
+  }
   for(const g of suggested)items.push({key:'suggest:'+g.person.id,kind:'suggest',tone:'person',time:'Suggested',title:g.person.full_name,sub:'Last contact '+g.age+' days ago',open:{action:'open-career',page:'people'}});
  }
  return {items:items.slice(0,MAX_ITEMS),hidden:Math.max(0,items.length-MAX_ITEMS)};
@@ -97,7 +109,14 @@ function triageQueue(inbox,skippedIds,pendingIds){
 function careerData(){
  const c=root.SELFCareer?.ui,p=root.SELFCareerPhase2?.ui;
  if(!c?.ready||!p?.ready)return null;
- return {people:c.people||[],applications:c.applications||[],companies:c.companies||[],interviews:p.interviews||[],touchpoints:p.touchpoints||[],dismissed:root.SELFDossier?.dismissed?.()||[]};
+ const tu=root.SELFTrackerUI?.state,pd=tu?.pendingDelete?.id;
+ return {tracks:tu?.ready?tu.rows.filter(r=>r.id!==pd):[],staleDays:tu?.staleDays||14,people:c.people||[],applications:c.applications||[],companies:c.companies||[],interviews:p.interviews||[],touchpoints:p.touchpoints||[],dismissed:root.SELFDossier?.dismissed?.()||[]};
+}
+function trackLine(career,day,attr){
+ if(!career)return '';
+ const c=trackCounts(career,day),parts=[[c.today.length,'due','today'],[c.inbox,'in Inbox','inbox'],[c.stale,'stale','stale']].filter(p=>p[0]);
+ if(!parts.length)return '';
+ return '<p class="today-sub agenda-track">Tracker: '+parts.map(([n,l,v])=>'<button type="button" class="link-action" data-today="open-career" data-page="tracker" data-view="'+attr(v)+'">'+n+' '+l+'</button>').join(' · ')+'</p>';
 }
 function render(){
  const {state,esc,attr,ic,today,spaceOf,statusOf,dueBadge}=host,day=today(),st=state();
@@ -129,9 +148,10 @@ function render(){
  const agendaCard='<section class="card card-pad today-agenda" aria-labelledby="agenda-h"><div class="section-head"><h2 id="agenda-h">Agenda</h2></div>'+
   (agenda.items.length?'<ul class="agenda-list">'+agenda.items.map(a=>
    '<li><time>'+esc(a.time)+'</time><span class="agenda-dot" style="--c:'+tones[a.tone]+'" aria-hidden="true"></span>'+
-   '<button type="button" class="agenda-item" '+(a.open.action==='open-task'?'data-action="open-task" data-id="'+attr(a.open.id)+'"':'data-today="open-career" data-page="'+attr(a.open.page)+'"')+'><strong>'+esc(a.title)+'</strong><small>'+esc(a.sub)+'</small></button></li>').join('')+'</ul>'+
+   '<button type="button" class="agenda-item" '+(a.open.action==='open-task'?'data-action="open-task" data-id="'+attr(a.open.id)+'"':'data-today="open-career" data-page="'+attr(a.open.page)+'"'+(a.open.view?' data-view="'+attr(a.open.view)+'"':''))+'><strong>'+esc(a.title)+'</strong><small>'+esc(a.sub)+'</small></button></li>').join('')+'</ul>'+
    (agenda.hidden?'<p class="today-sub">+'+agenda.hidden+' more in Work and Hunt.</p>':''):
    '<div class="empty-mini">Nothing scheduled. Pick three from Work.</div>')+
+  trackLine(career,day,attr)+
   (career?'':loading?'<p class="today-sub" role="status">Loading your Career agenda…</p>':'<p class="today-sub">Interviews and follow-ups come from Career.</p><button type="button" class="soft-btn" data-today="load-career">'+ic('briefcase',16)+' Load Career agenda</button>')+'</section>';
 
  /* triage */
@@ -189,7 +209,7 @@ async function action(e){
  const b=e.target.closest('[data-today]');if(!b)return false;
  const a=b.dataset.today,id=b.dataset.id;
  if(a==='load-career'){root.SELFCareer?.enter?.();host.render();return true}
- if(a==='open-career'){host.go('career',{room:'hunt'});root.SELFCareer?.setPage?.(b.dataset.page);return true}
+ if(a==='open-career'){host.go('career',{room:'hunt'});if(b.dataset.view)root.SELFTrackerUI?.setView?.(b.dataset.view);root.SELFCareer?.setPage?.(b.dataset.page);return true}
  if(a==='triage-task'){await makeTask(id);return true}
  if(a==='triage-keep'){skipped.add(id);host.render();return true}
  if(a==='triage-reset'){skipped.clear();host.render();return true}

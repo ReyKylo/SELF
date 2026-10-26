@@ -78,3 +78,7 @@
  .outreach-cover{margin-left:0}
 }
 @media (prefers-reduced-motion:reduce){.outreach-card,.outreach-lane{transition:none}}
+
+.outreach-menu .danger{color:var(--red,#d9534f)}
+.outreach-check{display:flex;gap:8px;align-items:center;font-size:.86em;margin:10px 0}
+.outreach-snack{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;z-index:45;max-width:min(520px,calc(100vw - 32px));box-shadow:0 12px 30px rgba(0,0,0,.3)}
