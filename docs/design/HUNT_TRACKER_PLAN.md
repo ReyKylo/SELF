@@ -100,7 +100,7 @@ Add a **Career** block to Today, next to "Needs a touch": "3 due · 5 in Inbox �
 ### 4.1 `normalizeUrl(text)`
 Trim, add `https://` when the scheme is missing, lowercase the host, drop the `www.` prefix, drop the hash and tracking parameters (`utm_*`, `trk`, `trackingId`, `refId`, `lipi`, `ref`, `source`, `gclid`, `fbclid`), drop the trailing slash. Keep other query parameters (some job boards use them as the job id, e.g. `currentJobId`). Returns `null` for anything that is not `http(s)` or `mailto:`.
 
-For LinkedIn job URLs, reduce to `https://linkedin.com/jobs/view/<id>` (also when the id comes from `?currentJobId=`). LinkedIn profiles reuse `SELFOutreach.profileUrl`, so the Tracker and Outreach share one duplicate key.
+For LinkedIn job URLs, reduce to `https://www.linkedin.com/jobs/view/<id>` (LinkedIn always uses the `www.` host, matching Outreach profile links) (also when the id comes from `?currentJobId=`). LinkedIn profiles reuse `SELFOutreach.profileUrl`, so the Tracker and Outreach share one duplicate key.
 
 ### 4.2 `detectSource(url)` → `{source, kind, companyGuess}`
 Only the URL is read. **Nothing is fetched.**
