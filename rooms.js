@@ -39,9 +39,11 @@ function doorMarkup(room,active,badge,ic,esc){
  return '<button type="button" class="door" data-action="nav" data-view="'+room.view+'" data-room="'+room.id+'" style="--c:var(--room-'+room.id+')" aria-current="'+(active?'page':'false')+'"'+
   ' aria-label="'+esc(room.label+(badge?' ('+badge.aria+')':''))+'">'+ic(room.icon,24)+'<span>'+esc(room.label)+'</span><small>'+(badge?esc(badge.text):'')+'</small></button>';
 }
+const PRIVATE=['study'];
+const visible=study=>study?ROOMS:ROOMS.filter(r=>!PRIVATE.includes(r.id));
 function doors(ctx){
  const active=roomOf(ctx.view,ctx.careerPage),b=badges(ctx);
- return '<span class="rail-ind" aria-hidden="true"></span>'+ROOMS.map(r=>doorMarkup(r,r.id===active,b[r.id],ctx.ic,ctx.esc)).join('');
+ return '<span class="rail-ind" aria-hidden="true"></span>'+visible(ctx.study).map(r=>doorMarkup(r,r.id===active,b[r.id],ctx.ic,ctx.esc)).join('');
 }
 function sidebar(ctx,brand,foot){
  return '<aside class="sidebar rooms-rail" aria-label="SELF navigation">'+brand+'<nav class="nav-items" aria-label="Rooms">'+doors(ctx)+'</nav>'+foot+'</aside>';
@@ -90,12 +92,12 @@ function afterRender(){
  if(room)last.room=room;
 }
 /* Alt+1..5 switches rooms, except while typing. Returns the room id or null. */
-function roomForKey(e){
+function roomForKey(e,study){
  if(!e.altKey||e.ctrlKey||e.metaKey)return null;
  const t=e.target;if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||'')))return null;
- const i=Number(e.key)-1;return Number.isInteger(i)&&i>=0&&i<ROOMS.length?ROOMS[i].id:null;
+ const i=Number(e.key)-1;return Number.isInteger(i)&&i>=0&&i<visible(study).length?visible(study)[i].id:null;
 }
-const api={ROOMS,WORK_PAGES,roomOf,badges,sidebar,bar,subnav,alignCareer,afterRender,roomForKey};
+const api={ROOMS,visible,WORK_PAGES,roomOf,badges,sidebar,bar,subnav,alignCareer,afterRender,roomForKey};
 root.SELFRooms=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

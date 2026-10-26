@@ -9,9 +9,9 @@ const SOURCES=[['linkedin','LinkedIn'],['linkedin_jobs','LinkedIn Jobs'],['jobst
 const KINDS=[['job','Job'],['person','Person'],['company','Company'],['other','Other']];
 const STATUSES=[['inbox','Inbox'],['active','Active'],['waiting','Waiting'],['done','Done'],['dropped','Dropped']];
 const VIEWS=['today','inbox','all','stale'];
-const DROP_REASONS=['No Indonesia office','No Indonesians there','No vacancy in Indonesia','No careers page','Closed','Not a fit'];
+const DROP_REASONS=['No vacancy','Wrong location','No careers page','Closed','Not a fit'];
 const OUTCOMES=['Applied','Got a reply','Interview','Offer','Rejected','Other'];
-const INDUSTRIES=['Private Equity','Venture Capital','Investment Banking','Consulting','Corporate Finance / Strategy','Asset Management','Banking','Fintech','Tech','Other'];
+const INDUSTRIES=['Private Equity','Venture Capital','Investment Banking','Consulting','Corporate Finance / Strategy','Asset Management','Banking','Fintech','Tech','Software / IT','Healthcare','Education','Marketing / Media','Operations','Design','Other'];
 const STALE_DAYS=14;
 const label=(list,v)=>(list.find(x=>x[0]===v)||[v,v])[1];
 const sourceLabel=v=>label(SOURCES,v),kindLabel=v=>label(KINDS,v),statusLabel=v=>label(STATUSES,v);

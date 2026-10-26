@@ -85,6 +85,7 @@ const run=async()=>{
     await s.page.locator('[data-action="logout"]').click();
     await s.page.locator('#auth-form').waitFor();
     s.fixture.user={id:'dca1c233-018d-4c53-a52c-bef5932a8a7f',email:'second-qa@example.invalid'};
+    await s.page.evaluate(id=>window.__SELF_CAREER_OWNERS.push(id),s.fixture.user.id);
     await s.context.route('https://btiwxqjiptbwaunjibjh.supabase.co/auth/v1/token*',route=>
       route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
         access_token:'synthetic-next-token',refresh_token:'synthetic-next-refresh',user:s.fixture.user

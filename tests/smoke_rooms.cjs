@@ -29,7 +29,7 @@ assert.equal(R.badges({today:day,tasks:[],boards:[{}]}).studio.text,'1 board');
 /* markup */
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ic=n=>'<svg data-i="'+n+'"></svg>';
-const ctx=over=>({view:'home',tasks:[],boards:[],today:day,ic,esc,...over});
+const ctx=over=>({study:true,view:'home',tasks:[],boards:[],today:day,ic,esc,...over});
 function count(html,re){return (html.match(re)||[]).length}
 for(const [view,page,active] of [['home',undefined,'today'],['work',undefined,'work'],['space',undefined,'work'],['career','overview','hunt'],['career','learning','study'],['boards',undefined,'studio']]){
  const html=R.sidebar(ctx({view,careerPage:page}),'<div class="brand"></div>','<div class="sidebar-foot"></div>');
@@ -48,7 +48,11 @@ assert.match(R.subnav(ctx({view:'work'})),/data-view="work" aria-current="page"/
 assert.equal(R.subnav(ctx({view:'home'})),'');assert.equal(R.subnav(ctx({view:'career',careerPage:'overview'})),'');
 
 /* keys */
-const key=(o)=>R.roomForKey({altKey:true,target:{tagName:'DIV'},...o});
+const key=(o,study=true)=>R.roomForKey({altKey:true,target:{tagName:'DIV'},...o},study);
+/* Accounts without Study: four doors, no Study door, Alt+4 is Studio, Alt+5 is nothing; Hunt stays. */
+{const h=R.sidebar(ctx({study:false}),'','');assert.equal(count(h,/class="door"/g),4,'four doors without Study');assert.doesNotMatch(h,/data-room="study"/);assert.match(h,/data-room="hunt"/);
+ assert.equal(key({key:'4'},false),'studio');assert.equal(key({key:'5'},false),null);assert.equal(key({key:'4'},true),'study');
+ assert.equal(count(R.bar(ctx({study:false})),/class="door"/g),4)}
 assert.equal(key({key:'1'}),'today');assert.equal(key({key:'5'}),'studio');assert.equal(key({key:'6'}),null);assert.equal(key({key:'0'}),null);
 assert.equal(key({key:'2',ctrlKey:true}),null);assert.equal(key({key:'2',altKey:false}),null);
 assert.equal(key({key:'2',target:{tagName:'INPUT'}}),null);assert.equal(key({key:'2',target:{tagName:'TEXTAREA'}}),null);assert.equal(key({key:'2',target:{isContentEditable:true,tagName:'DIV'}}),null);
@@ -63,15 +67,18 @@ delete globalThis.SELFCareer;
 /* integration: real app.js in a vm, rooms and classic */
 function boot(search){
  let markup='';const el={style:{setProperty(){}},dataset:{}};
- const w={scrollTo(){}};
+ const w={scrollTo(){},__SELF_CAREER_OWNERS:['u1']};
  const ctx={console,setTimeout,clearTimeout,URL,URLSearchParams,Date,window:w,location:{search},localStorage:{getItem:()=>null,setItem(){},removeItem(){}},navigator:{},
   document:{body:el,documentElement:el,addEventListener(){},querySelector:s=>s==='#app'?{set innerHTML(v){markup=v},get innerHTML(){return markup}}:null}};
  vm.createContext(ctx);
- for(const f of ['rooms.js','self-dnd.js','career.js','app.js'])vm.runInContext(root(f),ctx);
+ for(const f of ['access.js','rooms.js','self-dnd.js','career.js','app.js'])vm.runInContext(root(f),ctx);
  vm.runInContext('state.user={id:"u1",email:"a@b.c"};state.spaces=[{id:"s1",name:"Fin",icon:"chart",accent:"green"}];state.tasks=[{id:"t1",title:"Do",space_id:"s1",status:"todo",priority:"high",due_date:"2026-10-20",created_at:"2026-10-01T00:00:00Z"}];',ctx);
  return {ctx,html:()=>markup};
 }
 const rooms=boot('');
+{const other=boot('');vm.runInContext('state.user={id:"u2",email:"x@y.z"};state.view="home";render();',other.ctx);
+ assert.equal(count(other.html(),/class="door"/g),8,'a non-owner gets four doors in the rail and four in the bar');assert.doesNotMatch(other.html(),/data-room="study"/);
+ vm.runInContext('state.view="career";render();',other.ctx);vm.runInContext('go("career",{room:"study"});',other.ctx);assert.doesNotMatch(other.html(),/Career Prep|CAREER \/ CAREER PREP/,'non-owner can never open Study')}
 for(const view of ['home','spaces','space','boards','work','links','inbox','career','search','settings']){
  vm.runInContext("state.view='"+view+"';state.spaceId='s1';render();",rooms.ctx);const m=rooms.html();
  assert.match(m,/data-shell="rooms"/,view);assert.match(m,/class="sidebar rooms-rail"/,view);assert.match(m,/class="mobile-nav rooms-bar"/,view);

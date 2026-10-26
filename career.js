@@ -12,6 +12,7 @@ const HIRING=[['wishlist','Wishlist'],['applied','Applied'],['interviewing','Int
 const RELATIONSHIPS=[['new','Found'],['connect_sent','Connect sent'],['connected','Connected'],['reached_out','Approached'],['in_conversation','Talking'],['maintain','Ally'],['no_reply','No reply']];
 const TYPES={company:'career_companies',person:'career_people',application:'career_applications'};
 const names={company:'Company',person:'Person',application:'Application'};
+const studyOk=()=>!!window.SELFAccess?.study?.(host?.state?.()?.user);
 const ui={page:'tracker',railCollapsed:false,ready:false,loading:false,error:'',
  companies:[],people:[],applications:[],drawer:null,modal:null,dirty:false,busy:false,saveError:'',generation:0,owner:null};
 let host=null;
@@ -192,14 +193,16 @@ function drawerMarkup(){
  '<p class="career-drawer-note">Career status and Task status remain independent, with explicit links between records.</p></div></aside></div>';
 }
 /* ---- Rooms: Career is hosted inside the Hunt and Study rooms. The classic shell keeps its own rail. ---- */
-const HUNT_PILLS=[['tracker','Tracker'],['overview','Overview'],['applications','Pipeline'],['people','Outreach'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['cvs','Kit']];
+const radarOk=()=>!!window.SELFAccess?.radar?.(host?.state?.()?.user);
+const HUNT_PILLS_ALL=[['tracker','Tracker'],['overview','Overview'],['applications','Pipeline'],['people','Outreach'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['cvs','Kit']];
+const huntPillList=()=>HUNT_PILLS_ALL.filter(p=>p[0]!=='radar'||radarOk());
 const KIT_PAGES=[['cvs','CV Library'],['templates','Templates'],['reminders','Reminders']];
 const inKit=id=>KIT_PAGES.some(x=>x[0]===id);
 function huntPills(selected){
  const pill=([id,label])=>{const on=selected===id||(id==='cvs'&&inKit(selected));
   return '<button type="button" class="career-pill'+(on?' active':'')+'" data-career="page" data-page="'+id+'" aria-current="'+(on?'page':'false')+'">'+h(label)+'</button>'};
- return '<nav class="career-pills" aria-label="Hunt sections">'+HUNT_PILLS.map(pill).join('')+
-  '<button type="button" class="career-pill career-pill-link" data-career="page" data-page="learning" aria-current="false">Career Prep →</button></nav>'+
+ return '<nav class="career-pills" aria-label="Hunt sections">'+huntPillList().map(pill).join('')+
+  (studyOk()?'<button type="button" class="career-pill career-pill-link" data-career="page" data-page="learning" aria-current="false">Career Prep →</button>':'')+'</nav>'+
   (inKit(selected)?'<div class="career-kit-tabs" role="group" aria-label="Kit">'+KIT_PAGES.map(([id,label])=>
    '<button type="button" class="career-kit-tab'+(selected===id?' active':'')+'" data-career="page" data-page="'+id+'" aria-pressed="'+(selected===id)+'">'+h(label)+'</button>').join('')+'</div>':'');
 }
@@ -236,12 +239,13 @@ function render(){
  const selected=ui.page,title=PAGES.find(x=>x[0]===selected)?.[1]||'Overview';
  const nav=hosted?'<h2 class="sr-only">CAREER STUDIO</h2>':'<nav class="career-rail '+(ui.railCollapsed?'collapsed':'')+'" aria-label="Career subpages"><div class="career-rail-head"><strong>CAREER STUDIO</strong>'+
  button(ui.railCollapsed?'›':'‹','toggle-rail','aria-label="Toggle Career navigation"')+'</div>'+
- PAGES.map(([id,label,icon])=> (id==='cvs'?'<div class="career-rail-category">RESOURCES</div>':'')+
+ PAGES.filter(p=>(p[0]!=='learning'||studyOk())&&(p[0]!=='radar'||radarOk())).map(([id,label,icon])=> (id==='cvs'?'<div class="career-rail-category">RESOURCES</div>':'')+
  '<button type="button" class="career-subnav '+(selected===id?'active':'')+'" data-career="page" data-page="'+id+'" title="'+label+'" aria-current="'+(selected===id?'page':'false')+'">'+
  '<span class="career-nav-symbol">'+(host.icon?host.icon(icon,19):'•')+'</span><span class="career-nav-text">'+label+'</span></button>').join('')+
  '<div class="career-rail-footer">One Career workspace. SELF Tasks, Links and Boards stay connected.</div></nav>';
  let main='';
- if(selected==='learning')main=window.SELFCareerLearning?.render?.()||empty('Career Prep unavailable','Try reloading SELF.');
+ if(selected==='learning'&&!studyOk())main=empty('Not available','This section is not part of your workspace.');
+ else if(selected==='learning')main=window.SELFCareerLearning?.render?.()||empty('Career Prep unavailable','Try reloading SELF.');
  else if(ui.loading&&!ui.ready)main=empty('Opening Career…','Loading your private records.');
  else if(ui.error&&!ui.ready)main=empty('Career could not load',ui.error,primary('Retry loading','retry'));
  else if(selected==='tracker')main=window.SELFTrackerUI?.render?.()||empty('Tracker unavailable','Try reloading SELF.');
@@ -260,7 +264,7 @@ function render(){
  '<p>'+h(selected==='overview'?'Your next steps and actual records. No duplicate to-do system.':'One Career workspace, inside your existing SELF.')+'</p></div>'+
  (hosted?(selected==='learning'?'':'<div class="career-head-actions">'+primary('+ Quick Capture','quick-capture')+'</div>'):'<div class="career-head-actions">'+button('Sections','toggle-sections','aria-label="Choose Career subpage"')+
  primary('+ Quick Capture','quick-capture')+'</div>')+'</header>'+
- (hosted?'':'<div class="career-mobile-sections">'+PAGES.map(([id,label])=>button(label,'page','data-page="'+id+'" class="'+(selected===id?'active':'')+'"')).join('')+'</div>')+
+ (hosted?'':'<div class="career-mobile-sections">'+PAGES.filter(p=>(p[0]!=='learning'||studyOk())&&(p[0]!=='radar'||radarOk())).map(([id,label])=>button(label,'page','data-page="'+id+'" class="'+(selected===id?'active':'')+'"')).join('')+'</div>')+
  (ui.error&&ui.ready?'<p class="career-warning">'+h(ui.error)+' '+button('Retry','retry')+'</p>':'')+
  main+'</div>'+modalMarkup()+drawerMarkup()+(window.SELFCareerPhase2?.modalMarkup?.()||'')+(window.SELFOutreachUI?.overlay?.()||'')+'</div>';
 }
@@ -306,7 +310,7 @@ function enter(){
  if(!ui.ready&&!ui.loading)void load();
 }
 function setPage(id){
- if(!PAGES.some(x=>x[0]===id))return;
+ if(!PAGES.some(x=>x[0]===id)||(id==='learning'&&!studyOk())||(id==='radar'&&!radarOk()))return;
  if(ui.dirty&&!confirm('Discard unsaved edits?'))return;
  if(window.SELFCareerPhase3?.beforeNavigate?.()===false)return;
  window.SELFTrackerUI?.beforeNavigate?.();
