@@ -35,7 +35,7 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
 
  /* 1. overview */
  await page.goto(x.base);await page.locator('.rooms-rail .door[data-room="hunt"]').click();await page.locator('.career-pills').waitFor();
- assert.deepEqual(await page.locator('.career-pills .career-pill').allInnerTexts(),['Overview','Pipeline','Outreach','Companies','Radar','Interviews','Kit','Career Prep →']);
+ assert.deepEqual(await page.locator('.career-pills .career-pill').allInnerTexts(),['Tracker','Overview','Pipeline','Outreach','Companies','Radar','Interviews','Kit','Career Prep →']);
  await page.locator('.career-pill[data-page="people"]').click();await page.locator('.outreach').waitFor();
  assert.equal(await page.locator('.career-pill.active').innerText(),'Outreach');
  let rows=await page.locator('.outreach>.outreach-list>.outreach-row strong').allInnerTexts();assert.deepEqual(rows,['Sample Capital'],'only companies with people are listed first');

@@ -90,7 +90,7 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await page.locator('.career-workspace').waitFor();await page.locator('.learning-workspace').waitFor();assert.equal(await current(),'study');
  assert.equal(await page.locator('.career-pills').count(),0,'Study shows Career Prep, not the Hunt pills');
  await page.locator('.rooms-rail .door[data-room="hunt"]').click();assert.equal(await current(),'hunt');
- await page.locator('.career-pills').waitFor();assert.equal(await page.locator('.career-pill.active').innerText(),'Overview','Hunt leaves the learning page');
+ await page.locator('.career-pills').waitFor();assert.equal(await page.locator('.career-pill.active').innerText(),'Tracker','Hunt leaves the learning page');
  await page.locator('.career-pill[data-page="applications"]').click();
  await page.locator('[data-dnd-zone="stage:wishlist"] [data-dnd-item]').waitFor();
  assert.equal(await current(),'hunt','applications stay in Hunt');

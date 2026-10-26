@@ -68,6 +68,7 @@ async function main(){
  ctx.window.SELFCareer.enter();
  await new Promise(resolve=>setTimeout(resolve,12));
  assert.equal(careerUI.ready,true,'Career loads independent from SELF core app loader');
+ ctx.window.SELFCareer.setPage('overview');
  let html=ctx.window.SELFCareer.render();
  for(const section of ['Overview','Applications','Outreach','Companies','Opportunity Radar','CV Library','Interview Prep','Templates','Reminders'])
   assert(html.includes(section),'includes Career subpage: '+section);

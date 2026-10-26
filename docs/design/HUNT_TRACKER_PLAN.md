@@ -1,6 +1,6 @@
 # Hunt › Tracker: one place to drop any link and know what to do next
 
-**Status (26 Oct 2026): T1 (helpers) and T2 (migration) done; T3–T5 not built.** Builder: Sonnet, one PR per step (§9). The migration in §5 was applied on 26 Oct 2026 with the user's explicit approval ("Go Migration"): live version `20261026145143`, repo file `supabase/migrations/20261026145143_career_tracker.sql`; tables, RLS policies, grants and the unique URL index verified afterwards.
+**Status (26 Oct 2026): T1 (helpers), T2 (migration) and T3 (Tracker page) done; T4–T5 not built.** Builder: Sonnet, one PR per step (§9). The migration in §5 was applied on 26 Oct 2026 with the user's explicit approval ("Go Migration"): live version `20261026145143`, repo file `supabase/migrations/20261026145143_career_tracker.sql`; tables, RLS policies, grants and the unique URL index verified afterwards.
 
 **The problem, in the user's words:** "Gak semua via LinkedIn." Job hunting happens across company websites, LinkedIn Jobs, Jobstreet, Glints, Kalibrr, email and referrals. Today SELF only has a place for *people on LinkedIn* (Outreach), so:
 1. A careers page that turns out to be a dead end (no Indonesia office, no Indonesians, no vacancy in Indonesia) leaves no trace. The effort is lost, and the same firm gets researched again later.

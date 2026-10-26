@@ -59,7 +59,7 @@ function subnav(ctx){
 function alignCareer(room){
  const c=root.SELFCareer;if(!c?.ui||typeof c.setPage!=='function')return;
  if(room==='study'&&c.ui.page!=='learning')c.setPage('learning');
- else if(room==='hunt'&&c.ui.page==='learning')c.setPage('overview');
+ else if(room==='hunt'&&c.ui.page==='learning')c.setPage('tracker');
 }
 
 /* ---- post-render: slide the indicator and glide the tint from the previous room ---- */

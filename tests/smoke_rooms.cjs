@@ -56,8 +56,8 @@ assert.equal(key({key:'2',target:{tagName:'INPUT'}}),null);assert.equal(key({key
 /* alignCareer only changes the page across the Hunt/Study split */
 const calls=[];globalThis.SELFCareer={ui:{page:'overview'},setPage:id=>calls.push(id)};
 R.alignCareer('study');R.alignCareer('hunt');assert.deepEqual(calls,['learning']);
-SELFCareer.ui.page='learning';R.alignCareer('hunt');R.alignCareer('study');assert.deepEqual(calls,['learning','overview']);
-SELFCareer.ui.page='applications';R.alignCareer('hunt');assert.deepEqual(calls,['learning','overview'],'hunt keeps the current Career page');
+SELFCareer.ui.page='learning';R.alignCareer('hunt');R.alignCareer('study');assert.deepEqual(calls,['learning','tracker']);
+SELFCareer.ui.page='applications';R.alignCareer('hunt');assert.deepEqual(calls,['learning','tracker'],'hunt keeps the current Career page');
 delete globalThis.SELFCareer;
 
 /* integration: real app.js in a vm, rooms and classic */

@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const PAGES=[
- ['overview','Overview','home'],['applications','Applications','briefcase'],
+ ['tracker','Tracker','note'],['overview','Overview','home'],['applications','Applications','briefcase'],
  ['people','Outreach','person'],['companies','Companies','grid'],
  ['radar','Opportunity Radar','search'],['cvs','CV Library','note'],
  ['learning','Career Prep','graduation'],['interviews','Interview Prep','calendar'],['templates','Templates','book'],
@@ -12,7 +12,7 @@ const HIRING=[['wishlist','Wishlist'],['applied','Applied'],['interviewing','Int
 const RELATIONSHIPS=[['new','Found'],['connect_sent','Connect sent'],['connected','Connected'],['reached_out','Approached'],['in_conversation','Talking'],['maintain','Ally'],['no_reply','No reply']];
 const TYPES={company:'career_companies',person:'career_people',application:'career_applications'};
 const names={company:'Company',person:'Person',application:'Application'};
-const ui={page:'overview',railCollapsed:false,ready:false,loading:false,error:'',
+const ui={page:'tracker',railCollapsed:false,ready:false,loading:false,error:'',
  companies:[],people:[],applications:[],drawer:null,modal:null,dirty:false,busy:false,saveError:'',generation:0,owner:null};
 let host=null;
 const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','"':'&quot;',"'":'&#39;'}[c]));
@@ -192,7 +192,7 @@ function drawerMarkup(){
  '<p class="career-drawer-note">Career status and Task status remain independent, with explicit links between records.</p></div></aside></div>';
 }
 /* ---- Rooms: Career is hosted inside the Hunt and Study rooms. The classic shell keeps its own rail. ---- */
-const HUNT_PILLS=[['overview','Overview'],['applications','Pipeline'],['people','Outreach'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['cvs','Kit']];
+const HUNT_PILLS=[['tracker','Tracker'],['overview','Overview'],['applications','Pipeline'],['people','Outreach'],['companies','Companies'],['radar','Radar'],['interviews','Interviews'],['cvs','Kit']];
 const KIT_PAGES=[['cvs','CV Library'],['templates','Templates'],['reminders','Reminders']];
 const inKit=id=>KIT_PAGES.some(x=>x[0]===id);
 function huntPills(selected){
@@ -236,7 +236,7 @@ function render(){
  const selected=ui.page,title=PAGES.find(x=>x[0]===selected)?.[1]||'Overview';
  const nav=hosted?'<h2 class="sr-only">CAREER STUDIO</h2>':'<nav class="career-rail '+(ui.railCollapsed?'collapsed':'')+'" aria-label="Career subpages"><div class="career-rail-head"><strong>CAREER STUDIO</strong>'+
  button(ui.railCollapsed?'›':'‹','toggle-rail','aria-label="Toggle Career navigation"')+'</div>'+
- PAGES.map(([id,label,icon],index)=> (index===5?'<div class="career-rail-category">RESOURCES</div>':'')+
+ PAGES.map(([id,label,icon])=> (id==='cvs'?'<div class="career-rail-category">RESOURCES</div>':'')+
  '<button type="button" class="career-subnav '+(selected===id?'active':'')+'" data-career="page" data-page="'+id+'" title="'+label+'" aria-current="'+(selected===id?'page':'false')+'">'+
  '<span class="career-nav-symbol">'+(host.icon?host.icon(icon,19):'•')+'</span><span class="career-nav-text">'+label+'</span></button>').join('')+
  '<div class="career-rail-footer">One Career workspace. SELF Tasks, Links and Boards stay connected.</div></nav>';
@@ -244,6 +244,7 @@ function render(){
  if(selected==='learning')main=window.SELFCareerLearning?.render?.()||empty('Career Prep unavailable','Try reloading SELF.');
  else if(ui.loading&&!ui.ready)main=empty('Opening Career…','Loading your private records.');
  else if(ui.error&&!ui.ready)main=empty('Career could not load',ui.error,primary('Retry loading','retry'));
+ else if(selected==='tracker')main=window.SELFTrackerUI?.render?.()||empty('Tracker unavailable','Try reloading SELF.');
  else if(selected==='overview')main=careerOverview();
  else if(selected==='applications')main=window.SELFCareerPhase2?.renderApplications?.()||careerApplications();
  else if(selected==='people')main=window.SELFOutreachUI?.render?.()||window.SELFCareerPhase2?.renderPeople?.()||careerPeople();
@@ -282,6 +283,8 @@ async function load(){
   if(gen!==ui.generation)return;
   await window.SELFCareerPhase3?.load?.(ui.owner);
   if(gen!==ui.generation)return;
+  await window.SELFTrackerUI?.load?.(ui.owner);
+  if(gen!==ui.generation)return;
   ui.ready=true;ui.error='';
  }catch(e){if(gen!==ui.generation)return;ui.error=e?.message||String(e)}
  finally{if(gen===ui.generation){ui.loading=false;host.render()}}
@@ -297,6 +300,7 @@ function enter(){
   window.SELFCareerPhase3?.reset?.(owner);
   window.SELFCareerLearning?.reset?.(owner);
   window.SELFOutreachUI?.reset?.();
+  window.SELFTrackerUI?.reset?.(owner);
   window.SELFDossier?.reset?.();
  }
  if(!ui.ready&&!ui.loading)void load();
@@ -305,6 +309,7 @@ function setPage(id){
  if(!PAGES.some(x=>x[0]===id))return;
  if(ui.dirty&&!confirm('Discard unsaved edits?'))return;
  if(window.SELFCareerPhase3?.beforeNavigate?.()===false)return;
+ window.SELFTrackerUI?.beforeNavigate?.();
  if(window.SELFCareerPhase2?.beforeNavigate?.()===false)return;
  ui.page=id;ui.drawer=null;ui.modal=null;ui.dirty=false;ui.saveError='';host.render();
 }
@@ -370,6 +375,7 @@ async function erase(kind,id){
 }
 async function action(e){
  if(await window.SELFDossier?.action?.(e))return true;
+ if(await window.SELFTrackerUI?.action?.(e))return true;
  if(await window.SELFOutreachUI?.action?.(e))return true;
  if(await window.SELFLessonLoop?.action?.(e))return true;
  if(await window.SELFCareerLearning?.action?.(e))return true;
@@ -408,6 +414,7 @@ async function submit(e){
 }
 function input(e){
  if(window.SELFDossier?.input?.(e))return true;
+ if(window.SELFTrackerUI?.input?.(e))return true;
  if(window.SELFOutreachUI?.input?.(e))return true;
  if(window.SELFLessonLoop?.input?.(e))return true;
  if(window.SELFCareerLearning?.input?.(e))return true;
@@ -420,6 +427,7 @@ function input(e){
  return true;
 }
 function keydown(e){
+ if(window.SELFTrackerUI?.keydown?.(e))return true;
  if(window.SELFOutreachUI?.keydown?.(e))return true;
  if(window.SELFLessonLoop?.keydown?.(e))return true;
  if(window.SELFCareerPhase3?.keydown?.(e))return true;
@@ -436,6 +444,6 @@ function links(){
   ...(window.SELFCareerPhase3?.links?.()||[])
  ];
 }
-window.SELFCareer={setPage,init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api});window.SELFOutreachUI?.init?.({career:window.SELFCareer,host:api});window.SELFDossier?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
+window.SELFCareer={setPage,init(api){host=api;window.SELFCareerPhase2?.init?.({career:window.SELFCareer,host:api});window.SELFCareerPhase3?.init?.({career:window.SELFCareer,host:api});window.SELFCareerLearning?.init?.({career:window.SELFCareer,host:api});window.SELFOutreachUI?.init?.({career:window.SELFCareer,host:api});window.SELFTrackerUI?.init?.({career:window.SELFCareer,host:api});window.SELFDossier?.init?.({career:window.SELFCareer,host:api})},enter,render,action,submit,input,keydown,links,reload:load,ui};
 })();
 
