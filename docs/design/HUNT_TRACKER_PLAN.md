@@ -1,6 +1,6 @@
 # Hunt › Tracker: one place to drop any link and know what to do next
 
-**Status (26 Oct 2026): design agreed with the user, not built.** Builder: Sonnet, one PR per step (§9). The migration in §5 needs the user's explicit go-ahead before it runs.
+**Status (26 Oct 2026): T1 (helpers) and T2 (migration) done; T3–T5 not built.** Builder: Sonnet, one PR per step (§9). The migration in §5 was applied on 26 Oct 2026 with the user's explicit approval ("Go Migration"): live version `20261026145143`, repo file `supabase/migrations/20261026145143_career_tracker.sql`; tables, RLS policies, grants and the unique URL index verified afterwards.
 
 **The problem, in the user's words:** "Gak semua via LinkedIn." Job hunting happens across company websites, LinkedIn Jobs, Jobstreet, Glints, Kalibrr, email and referrals. Today SELF only has a place for *people on LinkedIn* (Outreach), so:
 1. A careers page that turns out to be a dead end (no Indonesia office, no Indonesians, no vacancy in Indonesia) leaves no trace. The effort is lost, and the same firm gets researched again later.
@@ -131,7 +131,7 @@ Company guesses are title-cased slugs (`northstar-capital` → "Northstar Capita
 ### 4.4 `INDUSTRIES`
 `Private Equity`, `Venture Capital`, `Investment Banking`, `Consulting`, `Corporate Finance / Strategy`, `Asset Management`, `Banking`, `Fintech`, `Tech`, `Other`. Stored as the label text. `industryOf(text)` maps existing free-text values in `career_companies.industry` (e.g. "PE", "pe fund", "VC") to the list, so old companies filter correctly without a data migration. A row with no industry but a linked company inherits the company's industry for filtering.
 
-## 5. Data change (**needs the user's explicit approval before it runs**)
+## 5. Data change (**applied 26 Oct 2026 with the user's explicit approval; do not run again**)
 New migration `supabase/migrations/<timestamp>_career_tracker.sql`, applied once by the Integrator. It is additive only: two new tables and no change to existing rows. RLS and grants follow the four owner policies used in `20261021135000_self_career_phase1_core.sql`.
 
 ```sql
