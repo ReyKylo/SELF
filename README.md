@@ -106,6 +106,8 @@ No service-role keys in the browser. Users can select/change only their own reco
 
 ## Deploy on Cloudflare Workers Builds (existing Worker: `self`)
 
+> **Deploys now run from GitHub Actions** (`.github/workflows/deploy-cloudflare.yml`, on every push to `main` or by hand from the Actions tab). It needs the repository secrets `CLOUDFLARE_API_TOKEN` (permission: Workers Scripts, Edit) and `CLOUDFLARE_ACCOUNT_ID`. Disconnect the repository under **Workers & Pages > self > Settings > Builds** so a commit does not deploy twice. The Workers Builds notes below are kept for reference.
+
 SELF is a zero-dependency static application deployed as **Cloudflare Workers Static Assets**, not as a Cloudflare Pages project.
 
 The repository includes:
