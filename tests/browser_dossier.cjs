@@ -75,6 +75,10 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  const tp=writes.filter(w=>w.table==='career_interviews');assert.equal(tp.length,1);assert.equal(tp[0].body.prep_notes,'Track: VC');
  assert.equal(await page.locator('.dossier-questions li').count(),5);
  assert.match(await page.locator('.gameday').innerText(),/Nothing here is scored/);
+ /* an account without Study gets no practice questions, but keeps Stories and the timer */
+ await page.evaluate(()=>{window.__SELF_CAREER_OWNERS.length=0});await page.locator('[data-dossier="timer-reset"]').click();
+ {const t=await page.locator('.gameday').innerText();assert.doesNotMatch(t,/Practice questions|Nothing here is scored/);assert.match(t,/Stories/);assert.match(t,/Drill timer/)}
+ await page.evaluate(id=>window.__SELF_CAREER_OWNERS.push(id),fixture.user.id);await page.locator('[data-dossier="timer-reset"]').click();
  /* timer */
  await page.locator('[data-dossier="timer"]').click();await page.waitForTimeout(1300);
  assert.notEqual(await page.locator('[data-dossier-clock]').innerText(),'00:00');
