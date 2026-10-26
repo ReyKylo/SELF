@@ -7,12 +7,14 @@ const Sync=require('../user-sync.js');
 const {plan,synced}=Sync;
 
 // allow-list
-assert(synced('self.today.u1.2026-10-26')&&synced('self.views.u1')&&synced('self.lesson.v2.u1.pe-1')&&synced('self.tracker.draft'));
+assert(synced('self.today.u1.2026-10-26')&&synced('self.views.u1'));
+// Study and Hunt keys are deliberately untracked
+assert(!synced('self.lesson.v2.u1.pe-1')&&!synced('self.study.track.u1')&&!synced('self.review.v1.u1')&&!synced('self.tracker.draft')&&!synced('self.dossier.x')&&!synced('self.outreach.x'));
 assert(!synced('self.session')&&!synced('self.theme')&&!synced('self.scale')&&!synced('other.key')&&!synced('self.views.anon')&&!synced('self.lesson.v2.anon.x')&&!synced(null));
 
 // plan: remote wins, local-only is pushed, junk ignored
-let r=plan({'self.views.u1':'[1]','self.today.u1.d':'["a"]','self.session':'tok'},[{key:'self.views.u1',value:'[2]'},{key:'self.review.v1.u1',value:'[]'},{key:'evil',value:'x'},{key:'self.views.u2',value:5}]);
-assert.deepStrictEqual(r.write.sort(),[['self.review.v1.u1','[]'],['self.views.u1','[2]']].sort());
+let r=plan({'self.views.u1':'[1]','self.today.u1.d':'["a"]','self.session':'tok'},[{key:'self.views.u1',value:'[2]'},{key:'self.today.u1.d2',value:'[]'},{key:'evil',value:'x'},{key:'self.views.u2',value:5}]);
+assert.deepStrictEqual(r.write.sort(),[['self.today.u1.d2','[]'],['self.views.u1','[2]']].sort());
 assert.deepStrictEqual(r.push,[['self.today.u1.d','["a"]']]);
 assert.deepStrictEqual(plan({'self.views.u1':'same'},[{key:'self.views.u1',value:'same'}]),{write:[],push:[]});
 assert.deepStrictEqual(plan({'self.views.u1':'x'.repeat(262145)},[]).push,[]);

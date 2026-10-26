@@ -61,6 +61,7 @@ const noOverflow=async p=>{const width=await p.evaluate(()=>({actual:document.do
   await switching.page.locator('[data-learning="task"]').click();while(!postSeen)await new Promise(r=>setTimeout(r,5));
   await switching.page.locator('[data-action="nav"][data-view="settings"]:visible').first().click();await switching.page.locator('[data-action="logout"]').click();await switching.page.locator('#auth-form').waitFor();
   switching.fixture.user={id:'596c22f5-d7de-47d6-af05-289e8f7bce1e',email:'synthetic-second@example.invalid'};
+  await switching.page.evaluate(id=>window.__SELF_CAREER_OWNERS.push(id),switching.fixture.user.id);
   await switching.page.locator('#auth-form [name=email]').fill(switching.fixture.user.email);await switching.page.locator('#auth-form [name=password]').fill('synthetic-only-password');await switching.page.locator('#auth-form button[type=submit]').click();
   await switching.page.locator('[data-action="nav"][data-view="career"]:visible').first().click();await switching.page.locator('[data-career="page"][data-page="learning"]:visible').first().click();await switching.page.locator('.learning-sprint-intro').waitFor();
   releaseSwitch();await switching.page.waitForTimeout(150);assert.equal(await switching.page.locator('.overlay').count(),0);assert.equal(await switching.page.locator('[data-learning="task"]').innerText(),'Tambah proyek ke My Work');assert.equal(await switching.page.evaluate(()=>window.SELFCareerLearning.ui.owner),switching.fixture.user.id);

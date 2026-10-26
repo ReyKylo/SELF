@@ -1,5 +1,5 @@
 {
-  "build": "35e693664ef991bee8a9a15ead94c1d378da21f1cc274e4c1c964e8d3750bcf2",
+  "build": "549c1ab4ffef4df5960390d17cc6a604664a87803e0e431d01bca67f07c18f21",
   "environment": "Chromium headless 145; local synthetic Supabase fixture; not production RLS or real user persistence",
   "checks": [
     {

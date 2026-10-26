@@ -21,6 +21,7 @@ jobs:
       - name: Syntax check
         run: |
           node --check app.js
+          node --check access.js
           node --check user-sync.js
           node --check rooms.js
           node --check motion.js

@@ -75,8 +75,8 @@ function trackItems(ctx,q){
 /* ctx: {tasks,spaces,boards,people,companies,links,statusName,spaceName,capture,canTrack}  ->  [{id,group,label,hint,idx,run}] in display order */
 function buildItems(ctx,query){
  const q=String(query||'').trim();
- const nav=[...ROOM_ITEMS.map(([id,label,hint])=>({group:'Go to',label:'Go to '+label,hint,run:{type:'room',room:id},key:label,offset:'Go to '.length,bonus:40})),
-  ...SECTIONS.map(s=>({group:s.run.type==='theme'?'Actions':'Go to',label:s.label,hint:s.hint,run:s.run})),
+ const nav=[...ROOM_ITEMS.filter(r=>ctx.study||r[0]!=='study').map(([id,label,hint])=>({group:'Go to',label:'Go to '+label,hint,run:{type:'room',room:id},key:label,offset:'Go to '.length,bonus:40})),
+  ...SECTIONS.filter(s=>ctx.study||s.run.page!=='radar').map(s=>({group:s.run.type==='theme'?'Actions':'Go to',label:s.label,hint:s.hint,run:s.run})),
   ...(ctx.views||[]).map(v=>({group:'Go to',label:'View · '+v.name,hint:'Saved Work view',run:{type:'saved-view',id:v.id}}))];
  if(!q)return [...nav.slice(0,5),...nav.filter(n=>['Settings','Search everything','Switch theme'].includes(n.label))].map((n,i)=>({...n,id:'i'+i,idx:[]}));
  const navHits=rank(nav.map(n=>({...n,label:n.label})),q,6);
@@ -108,6 +108,7 @@ function context(query){
  const st=host.state(),c=host.careerUi?.()||{};
  const ctx={tasks:[...st.tasks].sort((a,b)=>(a.status==='done')-(b.status==='done')),spaces:st.spaces,boards:st.boards,links:st.links,
   people:c.ready?c.people:[],companies:c.ready?c.companies:[],views:host.views?host.views():[],spaceName:id=>host.spaceName(id),statusName:s=>host.statusName(s)};
+ ctx.study=!!root.SELFAccess?.study?.(st.user);
  ctx.canTrack=!!host.track;
  ctx.capture=query.trim()?root.SELFCapture.parseCapture(query,{today:host.today(),spaces:st.spaces}):null;
  return ctx;

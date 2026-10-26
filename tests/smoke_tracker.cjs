@@ -126,7 +126,7 @@ t('industry mapping',()=>{
 t('vocabulary',()=>{
  assert.deepEqual(T.STATUSES.map(s=>s[0]),['inbox','active','waiting','done','dropped']);
  assert.equal(T.sourceLabel('linkedin_jobs'),'LinkedIn Jobs');assert.equal(T.statusLabel('waiting'),'Waiting');assert.equal(T.kindLabel('person'),'Person');
- assert.equal(T.INDUSTRIES.length,10);assert.equal(T.STALE_DAYS,14);
+ assert.equal(T.INDUSTRIES.length,16);assert.equal(T.STALE_DAYS,14);
 });
 /* ---- T4: Today agenda and the command palette use the Tracker through the SELFTracker global ---- */
 t('Today agenda lists due Tracker rows and counts Inbox and Stale',()=>{

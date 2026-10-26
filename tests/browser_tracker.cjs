@@ -105,10 +105,10 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  /* 9. Drop with a one-tap reason: leaves Today/Inbox/Stale, visible in All with the reason */
  await tab('inbox').click();writes.length=0;
  await row('jobstreet.co.id').locator('.tracker-more').click();await page.locator('.tracker-menu [data-tracker="close-drop"]').click();
- await page.locator('.tracker-chip',{hasText:'No Indonesia office'}).click();await settle();
- const dropped=writes.find(w=>w.m==='PATCH');assert.equal(dropped.body.status,'dropped');assert.equal(dropped.body.close_reason,'No Indonesia office');
+ await page.locator('.tracker-chip',{hasText:'No vacancy'}).click();await settle();
+ const dropped=writes.find(w=>w.m==='PATCH');assert.equal(dropped.body.status,'dropped');assert.equal(dropped.body.close_reason,'No vacancy');
  assert.equal(await count('inbox'),1);
- await tab('all').click();assert.match(await row('jobstreet.co.id').innerText(),/Dropped: No Indonesia office/);
+ await tab('all').click();assert.match(await row('jobstreet.co.id').innerText(),/Dropped: No vacancy/);
  await page.locator('.tracker-selects select').nth(2).selectOption('dropped');assert.equal(await page.locator('.tracker-row').count(),1);
  await page.locator('.tracker-selects select').nth(2).selectOption('');
 

@@ -13,6 +13,7 @@ async function launch(options={}){
  const originalClose=browser.close.bind(browser);browser.close=async()=>{await originalClose();await new Promise(r=>server.close(r))};
  const context=await browser.newContext({viewport:options.viewport||{width:1366,height:768},reducedMotion:'reduce'});
  const fixture={user:{id:'5cd5464c-9879-492d-8e74-b34f99ad15bb',email:'synthetic-qa@example.invalid'},tasks:[],failCareer:false,failTasks:false,dropAck:false,postCount:0,delay:0,contentFail:false};
+ await context.addInitScript(id=>{window.__SELF_CAREER_OWNERS=[id]},fixture.user.id);
  await context.addInitScript(()=>localStorage.setItem('self.session',JSON.stringify({access_token:'synthetic-local-test-token',refresh_token:'synthetic-local-refresh-token'})));
  await context.route('https://fonts.googleapis.com/**',r=>r.fulfill({status:200,contentType:'text/css',body:''}));
  await context.route('https://fonts.gstatic.com/**',r=>r.abort());
