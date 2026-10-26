@@ -11,7 +11,7 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  const id=(k,n)=>k+String(n).padStart(7,'0')+'-0000-4000-8000-000000000000';
  const db={
   career_companies:[{id:id('c',1),user_id:U,name:'Sample Capital',industry:'Private Equity',location:'Jakarta Selatan',website:'https://sample.example/',notes:'',created_at:ts,updated_at:ts},{id:id('c',2),user_id:U,name:'Contoh Ventures',industry:'Venture Capital',location:'Jakarta',website:null,notes:'',created_at:ts,updated_at:ts}],
-  career_people:[],career_touchpoints:[]
+  career_people:[],career_touchpoints:[],career_applications:[]
  };
  const P=(n,name,role,stage,url,last)=>({id:id('p',n),user_id:U,full_name:name,role_title:role,company_id:id('c',1),email:'',profile_url:url,relationship_stage:stage,last_contacted_at:last||null,notes:'',created_at:ts,updated_at:'2026-10-2'+n+'T00:00:00Z'});
  db.career_people.push(P(1,'Sari Anindya','Associate','new','https://www.linkedin.com/in/sari-anindya/'),P(2,'Hendra Wijaya','Vice President','new',null),P(3,'Dimas Prakoso','Analyst','connect_sent','https://www.linkedin.com/in/dimas-prakoso-55aa10/',ago(16)),P(4,'Rina Wulandari','VP, Investments','connected','https://www.linkedin.com/in/rina-wulandari/',ago(3)),P(5,'Ayu Lestari','Associate','in_conversation','https://www.linkedin.com/in/ayu-lestari/',ago(5)));
@@ -147,7 +147,42 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  assert.equal(await page.locator('.outreach-modal').count(),0);
  await page.locator('[data-outreach-filter]').fill('new');assert.equal(await page.locator('.outreach-row').count(),1);
 
+ /* 15. Delete: a person waits for Undo then goes; an empty company deletes at once with Undo; a company with an application needs the checkbox */
+ await page.locator('[data-outreach-filter]').fill('');
+ await page.locator('.outreach-row',{hasText:'Sample Capital'}).click();await page.locator('.outreach-board').waitFor();
+ writes.length=0;
+ await card('Ayu Lestari').locator('.outreach-more').click();await page.locator('.outreach-menu [data-outreach="delete"]').click();
+ assert.equal(await card('Ayu Lestari').count(),0);assert.match(await page.locator('.outreach-undo').innerText(),/Deleted “Ayu Lestari”/);
+ await page.locator('[data-outreach="undo-delete"]').click();assert.equal(await card('Ayu Lestari').count(),1);
+ await page.waitForTimeout(400);assert.equal(writes.filter(w=>w.m==='DELETE').length,0,'Undo sent no request');
+ await card('Ayu Lestari').locator('.outreach-more').click();await page.locator('.outreach-menu [data-outreach="delete"]').click();
+ await page.waitForTimeout(10600);
+ assert.deepEqual(writes.filter(w=>w.m==='DELETE').map(w=>w.table),['career_people'],'exactly one DELETE after the window');
+ assert.equal(await card('Ayu Lestari').count(),0);
+
+ await page.locator('[data-outreach="back"]').click();await page.locator('.outreach-toolbar').waitFor();
+ await page.locator('.outreach-more-list summary').click();await page.locator('.outreach-row',{hasText:'New Fund'}).click();await page.locator('.outreach-board').waitFor();
+ writes.length=0;await page.locator('[data-outreach="delete-company"]').click();await settle();
+ assert.deepEqual(writes.filter(w=>w.m==='DELETE').map(w=>w.table),['career_companies'],'nothing attached: deleted without a dialog');
+ assert.equal(await page.locator('.outreach-modal').count(),0);assert.match(await page.locator('.outreach-snack').innerText(),/Company “New Fund” deleted/);
+ writes.length=0;await page.locator('[data-outreach="undo"]').click();await settle();
+ assert.equal(writes.find(w=>w.m==='POST'&&w.table==='career_companies').body.name,'New Fund','Undo puts the company back');
+
+ db.career_applications.push({id:id('a',1),user_id:U,company_id:id('c',1),role_title:'Analyst',hiring_stage:'applied',source_url:null,applied_at:null,notes:'',created_at:ts,updated_at:ts});
+ await page.reload();await page.locator('.rooms-rail .door[data-room="hunt"]').click();await page.locator('.career-pills').waitFor();
+ await page.locator('.career-pill[data-page="people"]').click();await page.locator('.outreach').waitFor();
+ await page.locator('.outreach-row',{hasText:'Sample Capital'}).click();await page.locator('.outreach-board').waitFor();
+ writes.length=0;await page.locator('[data-outreach="delete-company"]').click();await page.locator('.outreach-modal').waitFor();
+ assert.match(await page.locator('.outreach-modal').innerText(),/people will be kept, without a company/);assert.match(await page.locator('.outreach-modal').innerText(),/1 application/);
+ assert.equal(await page.locator('[data-outreach="del-confirm"]').isDisabled(),true,'applications block the delete until the box is ticked');
+ await page.locator('[data-outreach="del-cancel"]').click();assert.equal(await page.locator('.outreach-modal').count(),0);assert.equal(writes.filter(w=>w.m==='DELETE').length,0);
+ await page.locator('[data-outreach="delete-company"]').click();await page.locator('[data-outreach-del-apps]').check();
+ assert.equal(await page.locator('[data-outreach="del-confirm"]').isDisabled(),false);
+ await page.locator('[data-outreach="del-confirm"]').click();await settle();
+ assert.deepEqual(writes.filter(w=>w.m==='DELETE').map(w=>w.table),['career_applications','career_companies'],'applications first, then the company');
+ assert.equal(await page.locator('.outreach-modal').count(),0);
+
  assert.deepEqual(errors.filter(e=>!/linkedin/i.test(String(e))),[],'no page errors');
  await x.browser.close();
- console.log('PASS Outreach browser: overview, board, link opens, drag moves without opening, log + Undo, paste links, Let go, drawer, composer, CSV, keyboard, 390px.');
+ console.log('PASS Outreach browser: overview, board, link opens, drag moves without opening, log + Undo, paste links, Let go, drawer, composer, CSV, keyboard, 390px, delete person/company.');
 })().catch(e=>{console.error(e);process.exit(1)});

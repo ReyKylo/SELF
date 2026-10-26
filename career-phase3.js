@@ -91,6 +91,7 @@ function opportunityCard(o){
  (stage!=='converted'&&stage!=='dismissed'?button('Dismiss','dismiss','data-url="'+a(o.job_url)+'"'):'')+
  (stage!=='converted'&&stage!=='dismissed'?primary('Add to Applications','convert','data-url="'+a(o.job_url)+'"'):'')+
  button('Assist','assist','data-url="'+a(o.job_url)+'"')+
+ (row?.id?button('Delete','delete-record','data-id="'+a(row.id)+'"'):'')+
  '</div></article>';
 }
 function empty(title,desc){return '<div class="career3-empty"><strong>'+h(title)+'</strong><p>'+h(desc)+'</p></div>'}
@@ -260,6 +261,12 @@ async function action(event){
   catch(error){RADAR.error='Not saved: '+error.message;host.render()}
  }
  else if(type==='unsave'||type==='restore')await update(id,'new');
+ else if(type==='delete-record'){
+  if(!confirm('Delete this Radar record? A role you dismissed may show up again on the next scan.'))return true;
+  try{await host.del('career_opportunities',id);RADAR.items=RADAR.items.filter(x=>x.id!==id);host.notify('Radar record deleted')}
+  catch(error){RADAR.error='Not deleted: '+error.message}
+  host.render();
+ }
  else if(type==='copy-prompt'){
   const input=document.getElementById?.('career3-prompt');
   if(input){try{await navigator.clipboard.writeText(input.value);host.notify('Research prompt copied')}

@@ -262,7 +262,7 @@ function render(){
  primary('+ Quick Capture','quick-capture')+'</div>')+'</header>'+
  (hosted?'':'<div class="career-mobile-sections">'+PAGES.map(([id,label])=>button(label,'page','data-page="'+id+'" class="'+(selected===id?'active':'')+'"')).join('')+'</div>')+
  (ui.error&&ui.ready?'<p class="career-warning">'+h(ui.error)+' '+button('Retry','retry')+'</p>':'')+
- main+'</div>'+modalMarkup()+drawerMarkup()+(window.SELFCareerPhase2?.modalMarkup?.()||'')+'</div>';
+ main+'</div>'+modalMarkup()+drawerMarkup()+(window.SELFCareerPhase2?.modalMarkup?.()||'')+(window.SELFOutreachUI?.overlay?.()||'')+'</div>';
 }
 function focusCareerDialog(){
  Promise.resolve().then(()=>document.querySelector?.('.career-capture-choices button:not(:disabled),.career-modal .career-field,.career-drawer .career-field')?.focus?.());
@@ -310,6 +310,7 @@ function setPage(id){
  if(ui.dirty&&!confirm('Discard unsaved edits?'))return;
  if(window.SELFCareerPhase3?.beforeNavigate?.()===false)return;
  window.SELFTrackerUI?.beforeNavigate?.();
+ window.SELFOutreachUI?.beforeNavigate?.();
  if(window.SELFCareerPhase2?.beforeNavigate?.()===false)return;
  ui.page=id;ui.drawer=null;ui.modal=null;ui.dirty=false;ui.saveError='';host.render();
 }
@@ -358,6 +359,7 @@ async function save(form){
 }
 async function erase(kind,id){
  const row=find(kind,id);if(!row)return;
+ if(kind==='company'&&window.SELFOutreachUI?.deleteCompany){await window.SELFOutreachUI.deleteCompany(id);return}
  if(!confirm('Delete '+names[kind]+' "'+(row.name||row.full_name||row.role_title)+'"? This cannot be undone.'))return;
  if(ui.busy)return;
  ui.busy=true;

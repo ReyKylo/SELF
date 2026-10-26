@@ -136,11 +136,11 @@ if(!root.document)return;
 
 /* ================= UI ================= */
 let host=null,core=null;
-const S={company:null,filter:'',paste:'',preview:null,csv:'',csvPreview:null,menu:null,composer:null,csvOpen:false,pasteOpen:false,trayOpen:false,busy:false,undo:null,focus:null};
+const S={pendingDelete:null,delCompany:null,company:null,filter:'',paste:'',preview:null,csv:'',csvPreview:null,menu:null,composer:null,csvOpen:false,pasteOpen:false,trayOpen:false,busy:false,undo:null,focus:null};
 const h=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const store={get(k,d=''){try{return root.localStorage?.getItem('self.outreach.'+k)??d}catch{return d}},set(k,v){try{root.localStorage?.setItem('self.outreach.'+k,v)}catch{}}};
 const today=()=>new Date().toLocaleDateString('en-CA');
-const people=()=>core?.ui.people||[];
+const people=()=>(core?.ui.people||[]).filter(p=>!(S.pendingDelete&&S.pendingDelete.id===p.id));
 const companies=()=>core?.ui.companies||[];
 const touchpoints=()=>root.SELFCareerPhase2?.ui?.touchpoints||[];
 const personOf=id=>people().find(p=>p.id===id);
@@ -196,6 +196,7 @@ function overview(){
   '<div class="outreach-actions"><button type="button" class="career-btn" data-outreach="csv">Import companies</button><button type="button" class="career-btn career-primary" data-career="new" data-kind="company">+ Company</button></div></div>'+
   '<div class="outreach-pace" role="group" aria-label="Weekly pace"><span><b>'+sent+'</b> connection requests sent this week</span><label>your weekly cap <input class="career-field outreach-cap" type="number" min="1" max="200" value="'+cap+'" data-outreach-cap aria-label="Weekly connection request cap"></label>'+
    (sent>=cap?'<span class="outreach-need">● At your cap: slow down, quality over volume</span>':'')+'</div>'+
+  undoBars()+
   '<div class="outreach-toolbar"><input class="career-field" type="search" placeholder="Filter companies…" value="'+h(S.filter)+'" data-outreach-filter aria-label="Filter companies"></div>'+
   (loose.total?'<button type="button" class="outreach-row" data-outreach="open-company" data-id="none"><span><strong>No company yet</strong><small>People without a company</small></span>'+funnel(loose.counts)+'<span class="outreach-counts">'+loose.total+' people</span><span class="outreach-need'+(loose.need?'':' none')+'">'+(loose.need?'● '+loose.need+' need you':'All good')+'</span></button>':'')+
   (withPeople.length?'<div class="outreach-list" role="list">'+withPeople.map(r=>row(r,false)).join('')+'</div>':
@@ -227,7 +228,13 @@ function menuMarkup(p){
   '<button type="button" role="menuitem" data-outreach="details" data-id="'+h(p.id)+'">Details &amp; notes</button>'+
   '<button type="button" role="menuitem" data-outreach="compose" data-id="'+h(p.id)+'">Write message</button>'+
   '<button type="button" role="menuitem" data-outreach="add-link" data-id="'+h(p.id)+'">'+(safeHttp(p.profile_url)?'Edit LinkedIn link':'Add LinkedIn link')+'</button>'+
-  (nr?'<button type="button" role="menuitem" data-outreach="revive" data-id="'+h(p.id)+'">Bring back to Found</button>':'<button type="button" role="menuitem" data-outreach="let-go" data-id="'+h(p.id)+'">Let go (No reply)</button>')+'</div>';
+  (nr?'<button type="button" role="menuitem" data-outreach="revive" data-id="'+h(p.id)+'">Bring back to Found</button>':'<button type="button" role="menuitem" data-outreach="let-go" data-id="'+h(p.id)+'">Let go (No reply)</button>')+
+  '<button type="button" role="menuitem" class="danger" data-outreach="delete" data-id="'+h(p.id)+'">Delete</button></div>';
+}
+/* Undo bars: a move or an empty-company delete (S.undo) and a person delete that is still inside its 10 second window. The global kind renders in overlay(). */
+function undoBars(){
+ return (S.undo&&!S.undo.global?'<div class="outreach-undo" role="status"><span>'+h(S.undo.text)+'</span><button type="button" class="career-btn" data-outreach="undo">↶ Undo</button></div>':'')+
+  (S.pendingDelete?'<div class="outreach-undo" role="status"><span>Deleted “'+h(S.pendingDelete.name)+'”</span><button type="button" class="career-btn" data-outreach="undo-delete">↶ Undo</button></div>':'');
 }
 function board(){
  const id=S.company,c=id==='none'?null:companyOf(id);
@@ -240,12 +247,12 @@ function board(){
  return '<div class="outreach">'+
   '<div class="outreach-head"><button type="button" class="career-btn" data-outreach="back">← Outreach</button><div class="outreach-title"><h2>'+h(name)+'</h2><p>'+h(c?[c.industry,c.location].filter(Boolean).join(' · '):'People you have not linked to a company')+
   (site?' · <a href="'+h(site)+'" target="_blank" rel="noopener noreferrer">website ↗</a>':'')+'</p></div>'+
-  '<div class="outreach-actions">'+(c&&root.SELFBoards?.createFromRecipe?'<button type="button" class="career-btn" data-outreach="map" title="Create a Studio board from the Company Map recipe, with these people">Company map</button>':'')+'<button type="button" class="career-btn career-primary" data-outreach="paste-toggle" aria-expanded="'+S.pasteOpen+'">Paste links</button></div></div>'+
+  '<div class="outreach-actions">'+(c?'<button type="button" class="career-btn career-danger" data-outreach="delete-company" data-id="'+h(c.id)+'">Delete company</button>':'')+(c&&root.SELFBoards?.createFromRecipe?'<button type="button" class="career-btn" data-outreach="map" title="Create a Studio board from the Company Map recipe, with these people">Company map</button>':'')+'<button type="button" class="career-btn career-primary" data-outreach="paste-toggle" aria-expanded="'+S.pasteOpen+'">Paste links</button></div></div>'+
   (c?'<div class="outreach-find" aria-label="Find people on LinkedIn"><span>Find people on LinkedIn:</span>'+finders.map(([l,k])=>'<a class="career-btn" href="'+h(linkedInSearch(c.name,k))+'" target="_blank" rel="noopener noreferrer">'+h(l)+' ↗</a>').join('')+
    '<label class="outreach-campus">your campus <input class="career-field" data-outreach-campus value="'+h(campus)+'" placeholder="e.g. UI" aria-label="Your campus for alumni search"></label>'+
    '<span class="outreach-cover" title="Role group is guessed from titles">'+peer+' peer · '+senior+' senior · aim for 3 to 5 people per firm</span></div>':'')+
   (S.pasteOpen?pastePanel():'')+
-  (S.undo?'<div class="outreach-undo" role="status"><span>'+h(S.undo.text)+'</span><button type="button" class="career-btn" data-outreach="undo">↶ Undo</button></div>':'')+
+  undoBars()+
   '<div class="outreach-board" data-dnd-scroll>'+STAGES.map(([k,label])=>{
    const rows=by[k];
    return '<section class="outreach-lane" data-stage="'+k+'" data-dnd-zone="outreach:'+k+'" aria-label="'+h(label)+'"><div class="outreach-lane-head"><strong>'+h(label)+'</strong><span data-count-for="outreach:'+k+'">'+rows.length+'</span></div>'+
@@ -299,7 +306,10 @@ function composerModal(){
 function render(){return S.company==null?overview():board()}
 
 /* ---- data actions ---- */
-function setUndo(text,fn){S.undo={text,fn}}
+function setUndo(text,fn,opts={}){
+ S.undo={text,fn,global:!!opts.global};
+ if(opts.global)setTimeout(()=>{if(S.undo&&S.undo.fn===fn){S.undo=null;host?.render?.()}},10000);
+}
 async function reload(){await core.reload();}
 async function move(id,to,{auto=true,summary,nextStep}={}){
  const p=personOf(id);if(!p||!ALL_STAGES.includes(to)||S.busy)return false;
@@ -332,6 +342,76 @@ async function undo(){
  try{await u.fn();await reload()}catch(err){host.notify('Undo failed: '+(err?.message||err),true)}
  finally{S.busy=false;host.render()}
 }
+/* Person delete waits 10 seconds for Undo; the DELETE is only sent when that window ends or the page is left. */
+function flushDelete(){
+ const p=S.pendingDelete;if(!p)return;
+ clearTimeout(p.timer);S.pendingDelete=null;
+ if(core?.ui.people)core.ui.people=core.ui.people.filter(x=>x.id!==p.id);
+ Promise.resolve().then(async()=>{
+  try{await host.del('career_people',p.id)}catch(err){host.notify('Delete failed: '+(err?.message||err),true)}
+  try{await reload()}catch{}
+ });
+}
+function startDelete(id){
+ const p=(core?.ui.people||[]).find(x=>x.id===id);if(!p)return;
+ flushDelete();S.menu=null;
+ S.pendingDelete={id,name:p.full_name,timer:setTimeout(()=>{flushDelete();host.render()},10000)};
+ host.render();
+}
+function undoDelete(){const p=S.pendingDelete;if(!p)return;clearTimeout(p.timer);S.pendingDelete=null;host.render()}
+function companyUsage(id){
+ const apps=(core.ui.applications||[]).filter(a=>a.company_id===id),ids=new Set(apps.map(a=>a.id));
+ return {apps,ppl:(core.ui.people||[]).filter(p=>p.company_id===id),tracks:(root.SELFTrackerUI?.state?.rows||[]).filter(t=>t.company_id===id),
+  interviews:(root.SELFCareerPhase2?.ui?.interviews||[]).filter(i=>ids.has(i.application_id))};
+}
+/* Empty company: deleted at once, with Undo. Anything attached: a dialog first. People and Tracker rows are kept (their link is cleared by the database);
+   applications block the delete unless the user ticks the box that also deletes them. */
+async function deleteCompany(id){
+ const c=companyOf(id);if(!c||S.busy)return;
+ const u=companyUsage(id);core.ui.drawer=null;core.ui.dirty=false;
+ if(!u.apps.length&&!u.ppl.length&&!u.tracks.length){
+  S.busy=true;
+  try{
+   const rec={name:c.name,industry:c.industry||'',website:c.website||null,location:c.location||'',notes:c.notes||''};
+   await host.del('career_companies',id);
+   setUndo('Company “'+c.name+'” deleted',async()=>{await host.insert('career_companies',rec)},{global:true});
+   if(S.company===id)S.company=null;
+   await reload();
+  }catch(err){host.notify('Delete failed: '+(err?.message||err),true)}
+  finally{S.busy=false;host.render()}
+  return;
+ }
+ S.delCompany={id,alsoApps:false};host.render();
+}
+async function confirmDeleteCompany(){
+ const d=S.delCompany;if(!d||S.busy)return;
+ const u=companyUsage(d.id);if(u.apps.length&&!d.alsoApps)return;
+ S.busy=true;
+ try{
+  if(u.apps.length)await Promise.all(u.apps.map(a=>host.del('career_applications',a.id)));
+  await host.del('career_companies',d.id);
+  host.notify('Company deleted'+(u.apps.length?' with '+u.apps.length+(u.apps.length===1?' application':' applications'):''));
+  if(S.company===d.id)S.company=null;S.delCompany=null;
+  await reload();
+ }catch(err){host.notify('Delete failed: '+(err?.message||err),true);try{await reload()}catch{}}
+ finally{S.busy=false;host.render()}
+}
+function delCompanyModal(){
+ const d=S.delCompany;if(!d)return '';
+ const c=companyOf(d.id);if(!c){S.delCompany=null;return ''}
+ const u=companyUsage(d.id),plural=(n,one,many)=>n+' '+(n===1?one:many);
+ const keep=[u.ppl.length?(u.ppl.length===1?'1 person':u.ppl.length+' people'):'',u.tracks.length?plural(u.tracks.length,'Tracker row','Tracker rows'):''].filter(Boolean);
+ return '<div class="outreach-modal-layer"><div class="outreach-modal" role="dialog" aria-modal="true" aria-labelledby="outreach-del-h"><div class="outreach-modal-head"><h3 id="outreach-del-h">Delete “'+h(c.name)+'”?</h3></div>'+
+  (keep.length?'<p>'+h(keep.join(' and '))+' will be kept, without a company.</p>':'')+
+  (u.apps.length?'<p class="outreach-need" role="alert">'+h(plural(u.apps.length,'application','applications'))+(u.interviews.length?' and '+h(plural(u.interviews.length,'interview','interviews')):'')+' belong to this company and block the delete.</p>'+
+   '<label class="outreach-check"><input type="checkbox" data-outreach-del-apps'+(d.alsoApps?' checked':'')+'> Also delete '+h(plural(u.apps.length,'application','applications'))+(u.interviews.length?' and their interviews':'')+'</label>':'')+
+  '<div class="outreach-actions"><button type="button" class="career-btn" data-outreach="del-cancel">Cancel</button><button type="button" class="career-btn career-danger" data-outreach="del-confirm"'+((u.apps.length&&!d.alsoApps)||S.busy?' disabled':'')+'>Delete company</button></div></div></div>';
+}
+/* Rendered by career.js on every Career page, so a delete started from the Companies page shows its dialog and Undo too. */
+function overlay(){
+ return delCompanyModal()+(S.undo&&S.undo.global?'<div class="outreach-snack outreach-undo" role="status"><span>'+h(S.undo.text)+'</span><button type="button" class="career-btn" data-outreach="undo">↶ Undo</button></div>':'');
+}
+function beforeNavigate(){flushDelete();return true}
 async function addPasted(){
  const pv=S.preview;if(!pv||!pv.fresh.length||S.busy)return;
  S.busy=true;const cid=S.company==='none'?null:S.company;
@@ -399,6 +479,11 @@ async function action(e){
  else if(a==='copy'){const t=document.querySelector('[data-outreach-msg]')?.value||'';await copyText(t,b)}
  else if(a==='log-sent')await logSent();
  else if(a==='let-go')await move(id,NO_REPLY);
+ else if(a==='delete')startDelete(id);
+ else if(a==='undo-delete')undoDelete();
+ else if(a==='delete-company')await deleteCompany(id);
+ else if(a==='del-cancel'){S.delCompany=null;host.render()}
+ else if(a==='del-confirm')await confirmDeleteCompany();
  else if(a==='revive')await move(id,'new',{auto:false});
  else if(a==='tray'){S.trayOpen=!S.trayOpen;host.render()}
  else if(a==='undo')await undo();
@@ -421,6 +506,7 @@ function input(e){
 }
 function change(e){
  const t=e.target;if(!t?.matches)return false;
+ if(t.matches('[data-outreach-del-apps]')){if(S.delCompany){S.delCompany.alsoApps=t.checked;host.render()}return true}
  if(t.matches('[data-outreach-tpl]')){if(S.composer){S.composer.tpl=t.value;S.composer.edited=null;host.render()}return true}
  if(t.matches('[data-outreach-myname]')){host.render();return true}
  if(t.matches('[data-outreach-campus]')){host.render();return true}
@@ -430,6 +516,7 @@ function change(e){
 }
 function keydown(e){
  if(e.key==='Escape'){
+  if(S.delCompany){S.delCompany=null;host.render();return true}
   if(S.composer){S.composer=null;host.render();return true}
   if(S.csvOpen){S.csvOpen=false;host.render();return true}
   if(S.menu){S.menu=null;host.render();return true}
@@ -446,6 +533,6 @@ function outsideClick(e){
 }
 root.document.addEventListener('click',outsideClick,true);
 root.document.addEventListener('dragstart',e=>{if(e.target.closest?.('.outreach-card'))e.preventDefault()});
-function reset(){Object.assign(S,{company:null,filter:'',paste:'',preview:null,csv:'',csvPreview:null,menu:null,composer:null,csvOpen:false,pasteOpen:false,trayOpen:false,busy:false,undo:null})}
-root.SELFOutreachUI={init,reset,render,action,input,change,keydown,state:S,pending};
+function reset(){flushDelete();Object.assign(S,{delCompany:null,company:null,filter:'',paste:'',preview:null,csv:'',csvPreview:null,menu:null,composer:null,csvOpen:false,pasteOpen:false,trayOpen:false,busy:false,undo:null})}
+root.SELFOutreachUI={init,reset,render,overlay,deleteCompany,beforeNavigate,flushDelete,action,input,change,keydown,state:S,pending};
 })(typeof window!=='undefined'?window:globalThis);
