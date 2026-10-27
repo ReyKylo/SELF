@@ -190,7 +190,7 @@ async function gfetch(path,{method='GET',body}={}){
 }
 async function connect(){
  const id=S.clientId.trim();
- if(!/^[\w.-]+\.apps\.googleusercontent\.com$/.test(id)){say('Paste a valid OAuth Client ID (ends with .apps.googleusercontent.com).',true);return}
+ if(!/^[\w.-]+\.apps\.googleusercontent\.com$/.test(id)){say('Paste a valid OAuth Client ID (ends with .apps.googleusercontent.com).',true);host.render();return}
  S.loading=true;say('Opening Google sign-in…');
  try{
   await loadGis();

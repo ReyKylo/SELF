@@ -38,7 +38,7 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
 
  /* 1. Rooms shell on Home, desktop */
  await page.goto(x.base);await page.locator('.shell[data-shell="rooms"]').waitFor();
- assert.equal(await doorsVisible().count(),5);assert.equal(await current(),'today');
+ assert.equal(await doorsVisible().count(),6);assert.equal(await current(),'today');
  assert.equal(await page.locator('.shell').getAttribute('data-room'),'today');
  assert.equal(await page.locator('.rooms-bar').isVisible(),false,'door bar hidden on desktop');
  const badge=await page.locator('.rooms-rail .door[data-room="work"] small').innerText();
@@ -117,7 +117,7 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await page.setViewportSize({width:390,height:844});
  await page.locator('.rooms-bar').waitFor();
  assert.equal(await page.locator('.rooms-rail').isVisible(),false);
- assert.equal(await page.locator('.rooms-bar .door:visible').count(),5);
+ assert.equal(await page.locator('.rooms-bar .door:visible').count(),6);
  const box=await page.locator('.rooms-bar .door').first().boundingBox();assert.ok(box.height>=48,'door is at least 48px tall: '+box.height);
  for(const room of ['work','hunt','study','studio','today']){
   await page.locator('.rooms-bar .door[data-room="'+room+'"]').click();assert.equal(await current(),room);
