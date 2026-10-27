@@ -120,3 +120,17 @@
  .cal-toggle{margin-left:0}
 }
 @media (prefers-reduced-motion:reduce){.cal-cell{transition:none}}
+
+/* repeating items */
+.cal-routine{background:transparent;border:1px dashed color-mix(in srgb,var(--purple) 65%,var(--line));cursor:pointer}
+.cal-routine:hover{background:color-mix(in srgb,var(--purple) 14%,transparent)}
+.cal-chip-rep{flex:none;color:var(--purple);font-weight:800;line-height:1}
+.cal-chip-time{flex:none;color:var(--muted);font-weight:500;font-size:calc(11px*var(--scale));font-variant-numeric:tabular-nums}
+.cal-form .cal-field input,.cal-form .cal-field select{width:100%}
+.cal-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cal-days{display:flex;flex-wrap:wrap;gap:6px}
+.cal-day{min-width:44px;height:32px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--muted);font:inherit;font-size:calc(12.5px*var(--scale));font-weight:600;cursor:pointer}
+.cal-day.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.cal-btn.danger{color:var(--red);border-color:color-mix(in srgb,var(--red) 45%,var(--line))}
+.g-repeats h3{color:var(--purple)}
+@media (max-width:640px){.cal-grid2{grid-template-columns:1fr}.cal-chip-time{display:none}}

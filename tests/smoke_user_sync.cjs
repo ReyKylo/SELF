@@ -7,7 +7,7 @@ const Sync=require('../user-sync.js');
 const {plan,synced}=Sync;
 
 // allow-list
-assert(synced('self.today.u1.2026-10-26')&&synced('self.views.u1'));
+assert(synced('self.today.u1.2026-10-26')&&synced('self.views.u1')&&synced('self.cal.routines.u1'));assert(!synced('self.cal.routines.anon')&&!synced('self.cal.prefs'));
 // Study and Hunt keys are deliberately untracked
 assert(!synced('self.lesson.v2.u1.pe-1')&&!synced('self.study.track.u1')&&!synced('self.review.v1.u1')&&!synced('self.tracker.draft')&&!synced('self.dossier.x')&&!synced('self.outreach.x'));
 assert(!synced('self.session')&&!synced('self.theme')&&!synced('self.scale')&&!synced('other.key')&&!synced('self.views.anon')&&!synced('self.lesson.v2.anon.x')&&!synced(null));

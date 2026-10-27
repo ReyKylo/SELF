@@ -1,10 +1,10 @@
-/* SELF account sync: mirrors per-user browser settings (Today pins and Work saved views) into public.user_kv so they follow the account, not the device. Feature files keep reading and writing
+/* SELF account sync: mirrors per-user browser settings (Today pins, Work saved views and Calendar repeating items) into public.user_kv so they follow the account, not the device. Feature files keep reading and writing
    localStorage unchanged; this layer wraps Storage writes for allow-listed keys, pushes them debounced, and pulls on sign-in.
    Sign-out flushes, then wipes the synced keys so the next person on a shared browser starts clean.
    If the table is missing or the network fails, everything keeps working from localStorage. Spec: docs/MULTIUSER_PLAN.md */
 (function(root){
 'use strict';
-const PREFIXES=['self.today.','self.views.'];
+const PREFIXES=['self.today.','self.views.','self.cal.routines.'];
 const MAX_VALUE=262144;
 const synced=k=>typeof k==='string'&&k.length<=200&&PREFIXES.some(p=>k.startsWith(p))&&!/\.anon(\.|$)/.test(k);
 

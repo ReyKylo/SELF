@@ -49,13 +49,45 @@ const doneEv=C.planSync([T('1','2026-10-28',{status:'done'})],[owned('1','2026-1
 assert.equal(doneEv.update[0].body.summary,'✓ Task 1','finished tasks get a check, not a delete');
 
 /* Google event mapping */
-assert.deepEqual(C.mapGoogleEvent({id:'x',summary:'Trip',start:{date:'2026-10-28'},end:{date:'2026-10-31'}}),{id:'x',title:'Trip',date:'2026-10-28',endDate:'2026-10-30',time:'',allDay:true,own:false,taskId:null,link:''});
+assert.deepEqual(C.mapGoogleEvent({id:'x',summary:'Trip',start:{date:'2026-10-28'},end:{date:'2026-10-31'}}),{id:'x',title:'Trip',date:'2026-10-28',endDate:'2026-10-30',time:'',allDay:true,own:false,taskId:null,routineId:null,link:''});
 const timed=C.mapGoogleEvent({id:'y',start:{dateTime:'2026-10-28T09:30:00'},end:{dateTime:'2026-10-28T10:00:00'}});
 assert.equal(timed.title,'(No title)');assert.equal(timed.time,'09:30');assert.equal(timed.date,'2026-10-28');
 assert.equal(C.mapGoogleEvent({id:'z',status:'cancelled',start:{date:'2026-10-28'}}),null);
 const by=C.eventsByDate([C.mapGoogleEvent({id:'x',summary:'Trip',start:{date:'2026-10-28'},end:{date:'2026-10-30'}}),timed]);
 assert.deepEqual([...by.keys()],['2026-10-28','2026-10-29']);assert.equal(by.get('2026-10-28')[0].allDay,true,'all-day sorts before timed');
 
+
+/* routines: repeating items */
+const R=(o={})=>C.cleanRoutine({id:'r1',title:'Weekly review',freq:'weekly',interval:1,days:[0,2],start:'2026-10-26',...o});
+{
+ const r=R();
+ assert.equal(C.describe(r),'Every week on Mon, Wed');
+ assert.deepEqual(C.occurrences(r,'2026-10-26','2026-11-08'),['2026-10-26','2026-10-28','2026-11-02','2026-11-04'],'Mon+Wed every week');
+ assert.deepEqual(C.occurrences(R({interval:2}),'2026-10-26','2026-11-15'),['2026-10-26','2026-10-28','2026-11-09','2026-11-11'],'every 2 weeks');
+ assert.deepEqual(C.occurrences(r,'2026-10-01','2026-10-27'),['2026-10-26'],'nothing before the start date');
+ assert.deepEqual(C.occurrences(R({until:'2026-11-02'}),'2026-10-26','2026-11-30'),['2026-10-26','2026-10-28','2026-11-02'],'until is inclusive');
+ assert.deepEqual(C.occurrences(R({skip:['2026-10-28']}),'2026-10-26','2026-10-30'),['2026-10-26'],'skipped day removed');
+ assert.deepEqual(C.occurrences(R({freq:'daily',interval:3,days:[]}),'2026-10-26','2026-11-04'),['2026-10-26','2026-10-29','2026-11-01','2026-11-04']);
+ assert.deepEqual(C.occurrences(R({freq:'monthly',start:'2026-01-31',days:[]}),'2026-01-01','2026-04-30'),['2026-01-31','2026-02-28','2026-03-31','2026-04-30'],'monthly clamps to month end');
+ assert.equal(C.cleanRoutine({id:'x',title:'  ',start:'2026-10-26'}),null);assert.equal(C.cleanRoutine({id:'x',title:'A',start:'2026-13-01'}),null);
+ assert.deepEqual(R({days:[]}).days,[0],'weekly with no days falls back to the start weekday');
+ assert.equal(R({time:'09:00',endTime:'08:00'}).endTime,'','end before start is dropped');
+ assert.equal(C.firstOccurrence(R({start:'2026-10-27'})),'2026-10-28','first occurrence is the first matching day');
+ assert.equal(C.rrule(r),'FREQ=WEEKLY;BYDAY=MO,WE');assert.equal(C.rrule(R({interval:2,until:'2026-12-31'})),'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE;UNTIL=20261231');
+ assert.equal(C.routinesByDate([r],'2026-10-26','2026-10-28').get('2026-10-28')[0].r.id,'r1');
+ const ics=C.buildIcs([],{now:new Date('2026-10-27T10:00:00Z'),routines:[R({skip:['2026-11-02'],time:'09:00'})]});
+ assert.match(ics,/UID:routine-r1@self/);assert.match(ics,/DTSTART:20261026T090000/);assert.match(ics,/RRULE:FREQ=WEEKLY;BYDAY=MO,WE/);assert.match(ics,/EXDATE:20261102T090000/);assert.match(ics,/SUMMARY:↻ Weekly review/);
+ const p1=C.routinePayload(R({skip:['2026-11-02']}),'Asia/Jakarta');
+ assert.deepEqual(p1.recurrence,['RRULE:FREQ=WEEKLY;BYDAY=MO,WE','EXDATE;VALUE=DATE:20261102']);assert.deepEqual(p1.start,{date:'2026-10-26'});assert.equal(p1.extendedProperties.private.selfRoutineId,'r1');
+ const timed=C.routinePayload(R({time:'09:00'}),'Asia/Jakarta');assert.deepEqual(timed.start,{dateTime:'2026-10-26T09:00:00',timeZone:'Asia/Jakarta'});assert.deepEqual(timed.end,{dateTime:'2026-10-26T10:00:00',timeZone:'Asia/Jakarta'});
+ const have={id:'g1',...p1};
+ assert.equal(C.planRoutineSync([R({skip:['2026-11-02']})],[have],{tz:'Asia/Jakarta'}).same,1,'unchanged routine is left alone');
+ assert.equal(C.planRoutineSync([R({title:'Renamed',skip:['2026-11-02']})],[have]).update.length,1);
+ assert.equal(C.planRoutineSync([],[have]).remove.length,1,'deleted routine removes its own event');assert.equal(C.planRoutineSync([],[have],{allowRemove:false}).remove.length,0);
+ assert.equal(C.planRoutineSync([r],[]).create.length,1);
+ assert.equal(C.planSync([],[have]).remove.length,0,'task sync never touches routine events');
+ const m=C.mapGoogleEvent({id:'g',summary:'x',start:{dateTime:'2026-10-28T09:00:00'},extendedProperties:{private:{selfApp:'SELF',selfRoutineId:'r1'}}});assert.equal(m.own,true);assert.equal(m.routineId,'r1');
+}
 /* rendering escapes user text */
 C.init({state:()=>({tasks:[T('x','2026-10-28',{title:'<img src=x onerror=alert(1)>'})]}),esc:s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';'),attr:s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';'),ic:()=>'',today:()=>today,spaceOf:()=>null,statusOf:()=>['todo','To Do'],mutate:async f=>f(),patch:async()=>({}),render(){},newTask(){}});
 for(const v of ['month','week','agenda']){C.state.view=v;C.state.anchor=today;const h=C.render();assert.doesNotMatch(h,/<img/,v+' escapes titles');assert.match(h,/&#60;img/,v+' shows the task')}

@@ -52,11 +52,36 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  assert.match(await page.locator('.cal-msg').innerText(),/valid OAuth Client ID/);
  await page.locator('[data-view="week"]').click();assert.equal(await page.locator('.cal-weekview .cal-cell').count(),7);
 
+
+ /* repeating item: create weekly on today's weekday, appears in the week, survives reload, done/skip/delete */
+ await page.locator('[data-view="week"]').click();
+ await page.locator('[data-cal="rnew"]').click();
+ await page.locator('[data-cal-field="title"]').fill('Weekly review');
+ await page.locator('[data-cal="rsave"]').click();
+ await page.locator('.cal-routine',{hasText:'Weekly review'}).first().waitFor();
+ assert.ok(await page.locator('.cal-weekview .cal-routine',{hasText:'Weekly review'}).count()>=1,'routine shows in the week');
+ await page.locator('[data-view="month"]').click();
+ await page.locator('[data-cal="next"]').click();
+ assert.ok(await page.locator('.cal-month .cal-routine',{hasText:'Weekly review'}).count()>=4,'repeats every week through the next month');
+ await page.locator('[data-cal="today"]').click();
+ await page.locator('[data-cal="rnew"]').click();await page.locator('[data-cal="rsave"]').click();
+ assert.match(await page.locator('.cal-msg').innerText(),/Give it a name/,'empty name is refused visibly');
+ await page.locator('[data-cal="rcancel"]').click();
+ await page.reload();await page.locator('.rooms-rail .door[data-room="calendar"]').click();await page.locator('.cal-routine').first().waitFor();
+ assert.ok(await page.locator('.cal-routine',{hasText:'Weekly review'}).count()>=1,'saved routine survives a reload');
+ const before=await page.locator('.cal-routine',{hasText:'Weekly review'}).count();
+ await page.locator('.cal-routine',{hasText:'Weekly review'}).first().click();
+ await page.locator('[data-cal="rdone"]').click();
+ assert.equal(await page.locator('.cal-routine.u-done').count(),1,'one occurrence ticked off');
+ await page.locator('[data-cal="rskip"]').click();
+ assert.equal(await page.locator('.cal-routine',{hasText:'Weekly review'}).count(),before-1,'skipped occurrence disappears');
+ page.once('dialog',d=>d.accept());await page.locator('[data-cal="rdelete"]').click();
+ await page.waitForFunction(()=>!document.querySelector('.cal-routine'));
  /* phone: no horizontal overflow */
  await page.setViewportSize({width:390,height:800});await page.locator('[data-view="month"]').click();
  {const d=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));assert.ok(d.scroll<=d.viewport+1,'calendar overflows: '+JSON.stringify(d))}
 
  assert.deepEqual(errors,[],'no page errors');
  await x.browser.close();
- console.log('PASS Calendar browser: door, deadlines, tray drag with one save, prefilled new task, agenda + Add to Google link, Google panel validation, week view, 390px no overflow');
+ console.log('PASS Calendar browser: door, deadlines, tray drag with one save, prefilled new task, agenda + Add to Google link, Google panel validation, week view, repeating items (create, reload, done, skip, delete), 390px no overflow');
 })().catch(e=>{console.error(e);process.exit(1)});
