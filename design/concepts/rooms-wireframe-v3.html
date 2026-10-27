@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SELF Rooms Wireframe</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#fff;--surface-2:#ececf0;--line:#d8d8de;--line-2:#e6e6eb;
+  --text:#1d1d1f;--text-2:#5e5e66;--text-3:#86868b;--accent:#0a66d8;--accent-soft:#e3eefc;
+  --ok:#1f8a3b;--warn:#b25e00;--bad:#c4302b;--radius:12px;--sidebar:#ebebef;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141418;--surface:#1e1e23;--surface-2:#28282e;--line:#3a3a42;--line-2:#2e2e35;
+  --text:#f2f2f5;--text-2:#b0b0b8;--text-3:#8a8a93;--accent:#4c9bff;--accent-soft:#1a2b44;
+  --ok:#4cc46a;--warn:#f0a43a;--bad:#ff6b63;--sidebar:#18181c;}}
+:root[data-theme="dark"]{
+  --bg:#141418;--surface:#1e1e23;--surface-2:#28282e;--line:#3a3a42;--line-2:#2e2e35;
+  --text:#f2f2f5;--text-2:#b0b0b8;--text-3:#8a8a93;--accent:#4c9bff;--accent-soft:#1a2b44;
+  --ok:#4cc46a;--warn:#f0a43a;--bad:#ff6b63;--sidebar:#18181c;}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.45 var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+/* Sidebar: the five doors + calendar */
+.side{background:var(--sidebar);border-right:1px solid var(--line-2);padding:16px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh}
+.brand{font-weight:700;font-size:17px;padding:4px 10px 14px;display:flex;gap:8px;align-items:center}
+.search{display:flex;align-items:center;gap:8px;margin:0 2px 12px;padding:6px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line-2);color:var(--text-3);font-size:13px}
+.search kbd{margin-left:auto;font:11px var(--font);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.door{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:var(--text-2);min-height:32px;text-align:left;width:100%;transition:background .14s}
+.door:hover{background:var(--surface-2)}
+.door[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.door .ic{width:18px;height:18px;border-radius:5px;border:1.5px solid currentColor;opacity:.8;flex:none}
+.badge{margin-left:auto;font-size:11px;color:var(--text-3);font-weight:500}
+.door[aria-current="page"] .badge{color:var(--accent)}
+.side-foot{margin-top:auto;border-top:1px solid var(--line-2);padding-top:8px}
+/* Main */
+.main{min-width:0;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:12px;padding:14px 32px;border-bottom:1px solid var(--line-2);background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);position:sticky;top:0;z-index:5}
+.kicker{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
+.bar h1{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.seg{display:flex;gap:2px;background:var(--surface-2);padding:2px;border-radius:8px;margin-left:16px}
+.seg button{padding:4px 12px;border-radius:6px;font-size:13px;color:var(--text-2);min-height:28px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgb(0 0 0/.12);font-weight:600}
+.spacer{flex:1}
+.btn{padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:500;min-height:30px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.content{padding:28px 32px 64px;max-width:1240px;width:100%}
+.view{display:none}.view.on{display:block}
+.card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--radius);padding:18px}
+.card h2{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h2 .more{margin-left:auto;font-size:13px;font-weight:500;color:var(--accent)}
+.muted{color:var(--text-3);font-size:13px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1.4fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.ph{background:repeating-linear-gradient(135deg,var(--surface-2) 0 6px,transparent 6px 12px);border:1px dashed var(--line);border-radius:8px;color:var(--text-3);font-size:12px;display:grid;place-items:center}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line-2)}
+.row:first-of-type{border-top:0}
+.chk{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);flex:none}
+.tag{font-size:12px;padding:1px 8px;border-radius:999px;background:var(--surface-2);color:var(--text-2);white-space:nowrap}
+.tag.late{color:var(--bad)}.tag.soon{color:var(--warn)}.tag.ok{color:var(--ok)}
+.capture{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);box-shadow:0 1px 3px rgb(0 0 0/.06)}
+.capture input{flex:1;border:0;background:none;font:inherit;color:var(--text);outline:none;font-size:16px}
+.chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.chip{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--text-2)}
+.hello{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+.stat{font-size:24px;font-weight:700}
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;font-weight:500;color:var(--text-3);padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line-2)}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--surface-2)}
+tbody tr.sel{background:var(--accent-soft)}
+/* Split view */
+.split{display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:start}
+.sheet .title{font-size:22px;font-weight:700;margin:4px 0 14px}
+.prop{display:grid;grid-template-columns:96px 1fr;font-size:13px;padding:6px 0}
+.prop span:first-child{color:var(--text-3)}
+.tabs{display:flex;gap:16px;border-bottom:1px solid var(--line);margin:14px 0 12px;font-size:13px;overflow-x:auto}
+.tabs b{padding-bottom:8px;border-bottom:2px solid var(--accent);font-weight:600}
+.tabs span{padding-bottom:8px;color:var(--text-3);white-space:nowrap}
+/* Kanban */
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(180px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--surface-2);border-radius:var(--radius);padding:10px;min-height:340px}
+.col h3{font-size:13px;font-weight:600;display:flex;justify-content:space-between;margin:2px 4px 10px}
+.col h3 span{color:var(--text-3);font-weight:500}
+.job{background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:10px;margin-bottom:8px;font-size:13px}
+.job b{display:block;font-size:14px;margin-bottom:2px}
+/* Study */
+.lesson{display:flex;gap:14px;align-items:center}
+.prog{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;background:var(--accent)}
+/* Calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.cal div{min-height:92px;border-right:1px solid var(--line-2);border-bottom:1px solid var(--line-2);padding:6px;font-size:12px;color:var(--text-3)}
+.cal .hd{min-height:auto;font-weight:600;background:var(--surface-2)}
+.cal .ev{display:block;margin-top:4px;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:1px 5px;font-size:11px}
+.cal .today{color:var(--accent);font-weight:700}
+.note{margin-top:24px;font-size:12px;color:var(--text-3);border-left:3px solid var(--line);padding-left:10px}
+/* Phone: tab bar idiom */
+.tabbar{display:none}
+@media (max-width:1100px){.split{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}.side{display:none}
+  .bar{padding:12px 16px;flex-wrap:wrap}.seg{margin-left:0;order:3;width:100%;overflow-x:auto}
+  .seg button{flex:1;min-height:36px}.content{padding:16px 16px 96px}
+  .g2,.g3,.g4{grid-template-columns:1fr}.hide-sm{display:none}
+  .cal div{min-height:56px}.cal .ev{font-size:0;height:6px;padding:0}
+  .tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(16px);border-top:1px solid var(--line-2);padding:6px 4px 18px;z-index:9}
+  .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--text-3);min-height:44px}
+  .tabbar button .ic{width:20px;height:20px;border-radius:6px;border:1.5px solid currentColor}
+  .tabbar button[aria-current="page"]{color:var(--accent)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side" aria-label="Rooms">
+    <div class="brand">✳ SELF</div>
+    <div class="search">Search <kbd>⌘K</kbd></div>
+    <button class="door" data-room="today" aria-current="page"><span class="ic"></span>Today<span class="badge">3 due</span></button>
+    <button class="door" data-room="work"><span class="ic"></span>Work<span class="badge">12 open</span></button>
+    <button class="door" data-room="hunt"><span class="ic"></span>Hunt<span class="badge">2 intvw</span></button>
+    <button class="door" data-room="study"><span class="ic"></span>Study</button>
+    <button class="door" data-room="studio"><span class="ic"></span>Studio<span class="badge">4 boards</span></button>
+    <button class="door" data-room="calendar"><span class="ic"></span>Calendar<span class="badge">1 late</span></button>
+    <div class="side-foot">
+      <button class="door" id="theme"><span class="ic"></span>Theme</button>
+      <button class="door"><span class="ic"></span>Settings</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="bar">
+      <div><div class="kicker" id="kicker">Today</div><h1 id="title">Good morning, Rey</h1></div>
+      <div class="seg" id="sub" role="group" aria-label="Pages"></div>
+      <div class="spacer"></div>
+      <button class="btn hide-sm">Filter</button>
+      <button class="btn primary" id="primary">New capture</button>
+    </header>
+
+    <main class="content">
+      <!-- TODAY -->
+      <section class="view on" data-view="today">
+        <div class="capture"><span class="muted">＋</span><input placeholder="Capture anything — task, link, note…" aria-label="Quick capture"><button class="btn primary">Save</button></div>
+        <div class="chips"><span class="chip">Task</span><span class="chip">Note</span><span class="chip">Link</span><span class="chip">Tracker row</span><span class="chip">Follow up</span></div>
+        <div class="grid g2" style="margin-top:20px">
+          <div class="card"><h2>Three for today <a class="more">Edit</a></h2>
+            <div class="row"><span class="chk"></span>Finish DCF model — Case 04<span class="spacer"></span><span class="tag late">Overdue</span></div>
+            <div class="row"><span class="chk"></span>Send follow up to Mandiri Sekuritas<span class="spacer"></span><span class="tag soon">Today</span></div>
+            <div class="row"><span class="chk"></span>Review Lesson 6: Comparables<span class="spacer"></span><span class="tag">Study</span></div>
+          </div>
+          <div class="card"><h2>Continue where you left off</h2>
+            <div class="row"><span class="tag">Board</span>Q4 Planning canvas<span class="spacer"></span><span class="muted">2h ago</span></div>
+            <div class="row"><span class="tag">Lesson</span>LBO basics · 60%<span class="spacer"></span><span class="muted">Yesterday</span></div>
+            <div class="row"><span class="tag">Dossier</span>BCG Indonesia<span class="spacer"></span><span class="muted">Mon</span></div>
+          </div>
+        </div>
+        <div class="grid g3" style="margin-top:16px">
+          <div class="card"><h2>Unsorted <a class="more">File all</a></h2><p class="muted">4 captures waiting · Suggested: Work, Hunt</p></div>
+          <div class="card"><h2>Deadline coming up</h2><p>Interview · Danantara</p><p class="muted">Thu 10:00 · Prep checklist 3/5</p></div>
+          <div class="card"><h2>Reflect</h2><p class="muted">Reflect on this week — one line is enough.</p></div>
+        </div>
+      </section>
+
+      <!-- WORK -->
+      <section class="view" data-view="work">
+        <div class="split">
+          <div class="card" style="padding:6px 8px;overflow-x:auto">
+            <table><thead><tr><th>Task</th><th>Space</th><th>Status</th><th class="hide-sm">Priority</th><th>Deadline</th></tr></thead>
+            <tbody>
+              <tr class="sel"><td>Finish DCF model</td><td>Career</td><td><span class="tag soon">Doing</span></td><td class="hide-sm">High</td><td><span class="tag late">Oct 26</span></td></tr>
+              <tr><td>Update CV v7</td><td>Career</td><td><span class="tag">To do</span></td><td class="hide-sm">Med</td><td>Oct 30</td></tr>
+              <tr><td>Renew BPJS</td><td>Personal</td><td><span class="tag">To do</span></td><td class="hide-sm">Low</td><td>Nov 2</td></tr>
+              <tr><td>Draft outreach batch</td><td>Hunt</td><td><span class="tag ok">Done</span></td><td class="hide-sm">Med</td><td>—</td></tr>
+              <tr><td>Clean Studio boards</td><td>Studio</td><td><span class="tag">To do</span></td><td class="hide-sm">Low</td><td>—</td></tr>
+            </tbody></table>
+          </div>
+          <aside class="card sheet" aria-label="Task detail">
+            <div class="muted">Career / Tasks</div>
+            <div class="title">Finish DCF model</div>
+            <div class="prop"><span>Status</span><span><span class="tag soon">Doing</span></span></div>
+            <div class="prop"><span>Space</span><span>Career</span></div>
+            <div class="prop"><span>Priority</span><span>High</span></div>
+            <div class="prop"><span>Deadline</span><span class="tag late" style="justify-self:start">Oct 26 · overdue</span></div>
+            <div class="tabs"><b>Description</b><span>Checklist</span><span>Notes</span><span>Links</span><span>Subpages</span></div>
+            <div class="ph" style="height:150px">Rich text body</div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- HUNT -->
+      <section class="view" data-view="hunt">
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="card"><div class="muted">Active</div><div class="stat">14</div></div>
+          <div class="card"><div class="muted">Interviews · 7d</div><div class="stat">2</div></div>
+          <div class="card"><div class="muted">Follow up due</div><div class="stat">3</div></div>
+          <div class="card"><div class="muted">Offer</div><div class="stat">0</div></div>
+        </div>
+        <div class="kanban">
+          <div class="col"><h3>Wishlist <span>5</span></h3><div class="job"><b>Goldman Sachs</b>IBD Analyst · Jakarta</div><div class="job"><b>Northstar</b>PE Analyst</div></div>
+          <div class="col"><h3>Applied <span>6</span></h3><div class="job"><b>Mandiri Sekuritas</b>IB Analyst<br><span class="tag soon">Follow up</span></div><div class="job"><b>McKinsey</b>Business Analyst</div></div>
+          <div class="col"><h3>Interview <span>2</span></h3><div class="job"><b>Danantara</b>Investment Analyst<br><span class="tag soon">Thu 10:00</span></div></div>
+          <div class="col"><h3>Offer <span>0</span></h3><p class="muted" style="padding:4px">Nothing here yet.</p></div>
+          <div class="col"><h3>Closed <span>3</span></h3><div class="job"><b>Bain</b>Associate<br><span class="muted">Dropped · timing</span></div></div>
+        </div>
+      </section>
+
+      <!-- STUDY -->
+      <section class="view" data-view="study">
+        <div class="card" style="margin-bottom:16px"><h2>Next up</h2>
+          <div class="lesson"><div class="ph" style="width:96px;height:64px">Visual</div><div style="flex:1"><b>Lesson 6 · Trading comparables</b><div class="muted">PE track · 18 min</div><div class="prog"><i style="width:60%"></i></div></div><button class="btn primary">Continue</button></div>
+        </div>
+        <div class="grid g3">
+          <div class="card"><h2>Analyst Lab</h2><p class="muted">Workbook check · 3 cases</p><div class="prog"><i style="width:33%"></i></div></div>
+          <div class="card"><h2>Consulting Lab</h2><p class="muted">Case drills · 5 cases</p><div class="prog"><i style="width:20%"></i></div></div>
+          <div class="card"><h2>VC Lab</h2><p class="muted">Waterfall · 2 cases</p><div class="prog"><i style="width:50%"></i></div></div>
+        </div>
+        <p class="note">Simulated cases — practice only, not executed investments.</p>
+      </section>
+
+      <!-- STUDIO -->
+      <section class="view" data-view="studio">
+        <div class="grid g4">
+          <div class="card"><div class="ph" style="height:120px;margin-bottom:10px">Canvas preview</div><b>Q4 Planning</b><div class="muted">Edited 2h ago</div></div>
+          <div class="card"><div class="ph" style="height:120px;margin-bottom:10px">Canvas preview</div><b>Interview map</b><div class="muted">Yesterday</div></div>
+          <div class="card"><div class="ph" style="height:120px;margin-bottom:10px">Canvas preview</div><b>Portfolio story</b><div class="muted">Mon</div></div>
+          <div class="card"><div class="ph" style="height:120px;margin-bottom:10px">Canvas preview</div><b>Reading notes</b><div class="muted">Oct 19</div></div>
+          <button class="card ph" style="min-height:190px;font-size:14px">＋ New board</button>
+        </div>
+      </section>
+
+      <!-- CALENDAR -->
+      <section class="view" data-view="calendar">
+        <div class="cal">
+          <div class="hd">Mon</div><div class="hd">Tue</div><div class="hd">Wed</div><div class="hd">Thu</div><div class="hd">Fri</div><div class="hd">Sat</div><div class="hd">Sun</div>
+          <div>26<span class="ev" style="background:transparent;color:var(--bad)">DCF model</span></div><div class="today">27<span class="ev">Follow up</span></div><div>28</div><div>29<span class="ev">Danantara 10:00</span></div><div>30<span class="ev">CV v7</span></div><div>31</div><div>1</div>
+          <div>2<span class="ev">BPJS</span></div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>
+        </div>
+        <div class="card" style="margin-top:16px"><h2>Upcoming</h2>
+          <div class="row"><span class="tag soon">Thu</span>Interview · Danantara</div>
+          <div class="row"><span class="tag">Fri</span>Update CV v7</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="tabbar" aria-label="Rooms">
+  <button data-room="today" aria-current="page"><span class="ic"></span>Today</button>
+  <button data-room="work"><span class="ic"></span>Work</button>
+  <button data-room="hunt"><span class="ic"></span>Hunt</button>
+  <button data-room="study"><span class="ic"></span>Study</button>
+  <button data-room="studio"><span class="ic"></span>Studio</button>
+  <button data-room="calendar"><span class="ic"></span>Calendar</button>
+</nav>
+
+<script>
+const ROOMS={
+  today:{title:'Good morning, Rey',sub:[],cta:'New capture'},
+  work:{title:'Tasks',sub:['Tasks','Spaces','Links','Inbox'],cta:'New task'},
+  hunt:{title:'Pipeline',sub:['Pipeline','Outreach','Dossier','Interviews'],cta:'Add job'},
+  study:{title:'Learning',sub:['Lessons','Labs','Portfolio'],cta:'Continue'},
+  studio:{title:'Boards',sub:[],cta:'New board'},
+  calendar:{title:'October 2026',sub:['Month','Week'],cta:'Today'}
+};
+function go(r){
+  const R=ROOMS[r];
+  document.querySelectorAll('[data-room]').forEach(b=>b.dataset.room===r?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.dataset.view===r));
+  document.getElementById('kicker').textContent=r[0].toUpperCase()+r.slice(1);
+  document.getElementById('title').textContent=R.title;
+  document.getElementById('primary').textContent=R.cta;
+  const s=document.getElementById('sub');
+  s.style.display=R.sub.length?'flex':'none';
+  s.innerHTML=R.sub.map((x,i)=>`<button aria-pressed="${i===0}">${x}</button>`).join('');
+}
+document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>go(b.dataset.room));
+document.getElementById('sub').onclick=e=>{if(e.target.tagName==='BUTTON')e.currentTarget.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===e.target))};
+document.querySelectorAll('tbody tr').forEach(tr=>tr.onclick=()=>{document.querySelectorAll('tbody tr').forEach(x=>x.classList.remove('sel'));tr.classList.add('sel');document.querySelector('.sheet .title').textContent=tr.cells[0].textContent});
+document.getElementById('theme').onclick=()=>{const h=document.documentElement,d=h.dataset.theme==='dark'||(!h.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);h.dataset.theme=d?'light':'dark'};
+go('today');
+</script>
+</body>
+</html>
