@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SELF Rooms</title>
+<style>
+/* Tokens: Apple system surfaces + SELF room tints (rooms.css). One tint visible at a time. */
+:root{
+  color-scheme:light dark;
+  --bg:#f5f5f7;--window:#fff;--surface:#fff;--surface-2:#f2f2f7;--grouped:#f2f2f7;
+  --label:#1d1d1f;--label-2:rgba(60,60,67,.62);--label-3:rgba(60,60,67,.36);
+  --separator:rgba(60,60,67,.14);--separator-strong:rgba(60,60,67,.24);--fill:rgba(120,120,128,.1);--fill-2:rgba(120,120,128,.16);
+  --material:rgba(246,246,248,.72);--material-strong:rgba(255,255,255,.8);
+  --success:#28a745;--warning:#c76a00;--destructive:#e0352b;
+  --room-today:#2369e0;--room-work:#0f8e9b;--room-hunt:#16855f;--room-study:#7552c8;--room-studio:#a8650c;--room-calendar:#c0306a;
+  --on-tint:#fff;--tint:var(--room-today);--tint-soft:color-mix(in srgb,var(--tint) 12%,transparent);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,sans-serif;
+  --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,sans-serif;
+  --t-large:26px;--t-title1:22px;--t-title2:17px;--t-title3:15px;--t-body:13px;--t-callout:12px;--t-sub:11px;
+  --control:28px;--r-sm:6px;--r-md:10px;--r-lg:14px;--r-xl:18px;
+  --shadow-1:0 1px 2px rgba(0,0,0,.05),0 0 0 .5px rgba(0,0,0,.06);
+  --shadow-2:0 8px 28px rgba(0,0,0,.08),0 0 0 .5px rgba(0,0,0,.06);
+  --ease-out:cubic-bezier(.22,1,.36,1);--fast:150ms;--dur:250ms;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000;--window:#000;--surface:#1c1c1e;--surface-2:#2c2c2e;--grouped:#000;
+  --label:#f5f5f7;--label-2:rgba(235,235,245,.62);--label-3:rgba(235,235,245,.34);
+  --separator:rgba(84,84,88,.42);--separator-strong:rgba(84,84,88,.7);--fill:rgba(120,120,128,.2);--fill-2:rgba(120,120,128,.3);
+  --material:rgba(28,28,30,.7);--material-strong:rgba(30,30,32,.82);
+  --success:#30d158;--warning:#ff9f0a;--destructive:#ff453a;
+  --room-today:#428cff;--room-work:#3fc5d2;--room-hunt:#3dce9e;--room-study:#ad92fa;--room-studio:#f0b862;--room-calendar:#f06f9b;
+  --shadow-1:0 0 0 .5px rgba(255,255,255,.08);--shadow-2:0 0 0 .5px rgba(255,255,255,.1);--on-tint:#0b0b0c;}}
+:root[data-theme="dark"]{
+  --bg:#000;--window:#000;--surface:#1c1c1e;--surface-2:#2c2c2e;--grouped:#000;
+  --label:#f5f5f7;--label-2:rgba(235,235,245,.62);--label-3:rgba(235,235,245,.34);
+  --separator:rgba(84,84,88,.42);--separator-strong:rgba(84,84,88,.7);--fill:rgba(120,120,128,.2);--fill-2:rgba(120,120,128,.3);
+  --material:rgba(28,28,30,.7);--material-strong:rgba(30,30,32,.82);
+  --success:#30d158;--warning:#ff9f0a;--destructive:#ff453a;
+  --room-today:#428cff;--room-work:#3fc5d2;--room-hunt:#3dce9e;--room-study:#ad92fa;--room-studio:#f0b862;--room-calendar:#f06f9b;
+  --shadow-1:0 0 0 .5px rgba(255,255,255,.08);--shadow-2:0 0 0 .5px rgba(255,255,255,.1);--on-tint:#0b0b0c;}
+[data-room="today"]{--tint:var(--room-today)}[data-room="work"]{--tint:var(--room-work)}
+[data-room="hunt"]{--tint:var(--room-hunt)}[data-room="study"]{--tint:var(--room-study)}
+[data-room="studio"]{--tint:var(--room-studio)}[data-room="calendar"]{--tint:var(--room-calendar)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font:var(--t-body)/1.47 var(--font);background:var(--window);color:var(--label);-webkit-font-smoothing:antialiased;letter-spacing:-.003em}
+button,input{font:inherit;color:inherit;background:none;border:0}
+button{cursor:default}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--tint) 55%,transparent);outline-offset:1px;border-radius:var(--r-sm)}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;letter-spacing:-.022em;line-height:1.2}
+[hidden]{display:none!important}
+
+/* ===== Shell ===== */
+.shell{display:grid;grid-template-columns:236px 1fr;min-height:100vh;background:var(--window)}
+.sidebar{position:sticky;top:8px;margin:8px 0 8px 8px;height:calc(100vh - 16px);border-radius:var(--r-xl);
+  background:var(--material);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);
+  box-shadow:var(--shadow-2);display:flex;flex-direction:column;padding:12px 10px;z-index:10}
+@supports not (backdrop-filter:blur(1px)){.sidebar{background:var(--surface-2)}}
+.traffic{display:flex;gap:8px;padding:4px 8px 18px}
+.traffic i{width:12px;height:12px;border-radius:50%;background:var(--fill-2)}
+.group-label{font-size:var(--t-sub);font-weight:600;color:var(--label-3);padding:12px 10px 4px}
+.door{display:flex;align-items:center;gap:9px;width:100%;height:30px;padding:0 10px;border-radius:8px;color:var(--label);text-align:left;
+  transition:background var(--fast) var(--ease-out)}
+.door svg.i{color:var(--label-2)}
+.door:hover{background:var(--fill)}
+.door[aria-current="page"]{background:var(--tint-soft)}
+.door[aria-current="page"] svg.i{color:var(--tint)}
+.door[aria-current="page"] .door-name{font-weight:600}
+.door .count{margin-left:auto;font-size:var(--t-sub);color:var(--label-2);font-variant-numeric:tabular-nums}
+.door .count.alert{color:var(--destructive);font-weight:600}
+.side-foot{margin-top:auto;padding-top:8px;border-top:.5px solid var(--separator)}
+.me{display:flex;align-items:center;gap:9px;padding:8px 10px}
+.avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(var(--fill-2),var(--fill-2));display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--label-2)}
+.me small{display:block;color:var(--label-2);font-size:var(--t-sub)}
+
+.main{min-width:0;display:flex;flex-direction:column}
+/* Toolbar: leading title, centre segmented control, trailing glyph capsule + search + primary */
+.toolbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;height:52px;padding:0 20px 0 24px;
+  background:color-mix(in srgb,var(--window) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:.5px solid transparent;transition:border-color var(--fast)}
+.toolbar.scrolled{border-bottom-color:var(--separator)}
+.tb-title{font-size:var(--t-title3);font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.seg{position:relative;display:inline-flex;padding:2px;border-radius:8px;background:var(--fill)}
+.seg button{position:relative;z-index:1;height:24px;padding:0 12px;border-radius:6px;font-size:var(--t-body);color:var(--label);white-space:nowrap}
+.seg button[aria-checked="true"]{font-weight:600}
+.seg .pill{position:absolute;top:2px;height:24px;border-radius:6px;background:var(--material-strong);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04);transition:transform var(--dur) var(--ease-out),width var(--dur) var(--ease-out)}
+:root[data-theme="dark"] .seg .pill{background:#636366}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg .pill{background:#636366}}
+.flex{flex:1}
+.capsule{display:flex;align-items:center;border-radius:999px;background:var(--fill);padding:2px}
+.glyph{width:32px;height:var(--control);display:grid;place-items:center;border-radius:999px;color:var(--label-2);transition:background var(--fast),transform var(--fast)}
+.glyph:hover{background:var(--fill);color:var(--label)}
+.glyph:active,.btn:active,.door:active{transform:scale(.97)}
+.searchbox{display:flex;align-items:center;gap:6px;height:var(--control);width:200px;padding:0 10px;border-radius:8px;background:var(--fill);color:var(--label-2)}
+.searchbox input{flex:1;min-width:0;outline:none;font-size:var(--t-body);color:var(--label)}
+.searchbox input::placeholder{color:var(--label-2)}
+.searchbox kbd{font:var(--t-sub) var(--font);color:var(--label-3)}
+.btn{display:inline-flex;align-items:center;gap:6px;height:var(--control);padding:0 12px;border-radius:8px;font-size:var(--t-body);font-weight:500;white-space:nowrap;transition:filter var(--fast),transform var(--fast)}
+.btn.primary{background:var(--tint);color:var(--on-tint)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.tinted{background:var(--tint-soft);color:var(--tint)}
+.btn.plain{color:var(--tint);padding:0 4px}
+
+.content{padding:20px 32px 72px;max-width:1160px;width:100%;margin:0 auto}
+.page-head{display:flex;align-items:flex-end;gap:16px;margin:8px 0 22px}
+.eyebrow{font-size:var(--t-callout);font-weight:600;color:var(--tint);margin-bottom:2px}
+.large-title{font-size:var(--t-large)}
+.subtitle{color:var(--label-2);font-size:var(--t-title3);margin-top:2px;letter-spacing:-.01em}
+.view{display:none}.view.on{display:block;animation:enter var(--dur) var(--ease-out)}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Surfaces */
+.panel{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-1)}
+.section-h{display:flex;align-items:baseline;gap:8px;padding:0 4px 8px;font-size:var(--t-title3);font-weight:600;letter-spacing:-.01em}
+.section-h .meta{font-weight:400;color:var(--label-2);font-size:var(--t-body)}
+.section-h .btn{margin-left:auto}
+.list{list-style:none}
+.list li{display:flex;align-items:center;gap:12px;min-height:44px;padding:8px 14px;position:relative}
+.list li+li::before{content:"";position:absolute;top:0;left:46px;right:0;border-top:.5px solid var(--separator)}
+.list li.plain+li::before{left:14px}
+.list .t{flex:1;min-width:0}
+.list .t b{font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list .t small{color:var(--label-2);font-size:var(--t-callout)}
+.list .trail{color:var(--label-2);font-size:var(--t-callout);white-space:nowrap;font-variant-numeric:tabular-nums}
+.check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--label-3);flex:none;display:grid;place-items:center;transition:all var(--fast)}
+.check:hover{border-color:var(--tint)}
+.check.done{background:var(--tint);border-color:var(--tint);color:var(--on-tint)}
+.check svg{width:12px;height:12px;stroke-width:2.4;opacity:0}.check.done svg{opacity:1}
+li.is-done .t b{color:var(--label-3);text-decoration:line-through}
+.icon-tile{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;background:var(--fill);color:var(--label-2);flex:none}
+.status{display:inline-flex;align-items:center;gap:5px;font-size:var(--t-callout);color:var(--label-2);white-space:nowrap}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.status.late{color:var(--destructive)}.status.soon{color:var(--warning)}.status.ok{color:var(--success)}.status.idle{color:var(--label-3)}
+.status.late,.status.soon,.status.ok{font-weight:500}
+.status.idle{color:var(--label-2)}.status.idle::before{background:var(--label-3)}
+
+/* Today */
+.capture{display:flex;align-items:center;gap:10px;height:48px;padding:0 8px 0 16px;border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow-1);transition:box-shadow var(--fast)}
+.capture:focus-within{box-shadow:0 0 0 3px color-mix(in srgb,var(--tint) 30%,transparent),var(--shadow-1)}
+.capture svg{color:var(--tint)}
+.capture input{flex:1;outline:none;font-size:var(--t-title3);letter-spacing:-.01em}
+.capture input::placeholder{color:var(--label-3)}
+.capture .hint{font-size:var(--t-sub);color:var(--label-3)}
+.kinds{display:flex;gap:6px;margin:10px 2px 28px;flex-wrap:wrap}
+.kind{height:24px;padding:0 10px;border-radius:999px;background:var(--fill);font-size:var(--t-callout);color:var(--label-2)}
+.kind[aria-pressed="true"]{background:var(--tint-soft);color:var(--tint);font-weight:500}
+.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:start}
+.cols>*{min-width:0}
+.stack{display:grid;gap:24px}
+.glance{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.glance .panel{padding:14px 16px}
+.glance .k{font-size:var(--t-callout);color:var(--label-2);display:flex;align-items:center;gap:6px}
+.glance .v{font-size:var(--t-title1);font-weight:600;letter-spacing:-.02em;margin-top:4px;font-variant-numeric:tabular-nums}
+.glance .d{font-size:var(--t-callout);color:var(--label-2)}
+
+/* Work: table + inspector */
+.split{display:grid;grid-template-columns:1fr 340px;gap:0;border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow-1);overflow:hidden;min-height:520px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:var(--t-body)}
+th{position:sticky;top:0;background:var(--surface);text-align:left;font-weight:500;color:var(--label-2);font-size:var(--t-callout);height:30px;padding:0 12px;border-bottom:.5px solid var(--separator);white-space:nowrap;user-select:none}
+th[aria-sort]{color:var(--label)}
+th .arr{display:inline-block;margin-left:3px;font-size:9px;color:var(--label-2)}
+td{height:34px;padding:0 12px;white-space:nowrap}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--fill) 45%,transparent)}
+tbody tr:hover{background:var(--fill)}
+tbody tr[aria-selected="true"]{background:color-mix(in srgb,var(--tint) 18%,var(--surface))!important;box-shadow:inset 3px 0 0 var(--tint)}
+td.title{font-weight:500}
+.muted{color:var(--label-2)}
+.space-dot{display:inline-flex;align-items:center;gap:6px}
+.space-dot::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--label-3)}
+.inspector{border-left:.5px solid var(--separator);padding:18px 18px 24px;background:color-mix(in srgb,var(--surface-2) 40%,var(--surface))}
+.crumb{font-size:var(--t-callout);color:var(--label-2)}
+.insp-title{font-size:var(--t-title1);margin:4px 0 16px;outline:none;border-radius:4px}
+.props{display:grid;grid-template-columns:84px 1fr;row-gap:2px;font-size:var(--t-body);margin-bottom:18px}
+.props dt{color:var(--label-2);height:28px;display:flex;align-items:center}
+.props dd{height:28px;display:flex;align-items:center;border-radius:6px;padding:0 6px;margin-left:-6px}
+.props dd:hover{background:var(--fill)}
+.mini-tabs{display:flex;gap:2px;padding:2px;border-radius:8px;background:var(--fill);margin-bottom:12px;overflow-x:auto}
+.mini-tabs button{flex:1;height:22px;border-radius:6px;font-size:var(--t-callout);color:var(--label-2);white-space:nowrap;padding:0 4px}
+.mini-tabs button[aria-selected="true"]{background:var(--material-strong);color:var(--label);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.prose{font-size:var(--t-body);color:var(--label);line-height:1.55}
+.prose p+p{margin-top:8px}
+.sub-checks{list-style:none;margin-top:12px}
+.sub-checks li{display:flex;gap:8px;align-items:center;height:28px}
+.sub-checks .check{width:16px;height:16px}
+
+/* Hunt */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.metrics .panel{padding:12px 16px}
+.board{display:grid;grid-template-columns:repeat(5,minmax(196px,1fr));gap:12px;overflow-x:auto;padding-bottom:8px}
+.lane{background:color-mix(in srgb,var(--fill) 55%,transparent);border-radius:var(--r-lg);padding:8px;min-height:380px}
+.lane-h{display:flex;align-items:center;gap:6px;padding:4px 6px 10px;font-weight:600}
+.lane-h .n{color:var(--label-2);font-weight:400}
+.lane-h .glyph{margin-left:auto;width:24px;height:22px}
+.job{background:var(--surface);border-radius:var(--r-md);padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow-1);transition:transform var(--fast) var(--ease-out),box-shadow var(--fast)}
+.job:hover{transform:translateY(-1px);box-shadow:var(--shadow-2)}
+.job .co{display:flex;align-items:center;gap:8px;font-weight:600}
+.logo{width:22px;height:22px;border-radius:6px;background:var(--fill-2);display:grid;place-items:center;font-size:10px;font-weight:700;color:var(--label-2);flex:none}
+.job .role{color:var(--label-2);margin:4px 0 8px 30px;font-size:var(--t-callout)}
+.job .foot{margin-left:30px;display:flex;gap:10px;align-items:center}
+.empty{display:grid;place-items:center;text-align:center;color:var(--label-2);padding:40px 12px;font-size:var(--t-callout)}
+.empty svg{width:22px;height:22px;color:var(--label-3);margin-bottom:6px}
+
+/* Study */
+.hero{display:grid;grid-template-columns:200px 1fr;gap:20px;padding:16px;align-items:center}
+.cover{aspect-ratio:16/10;border-radius:var(--r-md);background:color-mix(in srgb,var(--tint) 14%,var(--surface));display:grid;place-items:center;overflow:hidden}
+.hero h2{font-size:var(--t-title2)}
+.hero p{color:var(--label-2);margin:2px 0 12px}
+.bar{height:4px;border-radius:2px;background:var(--fill-2);overflow:hidden;margin:4px 0 12px;max-width:340px}
+.bar i{display:block;height:100%;background:var(--tint);border-radius:2px}
+.labs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.lab{padding:16px}
+.lab h3{font-size:var(--t-title3);margin:10px 0 2px}
+.lab p{color:var(--label-2);font-size:var(--t-callout)}
+.footnote{margin-top:20px;font-size:var(--t-callout);color:var(--label-2);display:flex;gap:6px;align-items:center}
+
+/* Studio */
+.boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+.bcard{border-radius:var(--r-lg);transition:transform var(--fast) var(--ease-out)}
+.bcard:hover{transform:translateY(-2px)}
+.thumb{aspect-ratio:4/3;border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow-1);overflow:hidden}
+.thumb svg{width:100%;height:100%;display:block}
+.bcard b{display:block;font-weight:500;margin:8px 2px 0}
+.bcard small{color:var(--label-2);font-size:var(--t-callout);margin-left:2px}
+.new-board{aspect-ratio:4/3;border-radius:var(--r-lg);border:1px dashed var(--separator-strong);display:grid;place-items:center;color:var(--label-2);width:100%}
+.new-board:hover{background:var(--fill);color:var(--tint)}
+
+/* Calendar */
+.cal{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-1);overflow:hidden}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.dow{font-size:var(--t-sub);font-weight:600;color:var(--label-2);text-align:right;padding:8px 10px}
+.day{min-height:104px;border-top:.5px solid var(--separator);border-left:.5px solid var(--separator);padding:6px 6px 6px}
+.day:nth-child(7n+1){border-left:0}
+.day .num{display:flex;justify-content:flex-end;font-size:var(--t-body);font-variant-numeric:tabular-nums;color:var(--label)}
+.day.out .num{color:var(--label-3)}
+.day.weekend{background:color-mix(in srgb,var(--fill) 30%,transparent)}
+.day.today .num span{background:var(--tint);color:var(--on-tint);border-radius:999px;min-width:22px;height:22px;display:grid;place-items:center;font-weight:600;padding:0 6px}
+.ev{display:flex;gap:5px;align-items:center;font-size:var(--t-sub);margin-top:3px;padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--tint);flex:none}
+.ev.late::before{background:var(--destructive)}.ev.late{color:var(--destructive)}
+.ev.block{background:var(--tint-soft);color:var(--tint);font-weight:500}
+
+/* Sheet (phone detail) */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity var(--dur);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--surface);border-radius:14px 14px 0 0;padding:8px 20px calc(24px + env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform var(--dur) var(--ease-out);z-index:41}
+.grabber{width:36px;height:5px;border-radius:3px;background:var(--fill-2);margin:0 auto 12px}
+body.sheet-open .scrim{opacity:1;pointer-events:auto}
+body.sheet-open .sheet{transform:none}
+
+.tabbar{display:none}
+.m-only{display:none}
+
+/* ===== ~1100: inspector narrower, glance stacks ===== */
+@media (max-width:1180px){.split{grid-template-columns:1fr 316px}.inspector{padding:16px 14px 22px}.mini-tabs button{font-size:11px;padding:0 2px}.searchbox{width:150px}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:980px){.shell{grid-template-columns:72px 1fr}.door-name,.door .count,.group-label,.me div,.traffic{display:none}
+  .door{justify-content:center;height:36px;padding:0}.sidebar{padding:12px 8px}.me{justify-content:center;padding:8px 0}
+  .cols{grid-template-columns:1fr}.split{grid-template-columns:1fr}.inspector{display:none}.searchbox{display:none}}
+
+/* ===== Phone: iOS idiom ===== */
+@media (max-width:734px){
+  :root{--t-large:34px;--t-title1:28px;--t-title2:22px;--t-title3:17px;--t-body:17px;--t-callout:15px;--t-sub:13px;--control:44px}
+  .shell{grid-template-columns:1fr}.sidebar{display:none}
+  .toolbar{height:44px;padding:0 16px;padding-top:env(safe-area-inset-top);box-sizing:content-box}
+  .toolbar .tb-title{font-size:17px;opacity:0;transition:opacity var(--fast);position:absolute;left:0;right:0;text-align:center;pointer-events:none}
+  .toolbar.scrolled .tb-title{opacity:1}
+  .toolbar .seg,.toolbar .capsule,.toolbar .btn.primary span{display:none}
+  .toolbar .btn.primary{width:36px;height:36px;padding:0;justify-content:center;border-radius:50%}
+  #calBtn{margin-left:auto;width:36px;height:36px;color:var(--tint)}#calBtn[aria-current]{background:var(--tint-soft)}
+  .content{padding:0 16px 120px}
+  .page-head{margin:4px 0 14px}
+  .m-only{display:flex}.m-seg{width:100%;margin-bottom:16px}.m-seg button{flex:1;height:30px;font-size:13px;padding:0 4px}.m-seg .pill{height:30px}
+  .capture{height:52px}.capture .hint{display:none}
+  .glance,.labs,.metrics{grid-template-columns:1fr 1fr}.glance .panel:last-child{grid-column:span 2}
+  .labs{grid-template-columns:1fr}
+  .hero{grid-template-columns:1fr}
+  .board{grid-template-columns:repeat(5,82%);scroll-snap-type:x mandatory}.lane{scroll-snap-align:start}
+  .list li{min-height:52px}.list li+li::before{left:50px}
+  /* table → inset grouped list */
+  .split{background:none;box-shadow:none;min-height:0;overflow:visible}
+  table,thead,tbody,tr,td{display:block}thead{display:none}
+  tbody{background:var(--surface);border-radius:var(--r-lg);overflow:hidden}
+  tbody tr{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:11px 16px;position:relative;background:none!important;color:inherit!important}
+  tbody tr+tr::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--separator)}
+  td{height:auto;padding:0}td.title{grid-column:1;font-size:17px}
+  td.c-space{grid-column:1;grid-row:2;font-size:15px;color:var(--label-2)}
+  td.c-status{grid-column:2;grid-row:1;justify-self:end}td.c-due{grid-column:2;grid-row:2;justify-self:end;font-size:15px}
+  td.c-prio{display:none}
+  tbody tr[aria-selected="true"]{box-shadow:none}
+  .day{min-height:52px;padding:4px}.ev{font-size:0;height:6px;padding:0;margin:3px auto 0;width:6px}.ev::before{width:6px;height:6px}.ev.block{background:none}
+  .day .num{justify-content:center}.dow{text-align:center;padding:6px 0}
+  .tabbar{display:flex;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));height:62px;border-radius:31px;z-index:30;
+    background:var(--material);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);box-shadow:0 8px 30px rgba(0,0,0,.14),0 0 0 .5px var(--separator);padding:4px}
+  .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:500;color:var(--label-2);border-radius:27px;min-height:44px}
+  .tabbar svg.i{width:24px;height:24px;stroke-width:1.7}
+  .tabbar button[aria-current="page"]{color:var(--tint);background:var(--fill)}
+  body{background:var(--grouped)}.shell{background:var(--grouped)}
+  .toolbar{background:color-mix(in srgb,var(--grouped) 78%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important;animation:none!important}.view.on{animation:none}}
+</style>
+</head>
+<body>
+<!-- Icon set: 1.6px stroke line icons (Lucide-style, drawn inline; SF Symbols are not licensed for web) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></symbol>
+  <symbol id="i-work" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-hunt" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol>
+  <symbol id="i-study" viewBox="0 0 24 24"><path d="M22 9.5 12 5 2 9.5 12 14l10-4.5Z"/><path d="M6 11.8V16c3 2.7 9 2.7 12 0v-4.2M22 9.5V15"/></symbol>
+  <symbol id="i-studio" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="9" rx="2"/><rect x="13.5" y="3" width="7.5" height="5" rx="2"/><rect x="13.5" y="11" width="7.5" height="10" rx="2"/><rect x="3" y="15" width="7.5" height="6" rx="2"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3.5"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M20 7h-8M12 17H4"/><circle cx="8" cy="7" r="3"/><circle cx="16" cy="17" r="3"/></symbol>
+  <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3.5"/><path d="M9.5 4v16"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18.5" cy="12" r="1"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M3 5h5.5A3.5 3.5 0 0 1 12 8.5V20a2.5 2.5 0 0 0-2.5-2.5H3zM21 5h-5.5A3.5 3.5 0 0 0 12 8.5V20a2.5 2.5 0 0 1 2.5-2.5H21z"/></symbol>
+  <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M16 7V5.5A1.5 1.5 0 0 0 14.5 4h-5A1.5 1.5 0 0 0 8 5.5V7M3 12.5h18"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13h5l1.5 3h5l1.5-3h5"/><path d="M5.5 5h13L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-reflect" viewBox="0 0 24 24"><path d="M4 19.5V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H8z"/><path d="M8.5 9h7M8.5 12.5h4.5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="m8 15 3.5-4 3 2.5L20 7"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0M16 4.6a3.5 3.5 0 0 1 0 6.8M21 20a6 6 0 0 0-3.5-5.5"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.01"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+</svg>
+
+<div class="shell" id="shell" data-room="today">
+  <nav class="sidebar" aria-label="Rooms">
+    <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="group-label">Rooms</div>
+    <button class="door" data-room="today" aria-current="page"><svg class="i"><use href="#i-sun"/></svg><span class="door-name">Today</span><span class="count alert">3 due</span></button>
+    <button class="door" data-room="work"><svg class="i"><use href="#i-work"/></svg><span class="door-name">Work</span><span class="count">12 open</span></button>
+    <button class="door" data-room="hunt"><svg class="i"><use href="#i-hunt"/></svg><span class="door-name">Hunt</span><span class="count">2 intvw</span></button>
+    <button class="door" data-room="study"><svg class="i"><use href="#i-study"/></svg><span class="door-name">Study</span></button>
+    <button class="door" data-room="studio"><svg class="i"><use href="#i-studio"/></svg><span class="door-name">Studio</span><span class="count">4 boards</span></button>
+    <div class="group-label">Plan</div>
+    <button class="door" data-room="calendar"><svg class="i"><use href="#i-calendar"/></svg><span class="door-name">Calendar</span><span class="count alert">1 late</span></button>
+    <div class="side-foot">
+      <button class="door" id="theme" aria-label="Switch theme"><svg class="i"><use href="#i-moon"/></svg><span class="door-name">Appearance</span></button>
+      <button class="door"><svg class="i"><use href="#i-settings"/></svg><span class="door-name">Settings</span></button>
+      <div class="me"><span class="avatar">RK</span><div>Rey Kylo<small>Synced just now</small></div></div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="toolbar" id="toolbar">
+      <span class="tb-title" id="tbTitle">Today</span>
+      <div class="seg" id="seg" role="radiogroup" aria-label="Section"></div>
+      <span class="flex"></span>
+      <div class="capsule" id="capsule">
+        <button class="glyph" aria-label="Filter"><svg class="i"><use href="#i-filter"/></svg></button>
+        <button class="glyph" aria-label="Sort"><svg class="i"><use href="#i-sort"/></svg></button>
+        <button class="glyph" aria-label="More"><svg class="i"><use href="#i-more"/></svg></button>
+      </div>
+      <label class="searchbox"><svg class="i"><use href="#i-search"/></svg><input placeholder="Search" aria-label="Search"><kbd>⌘K</kbd></label>
+      <button class="glyph m-only" id="calBtn" aria-label="Calendar" data-room="calendar"><svg class="i"><use href="#i-calendar"/></svg></button>
+      <button class="btn primary" id="primary"><svg class="i"><use href="#i-plus"/></svg><span id="primaryLabel">Capture</span></button>
+    </header>
+
+    <main class="content">
+      <!-- ================= TODAY ================= -->
+      <section class="view on" data-view="today">
+        <div class="page-head"><div><div class="eyebrow">Tuesday, 27 October</div><h1 class="large-title">Good morning, Rey</h1></div></div>
+        <label class="capture"><svg class="i"><use href="#i-plus"/></svg><input placeholder="Capture a task, link or note" aria-label="Quick capture"><span class="hint">Return to save</span></label>
+        <div class="kinds" role="group" aria-label="Capture as">
+          <button class="kind" aria-pressed="true">Task</button><button class="kind">Note</button><button class="kind">Link</button><button class="kind">Tracker row</button><button class="kind">Follow up</button>
+        </div>
+
+        <div class="cols">
+          <div>
+            <div class="section-h">Three for today <span class="meta">1 of 3 done</span><button class="btn plain">Edit</button></div>
+            <ul class="list panel" id="three">
+              <li><button class="check" aria-label="Mark done"><svg class="i"><use href="#i-check"/></svg></button><div class="t"><b>Finish DCF model, Case 04</b><small>Work · Career</small></div><span class="status late">Overdue</span></li>
+              <li><button class="check" aria-label="Mark done"><svg class="i"><use href="#i-check"/></svg></button><div class="t"><b>Follow up with Mandiri Sekuritas</b><small>Hunt · Last contact 6 days ago</small></div><span class="status soon">Today</span></li>
+              <li class="is-done"><button class="check done" aria-label="Mark not done"><svg class="i"><use href="#i-check"/></svg></button><div class="t"><b>Review Lesson 6: Trading comparables</b><small>Study</small></div><span class="trail">Done</span></li>
+            </ul>
+          </div>
+          <div>
+            <div class="section-h">Continue where you left off</div>
+            <ul class="list panel">
+              <li><span class="icon-tile"><svg class="i"><use href="#i-studio"/></svg></span><div class="t"><b>Q4 planning canvas</b><small>Studio</small></div><span class="trail">2h ago</span></li>
+              <li><span class="icon-tile"><svg class="i"><use href="#i-book"/></svg></span><div class="t"><b>LBO basics</b><small>Study · 60%</small></div><span class="trail">Yesterday</span></li>
+              <li><span class="icon-tile"><svg class="i"><use href="#i-doc"/></svg></span><div class="t"><b>BCG Indonesia dossier</b><small>Hunt</small></div><span class="trail">Mon</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="glance">
+          <div class="panel"><div class="k"><svg class="i"><use href="#i-inbox"/></svg>Unsorted</div><div class="v">4</div><div class="d">Captures to file</div></div>
+          <div class="panel"><div class="k"><svg class="i"><use href="#i-clock"/></svg>Deadline coming up</div><div class="v">Thu</div><div class="d">Interview · Danantara, 10:00</div></div>
+          <div class="panel"><div class="k"><svg class="i"><use href="#i-reflect"/></svg>Reflect</div><div class="v">—</div><div class="d">One line on this week</div></div>
+        </div>
+      </section>
+
+      <!-- ================= WORK ================= -->
+      <section class="view" data-view="work">
+        <div class="page-head"><div><div class="eyebrow">Work</div><h1 class="large-title">Tasks</h1><p class="subtitle">12 open · 1 overdue</p></div></div>
+        <div class="seg m-only m-seg" role="radiogroup" aria-label="Section" data-mirror></div>
+        <div class="split">
+          <div class="table-wrap">
+            <table aria-label="Tasks">
+              <thead><tr><th style="width:40%">Task</th><th>Space</th><th>Status</th><th class="c-prio">Priority</th><th aria-sort="ascending">Deadline <span class="arr">▲</span></th></tr></thead>
+              <tbody id="tasks">
+                <tr aria-selected="true" data-desc="Build the five-year DCF for Case 04. Use the comparables range from Lesson 6 to sanity-check the terminal value."><td class="title">Finish DCF model</td><td class="c-space"><span class="space-dot muted">Career</span></td><td class="c-status"><span class="status soon">Doing</span></td><td class="c-prio muted">High</td><td class="c-due"><span class="status late">26 Oct</span></td></tr>
+                <tr data-desc="Tighten the summary to three lines and move the Danantara project to the top."><td class="title">Update CV v7</td><td class="c-space"><span class="space-dot muted">Career</span></td><td class="c-status"><span class="status idle">To do</span></td><td class="c-prio muted">Medium</td><td class="c-due muted">30 Oct</td></tr>
+                <tr data-desc="Renew online before the end of the month."><td class="title">Renew BPJS</td><td class="c-space"><span class="space-dot muted">Personal</span></td><td class="c-status"><span class="status idle">To do</span></td><td class="c-prio muted">Low</td><td class="c-due muted">2 Nov</td></tr>
+                <tr data-desc="Five firms from the Wishlist column."><td class="title">Draft outreach batch</td><td class="c-space"><span class="space-dot muted">Hunt</span></td><td class="c-status"><span class="status ok">Done</span></td><td class="c-prio muted">Medium</td><td class="c-due muted">—</td></tr>
+                <tr data-desc="Archive the old wireframe boards."><td class="title">Tidy Studio boards</td><td class="c-space"><span class="space-dot muted">Studio</span></td><td class="c-status"><span class="status idle">To do</span></td><td class="c-prio muted">Low</td><td class="c-due muted">—</td></tr>
+                <tr data-desc="Two-page memo on the target's unit economics."><td class="title">Write investment memo</td><td class="c-space"><span class="space-dot muted">Career</span></td><td class="c-status"><span class="status idle">To do</span></td><td class="c-prio muted">High</td><td class="c-due muted">4 Nov</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <aside class="inspector" aria-label="Task details">
+            <div class="crumb">Career › Tasks</div>
+            <h2 class="insp-title" id="inspTitle" contenteditable="true" spellcheck="false">Finish DCF model</h2>
+            <dl class="props">
+              <dt>Status</dt><dd><span class="status soon" id="inspStatus">Doing</span></dd>
+              <dt>Space</dt><dd id="inspSpace">Career</dd>
+              <dt>Priority</dt><dd id="inspPrio">High</dd>
+              <dt>Deadline</dt><dd id="inspDue"><span class="status late">26 Oct · overdue</span></dd>
+            </dl>
+            <div class="mini-tabs" role="tablist">
+              <button role="tab" aria-selected="true">Description</button><button role="tab">Checklist</button><button role="tab">Notes</button><button role="tab">Links</button><button role="tab">Subpages</button>
+            </div>
+            <div class="prose"><p id="inspDesc">Build the five-year DCF for Case 04. Use the comparables range from Lesson 6 to sanity-check the terminal value.</p></div>
+            <ul class="sub-checks">
+              <li><span class="check done"><svg class="i"><use href="#i-check"/></svg></span>Revenue build</li>
+              <li><span class="check done"><svg class="i"><use href="#i-check"/></svg></span>Working capital</li>
+              <li><span class="check"></span>Terminal value</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= HUNT ================= -->
+      <section class="view" data-view="hunt">
+        <div class="page-head"><div><div class="eyebrow">Hunt</div><h1 class="large-title">Pipeline</h1><p class="subtitle">14 active applications</p></div></div>
+        <div class="seg m-only m-seg" role="radiogroup" aria-label="Section" data-mirror></div>
+        <div class="metrics">
+          <div class="panel glance-like"><div class="glance"><div></div></div></div>
+        </div>
+        <div class="board">
+          <div class="lane"><div class="lane-h">Wishlist <span class="n">5</span><button class="glyph" aria-label="Add to Wishlist"><svg class="i"><use href="#i-plus"/></svg></button></div>
+            <div class="job"><div class="co"><span class="logo">GS</span>Goldman Sachs</div><div class="role">IBD Analyst · Jakarta</div><div class="foot"><span class="status idle">Saved</span></div></div>
+            <div class="job"><div class="co"><span class="logo">NS</span>Northstar</div><div class="role">PE Analyst</div><div class="foot"><span class="status idle">Saved</span></div></div>
+          </div>
+          <div class="lane"><div class="lane-h">Applied <span class="n">6</span><button class="glyph" aria-label="Add to Applied"><svg class="i"><use href="#i-plus"/></svg></button></div>
+            <div class="job"><div class="co"><span class="logo">MS</span>Mandiri Sekuritas</div><div class="role">IB Analyst</div><div class="foot"><span class="status soon">Follow up today</span></div></div>
+            <div class="job"><div class="co"><span class="logo">Mc</span>McKinsey</div><div class="role">Business Analyst</div><div class="foot"><span class="status idle">Applied 12 Oct</span></div></div>
+          </div>
+          <div class="lane"><div class="lane-h">Interview <span class="n">2</span><button class="glyph" aria-label="Add to Interview"><svg class="i"><use href="#i-plus"/></svg></button></div>
+            <div class="job"><div class="co"><span class="logo">DA</span>Danantara</div><div class="role">Investment Analyst</div><div class="foot"><span class="status soon">Thu, 10:00</span></div></div>
+            <div class="job"><div class="co"><span class="logo">EY</span>EY-Parthenon</div><div class="role">Consultant</div><div class="foot"><span class="status idle">Round 2 · 6 Nov</span></div></div>
+          </div>
+          <div class="lane"><div class="lane-h">Offer <span class="n">0</span></div>
+            <div class="empty"><div><svg class="i"><use href="#i-briefcase"/></svg><br>No offers yet.<br>Move a card here when one arrives.</div></div>
+          </div>
+          <div class="lane"><div class="lane-h">Closed <span class="n">3</span></div>
+            <div class="job"><div class="co"><span class="logo">BC</span>Bain &amp; Company</div><div class="role">Associate</div><div class="foot"><span class="status idle">Dropped · timing</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STUDY ================= -->
+      <section class="view" data-view="study">
+        <div class="page-head"><div><div class="eyebrow">Study</div><h1 class="large-title">Learning</h1><p class="subtitle">PE track · Week 3</p></div></div>
+        <div class="seg m-only m-seg" role="radiogroup" aria-label="Section" data-mirror></div>
+        <div class="section-h">Up next</div>
+        <div class="panel hero">
+          <div class="cover"><svg viewBox="0 0 200 125" width="100%" height="100%" aria-hidden="true">
+            <g fill="none" stroke="var(--tint)" stroke-width="2" stroke-linecap="round" opacity=".9">
+              <path d="M30 95 L70 70 L105 80 L170 35"/></g>
+            <g fill="var(--tint)" opacity=".25"><rect x="30" y="100" width="18" height="10" rx="2"/><rect x="62" y="88" width="18" height="22" rx="2"/><rect x="94" y="94" width="18" height="16" rx="2"/><rect x="126" y="70" width="18" height="40" rx="2"/><rect x="158" y="56" width="18" height="54" rx="2"/></g>
+          </svg></div>
+          <div>
+            <h2>Lesson 7 · Precedent transactions</h2>
+            <p>18 minutes · Builds on trading comparables</p>
+            <div class="bar" aria-label="Track progress 60%"><i style="width:60%"></i></div>
+            <button class="btn primary">Continue lesson</button>
+          </div>
+        </div>
+        <div class="labs">
+          <div class="panel lab"><span class="icon-tile"><svg class="i"><use href="#i-chart"/></svg></span><h3>Analyst Lab</h3><p>Workbook check · 1 of 3 cases</p><div class="bar"><i style="width:33%"></i></div></div>
+          <div class="panel lab"><span class="icon-tile"><svg class="i"><use href="#i-people"/></svg></span><h3>Consulting Lab</h3><p>Case drills · 1 of 5 cases</p><div class="bar"><i style="width:20%"></i></div></div>
+          <div class="panel lab"><span class="icon-tile"><svg class="i"><use href="#i-layers"/></svg></span><h3>VC Lab</h3><p>Waterfall · 1 of 2 cases</p><div class="bar"><i style="width:50%"></i></div></div>
+        </div>
+        <p class="footnote"><svg class="i"><use href="#i-info"/></svg>Simulated cases for practice. None of these are executed investments.</p>
+      </section>
+
+      <!-- ================= STUDIO ================= -->
+      <section class="view" data-view="studio">
+        <div class="page-head"><div><div class="eyebrow">Studio</div><h1 class="large-title">Boards</h1><p class="subtitle">4 boards</p></div></div>
+        <div class="boards" id="boards"></div>
+      </section>
+
+      <!-- ================= CALENDAR ================= -->
+      <section class="view" data-view="calendar">
+        <div class="page-head"><div><div class="eyebrow">Calendar</div><h1 class="large-title">October 2026</h1></div></div>
+        <div class="seg m-only m-seg" role="radiogroup" aria-label="Section" data-mirror></div>
+        <div class="cal"><div class="cal-grid" id="cal"></div></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="tabbar" aria-label="Rooms">
+  <button data-room="today" aria-current="page"><svg class="i"><use href="#i-sun"/></svg>Today</button>
+  <button data-room="work"><svg class="i"><use href="#i-work"/></svg>Work</button>
+  <button data-room="hunt"><svg class="i"><use href="#i-hunt"/></svg>Hunt</button>
+  <button data-room="study"><svg class="i"><use href="#i-study"/></svg>Study</button>
+  <button data-room="studio"><svg class="i"><use href="#i-studio"/></svg>Studio</button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grabber"></div>
+  <div class="crumb" id="sheetCrumb">Career › Tasks</div>
+  <h2 class="insp-title" id="sheetTitle">Task</h2>
+  <dl class="props" id="sheetProps"></dl>
+  <div class="prose"><p id="sheetDesc"></p></div>
+</div>
+
+<script>
+const ROOMS={
+  today:{title:'Today',seg:[],cta:'Capture'},
+  work:{title:'Tasks',seg:['Tasks','Spaces','Links','Inbox'],cta:'New task'},
+  hunt:{title:'Pipeline',seg:['Pipeline','Outreach','Dossier','Interviews'],cta:'Add job'},
+  study:{title:'Learning',seg:['Lessons','Labs','Portfolio'],cta:'New note'},
+  studio:{title:'Boards',seg:[],cta:'New board'},
+  calendar:{title:'Calendar',seg:['Month','Week','Upcoming'],cta:'Add event'}
+};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+
+function buildSeg(el,items){
+  el.innerHTML=items.map((x,i)=>`<button role="radio" aria-checked="${i===0}">${x}</button>`).join('')+'<span class="pill"></span>';
+  el.hidden=!items.length;
+  requestAnimationFrame(()=>movePill(el));
+}
+function movePill(el){
+  const on=el.querySelector('[aria-checked="true"]'),pill=el.querySelector('.pill');
+  if(!on||!pill)return;pill.style.width=on.offsetWidth+'px';pill.style.transform=`translateX(${on.offsetLeft-2}px)`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.seg button');if(!b)return;
+  const seg=b.parentElement;seg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-checked',x===b));movePill(seg);
+});
+
+function go(room){
+  const R=ROOMS[room];
+  $('#shell').dataset.room=room;document.body.dataset.room=room;
+  $$('[data-room]').forEach(b=>{if(b.matches('button'))b.dataset.room===room?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
+  $$('.view').forEach(v=>v.classList.toggle('on',v.dataset.view===room));
+  $('#tbTitle').textContent=R.title;$('#primaryLabel').textContent=R.cta;
+  $('#primary').setAttribute('aria-label',R.cta);
+  buildSeg($('#seg'),R.seg);
+  const m=document.querySelector(`[data-view="${room}"] [data-mirror]`);if(m)buildSeg(m,R.seg);
+  $('#capsule').hidden=room==='today';
+  window.scrollTo(0,0);
+}
+$$('button[data-room]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.room)));
+
+/* Toolbar hairline appears on scroll (and phone inline title) */
+addEventListener('scroll',()=>$('#toolbar').classList.toggle('scrolled',scrollY>8),{passive:true});
+
+/* Today: check off */
+$('#three').addEventListener('click',e=>{const c=e.target.closest('.check');if(!c)return;
+  c.classList.toggle('done');c.closest('li').classList.toggle('is-done');
+  c.setAttribute('aria-label',c.classList.contains('done')?'Mark not done':'Mark done');
+  const n=$$('#three .check.done').length;$('#three').previousElementSibling.querySelector('.meta').textContent=n+' of 3 done';});
+$$('.kind').forEach(k=>k.addEventListener('click',()=>$$('.kind').forEach(x=>x.setAttribute('aria-pressed',x===k))));
+
+/* Work: selection drives inspector (desktop) or sheet (phone) */
+const phone=matchMedia('(max-width:734px)');
+$('#tasks').addEventListener('click',e=>{
+  const tr=e.target.closest('tr');if(!tr)return;
+  $$('#tasks tr').forEach(r=>r.setAttribute('aria-selected',r===tr));
+  const c=tr.cells,title=c[0].textContent;
+  $('#inspTitle').textContent=title;$('#inspSpace').textContent=c[1].textContent;$('#inspPrio').textContent=c[3].textContent;
+  $('#inspStatus').className=c[2].querySelector('.status').className;$('#inspStatus').textContent=c[2].textContent;
+  $('#inspDue').innerHTML=c[4].innerHTML;$('#inspDesc').textContent=tr.dataset.desc;
+  if(phone.matches){
+    $('#sheetCrumb').textContent=c[1].textContent+' › Tasks';$('#sheetTitle').textContent=title;
+    $('#sheetProps').innerHTML=`<dt>Status</dt><dd>${c[2].innerHTML}</dd><dt>Priority</dt><dd>${c[3].textContent}</dd><dt>Deadline</dt><dd>${c[4].innerHTML}</dd>`;
+    $('#sheetDesc').textContent=tr.dataset.desc;document.body.classList.add('sheet-open');
+  }
+});
+$('#scrim').addEventListener('click',()=>document.body.classList.remove('sheet-open'));
+addEventListener('keydown',e=>{if(e.key==='Escape')document.body.classList.remove('sheet-open')});
+
+/* Hunt metrics */
+$('.metrics').innerHTML=[['Active','14','Across 5 stages'],['Interviews','2','Next 7 days'],['Follow ups','3','Due this week'],['Offers','0','Keep going']]
+  .map(([k,v,d])=>`<div class="panel"><div class="k muted" style="font-size:var(--t-callout)">${k}</div><div style="font-size:var(--t-title1);font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums">${v}</div><div class="muted" style="font-size:var(--t-callout)">${d}</div></div>`).join('');
+
+/* Studio: drawn canvas thumbnails, not placeholders */
+const thumbs=[
+  ['Q4 planning','Edited 2h ago',`<rect x="14" y="16" width="52" height="34" rx="5" fill="var(--tint)" opacity=".18"/><rect x="74" y="16" width="52" height="34" rx="5" fill="var(--fill-2)"/><rect x="134" y="16" width="52" height="34" rx="5" fill="var(--fill-2)"/><path d="M40 50v20h60v-20M100 70h60V50" stroke="var(--label-3)" fill="none"/><rect x="60" y="84" width="80" height="34" rx="5" fill="var(--tint)" opacity=".35"/>`],
+  ['Interview map','Yesterday',`<circle cx="100" cy="75" r="20" fill="var(--tint)" opacity=".35"/><g stroke="var(--label-3)"><path d="M100 55V30M118 85l34 20M82 85l-34 20M120 68l40-22M80 68l-40-22"/></g><g fill="var(--fill-2)"><circle cx="100" cy="24" r="10"/><circle cx="158" cy="110" r="10"/><circle cx="42" cy="110" r="10"/><circle cx="166" cy="42" r="10"/><circle cx="34" cy="42" r="10"/></g>`],
+  ['Portfolio story','Monday',`<rect x="16" y="18" width="168" height="14" rx="3" fill="var(--fill-2)"/><rect x="16" y="40" width="110" height="8" rx="3" fill="var(--fill-2)"/><rect x="16" y="56" width="130" height="8" rx="3" fill="var(--fill-2)"/><rect x="16" y="80" width="76" height="46" rx="5" fill="var(--tint)" opacity=".25"/><rect x="100" y="80" width="84" height="46" rx="5" fill="var(--fill-2)"/>`],
+  ['Reading notes','19 Oct',`<g fill="var(--fill-2)"><rect x="18" y="20" width="50" height="50" rx="3" transform="rotate(-4 43 45)"/><rect x="128" y="76" width="50" height="50" rx="3" transform="rotate(3 153 101)"/></g><rect x="76" y="40" width="50" height="50" rx="3" fill="var(--tint)" opacity=".3" transform="rotate(2 101 65)"/><path d="M30 110c20-14 40 8 64-6" stroke="var(--label-3)" fill="none" stroke-width="2" stroke-linecap="round"/>`]
+];
+$('#boards').innerHTML=thumbs.map(([n,t,svg])=>`<button class="bcard" style="text-align:left"><div class="thumb"><svg viewBox="0 0 200 150" aria-hidden="true">${svg}</svg></div><b>${n}</b><small>${t}</small></button>`).join('')+
+  `<div><button class="new-board"><span style="display:grid;justify-items:center;gap:6px"><svg class="i" style="width:22px;height:22px"><use href="#i-plus"/></svg>New board</span></button></div>`;
+
+/* Calendar: October 2026 starts on Thursday; Monday-first grid */
+(function(){
+  const ev={6:[['DCF model','late']],27:[['Follow up','block']],29:[['Danantara 10:00','block']],30:[['CV v7','']]};
+  ev[26]=[['DCF model','late']];delete ev[6];
+  let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="dow">${d}</div>`).join('');
+  const start=3; // Mon=0 → Thu=3
+  for(let i=0;i<35;i++){
+    const d=i-start+1,out=d<1||d>31,num=out?(d<1?30+d:d-31):d,wk=i%7>4;
+    const evs=!out&&ev[d]?ev[d].map(([t,c])=>`<div class="ev ${c}">${t}</div>`).join(''):'';
+    h+=`<div class="day${out?' out':''}${wk?' weekend':''}${d===27?' today':''}"><div class="num"><span>${num}</span></div>${evs}</div>`;
+  }
+  $('#cal').innerHTML=h;
+})();
+
+/* Appearance toggle */
+$('#theme').addEventListener('click',()=>{const r=document.documentElement;
+  const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dark?'light':'dark';});
+
+addEventListener('resize',()=>$$('.seg').forEach(movePill));
+go(new URLSearchParams(location.search).get('room')||'today');
+</script>
+</body>
+</html>
