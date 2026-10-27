@@ -14,6 +14,7 @@ on:
       - 'tests/browser_career_learning.cjs'
       - 'tests/browser_worksample.cjs'
       - 'tests/browser_rooms.cjs'
+      - 'tests/browser_calendar.cjs'
       - 'tests/browser_today.cjs'
       - 'tests/browser_hunt.cjs'
       - 'tests/browser_outreach.cjs'
@@ -109,6 +110,8 @@ jobs:
         run: node tests/browser_worksample.cjs
       - name: Rooms shell and drag-and-drop Chromium tests
         run: node tests/browser_rooms.cjs
+      - name: Calendar page Chromium tests
+        run: node tests/browser_calendar.cjs
       - name: Today room Chromium tests
         run: node tests/browser_today.cjs
       - name: Hunt and Study rooms Chromium tests

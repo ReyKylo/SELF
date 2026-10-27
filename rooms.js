@@ -8,19 +8,21 @@ const ROOMS=[
  {id:'work',label:'Work',icon:'kanban',view:'work'},
  {id:'hunt',label:'Hunt',icon:'target',view:'career'},
  {id:'study',label:'Study',icon:'graduation',view:'career'},
- {id:'studio',label:'Studio',icon:'board',view:'boards'}
+ {id:'studio',label:'Studio',icon:'board',view:'boards'},
+ {id:'calendar',label:'Calendar',icon:'calendar',view:'calendar'}
 ];
 const WORK_PAGES=[['work','Tasks'],['spaces','Spaces'],['links','Links'],['inbox','Inbox']];
 const WEEK=7*24*3600*1000;
 
 function roomOf(view,careerPage){
  if(view==='career')return careerPage==='learning'?'study':'hunt';
- return {home:'today',work:'work',spaces:'work',space:'work',links:'work',inbox:'work',boards:'studio','board-editor':'studio'}[view]||null;
+ return {home:'today',work:'work',spaces:'work',space:'work',links:'work',inbox:'work',boards:'studio','board-editor':'studio',calendar:'calendar'}[view]||null;
 }
 function badges(ctx){
  const tasks=Array.isArray(ctx.tasks)?ctx.tasks:[],day=ctx.today||'';
  const open=tasks.filter(t=>t.status!=='done');
  const due=open.filter(t=>t.due_date&&t.due_date<=day).length;
+ const late=open.filter(t=>t.due_date&&t.due_date<day).length;
  const now=ctx.now??Date.now();
  const soon=(Array.isArray(ctx.interviews)?ctx.interviews:[]).filter(i=>{
   if(i.stage!=='scheduled'||!i.scheduled_at)return false;
@@ -32,7 +34,8 @@ function badges(ctx){
   work:make(open.length,open.length+' open',pl(open.length,'open task','open tasks')),
   hunt:make(soon,soon+' intvw',pl(soon,'interview','interviews')+' in the next 7 days'),
   study:null,
-  studio:make(boards,pl(boards,'board','boards'),pl(boards,'board','boards'))
+  studio:make(boards,pl(boards,'board','boards'),pl(boards,'board','boards')),
+  calendar:make(late,late+' late',pl(late,'task','tasks')+' overdue')
  };
 }
 function doorMarkup(room,active,badge,ic,esc){

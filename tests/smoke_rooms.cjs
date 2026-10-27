@@ -4,13 +4,13 @@ const R=require('../rooms.js');
 const root=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
 
 /* roomOf covers every view and Career page */
-const expect={home:'today',work:'work',spaces:'work',space:'work',links:'work',inbox:'work',boards:'studio','board-editor':'studio',search:null,settings:null};
+const expect={home:'today',work:'work',spaces:'work',space:'work',links:'work',inbox:'work',boards:'studio','board-editor':'studio',calendar:'calendar',search:null,settings:null};
 for(const [view,room] of Object.entries(expect))assert.equal(R.roomOf(view),room,view);
 assert.equal(R.roomOf('career','overview'),'hunt');
 for(const p of ['applications','people','companies','radar','cvs','interviews','templates','reminders'])assert.equal(R.roomOf('career',p),'hunt',p);
 assert.equal(R.roomOf('career','learning'),'study');
 assert.equal(R.roomOf('nope'),null);
-assert.deepEqual(R.ROOMS.map(r=>r.id),['today','work','hunt','study','studio']);
+assert.deepEqual(R.ROOMS.map(r=>r.id),['today','work','hunt','study','studio','calendar']);
 
 /* badges: real numbers only, nothing for empty or missing data */
 const now=Date.parse('2026-10-23T09:00:00Z'),day='2026-10-23',h=3600e3;
@@ -23,7 +23,7 @@ assert.equal(b.today.n,2);assert.equal(b.today.text,'2 due');
 assert.equal(b.work.n,4);assert.equal(b.hunt.n,1);assert.equal(b.hunt.text,'1 intvw');
 assert.equal(b.study,null);assert.equal(b.studio.text,'2 boards');
 const empty=R.badges({today:day,tasks:[],boards:[],interviews:undefined});
-for(const k of ['today','work','hunt','study','studio'])assert.equal(empty[k],null,'no badge when '+k+' is empty or unloaded');
+for(const k of ['today','work','hunt','study','studio','calendar'])assert.equal(empty[k],null,'no badge when '+k+' is empty or unloaded');
 assert.equal(R.badges({today:day,tasks:[],boards:[{}]}).studio.text,'1 board');
 
 /* markup */
@@ -31,9 +31,9 @@ const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const ic=n=>'<svg data-i="'+n+'"></svg>';
 const ctx=over=>({study:true,view:'home',tasks:[],boards:[],today:day,ic,esc,...over});
 function count(html,re){return (html.match(re)||[]).length}
-for(const [view,page,active] of [['home',undefined,'today'],['work',undefined,'work'],['space',undefined,'work'],['career','overview','hunt'],['career','learning','study'],['boards',undefined,'studio']]){
+for(const [view,page,active] of [['home',undefined,'today'],['work',undefined,'work'],['space',undefined,'work'],['career','overview','hunt'],['career','learning','study'],['boards',undefined,'studio'],['calendar',undefined,'calendar']]){
  const html=R.sidebar(ctx({view,careerPage:page}),'<div class="brand"></div>','<div class="sidebar-foot"></div>');
- assert.equal(count(html,/class="door"/g),5,view+' five doors');
+ assert.equal(count(html,/class="door"/g),6,view+' six doors');
  assert.equal(count(html,/aria-current="page"/g),1,view+' one current door');
  assert.match(html,new RegExp('data-room="'+active+'"[^>]*aria-current="page"'),view+' current is '+active);
  assert.match(html,/aria-label="SELF navigation"/);assert.match(html,/class="sidebar rooms-rail"/);
@@ -41,7 +41,7 @@ for(const [view,page,active] of [['home',undefined,'today'],['work',undefined,'w
 }
 const none=R.sidebar(ctx({view:'settings'}),'','');
 assert.equal(count(none,/aria-current="page"/g),0,'settings has no current door');
-const bar=R.bar(ctx({view:'work'}));assert.match(bar,/class="mobile-nav rooms-bar"/);assert.equal(count(bar,/class="door"/g),5);
+const bar=R.bar(ctx({view:'work'}));assert.match(bar,/class="mobile-nav rooms-bar"/);assert.equal(count(bar,/class="door"/g),6);
 assert.match(R.sidebar(ctx({tasks:[{status:'todo',due_date:'2026-10-01'}]}),'',''),/aria-label="Today \(1 task due today or overdue\)"/);
 assert.match(R.subnav(ctx({view:'space'})),/data-view="spaces" aria-current="page"/);
 assert.match(R.subnav(ctx({view:'work'})),/data-view="work" aria-current="page"/);
@@ -49,11 +49,11 @@ assert.equal(R.subnav(ctx({view:'home'})),'');assert.equal(R.subnav(ctx({view:'c
 
 /* keys */
 const key=(o,study=true)=>R.roomForKey({altKey:true,target:{tagName:'DIV'},...o},study);
-/* Accounts without Study: four doors, no Study door, Alt+4 is Studio, Alt+5 is nothing; Hunt stays. */
-{const h=R.sidebar(ctx({study:false}),'','');assert.equal(count(h,/class="door"/g),4,'four doors without Study');assert.doesNotMatch(h,/data-room="study"/);assert.match(h,/data-room="hunt"/);
- assert.equal(key({key:'4'},false),'studio');assert.equal(key({key:'5'},false),null);assert.equal(key({key:'4'},true),'study');
- assert.equal(count(R.bar(ctx({study:false})),/class="door"/g),4)}
-assert.equal(key({key:'1'}),'today');assert.equal(key({key:'5'}),'studio');assert.equal(key({key:'6'}),null);assert.equal(key({key:'0'}),null);
+/* Accounts without Study: five doors, no Study door, Alt+4 is Studio, Alt+5 is Calendar, Alt+6 is nothing; Hunt stays. */
+{const h=R.sidebar(ctx({study:false}),'','');assert.equal(count(h,/class="door"/g),5,'five doors without Study');assert.doesNotMatch(h,/data-room="study"/);assert.match(h,/data-room="hunt"/);
+ assert.equal(key({key:'4'},false),'studio');assert.equal(key({key:'5'},false),'calendar');assert.equal(key({key:'6'},false),null);assert.equal(key({key:'4'},true),'study');
+ assert.equal(count(R.bar(ctx({study:false})),/class="door"/g),5)}
+assert.equal(key({key:'1'}),'today');assert.equal(key({key:'5'}),'studio');assert.equal(key({key:'6'}),'calendar');assert.equal(key({key:'7'}),null);assert.equal(key({key:'0'}),null);
 assert.equal(key({key:'2',ctrlKey:true}),null);assert.equal(key({key:'2',altKey:false}),null);
 assert.equal(key({key:'2',target:{tagName:'INPUT'}}),null);assert.equal(key({key:'2',target:{tagName:'TEXTAREA'}}),null);assert.equal(key({key:'2',target:{isContentEditable:true,tagName:'DIV'}}),null);
 
@@ -77,12 +77,12 @@ function boot(search){
 }
 const rooms=boot('');
 {const other=boot('');vm.runInContext('state.user={id:"u2",email:"x@y.z"};state.view="home";render();',other.ctx);
- assert.equal(count(other.html(),/class="door"/g),8,'a non-owner gets four doors in the rail and four in the bar');assert.doesNotMatch(other.html(),/data-room="study"/);
+ assert.equal(count(other.html(),/class="door"/g),10,'a non-owner gets five doors in the rail and five in the bar');assert.doesNotMatch(other.html(),/data-room="study"/);
  vm.runInContext('state.view="career";render();',other.ctx);vm.runInContext('go("career",{room:"study"});',other.ctx);assert.doesNotMatch(other.html(),/Career Prep|CAREER \/ CAREER PREP/,'non-owner can never open Study')}
 for(const view of ['home','spaces','space','boards','work','links','inbox','career','search','settings']){
  vm.runInContext("state.view='"+view+"';state.spaceId='s1';render();",rooms.ctx);const m=rooms.html();
  assert.match(m,/data-shell="rooms"/,view);assert.match(m,/class="sidebar rooms-rail"/,view);assert.match(m,/class="mobile-nav rooms-bar"/,view);
- assert.equal(count(m,/class="door"/g),10,view+': five doors in the rail and five in the bar');
+ assert.equal(count(m,/class="door"/g),12,view+': six doors in the rail and six in the bar');
  assert.match(m,/data-action="nav" data-view="settings"/,view+': Settings stays reachable');
 }
 vm.runInContext("state.view='work';render();",rooms.ctx);

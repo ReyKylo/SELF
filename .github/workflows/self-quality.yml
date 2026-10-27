@@ -30,6 +30,7 @@ jobs:
           node --check today.js
           node --check outreach.js
           node --check tracker.js
+          node --check calendar.js
           node --check dossier.js
           node --check career-grid.js
           node --check career-visuals.js
@@ -78,6 +79,8 @@ jobs:
         run: node tests/smoke_outreach.cjs
       - name: Tracker helpers
         run: node tests/smoke_tracker.cjs
+      - name: Calendar smoke
+        run: node tests/smoke_calendar.cjs
       - name: Dossier and Game Day smoke tests
         run: node tests/smoke_dossier.cjs
       - name: Practice grid formula engine fixtures
