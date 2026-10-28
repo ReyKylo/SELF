@@ -12,7 +12,7 @@ const STATUSES=[['todo','To Do','gray'],['planning','Planning','yellow'],['in_pr
 const PRIORITIES=[['low','Low','green'],['normal','Normal','blue'],['high','High','red']];
 const COLORS={blue:'#428cff',green:'#3dce9e',purple:'#ad92fa',yellow:'#f0b862',red:'#f68e94',cyan:'#3fc5d2'};
 const SPACE_ICONS=['briefcase','chart','graduation','person','brain','folder'];
-const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',linkSearch:'',linkSource:'all',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'note',captureDraft:'',loginMode:'signin',toast:null,saving:false,savePending:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
+const state={user:null,session:JSON.parse(localStorage.getItem('self.session')||'null'),spaces:[],tasks:[],checklist:[],pages:[],links:[],inbox:[],boards:[],knowledgeCards:[],boardItems:[],boardEdges:[],preferences:{theme:localStorage.getItem('self.theme')||'dark',text_scale:Number(localStorage.getItem('self.scale')||100)},view:'home',sidebarCollapsed:localStorage.getItem('self.sidebarCollapsed')==='true',spaceId:null,spaceTab:'tasks',workView:'list',filterStatus:'all',filterSpace:'all',workSearch:'',search:'',linkSearch:'',linkSource:'all',taskId:null,panelTab:'overview',pageId:null,modal:null,captureMode:'auto',captureDraft:'',loginMode:'signin',toast:null,saving:false,savePending:false,saveError:null,lastTaskMove:null,dragTaskId:null,authMessage:'',spaceAccent:'blue',spaceIcon:'briefcase'};
 function setTheme(theme){state.preferences.theme=theme;document.body.dataset.theme=theme;localStorage.setItem('self.theme',theme)}
 function setScale(scale){state.preferences.text_scale=scale;document.documentElement.style.setProperty('--scale',String(scale/100));localStorage.setItem('self.scale',String(scale))}
 setTheme(state.preferences.theme);setScale(state.preferences.text_scale);
@@ -105,7 +105,25 @@ const homeTasks=()=>state.tasks.filter(t=>t.status!=='done').sort((a,b)=>
 /* Today's task order: same ranking as My Priorities. */
 const todayRank=(a,b)=>priorityRank(a)-priorityRank(b)||(a.due_date||'9999-99-99').localeCompare(b.due_date||'9999-99-99')||new Date(b.updated_at)-new Date(a.updated_at);
 const homeHeader=()=>header('Your day, in focus. ✳',new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),`<button class="primary-btn" data-action="new-task">${ic('plus')} New Task</button>`);
-const captureCard=()=>`<section class="card quick"><div class="quick-head">${ic('sparkle')} Quick Capture <span class="small-sub">— get it out of your head</span></div><div class="capture-row"><input id="quick-text" class="capture-input" value="${attr(state.captureDraft)}" placeholder="Tulis ide, catatan, atau kerjaan baru..." maxlength="250" aria-label="Quick capture"/><button class="primary-btn" title="Save capture" data-action="quick-submit">${ic('send')}</button></div><div class="capture-bottom"><div class="capture-modes">${[['note','Note'],['task','Task'],['link','Link'],['board','Board']].map(([k,v])=>`<button class="choice ${state.captureMode===k?'selected':''}" data-action="capture-mode" data-mode="${k}">${ic(k==='task'?'check':k)} ${v}</button>`).join('')}</div><span class="small-sub">Press Enter to save</span></div></section>`;
+const CAPTURE_KINDS=[['auto','Auto'],['task','Task'],['note','Note'],['link','Link'],['board','Board']];
+/* Quick Capture reads what you typed (capture-parse.js, the same parser as the palette) and shows where it will go before you press Enter.
+   No kind to pick first; the kind chip only overrides the guess. */
+function captureGuess(text){const P=window.SELFCapture;if(!P||!text.trim())return null;return P.parseCapture(text,{today:today(),spaces:state.spaces})}
+function capturePreview(text){
+ const mode=state.captureMode,c=captureGuess(text||'');
+ if(!String(text||'').trim())return `<span class="small-sub">Try “Kirim CV ke Dimas besok #Career !high”, paste a link, or type a thought. Press Enter to save.</span>`;
+ const kind=mode==='auto'?(c?.ok?c.kind:'note'):mode;
+ const label={task:'Task',note:'Note',link:'Link',board:'Board'}[kind];
+ const where=kind==='board'?'Studio':c?.spaceName?c.spaceName:kind==='task'?'My Work':'Inbox';
+ let h=`<button type="button" class="pchip pchip-kind" data-action="capture-mode" data-mode="${nextCaptureMode(mode,c)}" title="Change what this becomes">${ic(kind==='task'?'check':kind==='link'?'link':kind==='board'?'board':'note',14)} ${label}${mode==='auto'?'':' · set'}</button><span class="pchip">${ic('folder',14)} ${esc(where)}</span>`;
+ if(kind==='task'&&c?.dueDate)h+=`<span class="pchip">${ic('calendar',14)} ${esc(captureDay(c.dueDate))}</span>`;
+ if(kind==='task'&&c?.priority)h+=`<span class="pchip">${ic('flag',14)} ${esc(c.priority[0].toUpperCase()+c.priority.slice(1))} priority</span>`;
+ for(const ch of (c?.chips||[]).filter(x=>x.k==='warn'))h+=`<span class="pchip pchip-warn">${esc(ch.label)}</span>`;
+ return h+`<span class="small-sub capture-enter">Enter to save</span>`;
+}
+function nextCaptureMode(mode,c){const order=['auto','task','note',...(c?.url?['link']:[]),'board'];return order[(order.indexOf(mode)+1)%order.length]}
+function captureDay(iso){const t=today();if(iso===t)return 'Today';const d=new Date(iso+'T12:00:00');const tm=new Date(t+'T12:00:00');const n=Math.round((d-tm)/864e5);if(n===1)return 'Tomorrow';return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}
+const captureCard=()=>`<section class="card quick" aria-label="Quick Capture"><div class="capture-row"><span class="capture-ic" aria-hidden="true">${ic('sparkle')}</span><input id="quick-text" class="capture-input" value="${attr(state.captureDraft)}" placeholder="Capture anything. SELF sorts it." maxlength="250" aria-label="Quick capture" aria-describedby="capture-preview" autocomplete="off"/><button class="primary-btn" title="Save capture" aria-label="Save capture" data-action="quick-submit">${ic('send')}</button></div><div class="capture-preview" id="capture-preview" aria-live="polite">${capturePreview(state.captureDraft)}</div></section>`;
 const prioritiesCard=tasks=>`<section class="card card-pad"><div class="section-head"><h2>My Priorities <span style="color:var(--faint)">(${tasks.length})</span></h2><button class="link-action" data-action="nav" data-view="work">See all ${ic('chevron',13)}</button></div><div class="priority-list">${tasks.slice(0,6).map(t=>taskRow(t)).join('')||`<div class="empty-mini">Nothing urgent. Add a task to get started ✨</div>`}</div></section>`;
 const recentsCard=()=>{const recents=[...state.tasks].sort((a,b)=>new Date(b.updated_at)-new Date(a.updated_at)).slice(0,3);return `<section class="card card-pad"><div class="section-head"><h2>Continue Where You Left Off</h2><button class="link-action" data-action="nav" data-view="work">See all ${ic('chevron',13)}</button></div><div class="continue-list">${recents.map(t=>`<button class="continue-item" data-action="open-task" data-id="${t.id}"><span class="mini-thumb">${ic('note',25)}</span><span><strong>${esc(t.title)}</strong><small>${esc(spaceOf(t.space_id)?.name||'Unsorted')} · ${esc(statusOf(t.status)[1])}</small></span></button>`).join('')||`<div class="empty-mini">Your recently updated tasks will appear here.</div>`}</div></section>`};
 const countbar=()=>`<div class="countbar"><div class="stat"><strong data-countup="${state.tasks.filter(t=>t.status!=='done').length}">${state.tasks.filter(t=>t.status!=='done').length}</strong><span>Active tasks</span></div><div class="stat"><strong data-countup="${state.spaces.length}">${state.spaces.length}</strong><span>Spaces</span></div><div class="stat"><strong data-countup="${state.inbox.length}">${state.inbox.length}</strong><span>Captured notes</span></div><div class="stat"><strong data-countup="${state.tasks.filter(t=>t.status==='done').length}">${state.tasks.filter(t=>t.status==='done').length}</strong><span>Tasks completed</span></div></div>`;
@@ -270,7 +288,22 @@ if(form.id==='add-link-form'){const url=normalUrl(v.url);if(!url){toast('Use an 
 if(form.id==='create-link-form'){const url=normalUrl(v.url);if(!url){toast('Use a valid URL',true);return}if(await mutate(async()=>insert('inbox',{title:v.title.trim(),body:url,kind:'link'}),'Link added to My Links')){state.modal=null;render()}return}
 if(form.id==='create-subpage-form'){let made;if(await mutate(async()=>{made=await insert('task_pages',{task_id:state.taskId,title:v.title.trim()})},'Subpage created')){state.modal=null;state.pageId=made?.id||null;render()}return}
 }
-async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='board'){let made;if(await mutate(async()=>{made=await insert('boards',{title:text})},'Board created')){state.captureDraft='';if(made)window.SELFBoards.open(made.id)}return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}if(await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured')){state.captureDraft='';render()}}
+/* Auto capture: one step, then Undo. A failed save keeps the draft (same contract as the explicit modes). */
+async function smartCapture(text){
+ const c=captureGuess(text);
+ if(!c?.ok){if(c){toast('Add a few words so SELF knows what to save',true);return}state.captureMode='note';return quickCapture().finally(()=>{state.captureMode='auto'})}
+ const space=c.spaceId?{space_id:c.spaceId}:{};let table,rec,msg;
+ if(c.kind==='task'){table='tasks';rec={title:c.title,...space};if(c.description)rec.description=c.description;if(c.priority)rec.priority=c.priority;if(c.dueDate)rec.due_date=c.dueDate;msg='Task created'+(c.dueDate?' · '+captureDay(c.dueDate):'')+(c.spaceName?' · '+c.spaceName:'')}
+ else if(c.kind==='link'){table='inbox';rec={title:c.title,body:c.url,kind:'link',...space};msg='Link saved to '+(c.spaceName||'Inbox')}
+ else{table='inbox';rec={title:c.title,body:c.description||'',kind:'note',...space};msg='Note saved to '+(c.spaceName||'Inbox')}
+ const warn=(c.warnings||[]).find(w=>w.type==='unknown-space'||w.type==='ambiguous-space');if(warn)msg+=' · no Space named “'+warn.name+'”, so it is unfiled';
+ let made=null;
+ if(!await mutate(async()=>{made=await insert(table,rec)},null))return;
+ state.captureDraft='';render();
+ const undo=window.SELFToday?.undoToast;
+ if(undo&&made?.id)undo(msg,()=>mutate(async()=>{await del(table,made.id)},'Capture removed'));else toast(msg);
+}
+async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='auto'){await smartCapture(text);return}if(mode==='board'){let made;if(await mutate(async()=>{made=await insert('boards',{title:text})},'Board created')){state.captureDraft='';state.captureMode='auto';if(made)window.SELFBoards.open(made.id)}return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}if(await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured')){state.captureDraft='';state.captureMode='auto';render()}}
 async function handleAction(e){if((e.target.closest?.('[data-career],[data-career2],[data-career3],[data-learning],[data-teaching-action],[data-outreach],[data-tracker],[data-lesson],[data-dossier]')||e.target.closest?.('[data-director-action]'))){await window.SELFCareer?.action?.(e);return}if(window.SELFWork?.intercept?.(e))return;if(e.target.closest?.('[data-work]')&&await window.SELFWork?.action?.(e))return;if(e.target.closest?.('[data-export]')&&await window.SELFExportUI?.action?.(e))return;if(e.target.closest?.('[data-today]')&&await window.SELFToday?.action?.(e))return;if(e.target.closest?.('[data-review]')&&await window.SELFReview?.action?.(e))return;if(e.target.closest?.('[data-nextup]')&&await window.SELFNextUp?.action?.(e))return;const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if(action==='close-panel'&&b.classList?.contains('overlay')&&e.target!==b)return;if((e.target.closest('a, select, input, button')&&action==='open-task'&&e.target!==b))return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
 if(action==='toggle-sidebar'){
  state.sidebarCollapsed=!state.sidebarCollapsed;
@@ -311,7 +344,7 @@ if(action==='new-subpage'){state.modal='subpage';render();return}
 if(action==='new-link'){state.modal='link';render();return}
 if(action==='close-modal'){state.newTaskDue='';if(b.classList.contains('modal-overlay')&&e.target.closest('.modal'))return;state.modal=null;render();return}
 if(action==='quick-submit'){await quickCapture();return}
-if(action==='capture-mode'){state.captureMode=b.dataset.mode;render();const input=$('#quick-text');if(input)input.focus();return}
+if(action==='capture-mode'){state.captureMode=b.dataset.mode;const pv=$('#capture-preview');if(pv){pv.innerHTML=capturePreview(state.captureDraft)}else render();const input=$('#quick-text');if(input)input.focus();return}
 if(window.SELFAccount?.action?.(action))return;
 if(action==='auth-toggle'){state.loginMode=state.loginMode==='signin'?'signup':'signin';state.authMessage='';render();return}
 if(action==='logout'){await logout();return}
@@ -343,7 +376,7 @@ if(el.dataset.pageField){await mutate(async()=>patch('task_pages',el.dataset.id,
 let searchTimer;
 function handleInput(e){if(window.SELFWork?.input?.(e))return;if(window.SELFCareer?.input?.(e))return;const el=e.target;
 if(el.dataset?.taskField||el.dataset?.pageField||el.dataset?.checkField){state.savePending=true;paintSave();return}
-if(el.id==='quick-text'){state.captureDraft=el.value;return}
+if(el.id==='quick-text'){state.captureDraft=el.value;if(!el.value.trim()&&state.captureMode!=='auto')state.captureMode='auto';const pv=$('#capture-preview');if(pv)pv.innerHTML=capturePreview(el.value);return}
 if(el.id==='work-search'||el.id==='global-search'||el.id==='links-search'){const id=el.id,pos=el.selectionStart;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{if(id==='work-search')state.workSearch=el.value;else if(id==='links-search')state.linkSearch=el.value;else state.search=el.value;render();const restored=document.getElementById(id);if(restored){restored.focus();restored.setSelectionRange(pos,pos)}},160);return}
 if(el.id==='text-scale'){setScale(Number(el.value));const label=$('#scale-label');if(label)label.textContent=el.value+'%';clearTimeout(searchTimer);searchTimer=setTimeout(()=>mutate(async()=>savePref(),null),300)}
 }

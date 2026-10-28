@@ -237,3 +237,39 @@ body[data-theme='light'] .shell[data-shell="rooms"] .main::before{opacity:.7}
 @keyframes palChip{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
 @media(max-width:600px){.pal{padding-top:calc(12px + env(safe-area-inset-top,0px))}.pal-hint{display:none}.pal-foot{display:none}.pal-box{max-height:calc(100dvh - 90px)}.pal-input{font-size:1em}}
 @media(prefers-reduced-motion:reduce){.pal,.pal-box,.pal-chip{animation:none}}
+
+/* ---------- Today: Next up, Schedule, Quick Capture preview (docs/design/APPLE_REBUILD.md §Today) ---------- */
+.today-next{position:relative;overflow:hidden;margin-bottom:16px}
+.today-next::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--tint)}
+.today-next .next-when{display:flex;align-items:center;gap:6px;margin:0 0 4px;color:var(--tint);font-weight:600;font-size:.86em}
+.today-next h2{margin:0 0 2px;font-size:1.45em;letter-spacing:-.02em;line-height:1.2}
+.today-next .today-sub{margin:0}
+.today-next .next-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.today-next[data-mode="clear"]::before{background:var(--line)}
+.today-next[data-mode="clear"] .next-when{color:var(--muted)}
+.sched-list{list-style:none;margin:0;padding:0}
+.sched-item{display:grid;grid-template-columns:48px 14px minmax(0,1fr);gap:0 10px;align-items:start;position:relative}
+.sched-item time{text-align:right;font-size:.86em;color:var(--muted);padding-top:9px;font-variant-numeric:tabular-nums;line-height:1.2}
+.sched-item time small{display:block;color:var(--faint);font-size:.86em}
+.sched-dot{width:9px;height:9px;border-radius:50%;margin:13px auto 0;border:2px solid var(--faint);background:var(--card);position:relative}
+.sched-item:not(:last-child) .sched-dot::after{content:"";position:absolute;left:50%;top:9px;width:1.5px;height:44px;transform:translateX(-50%);background:var(--line)}
+.sched-item.is-past{opacity:.55}
+.sched-item.is-past .sched-dot{background:var(--faint)}
+.sched-item.is-now .sched-dot{border-color:var(--tint);background:var(--tint);box-shadow:0 0 0 4px color-mix(in srgb,var(--tint) 22%,transparent)}
+.sched-item.is-now .agenda-item{box-shadow:inset 0 0 0 1.5px var(--tint)}
+.sched-now{display:grid;grid-template-columns:48px 14px minmax(0,1fr);gap:0 10px;align-items:center;height:14px;margin:2px 0}
+.sched-now span{text-align:right;font-size:.74em;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.sched-now i{display:block;height:1.5px;background:var(--red);grid-column:2 / 4;position:relative}
+.sched-now i::before{content:"";position:absolute;left:2px;top:-3.5px;width:8px;height:8px;border-radius:50%;background:var(--red)}
+.quick .capture-row{display:flex;align-items:center;gap:10px}
+.quick .capture-ic{color:var(--tint);display:grid;place-items:center}
+.capture-preview{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:28px;margin-top:10px}
+.pchip{display:inline-flex;align-items:center;gap:5px;min-height:24px;padding:0 9px;border-radius:999px;border:0;background:var(--hover);color:var(--text);font-size:.86em;font-weight:500;white-space:nowrap}
+.pchip svg{width:13px;height:13px;color:var(--muted)}
+.pchip-kind{background:color-mix(in srgb,var(--tint) 16%,transparent);color:var(--tint);font-weight:600;cursor:pointer}
+.pchip-kind svg{color:var(--tint)}
+.pchip-kind:hover{background:color-mix(in srgb,var(--tint) 24%,transparent)}
+.pchip-warn{background:color-mix(in srgb,var(--yellow) 16%,transparent);color:var(--yellow)}
+.capture-enter{margin-left:auto}
+@media(max-width:600px){.capture-enter{display:none}.today-next h2{font-size:1.25em}}
+.today-schedule .link-action{white-space:nowrap}
