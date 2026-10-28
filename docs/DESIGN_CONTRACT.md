@@ -24,6 +24,9 @@ The user approved the Rooms direction and asked for it to be built. Spec: `docs/
 - **Palette:** Ctrl/⌘ K (or `/` outside a text field) opens a command palette: go to a room or section, open a task, Space, board, person or company, or create from shorthand (`Kirim CV besok #Career !high`). It never creates a Space without an explicit command and saves nothing until Enter. The classic shell keeps Ctrl K for Search.
 - **Unchanged:** 16px base text with 100 to 150% scaling, targets around 40px or more (doors 72px; the phone bar 58px plus the safe area), designed dark and light themes.
 
+## Apple layer (requested 2026-10-28)
+The owner asked for the visuals to be rebuilt "more Apple" and then for everything to be built. `apple.css` (loaded last) re-skins the Rooms shell to Apple HIG conventions: system font and macOS type ramp, neutral system surfaces in dark and light, a floating glass sidebar with labelled rows, segmented sub-navigation, flat tinted buttons. It changes the charcoal and gradient parts of the Visual DNA above on purpose; room tints, room structure, theme persistence, text scaling and reduced motion stay. Details, the status of every idea and what is still open: `docs/design/APPLE_REBUILD.md`.
+
 ## Acceptance gates
 1. Verify nine-screen hierarchy against user reference before announcing visual parity; screenshot actual running browser desktop/mobile, not a generated mockup.
 2. Verify Add/Edit/Delete Task, checklist, notes, status, space, link auto capture, dark/light toggle and text scaling with real state changes.

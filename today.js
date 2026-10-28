@@ -100,6 +100,46 @@ function buildAgenda({tasks=[],day,now=Date.now(),career=null}){
  return {items:items.slice(0,MAX_ITEMS),hidden:Math.max(0,items.length-MAX_ITEMS)};
 }
 
+/* ---------- Next up + schedule ---------- */
+/* Timed items for one local day, in minutes since midnight: SELF Calendar events (self.cal.events.<user>, mirrored by user-sync)
+   and scheduled interviews. All-day and finished events are left out; tasks have dates, not times, so they never appear here. */
+const clock=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const localDay=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function scheduleFor({events=[],interviews=[],day,companyOf=()=>''}){
+ const out=[];
+ for(const e of events){
+  if(e.allDay||e.done||!Number.isFinite(e.start))continue;
+  out.push({key:'event:'+e.id,kind:'event',title:e.title||'Untitled event',sub:'Calendar',start:e.start,end:Number.isFinite(e.end)?e.end:e.start+30});
+ }
+ for(const i of interviews){
+  if(i.stage!=='scheduled'||!i.scheduled_at)continue;
+  const at=new Date(i.scheduled_at);if(!Number.isFinite(+at)||localDay(at)!==day)continue;
+  const s=at.getHours()*60+at.getMinutes();
+  out.push({key:'interview:'+i.id,kind:'interview',title:i.title||'Interview',sub:['Interview',companyOf(i)].filter(Boolean).join(' · '),start:s,end:Math.min(1440,s+60)});
+ }
+ return out.sort((a,b)=>a.start-b.start||a.end-b.end||String(a.key).localeCompare(String(b.key)));
+}
+/* The one thing to look at now: something happening, something starting within the hour, else the first of the three. */
+function nextUp({schedule=[],three=[],now,day}){
+ const cur=schedule.find(s=>s.start<=now&&now<s.end);
+ if(cur)return {mode:'now',item:cur,label:'Now · until '+clock(cur.end)};
+ const nx=schedule.find(s=>s.start>now);
+ if(nx&&nx.start-now<=60)return {mode:'soon',item:nx,label:'In '+(nx.start-now)+' min · '+clock(nx.start)};
+ const t=three[0];
+ if(t){
+  const late=t.due_date&&t.due_date<day?daysBetween(t.due_date,day):0;
+  const reason=late?'Overdue by '+late+(late===1?' day':' days'):t.due_date===day?'Due today':t.priority==='high'?'High priority':'First of your three for today';
+  return {mode:'focus',task:t,label:nx?'Free until '+clock(nx.start):'Start with this',reason};
+ }
+ if(nx)return {mode:'later',item:nx,label:'Next at '+clock(nx.start)};
+ return null;
+}
+function calendarToday(userId,day){
+ const cal=root.SELFCalendar;if(!cal?.cleanEvents||!cal?.eventsByDay)return [];
+ try{const raw=JSON.parse(root.localStorage?.getItem('self.cal.events.'+userId)||'[]');return cal.eventsByDay(cal.cleanEvents(raw),day,day).get(day)||[]}catch{return []}
+}
+const minutesNow=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+
 /* ---------- Inbox triage ---------- */
 function triageQueue(inbox,skippedIds,pendingIds){
  return inbox.filter(x=>!x.space_id&&!skippedIds.has(x.id)&&!pendingIds.has(x.id)).sort((a,b)=>String(a.created_at).localeCompare(String(b.created_at))||String(a.id).localeCompare(String(b.id)));
@@ -171,7 +211,27 @@ function render(){
   (queue.length?'<p class="today-sub">One at a time. Swipe right to make a task, left to delete (with Undo).</p><div class="triage-stack">'+queue.slice(0,3).map(card).join('')+'</div>':
    '<div class="empty-mini">Inbox clear. Quick Capture lands here.'+(skipped.size?'<br><button type="button" class="soft-btn" data-today="triage-reset">Show the '+skipped.size+' kept for later</button>':'')+'</div>')+'</section>';
 
- return '<div class="today-grid"><div class="today-main">'+threeCard+'</div><div class="today-side">'+agendaCard+(root.SELFReview?.card?.()||'')+triageCard+'</div></div>';
+ /* next up + schedule */
+ const companyOf=i=>{const app=(career?.applications||[]).find(a=>a.id===i.application_id);return app?(career.companies||[]).find(c=>c.id===app.company_id)?.name||'':''};
+ const schedule=scheduleFor({events:calendarToday(st.user?.id,day),interviews:career?.interviews||[],day,companyOf});
+ const now=minutesNow(),nu=nextUp({schedule,three,now,day});
+ const openAttrs=s=>s.kind==='interview'?'data-today="open-career" data-page="interviews"':'data-action="nav" data-view="calendar"';
+ let nextBody;
+ if(!nu)nextBody='<p class="next-when">'+ic('check',14)+' Clear for now</p><h2 id="next-h">Nothing scheduled</h2><p class="today-sub">Capture what is on your mind, or pick three tasks from Work.</p>';
+ else if(nu.task)nextBody='<p class="next-when">'+ic('clock',14)+' '+esc(nu.label)+'</p><h2 id="next-h">'+esc(nu.task.title)+'</h2><p class="today-sub">'+esc(nu.reason)+' · '+esc(spaceOf(nu.task.space_id)?.name||'Unsorted')+'</p>'+
+  '<div class="next-acts"><button type="button" class="primary-btn" data-action="open-task" data-id="'+attr(nu.task.id)+'">Open task</button><button type="button" class="soft-btn" data-action="toggle-task" data-id="'+attr(nu.task.id)+'">'+ic('check',15)+' Mark done</button></div>';
+ else nextBody='<p class="next-when">'+ic('clock',14)+' '+esc(nu.label)+'</p><h2 id="next-h">'+esc(nu.item.title)+'</h2><p class="today-sub">'+esc(nu.item.sub)+' · '+clock(nu.item.start)+'–'+clock(nu.item.end)+'</p>'+
+  '<div class="next-acts"><button type="button" class="primary-btn" '+openAttrs(nu.item)+'>'+(nu.item.kind==='interview'?'Open Game Day':'Open Calendar')+'</button></div>';
+ const nextCard='<section class="card card-pad today-next" data-mode="'+(nu?nu.mode:'clear')+'" aria-labelledby="next-h" aria-live="polite">'+nextBody+'</section>';
+ let nowPlaced=false;
+ const schedRows=schedule.map(s=>{
+  let line='';if(!nowPlaced&&s.start>now){nowPlaced=true;line='<li class="sched-now" aria-label="Now '+clock(now)+'"><span>'+clock(now)+'</span><i></i></li>'}
+  const cls=s.end<=now?'is-past':s.start<=now?'is-now':'';
+  return line+'<li class="sched-item '+cls+'"><time>'+clock(s.start)+'<small>'+clock(s.end)+'</small></time><span class="sched-dot" aria-hidden="true"></span><button type="button" class="agenda-item" '+openAttrs(s)+'><strong>'+esc(s.title)+'</strong><small>'+esc(s.sub)+'</small></button></li>';
+ }).join('')+(!nowPlaced&&schedule.length?'<li class="sched-now" aria-label="Now '+clock(now)+'"><span>'+clock(now)+'</span><i></i></li>':'');
+ const schedCard=schedule.length?'<section class="card card-pad today-schedule" aria-labelledby="sched-h"><div class="section-head"><h2 id="sched-h">Schedule</h2><button class="link-action" data-action="nav" data-view="calendar">Calendar '+ic('chevron',13)+'</button></div><ol class="sched-list">'+schedRows+'</ol></section>':'';
+
+ return '<div class="today-grid"><div class="today-main">'+nextCard+threeCard+'</div><div class="today-side">'+schedCard+agendaCard+(root.SELFReview?.card?.()||'')+triageCard+'</div></div>';
 }
 
 /* ---------- actions ---------- */
@@ -273,8 +333,14 @@ function init(h){
   }
  });
  if(root.document)root.document.addEventListener('pointerdown',swipeDown);
+ /* Next up and the now line follow the clock; never re-render under a cursor in a field or during a drag */
+ if(root.document&&root.setInterval)root.setInterval(()=>{
+  const doc=root.document,a=doc.activeElement;
+  if(host.state().view!=='home'||doc.hidden||doc.querySelector('.dnd-ghost,.is-saving,.overlay')||(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))))return;
+  host.render();
+ },60000);
 }
-const api={init,render,action,change,pickThree,buildAgenda,followUps,triageQueue,readPins,writePins,pinKey};
+const api={init,render,action,change,pickThree,buildAgenda,followUps,triageQueue,readPins,writePins,pinKey,scheduleFor,nextUp,undoToast};
 root.SELFToday=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -4,7 +4,7 @@
    If the table is missing or the network fails, everything keeps working from localStorage. Spec: docs/MULTIUSER_PLAN.md */
 (function(root){
 'use strict';
-const PREFIXES=['self.today.','self.views.','self.cal.events.'];
+const PREFIXES=['self.today.','self.views.','self.cal.events.','self.studio.notes.'];
 const MAX_VALUE=262144;
 const synced=k=>typeof k==='string'&&k.length<=200&&PREFIXES.some(p=>k.startsWith(p))&&!/\.anon(\.|$)/.test(k);
 

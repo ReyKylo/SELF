@@ -71,6 +71,8 @@ jobs:
         run: node tests/smoke_dnd.cjs
       - name: Today room agenda merge, Three for today and inbox triage
         run: node tests/smoke_today.cjs
+      - name: Today Next up and Schedule
+        run: node tests/smoke_today_now.cjs
       - name: Capture shorthand parser fixtures
         run: node tests/smoke_capture_parse.cjs
       - name: Command palette ranking, items and markup safety

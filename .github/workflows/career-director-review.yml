@@ -16,6 +16,12 @@ on:
       - 'tests/browser_rooms.cjs'
       - 'tests/browser_calendar.cjs'
       - 'tests/browser_today.cjs'
+      - 'tests/browser_today_now.cjs'
+      - 'tests/browser_work_undo.cjs'
+      - 'tests/browser_canvas_additions.cjs'
+      - 'tests/browser_canvas_live_task.cjs'
+      - 'canvas-v3.css'
+      - 'apple.css'
       - 'tests/browser_hunt.cjs'
       - 'tests/browser_outreach.cjs'
       - 'outreach.js'
@@ -114,6 +120,14 @@ jobs:
         run: node tests/browser_calendar.cjs
       - name: Today room Chromium tests
         run: node tests/browser_today.cjs
+      - name: Today Next up, Schedule and smart capture
+        run: node tests/browser_today_now.cjs
+      - name: Task property Undo and offline state
+        run: node tests/browser_work_undo.cjs
+      - name: Canvas find, frames, keyboard connect, paste list, far zoom, Undo
+        run: node tests/browser_canvas_additions.cjs
+      - name: Canvas cards linked to tasks show them live
+        run: node tests/browser_canvas_live_task.cjs
       - name: Hunt and Study rooms Chromium tests
         run: node tests/browser_hunt.cjs
       - name: Command palette Chromium tests

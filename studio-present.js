@@ -54,7 +54,8 @@ function pace(i,total,elapsedMs,targetMs){
 }
 const clock=ms=>{const s=Math.max(0,Math.floor(ms/1000));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 
-const api={slideOrder,readingOrder,fitRect,ease,camAt,pace,clock};
+const noteKey=(boardId,frameId)=>'self.studio.notes.'+boardId+'.'+frameId;
+const api={slideOrder,readingOrder,fitRect,ease,camAt,pace,clock,noteKey};
 root.SELFPresentCore=api;
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(!root.document)return;
@@ -77,6 +78,9 @@ function target(i){
  const f=P.order[i],v=vp();if(!f||!v)return null;
  return fitRect({x:num(f.x),y:num(f.y),w:num(f.w,300),h:num(f.h,200)},v);
 }
+/* Speaker notes: one text per frame, kept on this account through the existing localStorage mirror (self.studio.notes.<board>.<frame>); no schema change */
+const readNote=(boardId,frameId)=>{try{return root.localStorage.getItem(noteKey(boardId,frameId))||''}catch{return ''}};
+const writeNote=(boardId,frameId,text)=>{try{const k=noteKey(boardId,frameId);String(text).trim()?root.localStorage.setItem(k,String(text).slice(0,2000)):root.localStorage.removeItem(k)}catch{}};
 function title(f){const c=B().internals.cardOf?.(f);return String(c?.title||'').trim()||'Frame'}
 function bar(){
  let el=root.document.getElementById('present-bar');
@@ -89,7 +93,8 @@ function bar(){
   '<button type="button" class="pr-btn pr-next" data-present="next" aria-label="Next frame"'+(P.i===total-1?' disabled':'')+'>→</button>'+
   '<label class="pr-target">Target <input type="number" min="0" max="120" step="1" value="'+(P.target||'')+'" placeholder="min" data-present-target aria-label="Target minutes"></label>'+
   '<span class="pr-clock" id="pr-clock">'+clock(elapsed)+(pc?' · '+(pc.state==='on'?'on pace':clock(pc.diffMs)+' '+pc.state):'')+'</span>'+
-  '<button type="button" class="pr-btn pr-exit" data-present="exit">Exit</button>';
+  '<button type="button" class="pr-btn pr-exit" data-present="exit">Exit</button>'+
+  '<textarea class="pr-notes" data-present-notes rows="2" maxlength="2000" placeholder="Speaker notes for this frame (only you see them)" aria-label="Speaker notes for this frame">'+h(readNote(B().ui.boardId,f.id))+'</textarea>';
 }
 function tick(){const c=root.document.getElementById('pr-clock');if(!c)return;const total=P.order.length,elapsed=Date.now()-P.started,pc=pace(P.i,total,elapsed,P.target*60000);c.textContent=clock(elapsed)+(pc?' · '+(pc.state==='on'?'on pace':clock(pc.diffMs)+' '+pc.state):'')}
 function start(){
@@ -116,7 +121,7 @@ function exit(){
 }
 function onKey(e){
  if(!P.active)return;
- if(e.target?.matches?.('[data-present-target]')&&e.key!=='Escape')return;
+ if(e.target?.matches?.('[data-present-target],[data-present-notes]')&&e.key!=='Escape')return;
  const k=e.key;
  if(k==='Escape'){e.preventDefault();e.stopImmediatePropagation();exit()}
  else if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '||k==='Enter'){e.preventDefault();e.stopImmediatePropagation();show(P.i+1)}
@@ -131,7 +136,8 @@ function onClick(e){
  const a=b.dataset.present;
  if(a==='next')show(P.i+1);else if(a==='prev')show(P.i-1);else if(a==='exit')exit();
 }
-function onInput(e){if(e.target?.matches?.('[data-present-target]')){P.target=clamp(Math.round(Number(e.target.value)||0),0,120);tick()}}
+function onInput(e){if(e.target?.matches?.('[data-present-notes]')){const f=P.order[P.i];if(f)writeNote(B().ui.boardId,f.id,e.target.value);return}
+ if(e.target?.matches?.('[data-present-target]')){P.target=clamp(Math.round(Number(e.target.value)||0),0,120);tick()}}
 root.document.addEventListener('keydown',onKey,true);
 root.document.addEventListener('click',onClick,true);
 root.document.addEventListener('input',onInput,true);

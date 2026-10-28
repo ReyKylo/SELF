@@ -1,0 +1,158 @@
+/* SELF Apple layer. Loaded last; re-skins the existing Rooms shell to Apple HIG conventions
+   (docs/design/APPLE_REBUILD.md). Tokens only change values, never meaning, so every room inherits it.
+   Room tints stay the SELF accents from rooms.css; one tint is visible at a time. */
+
+/* ---------- Tokens: neutral system surfaces, one tint, semantic states ---------- */
+:root{
+ font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Inter','Segoe UI',Roboto,system-ui,sans-serif;
+ --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',Roboto,system-ui,sans-serif;
+ --bg:#000;--side:rgba(28,28,30,.72);--card:#1c1c1e;--card2:#2c2c2e;--hover:rgba(120,120,128,.2);--line:rgba(84,84,88,.48);
+ --text:#f5f5f7;--muted:rgba(235,235,245,.64);--faint:rgba(235,235,245,.38);
+ --blue:#0a84ff;--blueSoft:rgba(10,132,255,.18);--green:#30d158;--red:#ff453a;--yellow:#ff9f0a;--purple:#bf5af2;
+ --shadow:0 12px 32px rgba(0,0,0,.5);
+ --a-fill:rgba(120,120,128,.2);--a-fill2:rgba(120,120,128,.32);--a-material:rgba(30,30,32,.72);--a-material-strong:rgba(44,44,46,.92);
+ --a-shadow-1:0 0 0 .5px rgba(255,255,255,.08);--a-shadow-2:0 10px 30px rgba(0,0,0,.45),0 0 0 .5px rgba(255,255,255,.1);
+ --a-on-tint:#0b0b0c;--a-r-sm:6px;--a-r-md:10px;--a-r-lg:12px;--a-r-xl:18px;--a-control:30px;
+ --e-1:var(--a-shadow-1);--e-2:var(--a-shadow-2);
+}
+body[data-theme='light']{
+ --bg:#f5f5f7;--side:rgba(246,246,248,.74);--card:#fff;--card2:#f2f2f7;--hover:rgba(120,120,128,.12);--line:rgba(60,60,67,.16);
+ --text:#1d1d1f;--muted:rgba(60,60,67,.66);--faint:rgba(60,60,67,.42);
+ --blue:#007aff;--blueSoft:rgba(0,122,255,.12);--green:#248a3d;--red:#d70015;--yellow:#b25000;--purple:#8944ab;
+ --shadow:0 12px 32px rgba(0,0,0,.08);
+ --a-fill:rgba(120,120,128,.12);--a-fill2:rgba(120,120,128,.2);--a-material:rgba(246,246,248,.76);--a-material-strong:rgba(255,255,255,.92);
+ --a-shadow-1:0 1px 2px rgba(0,0,0,.05),0 0 0 .5px rgba(0,0,0,.07);--a-shadow-2:0 10px 30px rgba(0,0,0,.1),0 0 0 .5px rgba(0,0,0,.08);
+ --a-on-tint:#fff;
+}
+/* Room tints that pass contrast as button fills in dark mode get dark text (see --a-on-tint). */
+body{font-size:calc(14px * var(--scale));letter-spacing:-.003em;-webkit-font-smoothing:antialiased}
+@media (max-width:734px){body{font-size:calc(16px * var(--scale))}}
+::selection{background:color-mix(in srgb,var(--tint,var(--blue)) 30%,transparent)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--a-fill2);border-radius:8px}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--tint,var(--blue)) 55%,transparent);outline-offset:1px}
+h1,h2,h3,.hero h1{font-family:var(--font-display)}
+
+/* ---------- Floating glass sidebar: labeled rows on desktop, icon column on tablets ---------- */
+@media (min-width:601px){
+.shell[data-shell="rooms"] .sidebar{top:8px;left:8px;bottom:8px;width:220px;min-width:220px;padding:14px 10px 12px;border:0;border-radius:var(--a-r-xl);
+ background:var(--side);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);box-shadow:var(--a-shadow-2)}
+@supports not (backdrop-filter:blur(1px)){.shell[data-shell="rooms"] .sidebar{background:var(--card)}}
+.shell[data-shell="rooms"] .main{margin-left:236px;width:calc(100% - 236px)}
+.rooms-rail .brand{flex-direction:row;justify-content:flex-start;gap:10px;padding:2px 6px 16px;letter-spacing:0;font-weight:700;font-size:1em}
+.rooms-rail .brand-text{display:inline}
+.rooms-rail .brand-square{width:26px;height:26px;border-radius:7px;box-shadow:none;background:var(--tint,var(--blue))}
+.rooms-rail .brand-square svg{width:15px;height:15px}
+.rooms-rail .brand .sidebar-toggle{margin:0 0 0 auto}
+.rooms-rail .nav-items{gap:1px}
+.rooms-rail .door{flex-direction:row;justify-content:flex-start;gap:10px;min-height:32px;padding:0 10px;border-radius:8px;color:var(--text)}
+.rooms-rail .door svg{width:17px;height:17px;color:var(--muted)}
+.rooms-rail .door span{font-size:1em;font-weight:500;letter-spacing:-.005em}
+.rooms-rail .door small{margin-left:auto;font:500 .79em/1 var(--font-display);color:var(--muted);font-variant-numeric:tabular-nums;min-height:0}
+@media(hover:hover){.rooms-rail .door:hover{background:var(--hover)}.rooms-rail .door:hover svg{transform:none}}
+.rooms-rail .door[aria-current="page"]{color:var(--text)}
+.rooms-rail .door[aria-current="page"] span{font-weight:600}
+.rooms-rail .door[aria-current="page"] svg{color:var(--tint)}
+.rooms-rail .rail-ind{border-radius:8px;background:color-mix(in srgb,var(--tint) 16%,transparent)}
+.rooms-rail .rail-ind::before{display:none}
+.rooms-rail .sidebar-foot{border-top:.5px solid var(--line);padding:8px 0 0}
+.rooms-rail .sidebar-foot .nav-btn{flex-direction:row;justify-content:flex-start;gap:10px;padding:0 10px;min-height:32px;border-radius:8px;color:var(--text);font-weight:500}
+.rooms-rail .sidebar-foot .nav-btn span{font-size:1em}
+.rooms-rail .sidebar-foot .nav-btn svg{width:17px;height:17px;color:var(--muted)}
+.rooms-rail .sidebar-foot .nav-btn:hover{transform:none;background:var(--hover)}
+.rooms-rail .profile{justify-content:flex-start;padding:8px 10px 2px}
+.rooms-rail .profile-text{display:block}
+.rooms-rail .avatar{width:26px;height:26px;font-size:.8em;background:var(--a-fill2);color:var(--muted)}
+/* Collapsed and canvas modes keep an icon column */
+.shell[data-shell="rooms"].self-sidebar-collapsed .sidebar,body:has(.c3-shell) .shell[data-shell="rooms"] .sidebar{width:60px;min-width:60px;padding:12px 8px}
+.shell[data-shell="rooms"].self-sidebar-collapsed .main,body:has(.c3-shell) .shell[data-shell="rooms"] .main{margin-left:76px;width:calc(100% - 76px)}
+.self-sidebar-collapsed .rooms-rail .door,body:has(.c3-shell) .rooms-rail .door{justify-content:center;padding:0;min-height:36px}
+.self-sidebar-collapsed .rooms-rail .brand-text,body:has(.c3-shell) .rooms-rail .brand-text,.self-sidebar-collapsed .rooms-rail .profile-text,body:has(.c3-shell) .rooms-rail .profile-text{display:none}
+.self-sidebar-collapsed .rooms-rail .brand,body:has(.c3-shell) .rooms-rail .brand{flex-direction:column;justify-content:center;padding:2px 0 12px}
+.self-sidebar-collapsed .rooms-rail .brand .sidebar-toggle,body:has(.c3-shell) .rooms-rail .brand .sidebar-toggle{margin:0}
+.self-sidebar-collapsed .rooms-rail .sidebar-foot .nav-btn,body:has(.c3-shell) .rooms-rail .sidebar-foot .nav-btn{justify-content:center;padding:0}
+.self-sidebar-collapsed .rooms-rail .sidebar-foot .nav-btn span,body:has(.c3-shell) .rooms-rail .sidebar-foot .nav-btn span{display:none}
+.self-sidebar-collapsed .rooms-rail .profile,body:has(.c3-shell) .rooms-rail .profile{justify-content:center;padding:8px 0 2px}
+}
+@media (min-width:601px) and (max-width:960px){
+ .shell[data-shell="rooms"] .sidebar{width:60px;min-width:60px;padding:12px 8px}
+ .shell[data-shell="rooms"] .main,.shell[data-shell="rooms"].self-sidebar-collapsed .main{margin-left:76px;width:calc(100% - 76px)}
+ .rooms-rail .door,.rooms-rail .sidebar-foot .nav-btn{justify-content:center;padding:0;min-height:36px}
+ .rooms-rail .door span,.rooms-rail .door small,.rooms-rail .brand-text,.rooms-rail .profile-text,.rooms-rail .sidebar-foot .nav-btn span{display:none}
+ .rooms-rail .brand{flex-direction:column;justify-content:center;padding:2px 0 12px}
+ .rooms-rail .brand .sidebar-toggle{margin:0}
+ .rooms-rail .profile{justify-content:center;padding:8px 0 2px}
+}
+
+/* ---------- Main: no aurora wash, glass toolbar, large title ---------- */
+.shell[data-shell="rooms"] .main::before{display:none}
+.topbar{padding:10px clamp(20px,2.6vw,40px);background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line);min-height:52px}
+.crumb{font-weight:500}
+.shell[data-shell="rooms"] .hero h1,.hero h1{font-family:var(--font-display);font-weight:700;font-size:1.86em;letter-spacing:-.022em;line-height:1.15}
+.hero{margin-bottom:22px}
+.eyebrow{letter-spacing:0!important;text-transform:none!important;font-weight:600;font-size:.86em!important}
+.shell[data-shell="rooms"] .hero .eyebrow{color:var(--tint)}
+
+/* ---------- Controls: flat, 30px, tinted primary ---------- */
+.primary-btn,.ghost-btn,.soft-btn,.icon-btn{border-radius:8px;box-shadow:none;font-weight:500;transition:filter .15s,transform .15s,background .15s}
+.primary-btn,.shell[data-shell="rooms"] .primary-btn{background:var(--tint,var(--blue));border-color:transparent;color:var(--a-on-tint);padding:6px 13px;min-height:var(--a-control)}
+.primary-btn:hover{filter:brightness(1.07)}
+.ghost-btn,.soft-btn{background:var(--a-fill);border-color:transparent;color:var(--text);padding:6px 12px;min-height:var(--a-control)}
+.ghost-btn:hover,.soft-btn:hover{background:var(--a-fill2)}
+.icon-btn{width:32px;height:32px;background:transparent;border-color:transparent;color:var(--muted)}
+.icon-btn:hover{background:var(--hover);color:var(--text)}
+.primary-btn:active,.ghost-btn:active,.soft-btn:active,.icon-btn:active{transform:scale(.97)}
+.card{border-radius:var(--a-r-lg);border:0;box-shadow:var(--a-shadow-1)}
+.field,.select,.capture-input,input.field,textarea.field,select.select{border-radius:8px;background:var(--a-fill);border-color:transparent}
+.field:focus,.select:focus,.capture-input:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--tint,var(--blue)) 30%,transparent);border-color:transparent;outline:none}
+
+/* ---------- Sub-navigation as a segmented control ---------- */
+.rooms-subnav{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--a-fill);margin:0 0 20px;flex-wrap:nowrap;overflow-x:auto;max-width:100%}
+.rooms-subnav button{border:0;min-height:26px;padding:0 13px;border-radius:7px;font-weight:500;font-size:.93em;color:var(--text);background:transparent;white-space:nowrap}
+.rooms-subnav button:hover{background:var(--hover)}
+.rooms-subnav button[aria-current="page"]{background:var(--a-material-strong);border:0;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
+body:not([data-theme='light']) .rooms-subnav button[aria-current="page"]{background:#636366}
+
+/* ---------- Phone: floating glass tab bar ---------- */
+@media (max-width:600px){
+ .rooms-bar{border-top:.5px solid var(--line)!important;background:var(--side)!important;-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px)}
+ .rooms-bar .rail-ind{height:3px;background:var(--tint)}
+ .rooms-bar .door span{font-weight:500;font-size:.68em}
+ .rooms-bar .door small{display:none}
+ .rooms-bar .door[aria-current="page"]{color:var(--tint)}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+/* ---------- Module controls follow the same system ---------- */
+.career-pills{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--a-fill);margin:0 0 20px;max-width:100%;overflow-x:auto;flex-wrap:nowrap}
+.career-pill{border:0;min-height:26px;padding:0 13px;border-radius:7px;font-weight:500;font-size:.93em;color:var(--text);background:transparent;white-space:nowrap;flex:none}
+.career-pill:hover{background:var(--hover)}
+.career-pill.active{background:var(--a-material-strong);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.04)}
+body:not([data-theme='light']) .career-pill.active{background:#636366}
+.career-eyebrow,.c3-eyebrow{letter-spacing:.02em;font-weight:600;font-size:.8em;color:var(--tint,var(--blue))}
+.c3-primary,.wb-primary{background:var(--tint,var(--blue));border-color:transparent;color:var(--a-on-tint);border-radius:8px;padding:6px 13px;min-height:var(--a-control);font-weight:500;box-shadow:none}
+.c3-primary:hover,.wb-primary:hover{filter:brightness(1.07)}
+.c3-tool.active{background:color-mix(in srgb,var(--tint,var(--blue)) 18%,transparent);color:var(--tint,var(--blue));box-shadow:none}
+.mini-thumb{background:var(--a-fill2);color:var(--muted)}
+.brand-square{background:var(--tint,var(--blue));box-shadow:none}
+
+/* ---------- Save indicator: offline is a state, not an error ---------- */
+.save-offline{color:var(--yellow)!important}
+.save-failed{color:var(--red)!important}
+
+/* ---------- Reading: lesson prose keeps a readable measure (~68 characters) ---------- */
+.ll-beat p,.ll-beat li,.ll-beat blockquote,.ll-foot,.learning-lesson p,.learning-lesson li{max-width:68ch}
+.ll-beat p,.learning-lesson p{line-height:1.6}
+
+/* ---------- Canvas chrome: glass bars, flat tools, hairlines (geometry unchanged) ---------- */
+.c3-shell .c3-header{background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line)}
+.c3-shell .c3-toolbar,.c3-shell .c3-bottom-tools,.c3-shell .d-toolbar,.c3-shell .c3-quick-add,.c3-shell .c3-minimap{background:var(--a-material);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border:0;box-shadow:var(--a-shadow-2);border-radius:var(--a-r-xl)}
+@supports not (backdrop-filter:blur(1px)){.c3-shell .c3-toolbar,.c3-shell .c3-bottom-tools,.c3-shell .d-toolbar,.c3-shell .c3-quick-add{background:var(--card)}}
+.c3-shell .c3-icon-btn,.c3-shell .c3-btn{background:var(--a-fill);border-color:transparent;border-radius:8px;font-weight:500;box-shadow:none}
+.c3-shell .c3-icon-btn:hover,.c3-shell .c3-btn:hover{background:var(--a-fill2);border-color:transparent;box-shadow:none}
+.c3-shell .c3-tool{border-radius:10px}
+.c3-shell .c3-tool:hover{transform:none;background:var(--hover)}
+.c3-shell .c3-tool.active{background:color-mix(in srgb,var(--tint,var(--blue)) 18%,transparent);color:var(--tint,var(--blue))}
+.c3-shell .c3-bottom-tools .c3-btn{background:transparent}
+.c3-shell .c3-bottom-tools .c3-btn:hover{background:var(--hover)}
+.c3-shell .c3-quick-title{letter-spacing:.02em;text-transform:none;font-weight:600}
+.c3-shell .c3-object.selected{outline:2px solid var(--tint,var(--blue));outline-offset:2px}
