@@ -597,3 +597,9 @@ body[data-theme='light'] .c3-kind-frame .d-legacy-title{color:var(--muted)}
 /* An object being edited is always readable, even far out */
 .c3-canvas.c3-far .c3-object:has(.d-is-editing) .c3-object-face>*{visibility:visible}
 .c3-canvas.c3-far .c3-object:has(.d-is-editing){background:revert-layer!important}
+
+/* Live task chip (status and due date come from the task itself) */
+.d-chip-live{font-weight:600}
+.d-chip-live.is-done{color:var(--green)}
+.d-chip-live.is-late{color:var(--red)}
+.d-chip-live.d-chip-gone{color:var(--muted);text-decoration:line-through}

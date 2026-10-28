@@ -214,6 +214,14 @@ function safeRich(html){
  return Array.from(root.content.childNodes).map(clean).join('');
 }
 function textFromHtml(html){return String(html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(?:p|div|li|h[1-3])>/gi,'\n').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
+/* A card linked to a task shows that task live: status and due date come from the task itself, so a change in Work shows here after the next refresh */
+const TASK_STATUS={todo:'To Do',planning:'Planning',in_progress:'In Progress',review:'Review',done:'Done'};
+function liveTaskChip(id){
+ const t=state().tasks.find(x=>x.id===id);
+ if(!t)return '<button class="d-chip d-chip-live d-chip-gone" data-c3="open-task" data-id="'+h(id)+'" title="This task was deleted">☑ Task removed</button>';
+ const today=new Date().toLocaleDateString('en-CA'),late=t.due_date&&t.status!=='done'&&t.due_date<today;
+ const due=t.due_date?' · '+new Date(t.due_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+ return '<button class="d-chip d-chip-live'+(t.status==='done'?' is-done':late?' is-late':'')+'" data-c3="open-task" data-id="'+h(id)+'" data-status="'+h(t.status)+'" title="Live from Work: '+h(t.title)+'">☑ '+h(TASK_STATUS[t.status]||t.status)+h(due)+(late?' · overdue':'')+'</button>'}
 function dBody(i,c,s){
  const editing=ui.dEditing?.id===i.id&&!ui.dFocus;
  const html=documentMarkup(c);
@@ -224,7 +232,7 @@ function dBody(i,c,s){
  (asset?'<img class="d-asset-thumb" src="'+h(asset)+'" alt="Attached private image"/>':'')+
  ((source||c?.task_id||c?.target_board_id||c?.asset_path)?'<div class="d-object-chips">'+
  (source?'<a class="d-chip" href="'+h(source)+'" target="_blank" rel="noopener noreferrer" title="'+h(source)+'">↗ Source</a>':'')+
- (c.task_id?'<button class="d-chip" data-c3="open-task" data-id="'+h(c.task_id)+'">☑ Task</button>':'')+
+ (c.task_id?liveTaskChip(c.task_id):'')+
  (c.target_board_id?'<button class="d-chip" data-c3="open-board" data-id="'+h(c.target_board_id)+'">▣ Board</button>':'')+
  (c.asset_path?'<span class="d-chip">▧ File</span>':'')+'</div>':'');
 }

@@ -44,6 +44,15 @@ Everything below is in production source and covered by tests. Nothing here need
 - Delete offers Undo in the toast; / opens the insert menu; ? toggles the help line.
 - Frame titles use the label colour in light mode (the default dark-mode ink was below 3:1).
 
+## 4b. Canvas round 2 (2026-10-28)
+
+- Glass chrome for the canvas header, toolbar, bottom tools and insert menu.
+- Type to create: while editing, Tab adds a connected sticky to the right and Alt+Enter a sibling below, both ready to type in. Dragging a connector into empty space already existed in SELF; the new object now opens for typing.
+- Outline panel (O or the list button): frames in Present order, contents, "Still empty" marker, click to fly.
+- Presenter notes per frame in the walkthrough bar, stored under `self.studio.notes.<board>.<frame>` (mirrored to the account by `user-sync.js`; no schema change). Timer and pace already existed.
+- Cards linked to a task show it live: status, due date, overdue, done, or "Task removed".
+- Tests: `browser_canvas_additions` (extended), `browser_canvas_live_task` (new).
+
 ## 5. Status of every idea from the reviews
 
 ### Rooms review (v4 → v5)
@@ -78,7 +87,7 @@ New, all wired into CI:
 - `tests/browser_work_undo.cjs`: Undo on task properties, offline and back-online states.
 - `tests/browser_canvas_additions.cjs`: find, frame jumps, keyboard connect, paste list, delete Undo, far zoom, / insert.
 
-Full local run on this branch: 69 of 69 test files pass. Cloudflare build passes and ships `apple.css`.
+Full local run on this branch: 70 of 70 test files pass. Cloudflare build passes and ships `apple.css`.
 
 ## 7. Still open (honest)
 
