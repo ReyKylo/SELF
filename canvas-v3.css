@@ -594,3 +594,6 @@ body:has(.c3-shell) .shell.self-sidebar-collapsed .main{
 .c3-canvas.c3-far .c3-kind-frame .d-legacy-title,.c3-canvas.c3-far .c3-kind-frame .c3-frame-title{font-size:calc(18px * var(--c3-inv,1));line-height:1.1;color:var(--text)}
 /* The default frame ink is a pale blue made for dark mode; on light it falls below 3:1, so frame titles use the label colour there */
 body[data-theme='light'] .c3-kind-frame .d-legacy-title{color:var(--muted)}
+/* An object being edited is always readable, even far out */
+.c3-canvas.c3-far .c3-object:has(.d-is-editing) .c3-object-face>*{visibility:visible}
+.c3-canvas.c3-far .c3-object:has(.d-is-editing){background:revert-layer!important}

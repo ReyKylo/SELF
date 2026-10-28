@@ -92,6 +92,23 @@ const SUPA='https://btiwxqjiptbwaunjibjh.supabase.co/**';
  await page.locator('#c3-canvas').focus();await page.keyboard.press('/');
  await page.locator('#c3-quick-add').waitFor();await page.keyboard.press('Escape');
 
+ /* 8. Type to create: edit a card, Tab makes a connected sticky that is ready to type in; Alt+Enter makes a sibling */
+ await page.keyboard.press(mod+'+0');await settle(400);
+ const src=db.board_items.find(i=>i.visual_kind!=='frame');
+ await page.locator('[data-c3-item="'+src.id+'"]').click();await page.keyboard.press('Enter');
+ await page.locator('[data-d-editor]').first().waitFor({state:'attached'});
+ const items0=db.board_items.length,edges1=db.board_edges.length;
+ await page.keyboard.press('Tab');
+ await page.waitForFunction(n=>document.querySelectorAll('[data-c3-item]').length>n,items0);await settle(900);
+ assert.equal(db.board_items.length,items0+1,'Tab created one object');
+ assert.equal(db.board_edges.length,edges1+1,'and connected it');
+ assert.equal(db.board_edges.at(-1).source_item_id,src.id);
+ await page.locator('[data-d-editor]').first().waitFor({state:'attached'});
+ await page.keyboard.type('Next idea');await page.keyboard.press('Alt+Enter');
+ await page.waitForFunction(n=>document.querySelectorAll('[data-c3-item]').length>n,items0+1);await settle(900);
+ assert.equal(db.board_items.length,items0+2,'Alt+Enter made a sibling');
+ assert.equal(db.board_edges.length,edges1+1,'a sibling is not connected');
+ assert.ok(db.knowledge_cards.some(c=>/Next idea/.test(c.title+c.body+JSON.stringify(c.content_blocks||''))),'typed text was saved');
  assert.deepEqual(errors,[]);
  await x.browser.close();console.log('browser_canvas_additions: ok');
 })().catch(e=>{console.error(e);process.exit(1)});

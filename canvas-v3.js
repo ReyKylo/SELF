@@ -818,7 +818,7 @@ async function gestureEnd(e){const g=ui.gesture;if(!g)return;ui.gesture=null;
    const inside=!!r&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
    if(g.moved&&inside){
     const world=worldPoint(e.clientX,e.clientY),next=await create('rectangle',{x:snap(world.x-120),y:snap(world.y-78)});
-    if(next)await addEdge(g.id,next.id,g.side,'auto');
+    if(next){await addEdge(g.id,next.id,g.side,'auto');dBeginEdit(next.id)} // type straight away
    }else say('Drop onto another shape, or drag into empty space to create one');
   }
   const layer=$('#c3-wires');if(layer)layer.innerHTML=renderWires();return
@@ -989,6 +989,8 @@ function keydown(e){if(state().view!=='board-editor'||window.SELFPresent?.active
  if(ui.dEditing&&(e.target?.matches?.('[data-d-editor],#d-focus-editor')||e.target?.closest?.('[contenteditable=true]'))){
    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();e.stopPropagation();dEndEdit();return}
    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();dEndEdit();return}
+   /* Type to create: Tab adds a connected child to the right, Alt+Enter a sibling below; the new one is ready to type in */
+   if((e.key==='Tab'&&!e.shiftKey)||(e.key==='Enter'&&e.altKey)){e.preventDefault();e.stopPropagation();typeNext(e.key==='Tab');return}
    return;
  }
  const typing=e.target.closest('input,textarea,select,[contenteditable=true]');
@@ -1030,6 +1032,15 @@ function paintFind(){document.querySelectorAll('.c3-match,.c3-match-on').forEach
  const n=document.getElementById('c3-find-n');if(n)n.textContent=!q?'':f.hits.length?(f.i+1)+' of '+f.hits.length:'No matches';
  f.hits.forEach((i,k)=>document.querySelector('[data-c3-item="'+i.id+'"]')?.classList.add('c3-match',...(k===f.i?['c3-match-on']:[])))}
 function closeFind(){const el=document.getElementById('c3-find');if(el)el.hidden=true;v6.find=null;paintFind()}
+async function typeNext(asChild){
+ const from=ui.dEditing&&itm(ui.dEditing.id);if(!from)return;
+ const gap=asChild?{x:from.x+from.w+80,y:from.y}:{x:from.x,y:from.y+from.h+24};
+ dCapture();await dPersist();ui.dEditing=null;
+ const next=await create('sticky',gap);
+ if(!next)return;
+ if(asChild)await addEdge(from.id,next.id,'e','w');
+ dBeginEdit(next.id);
+}
 /* Keyboard connect: C on one selected object, arrows choose the target, Enter connects (also the accessible path for connecting) */
 function nearestFrom(o,dir){const cx=o.x+o.w/2,cy=o.y+o.h/2;let best=null,bd=Infinity;
  for(const p of items()){if(p.id===o.id||p.id===v6.kc?.from)continue;const dx=p.x+p.w/2-cx,dy=p.y+p.h/2-cy;

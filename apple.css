@@ -142,3 +142,17 @@ body:not([data-theme='light']) .career-pill.active{background:#636366}
 /* ---------- Reading: lesson prose keeps a readable measure (~68 characters) ---------- */
 .ll-beat p,.ll-beat li,.ll-beat blockquote,.ll-foot,.learning-lesson p,.learning-lesson li{max-width:68ch}
 .ll-beat p,.learning-lesson p{line-height:1.6}
+
+/* ---------- Canvas chrome: glass bars, flat tools, hairlines (geometry unchanged) ---------- */
+.c3-shell .c3-header{background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line)}
+.c3-shell .c3-toolbar,.c3-shell .c3-bottom-tools,.c3-shell .d-toolbar,.c3-shell .c3-quick-add,.c3-shell .c3-minimap{background:var(--a-material);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border:0;box-shadow:var(--a-shadow-2);border-radius:var(--a-r-xl)}
+@supports not (backdrop-filter:blur(1px)){.c3-shell .c3-toolbar,.c3-shell .c3-bottom-tools,.c3-shell .d-toolbar,.c3-shell .c3-quick-add{background:var(--card)}}
+.c3-shell .c3-icon-btn,.c3-shell .c3-btn{background:var(--a-fill);border-color:transparent;border-radius:8px;font-weight:500;box-shadow:none}
+.c3-shell .c3-icon-btn:hover,.c3-shell .c3-btn:hover{background:var(--a-fill2);border-color:transparent;box-shadow:none}
+.c3-shell .c3-tool{border-radius:10px}
+.c3-shell .c3-tool:hover{transform:none;background:var(--hover)}
+.c3-shell .c3-tool.active{background:color-mix(in srgb,var(--tint,var(--blue)) 18%,transparent);color:var(--tint,var(--blue))}
+.c3-shell .c3-bottom-tools .c3-btn{background:transparent}
+.c3-shell .c3-bottom-tools .c3-btn:hover{background:var(--hover)}
+.c3-shell .c3-quick-title{letter-spacing:.02em;text-transform:none;font-weight:600}
+.c3-shell .c3-object.selected{outline:2px solid var(--tint,var(--blue));outline-offset:2px}
