@@ -460,8 +460,8 @@ function canvas(){
  objects.map(objectMarkup).join('')+'</div>'+
  (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="recipes">✦ Start from a recipe</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
  '<div class="c3-smart-strip"'+(ui.selected.size<2?' hidden':'')+'>'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
- '<div class="c3-bottom-tools">'+button('zoom-out','−','aria-label="Zoom out"')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋','aria-label="Zoom in"')+'<span class="c3-divider"></span>'+button('fit','⛶','aria-label="Fit all objects" title="Fit all objects"')+button('view-back','↶','id="c3-view-back" title="Previous view" aria-label="Previous view"')+button('help-toggle','?','aria-label="Show canvas shortcuts"')+'</div>'+
- '<div id="c3-floating-ui">'+floatingUI()+'</div>'+dFocusMarkup()+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F fit selection · / insert · C connect with arrows · Ctrl/⌘+F find · Ctrl/⌘+1–9 frames · Ctrl/⌘+0 fit all · ? this help</div>'+
+ '<div class="c3-bottom-tools">'+button('zoom-out','−','aria-label="Zoom out"')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋','aria-label="Zoom in"')+'<span class="c3-divider"></span>'+button('fit','⛶','aria-label="Fit all objects" title="Fit all objects"')+button('view-back','↶','id="c3-view-back" title="Previous view" aria-label="Previous view"')+button('outline','☰','aria-label="Board outline (O)" title="Board outline (O)"')+button('help-toggle','?','aria-label="Show canvas shortcuts"')+'</div>'+
+ '<div id="c3-floating-ui">'+floatingUI()+'</div>'+dFocusMarkup()+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F fit selection · / insert · O outline · Tab/Alt+Enter while writing · C connect with arrows · Ctrl/⌘+F find · Ctrl/⌘+1–9 frames · Ctrl/⌘+0 fit all · ? this help</div>'+
  '<div id="c3-marquee" hidden></div><input id="c3-upload" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"/></section>'+
  inspector()+'</div>'+modal()+'</div>';
 }
@@ -867,6 +867,7 @@ async function action(e){const el=e.target.closest('[data-c3]');if(!el)return;co
  if(a==='shapes-toggle'){ui.shapesOpen=!ui.shapesOpen;ui.toolsExpanded=false;api.render();return}
  if(a==='shape-create'){await createShape(el.dataset.shape);return}
  if(a==='help-toggle'){ui.helpOpen=!ui.helpOpen;api.render();return}
+ if(a==='outline'){toggleOutline();return}
  if(a==='quick-notes'){ui.dKnowledge=true;api.render();return}
  if(a==='d-retry'){
   const failed=ui.dFailedSave;if(!failed)return;
@@ -1032,6 +1033,14 @@ function paintFind(){document.querySelectorAll('.c3-match,.c3-match-on').forEach
  const n=document.getElementById('c3-find-n');if(n)n.textContent=!q?'':f.hits.length?(f.i+1)+' of '+f.hits.length:'No matches';
  f.hits.forEach((i,k)=>document.querySelector('[data-c3-item="'+i.id+'"]')?.classList.add('c3-match',...(k===f.i?['c3-match-on']:[])))}
 function closeFind(){const el=document.getElementById('c3-find');if(el)el.hidden=true;v6.find=null;paintFind()}
+/* Outline (O or the list button): frames in Present order with what each holds; click flies to the frame */
+function outlineData(){const frames=frameOrder();return frames.map((f,n)=>{const inside=items().filter(o=>o.id!==f.id&&kind(o)!=='frame'&&o.x+o.w/2>=f.x&&o.x+o.w/2<=f.x+f.w&&o.y+o.h/2>=f.y&&o.y+o.h/2<=f.y+f.h);
+ return {id:f.id,n:n+1,title:card(f.card_id)?.title||'Frame '+(n+1),names:inside.map(o=>card(o.card_id)?.title||'Untitled').slice(0,6),count:inside.length}})}
+function paintOutline(){let el=document.getElementById('c3-outline');if(!el)return;if(el.hidden)return;const d=outlineData();
+ el.innerHTML='<h3>Outline</h3>'+(d.length?d.map(f=>'<button type="button" class="o-frame" data-outline="'+h(f.id)+'"><span class="o-t"><span class="o-n">'+f.n+'</span>'+h(f.title)+'</span><ul>'+(f.count?f.names.map(n=>'<li>'+h(n)+'</li>').join(''):'<li class="o-empty">Still empty</li>')+'</ul></button>').join('')+'<p>The order here is the Present order. Ctrl/⌘+1–9 jumps to a frame.</p>':'<p>No frames yet. Add a frame (F in the toolbar) to outline your board.</p>')}
+function toggleOutline(force){let el=document.getElementById('c3-outline');if(!el){el=document.createElement('aside');el.id='c3-outline';el.className='c3-outline';el.setAttribute('aria-label','Board outline');el.hidden=true;document.body.appendChild(el);
+ el.addEventListener('click',e=>{const b=e.target.closest('[data-outline]');if(!b)return;const f=itm(b.dataset.outline);if(f){ui.selected=new Set([f.id]);fitEntities([f]);api.render();paintOutline()}})}
+ el.hidden=force===undefined?!el.hidden:!force;if(!el.hidden)paintOutline();return !el.hidden}
 async function typeNext(asChild){
  const from=ui.dEditing&&itm(ui.dEditing.id);if(!from)return;
  const gap=asChild?{x:from.x+from.w+80,y:from.y}:{x:from.x,y:from.y+from.h+24};
@@ -1076,6 +1085,7 @@ function v6Key(e){
  if(mod)return false;
  if(e.key==='/'){e.preventDefault();const r=$('#c3-canvas')?.getBoundingClientRect();if(r)openQuickAdd(r.left+r.width/2-140,r.top+r.height/2-120);return true}
  if(e.key==='?'){ui.helpOpen=!ui.helpOpen;api.render();return true}
+ if(e.key.toLowerCase()==='o'){e.preventDefault();toggleOutline();return true}
  if(e.key.toLowerCase()==='c'&&ui.selected.size===1){e.preventDefault();startKC();return true}
  return false;
 }
