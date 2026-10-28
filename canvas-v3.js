@@ -454,14 +454,14 @@ function canvas(){
  return '<div class="self-board-editor c3-shell" data-board-id="'+h(b.id)+'"><div class="c3-header"><div class="c3-breadcrumb"><button class="c3-icon-btn" data-c3="back" title="All boards">←</button><div><small>'+h(spaceName(b.space_id))+' / Board</small><strong>'+h(b.title)+'</strong></div></div>'+
  '<div class="c3-toolbar'+(ui.toolsCollapsed?' c3-toolbar-closed':'')+'" data-expanded="'+ui.toolsExpanded+'" data-collapsed="'+ui.toolsCollapsed+'" data-shapes="'+ui.shapesOpen+'" role="toolbar" aria-label="Create and edit on the board">'+dockInner()+'</div>'+ 
  '<div class="c3-header-right"><span id="c3-save" class="c3-live-save">'+(ui.dFailedSave?'⚠ Not saved':ui.dirty?'● Saving':'✓ Saved')+'</span>'+(ui.dFailedSave?button('d-retry','Retry','title="Retry unsaved writing"'):'')+button('undo','↶','title="Undo (Ctrl+Z)" aria-label="Undo"')+button('redo','↷','title="Redo (Ctrl+Shift+Z)" aria-label="Redo"')+button('present','▶ Present','title="Present frame by frame" aria-label="Present the frames as a walkthrough"')+button('inspector-toggle','⚙ Properties','id="c3-inspector-toggle" aria-label="'+(ui.inspectorOpen?'Close properties':'Open properties')+'" aria-expanded="'+ui.inspectorOpen+'"')+'</div></div>'+
- '<div class="c3-content '+(ui.inspectorOpen?'c3-panel-open':'c3-panel-closed')+'"><section class="c3-canvas" id="c3-canvas" tabindex="0" aria-label="Creative infinite whiteboard">'+
+ '<div class="c3-content '+(ui.inspectorOpen?'c3-panel-open':'c3-panel-closed')+'"><section class="c3-canvas'+(ui.zoom<FAR_ZOOM?' c3-far':'')+'" id="c3-canvas" style="--c3-inv:'+Math.min(3.2,1/Math.max(ui.zoom,.25))+'" tabindex="0" aria-label="Creative infinite whiteboard">'+
  '<div class="c3-world" id="c3-world" style="transform:translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')">'+
  '<svg class="c3-wires" id="c3-wires" aria-label="Connected objects">'+renderWires()+'</svg>'+
  objects.map(objectMarkup).join('')+'</div>'+
  (!objects.length?'<div class="c3-empty"><span>✳</span><h2>Create first. Think later.</h2><p>Click a shape above to place it instantly. Double click to start writing.</p><button class="c3-primary" data-c3="add" data-kind="rectangle">＋ Make something</button><button class="c3-btn c3-explore" data-c3="recipes">✦ Start from a recipe</button><button class="c3-btn c3-explore" data-c3="starter">✦ Explore Concept C starter</button></div>':'')+
  '<div class="c3-smart-strip"'+(ui.selected.size<2?' hidden':'')+'>'+button('align','≡ Smart align','data-align="middle"')+button('auto-tidy','✦ Auto tidy')+button('layout-flow','⊞ Suggested layout')+'</div>'+
  '<div class="c3-bottom-tools">'+button('zoom-out','−','aria-label="Zoom out"')+'<strong id="c3-zoom-label">'+Math.round(ui.zoom*100)+'%</strong>'+button('zoom-in','＋','aria-label="Zoom in"')+'<span class="c3-divider"></span>'+button('fit','⛶','aria-label="Fit all objects" title="Fit all objects"')+button('view-back','↶','id="c3-view-back" title="Previous view" aria-label="Previous view"')+button('help-toggle','?','aria-label="Show canvas shortcuts"')+'</div>'+
- '<div id="c3-floating-ui">'+floatingUI()+'</div>'+dFocusMarkup()+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F to fit</div>'+
+ '<div id="c3-floating-ui">'+floatingUI()+'</div>'+dFocusMarkup()+minimapMarkup()+'<div class="c3-canvas-help"'+(ui.helpOpen?'':' hidden')+'>Drag to pan · Double-click empty space to add · Shift+drag to select · F fit selection · / insert · C connect with arrows · Ctrl/⌘+F find · Ctrl/⌘+1–9 frames · Ctrl/⌘+0 fit all · ? this help</div>'+
  '<div id="c3-marquee" hidden></div><input id="c3-upload" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"/></section>'+
  inspector()+'</div>'+modal()+'</div>';
 }
@@ -648,7 +648,7 @@ async function createFromRecipe(title,recipeId,{spaceId=null,fill={}}={}){
 async function newBoard(title,space,recipeId=''){let b;await transact(async()=>{b=await api.insert('boards',{title:title.trim(),space_id:space||null})},'Board created');if(b){open(b.id);const r=recipeId&&window.SELFRecipes?.get?.(recipeId);if(r&&!(r.needs||[]).length)await applyRecipe(r,{})}}
 function snap(x){return ui.grid?Math.round(x/12)*12:x}
 function saveCam(){clearTimeout(ui.saveTimer);let id=ui.boardId,v={pan_x:ui.pan.x,pan_y:ui.pan.y,zoom:ui.zoom};ui.saveTimer=setTimeout(async()=>{if(id)try{await api.patch('boards',id,v)}catch(e){say('Canvas position not saved: '+e.message,true)}},550)}
-function updateCam(){let w=$('#c3-world');if(w)w.style.transform='translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')';let z=$('#c3-zoom-label');if(z)z.textContent=Math.round(ui.zoom*100)+'%';refreshNavigationUI()}
+function updateCam(){let w=$('#c3-world');if(w)w.style.transform='translate('+ui.pan.x+'px,'+ui.pan.y+'px) scale('+ui.zoom+')';semanticZoom();let z=$('#c3-zoom-label');if(z)z.textContent=Math.round(ui.zoom*100)+'%';refreshNavigationUI()}
 function zoomAt(factor,x,y){const vp=$('#c3-canvas');if(!vp)return;rememberCamera();const r=vp.getBoundingClientRect(),px=x-r.left,py=y-r.top,wx=(px-ui.pan.x)/ui.zoom,wy=(py-ui.pan.y)/ui.zoom;ui.zoom=clamp(ui.zoom*factor,.25,2.5);ui.pan={x:px-wx*ui.zoom,y:py-wy*ui.zoom};updateCam();saveCam()}
 function fitBoard(){
  rememberCamera(true);
@@ -994,17 +994,81 @@ function keydown(e){if(state().view!=='board-editor'||window.SELFPresent?.active
  const typing=e.target.closest('input,textarea,select,[contenteditable=true]');
  if(e.key===' '&&!typing){ui.spaceDown=true;e.preventDefault()}
  if(typing)return;
+ if(v6Key(e))return;
  if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey&&dSelected()){e.preventDefault();dBeginEdit(dSelected().id);return}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'){e.preventDefault();cloneSelection();return}
  if(e.key.toLowerCase()==='f'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();fitSelection();return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();step(e.shiftKey?'redo':'undo');return}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();step('redo');return}
  if(e.key==='Escape'){if(ui.dPopover){ui.dPopover=null;api.render();return}ui.dKnowledge=false;ui.modal=null;ui.quickAdd=null;ui.connectFrom=null;ui.tool='select';gestureCancel();selection([]);return}
- if(e.key==='Delete'||e.key==='Backspace'){if(ui.selected.size){e.preventDefault();let records=entries().map(i=>({...i})),ids=records.map(i=>i.id);ui.selected.clear();transact(async()=>{for(const id of ids)await api.del('board_items',id)},'Objects removed');history(async()=>{for(const i of records)await api.insert('board_items',i)},async()=>{for(const i of records)await api.del('board_items',i.id)})}return}
+ if(e.key==='Delete'||e.key==='Backspace'){if(ui.selected.size){e.preventDefault();let records=entries().map(i=>({...i})),ids=records.map(i=>i.id);ui.selected.clear();transact(async()=>{for(const id of ids)await api.del('board_items',id)},window.SELFToday?.undoToast?null:'Objects removed').then(()=>window.SELFToday?.undoToast?.(ids.length+(ids.length===1?' object':' objects')+' removed',()=>step('undo')));history(async()=>{for(const i of records)await api.insert('board_items',i)},async()=>{for(const i of records)await api.del('board_items',i.id)})}return}
  if(e.key.toLowerCase()==='r'){e.preventDefault();create('rectangle')}
  if(e.key.toLowerCase()==='n'){e.preventDefault();create('sticky')}
  if(e.key.toLowerCase()==='v'){e.preventDefault();ui.tool='select';api.render()}
 }
+/* ---------- Canvas additions (docs/design/APPLE_REBUILD.md §Canvas): find, jump to frames, keyboard connect,
+   paste a list, semantic zoom, delete with Undo. Each appears only on intent; no new permanent control, no schema change. ---------- */
+const v6={find:null,kc:null};
+const FAR_ZOOM=.3; // below a typical fit-all (about 35%), so a fitted board still reads
+const itemText=i=>{const c=card(i.card_id);return [c?.title,c?.summary,c?.body,c?.key_points].filter(Boolean).join(' ')};
+function frameOrder(){const core=window.SELFPresentCore;const all=items();return core?.slideOrder?core.slideOrder(all,edges()):all.filter(i=>kind(i)==='frame').sort((a,b)=>a.y-b.y||a.x-b.x)}
+function jumpFrame(n){const f=frameOrder()[n];if(!f){say(n?'There is no frame '+(n+1)+' on this board':'This board has no frames yet');return}ui.selected=new Set([f.id]);fitEntities([f]);api.render();say('Frame '+(n+1)+(card(f.card_id)?.title?': '+card(f.card_id).title:''))}
+function centerOn(i){const vp=$('#c3-canvas');if(!vp)return;rememberCamera(true);const w=vp.clientWidth,h=vp.clientHeight;ui.zoom=clamp(Math.max(ui.zoom,.8),.25,2.5);ui.pan={x:Math.round(w/2-(i.x+i.w/2)*ui.zoom),y:Math.round(h/2-(i.y+i.h/2)*ui.zoom)};updateCam();saveCam()}
+/* Find (Ctrl/Cmd+F): highlights every match, Enter moves through them */
+function findBox(){let el=document.getElementById('c3-find');if(el)return el;
+ el=document.createElement('div');el.id='c3-find';el.className='c3-find';el.setAttribute('role','search');
+ el.innerHTML='<input id="c3-find-q" placeholder="Find on board" aria-label="Find on board" autocomplete="off"/><span class="c3-find-n" id="c3-find-n" aria-live="polite"></span><button type="button" class="c3-find-x" aria-label="Close find">×</button>';
+ document.body.appendChild(el);
+ el.querySelector('input').addEventListener('input',runFind);
+ el.querySelector('input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();stepFind(e.shiftKey?-1:1)}if(e.key==='Escape'){e.preventDefault();closeFind()}});
+ el.querySelector('button').addEventListener('click',closeFind);return el}
+function openFind(){const el=findBox();el.hidden=false;v6.find=v6.find||{hits:[],i:0};const q=el.querySelector('input');q.focus();q.select();runFind()}
+function runFind(){const q=(document.getElementById('c3-find-q')?.value||'').trim().toLowerCase();
+ v6.find={hits:q?items().filter(i=>itemText(i).toLowerCase().includes(q)):[],i:0};paintFind();if(v6.find.hits.length)centerOn(v6.find.hits[0])}
+function stepFind(d){const f=v6.find;if(!f?.hits.length)return;f.i=(f.i+d+f.hits.length)%f.hits.length;paintFind();centerOn(f.hits[f.i])}
+function paintFind(){document.querySelectorAll('.c3-match,.c3-match-on').forEach(n=>n.classList.remove('c3-match','c3-match-on'));const f=v6.find||{hits:[],i:0},q=v6.find?(document.getElementById('c3-find-q')?.value||'').trim():'';
+ const n=document.getElementById('c3-find-n');if(n)n.textContent=!q?'':f.hits.length?(f.i+1)+' of '+f.hits.length:'No matches';
+ f.hits.forEach((i,k)=>document.querySelector('[data-c3-item="'+i.id+'"]')?.classList.add('c3-match',...(k===f.i?['c3-match-on']:[])))}
+function closeFind(){const el=document.getElementById('c3-find');if(el)el.hidden=true;v6.find=null;paintFind()}
+/* Keyboard connect: C on one selected object, arrows choose the target, Enter connects (also the accessible path for connecting) */
+function nearestFrom(o,dir){const cx=o.x+o.w/2,cy=o.y+o.h/2;let best=null,bd=Infinity;
+ for(const p of items()){if(p.id===o.id||p.id===v6.kc?.from)continue;const dx=p.x+p.w/2-cx,dy=p.y+p.h/2-cy;
+  const ok={e:dx>10&&Math.abs(dy)<=Math.abs(dx)*1.6,w:dx<-10&&Math.abs(dy)<=Math.abs(dx)*1.6,s:dy>10&&Math.abs(dx)<=Math.abs(dy)*1.6,n:dy<-10&&Math.abs(dx)<=Math.abs(dy)*1.6}[dir];
+  const d=Math.hypot(dx,dy);if(ok&&d<bd){bd=d;best=p}}return best}
+function startKC(){const o=entries()[0];if(!o)return;v6.kc={from:o.id,to:null};const t=['e','s','w','n'].map(d=>nearestFrom(o,d)).find(Boolean);v6.kc.to=t?.id||null;paintKC()}
+function paintKC(){document.querySelectorAll('.c3-kc-target').forEach(n=>n.classList.remove('c3-kc-target'));let b=document.getElementById('c3-kc');
+ if(!v6.kc){if(b)b.remove();return}
+ if(!b){b=document.createElement('div');b.id='c3-kc';b.className='c3-kc';b.setAttribute('role','status');document.body.appendChild(b)}
+ const name=id=>card(itm(id)?.card_id)?.title||'Untitled';
+ if(v6.kc.to)document.querySelector('[data-c3-item="'+v6.kc.to+'"]')?.classList.add('c3-kc-target');
+ b.textContent='Connect “'+name(v6.kc.from)+'” → '+(v6.kc.to?'“'+name(v6.kc.to)+'”':'…')+'  ·  arrows choose  ·  Enter connects  ·  Esc cancels'}
+async function kcKey(e){const k=v6.kc;e.preventDefault();e.stopPropagation();
+ const dir={ArrowRight:'e',ArrowLeft:'w',ArrowDown:'s',ArrowUp:'n'}[e.key];
+ if(dir){const from=itm(k.to||k.from);const t=from&&nearestFrom(from,dir);if(t){k.to=t.id;paintKC()}return}
+ if(e.key==='Enter'&&k.to){const {from,to}=k;v6.kc=null;paintKC();await addEdge(from,to);return}
+ if(e.key==='Escape'){v6.kc=null;paintKC()}}
+/* Paste a list: each line becomes a sticky in a column; plain text becomes one sticky */
+async function pasteText(raw,at){
+ const lines=String(raw).split(/\r?\n/).map(l=>l.replace(/^\s*(?:[-*•]|\d+[.)])\s*/,'').trim()).filter(Boolean).slice(0,24);if(!lines.length)return false;
+ const [w,hg]=dims.sticky||[220,150],start=at||centerPosition(w,hg*Math.min(lines.length,6));
+ for(let k=0;k<lines.length;k++)await create('sticky',{x:start.x,y:start.y+k*(hg+18)},{title:lines[k].slice(0,240)});
+ if(lines.length>1)say(lines.length+' stickies from your list');return true}
+/* Semantic zoom: far out, cards become quiet blocks and frame titles stay readable */
+function semanticZoom(){const c=$('#c3-canvas');if(!c)return;c.classList?.toggle?.('c3-far',ui.zoom<FAR_ZOOM);c.style?.setProperty?.('--c3-inv',String(Math.min(3.2,1/Math.max(ui.zoom,.25))))}
+/* Keys owned by these additions. Returns true when handled. */
+function v6Key(e){
+ const mod=e.ctrlKey||e.metaKey;
+ if(v6.kc){kcKey(e);return true}
+ if(mod&&!e.altKey&&e.key.toLowerCase()==='f'){e.preventDefault();openFind();return true}
+ if(mod&&!e.altKey&&e.key==='0'){e.preventDefault();fitBoard();return true}
+ if(mod&&!e.altKey&&/^[1-9]$/.test(e.key)){e.preventDefault();jumpFrame(+e.key-1);return true}
+ if(mod)return false;
+ if(e.key==='/'){e.preventDefault();const r=$('#c3-canvas')?.getBoundingClientRect();if(r)openQuickAdd(r.left+r.width/2-140,r.top+r.height/2-120);return true}
+ if(e.key==='?'){ui.helpOpen=!ui.helpOpen;api.render();return true}
+ if(e.key.toLowerCase()==='c'&&ui.selected.size===1){e.preventDefault();startKC();return true}
+ return false;
+}
+
 function dbl(e){
  if(state().view!=='board-editor'||window.SELFPresent?.active?.())return;
  const node=e.target.closest?.('[data-c3-item]');
@@ -1029,7 +1093,8 @@ function pasteOn(e){if(state().view!=='board-editor'||window.SELFPresent?.active
  const file=[...(e.clipboardData?.files||[])].find(f=>f.type.startsWith('image/'));
  if(file){e.preventDefault();upload(file);return}
  const raw=e.clipboardData?.getData('text/plain')||'';
- if(url(raw.trim())){e.preventDefault();create('reference',null,{url:raw.trim(),title:new URL(raw.trim()).hostname})}
+ if(url(raw.trim())){e.preventDefault();create('reference',null,{url:raw.trim(),title:new URL(raw.trim()).hostname});return}
+ if(raw.trim()){e.preventDefault();pasteText(raw)}
 }
 
 function init(x){api=x;window.SELFRecipesChanged=()=>{if(ui.modal&&['recipes','board'].includes(ui.modal.type))api.render()};document.addEventListener('click',action,true);document.addEventListener('submit',submit,true);document.addEventListener('change',change,true);document.addEventListener('input',input,true);document.addEventListener('pointerdown',gestureStart);document.addEventListener('pointerdown',dPreserveSelection,true);window.addEventListener('pointermove',gestureMove);window.addEventListener('pointerup',gestureEnd);window.addEventListener('pointercancel',gestureCancel);window.addEventListener('blur',gestureCancel);document.addEventListener('wheel',wheel,{passive:false});document.addEventListener('dblclick',dbl,true);document.addEventListener('keydown',keydown,true);document.addEventListener('keyup',e=>{if(e.key===' ')ui.spaceDown=false});document.addEventListener('dragover',dropOver);document.addEventListener('drop',dropOn);document.addEventListener('paste',pasteOn);}
