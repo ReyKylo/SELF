@@ -134,3 +134,11 @@ body:not([data-theme='light']) .career-pill.active{background:#636366}
 .c3-tool.active{background:color-mix(in srgb,var(--tint,var(--blue)) 18%,transparent);color:var(--tint,var(--blue));box-shadow:none}
 .mini-thumb{background:var(--a-fill2);color:var(--muted)}
 .brand-square{background:var(--tint,var(--blue));box-shadow:none}
+
+/* ---------- Save indicator: offline is a state, not an error ---------- */
+.save-offline{color:var(--yellow)!important}
+.save-failed{color:var(--red)!important}
+
+/* ---------- Reading: lesson prose keeps a readable measure (~68 characters) ---------- */
+.ll-beat p,.ll-beat li,.ll-beat blockquote,.ll-foot,.learning-lesson p,.learning-lesson li{max-width:68ch}
+.ll-beat p,.learning-lesson p{line-height:1.6}

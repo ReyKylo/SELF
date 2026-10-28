@@ -58,7 +58,7 @@ async function mutate(operation,success='Saved',{rerender=true}={}){
   return true;
  }catch(err){
   state.saving=false;
-  state.saveError=wrote?'Saved remotely, but refresh failed. Reload to verify.':'Not saved. '+(err?.message||String(err));
+  state.saveError=wrote?'Saved remotely, but refresh failed. Reload to verify.':typeof navigator!=='undefined'&&navigator.onLine===false?'Not saved: you are offline. What you typed is kept; try again when you are back online.':'Not saved. '+(err?.message||String(err));
   paintSave();toast(state.saveError,true);console.error(err);
   return false;
  }
@@ -66,9 +66,15 @@ async function mutate(operation,success='Saved',{rerender=true}={}){
 function paintSave(){
  const e=$('#save-state');if(!e)return;
  e.setAttribute('role','status');e.setAttribute('aria-live','polite');
- e.classList.toggle('save-failed',!!state.saveError);
- e.innerHTML=state.saving?`${ic('clock',14)} Saving...`:state.saveError?`${ic('flag',14)} Not saved`:state.savePending?`${ic('clock',14)} Unsaved changes`:`${ic('check',14)} Saved`;
- if(state.saveError)e.title=state.saveError;else e.removeAttribute('title');
+ const off=typeof navigator!=='undefined'&&navigator.onLine===false;
+ e.classList.toggle('save-failed',!!state.saveError);e.classList.toggle('save-offline',off);
+ e.innerHTML=off&&!state.saving?`${ic('flag',14)} Offline`:state.saving?`${ic('clock',14)} Saving...`:state.saveError?`${ic('flag',14)} Not saved`:state.savePending?`${ic('clock',14)} Unsaved changes`:`${ic('check',14)} Saved`;
+ if(off)e.title='You are offline. Nothing is lost: what you typed stays on screen. Save again when you are back online.';else if(state.saveError)e.title=state.saveError;else e.removeAttribute('title');
+}
+/* Connection changes are said once, in words, and the save indicator keeps saying it while offline */
+if(typeof window!=='undefined'&&window.addEventListener){
+ window.addEventListener('offline',()=>{paintSave();toast('You are offline. Changes will not save until you are back.',true)});
+ window.addEventListener('online',()=>{paintSave();toast('Back online')});
 }
 function nav(icon,label,view){return `<button class="nav-btn ${(state.view===view||(view==='spaces'&&state.view==='space')||(view==='boards'&&state.view==='board-editor'))?'active':''}" data-action="nav" data-view="${view}" title="${label}" aria-label="${label}">${ic(icon)}<span>${label}</span></button>`}
 let lastRoom='today';
@@ -303,6 +309,12 @@ async function smartCapture(text){
  const undo=window.SELFToday?.undoToast;
  if(undo&&made?.id)undo(msg,()=>mutate(async()=>{await del(table,made.id)},'Capture removed'));else toast(msg);
 }
+function taskChangeLabel(field,value){
+ if(field==='status')return 'Status → '+(statusOf(value)?.[1]||value);
+ if(field==='priority')return 'Priority → '+String(value||'normal').replace(/^./,c=>c.toUpperCase());
+ if(field==='space_id')return 'Moved to '+(value?spaceOf(value)?.name||'Space':'Unsorted');
+ return value?'Due '+new Date(value+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):'Due date cleared';
+}
 async function quickCapture(){const input=$('#quick-text');const text=input?.value.trim();if(!text){input?.focus();return}const mode=state.captureMode;state.captureDraft=text;if(mode==='auto'){await smartCapture(text);return}if(mode==='board'){let made;if(await mutate(async()=>{made=await insert('boards',{title:text})},'Board created')){state.captureDraft='';state.captureMode='auto';if(made)window.SELFBoards.open(made.id)}return}if(mode==='link'&&!normalUrl(text)){toast('Paste a full http(s) URL for Link mode',true);return}if(await mutate(async()=>{if(mode==='task')await insert('tasks',{title:text});else if(mode==='link')await insert('inbox',{title:new URL(text).hostname,body:normalUrl(text),kind:'link'});else await insert('inbox',{title:text,kind:'note'})},mode==='task'?'Task created':mode==='link'?'Link saved':'Note captured')){state.captureDraft='';state.captureMode='auto';render()}}
 async function handleAction(e){if((e.target.closest?.('[data-career],[data-career2],[data-career3],[data-learning],[data-teaching-action],[data-outreach],[data-tracker],[data-lesson],[data-dossier]')||e.target.closest?.('[data-director-action]'))){await window.SELFCareer?.action?.(e);return}if(window.SELFWork?.intercept?.(e))return;if(e.target.closest?.('[data-work]')&&await window.SELFWork?.action?.(e))return;if(e.target.closest?.('[data-export]')&&await window.SELFExportUI?.action?.(e))return;if(e.target.closest?.('[data-today]')&&await window.SELFToday?.action?.(e))return;if(e.target.closest?.('[data-review]')&&await window.SELFReview?.action?.(e))return;if(e.target.closest?.('[data-nextup]')&&await window.SELFNextUp?.action?.(e))return;const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action,id=b.dataset.id;if(action==='close-panel'&&b.classList?.contains('overlay')&&e.target!==b)return;if((e.target.closest('a, select, input, button')&&action==='open-task'&&e.target!==b))return; if(['toggle-task','toggle-check'].includes(action))e.stopPropagation();
 if(action==='toggle-sidebar'){
@@ -360,14 +372,18 @@ if(el.dataset.taskField){
  if(field==='title'&&!value.trim()){toast('Task title cannot be blank',true);render();return}
  if(field==='space_id'||field==='due_date')value=value||null;
  const id=el.dataset.id;let linkIndexError=null;
+ /* Property changes (not text) come with Undo, so trying a value costs nothing */
+ const prop=['status','priority','space_id','due_date'].includes(field),before=prop?(taskOf(id)||{})[field]??null:undefined;
  const saved=await mutate(async()=>{
   await patch('tasks',id,{[field]:value});
   if(field==='notes'||field==='description'){
    try{await autoCaptureLinks(id,value)}
    catch(err){linkIndexError=err}
   }
- },'Saved');
+ },prop&&window.SELFToday?.undoToast?null:'Saved');
  if(saved&&linkIndexError)toast('Writing saved, but link indexing failed. Add the URL via Links when needed.',true);
+ if(saved&&prop&&window.SELFToday?.undoToast&&before!==value)window.SELFToday.undoToast(taskChangeLabel(field,value),()=>mutate(async()=>{await patch('tasks',id,{[field]:before})},'Change undone'));
+ else if(saved&&prop&&window.SELFToday?.undoToast)toast('Saved');
  return
 }
 if(el.dataset.checkField){if(!el.value.trim()){toast('Checklist text cannot be blank',true);render();return}await mutate(async()=>patchSimple('task_checklist',el.dataset.id,{text:el.value.trim()}),'Step saved');return}
